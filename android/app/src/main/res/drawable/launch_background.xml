@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modify this file to customize your launch splash screen -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/sadhanaColor"/>
+
+    <!-- You can insert your own image assets here -->
+    <item
+            android:width="200dp"
+            android:height="178dp"
+            android:gravity="center"
+    >
+        <bitmap
+                android:gravity="fill_horizontal|fill_vertical"
+                android:src="@drawable/web_hi_res_512"
+        />
+    </item>
+</layer-list>
