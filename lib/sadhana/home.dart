@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
+import 'package:sadhana/sadhana/time-table.dart';
 import '../attendance/attendance_home.dart';
 import '../setup/numberpicker.dart';
 import 'package:sadhana/common.dart';
@@ -64,7 +65,7 @@ class HomePageState extends State<HomePage> {
 
       case 'share_excel':
         {
-          //statements;
+          Navigator.pushNamed(context, TimeTablePage.routeName);
         }
         break;
 
