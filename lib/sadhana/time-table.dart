@@ -26,10 +26,10 @@ class TimeTablePageState extends State<TimeTablePage> {
       body: SafeArea(
         child: ListView(
           children: List.generate(lastDayOfMonth, (int index) {
-            return Card(
-              elevation: 0,
-              color: Colors.red[index == today.day - 1 ? 50 : 0],
+            return Padding(
+              padding: EdgeInsets.all(10),
               child: ListTile(
+                selected: index == today.day - 1 ? true : false,
                 title: Text(
                   'Title Something',
                   textScaleFactor: 1.2,
@@ -43,7 +43,10 @@ class TimeTablePageState extends State<TimeTablePage> {
                       textScaleFactor: 1.5,
                       style: TextStyle(color: ThemeData().copyWith().primaryColor),
                     ),
-                    Text('${Constant.weekName[DateTime(today.year, today.month, index + 1).weekday - 1]}', textScaleFactor: 0.6,)
+                    Text(
+                      '${Constant.weekName[DateTime(today.year, today.month, index + 1).weekday - 1]}',
+                      textScaleFactor: 0.6,
+                    )
                   ],
                 ),
               ),
