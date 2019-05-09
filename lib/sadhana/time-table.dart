@@ -26,9 +26,8 @@ class TimeTablePageState extends State<TimeTablePage> {
       body: SafeArea(
         child: ListView(
           children: List.generate(lastDayOfMonth, (int index) {
-            return Padding(
-              padding: EdgeInsets.all(10),
-              child: ListTile(
+            return ListTile(
+                contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 25),
                 selected: index == today.day - 1 ? true : false,
                 title: Text(
                   'Title Something',
@@ -49,7 +48,6 @@ class TimeTablePageState extends State<TimeTablePage> {
                     )
                   ],
                 ),
-              ),
             );
           }),
         ),
