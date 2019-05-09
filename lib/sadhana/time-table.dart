@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:sadhana/constant/constant.dart';
+
+DateTime today = DateTime.now();
+int lastDayOfMonth = DateTime(today.year, today.month + 1, 1).subtract(Duration(days: 1)).day;
 
 class TimeTablePage extends StatefulWidget {
   static const String routeName = '/time-table';
@@ -8,7 +12,6 @@ class TimeTablePage extends StatefulWidget {
 }
 
 class TimeTablePageState extends State<TimeTablePage> {
-
   @override
   void initState() {
     super.initState();
@@ -18,20 +21,29 @@ class TimeTablePageState extends State<TimeTablePage> {
   Widget build(BuildContext context) {
     Widget home = Scaffold(
       appBar: AppBar(
-        title: Text('Schedule Page'),
+        title: Text('${Constant.monthName[today.month - 1]}-${today.year} Schedule'),
       ),
       body: SafeArea(
         child: ListView(
-          children: List.generate(20, (int index) {
-            return ListTile(
-              title: Text('${DateTime.now()}', textScaleFactor: 1.2,),
-              subtitle: Text('Timeline event'),
-              leading: CircleAvatar(
-                child: Column(
+          children: List.generate(lastDayOfMonth, (int index) {
+            return Card(
+              elevation: 0,
+              color: Colors.red[index == today.day - 1 ? 50 : 0],
+              child: ListTile(
+                title: Text(
+                  'Title Something',
+                  textScaleFactor: 1.2,
+                ),
+                subtitle: Text('Timeline event'),
+                leading: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('${DateTime.now().day}', textScaleFactor: 0.8),
-                    Text('MON', textScaleFactor: 0.5)
+                    Text(
+                      '${index + 1}',
+                      textScaleFactor: 1.5,
+                      style: TextStyle(color: ThemeData().copyWith().primaryColor),
+                    ),
+                    Text('${Constant.weekName[DateTime(today.year, today.month, index + 1).weekday - 1]}', textScaleFactor: 0.6,)
                   ],
                 ),
               ),
