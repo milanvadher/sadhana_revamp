@@ -6,14 +6,6 @@ import 'dart:io';
 
 User _user = new User();
 
-// For user Table
-final String tableUser = _user.tableUser;
-final String columnId = _user.columnId;
-final String columnFirstName = _user.columnFirstName;
-final String columnLastName = _user.columnLastName;
-final String columnMhtId = _user.columnMhtId;
-final String columnCenter = _user.columnCenter;
-
 class DBProvider {
   DBProvider._();
 
@@ -35,12 +27,12 @@ class DBProvider {
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute('''
-create table $tableUser ( 
-  $columnId integer primary key autoincrement, 
-  $columnFirstName text not null,
-  $columnLastName text not null,
-  $columnMhtId integer not null,
-  $columnCenter text not null)
+create table ${_user.tableUser} ( 
+  ${_user.columnId} integer primary key autoincrement, 
+  ${_user.columnFirstName} text not null,
+  ${_user.columnLastName} text not null,
+  ${_user.columnMhtId} integer not null,
+  ${_user.columnCenter} text not null)
 ''');
     });
   }
@@ -48,21 +40,21 @@ create table $tableUser (
   Future<User> newUser(User user) async {
     final db = await database;
     var data = user.toMap();
-    user.id = await db.insert(tableUser, data);
+    user.id = await db.insert(_user.tableUser, data);
     return user;
   }
 
   Future<User> getUser(int mhtId) async {
     final db = await database;
-    List<Map> maps = await db.query(tableUser,
+    List<Map> maps = await db.query(_user.tableUser,
         columns: [
-          columnId,
-          columnMhtId,
-          columnFirstName,
-          columnLastName,
-          columnCenter
+          _user.columnId,
+          _user.columnMhtId,
+          _user.columnFirstName,
+          _user.columnLastName,
+          _user.columnCenter
         ],
-        where: '$columnMhtId = ?',
+        where: '${_user.columnMhtId} = ?',
         whereArgs: [mhtId]);
     if (maps.length > 0) {
       return User.fromMap(maps.first);
@@ -72,7 +64,7 @@ create table $tableUser (
 
   Future<int> updateUser(User user) async {
     final db = await database;
-    return await db.update(tableUser, user.toMap(),
-        where: '$columnMhtId = ?', whereArgs: [user.mhtId]);
+    return await db.update(_user.tableUser, user.toMap(),
+        where: '${_user.columnMhtId} = ?', whereArgs: [user.mhtId]);
   }
 }

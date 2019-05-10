@@ -47,4 +47,28 @@ class Constant {
     const Color(0xFFaaaaaa),
   ];
 
+  // List of colors when create any sadhana
+  static List<List<Color>> colors = [
+    [Colors.red[700], Colors.red[200]],
+    [Colors.deepOrange[700], Colors.deepOrange[200]],
+    [Colors.orange[700], Colors.orange[200]],
+    [Colors.amber[800], Colors.amber[100]],
+    [Colors.yellow[800], Colors.yellow[200]],
+    [Colors.lime[800], Colors.lime[200]],
+    [Colors.lightGreen[600], Colors.lightGreen[200]],
+    [Colors.green[700], Colors.green[200]],
+    [Colors.teal[600], Colors.teal[200]],
+    [Colors.cyan[600], Colors.cyan[200]],
+    [Colors.lightBlue[600], Colors.lightBlue[200]],
+    [Colors.blue[700], Colors.blue[200]],
+    [Colors.indigo[700], Colors.indigo[200]],
+    [Colors.deepPurple[600], Colors.deepPurple[200]],
+    [Colors.purple[600], Colors.purple[200]],
+    [Colors.pink[600], Colors.pink[200]],
+    [Colors.brown[700], Colors.brown[200]],
+    [Colors.grey[800], Colors.grey[100]],
+    [Colors.grey[600], Colors.grey[300]],
+    [Colors.grey[500], Colors.grey[500]],
+  ];
+
 }
