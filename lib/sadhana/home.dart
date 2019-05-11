@@ -87,236 +87,6 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Widget _horizontalList(int sadhanaIndex, Color color, SadhanaType type) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
-      ),
-      margin: EdgeInsets.fromLTRB(0, 4, 4, 4),
-      child: Container(
-        height: 50,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: List.generate(
-              durationInDays,
-              (int index) {
-                return type == SadhanaType.BOOLEAN
-                    ? InkWell(
-                        onTap: () {
-                          setState(() {
-                            _userSadhanaData[sadhanaIndex]['sadhanaData'][index]
-                                    [1] =
-                                !_userSadhanaData[sadhanaIndex]['sadhanaData']
-                                    [index][1];
-                          });
-                        },
-                        child: Container(
-                          width: 48,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: color.withAlpha(
-                                _userSadhanaData[sadhanaIndex]['sadhanaData']
-                                        [index][1]
-                                    ? 20
-                                    : 0),
-                            border: Border.all(
-                              color: color,
-                              width: 2,
-                              style: _userSadhanaData[sadhanaIndex]
-                                      ['sadhanaData'][index][1]
-                                  ? BorderStyle.solid
-                                  : BorderStyle.none,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Container(
-                              width: 48,
-                              child: _userSadhanaData[sadhanaIndex]
-                                      ['sadhanaData'][index][1]
-                                  ? Icon(
-                                      Icons.done,
-                                      size: 20.0,
-                                      color: color,
-                                    )
-                                  : Icon(
-                                      Icons.close,
-                                      size: 20.0,
-                                      color: Colors.grey,
-                                    ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(
-                        width: 34,
-                        margin: EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: color.withAlpha(_userSadhanaData[sadhanaIndex]
-                                      ['sadhanaData'][index][1] !=
-                                  0
-                              ? 20
-                              : 0),
-                          border: Border.all(
-                            color: color,
-                            width: 2,
-                            style: _userSadhanaData[sadhanaIndex]['sadhanaData']
-                                        [index][1] !=
-                                    0
-                                ? BorderStyle.solid
-                                : BorderStyle.none,
-                          ),
-                        ),
-                        child: Container(
-                          width: 48,
-                          child: Center(
-                            child: FlatButton(
-                              padding: EdgeInsets.all(0),
-                              onPressed: () {
-                                showDialog<List>(
-                                    context: context,
-                                    builder: (_) {
-                                      return new NumberPickerDialog.integer(
-                                        title: Text(
-                                          'Change No. of ' +
-                                              (sadhanaIndex == 1
-                                                  ? 'page'
-                                                  : 'hour'),
-                                        ),
-                                        color: color,
-                                        initialIntegerValue:
-                                            _userSadhanaData[sadhanaIndex]
-                                                ['sadhanaData'][index][1],
-                                        minValue: 0,
-                                        maxValue: sadhanaIndex == 1 ? 100 : 24,
-                                        remark: _userSadhanaData[sadhanaIndex]
-                                            ['sadhanaData'][index][2],
-                                      );
-                                    }).then(
-                                  (List onValue) {
-                                    if (onValue != null && onValue[0] != null) {
-                                      setState(
-                                        () {
-                                          _userSadhanaData[sadhanaIndex]
-                                                  ['sadhanaData'][index][1] =
-                                              onValue[0];
-                                          _userSadhanaData[sadhanaIndex]
-                                                  ['sadhanaData'][index][2] =
-                                              onValue[1];
-                                        },
-                                      );
-                                    }
-                                  },
-                                );
-                              },
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    _userSadhanaData[sadhanaIndex]
-                                            ['sadhanaData'][index][1]
-                                        .toString(),
-                                    style: TextStyle(
-                                        color: _userSadhanaData[sadhanaIndex]
-                                                    ['sadhanaData'][index][1] !=
-                                                0
-                                            ? color
-                                            : Colors.grey),
-                                  ),
-                                  CircleAvatar(
-                                    maxRadius: _userSadhanaData[sadhanaIndex]
-                                                ['sadhanaData'][index][2] !=
-                                            ""
-                                        ? 2
-                                        : 0,
-                                    backgroundColor: color,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-              },
-            ),
-          ),
-        ),
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            bottom: BorderSide(width: 1.0, color: color),
-            top: BorderSide(width: 1.0, color: color),
-            end: BorderSide(width: 1.0, color: color),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _createHeading(
-    int index,
-    String title,
-    Color color,
-    SadhanaType type,
-  ) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
-      ),
-      margin: EdgeInsets.fromLTRB(4, 4, 0, 4),
-      child: Container(
-        height: 50,
-        alignment: Alignment(-1, 0),
-        child: Padding(
-          padding: EdgeInsets.all(10),
-          child: MaterialButton(
-              minWidth: headerWidth,
-              padding: EdgeInsets.all(0),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        SadhanaEditPage(title: title, color: color, type: type),
-                    fullscreenDialog: true,
-                  ),
-                );
-              },
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(right: 5.0),
-                    child: Icon(Icons.data_usage, color: color),
-                  ),
-                  Container(
-                    width: headerWidth - 54,
-                    child: Tooltip(
-                      message: '$title',
-                      child: Text(
-                        '$title',
-                        overflow: TextOverflow.ellipsis,
-                        textScaleFactor: 1.2,
-                        style: TextStyle(color: color),
-                      ),
-                    ),
-                  )
-                ],
-              )),
-        ),
-        decoration: BoxDecoration(
-          border: BorderDirectional(
-            bottom: BorderSide(width: 1.0, color: color),
-            top: BorderSide(width: 1.0, color: color),
-            start: BorderSide(width: 1.0, color: color),
-          ),
-        ),
-      ),
-    );
-  }
-
   static Widget _headerListData(String weekDay, int date) {
     return Container(
       height: 60,
@@ -378,7 +148,7 @@ class HomePageState extends State<HomePage> {
   void createSadhana({
     @required SadhanaType type,
     @required String title,
-    @required Color color,
+    @required List<Color> color,
   }) {
     int index = titleHeader.length - 1;
     titleHeader.add(SadhanaHeading(
@@ -419,33 +189,300 @@ class HomePageState extends State<HomePage> {
     createSadhana(
       type: SadhanaType.BOOLEAN,
       title: 'Samayik',
-      color: Colors.red,
+      color: Constant.colors[0],
     );
     createSadhana(
       type: SadhanaType.NUMBER,
       title: 'Vanchan',
-      color: Colors.green,
+      color: Constant.colors[3],
     );
     createSadhana(
       type: SadhanaType.BOOLEAN,
       title: 'Vidhi',
-      color: Colors.orange,
+      color: Constant.colors[7],
     );
     createSadhana(
       type: SadhanaType.BOOLEAN,
       title: 'G. Satsang',
-      color: Colors.blue,
+      color: Constant.colors[8],
     );
     createSadhana(
       type: SadhanaType.NUMBER,
       title: 'Seva',
-      color: Colors.teal,
+      color: Constant.colors[12],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    Brightness theme = Theme.of(context).brightness;
+
     double mobileWidth = MediaQuery.of(context).size.width;
+
+    Widget _horizontalList(
+        int sadhanaIndex, List<Color> color, SadhanaType type) {
+      return Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0.0),
+        ),
+        margin: EdgeInsets.fromLTRB(0, 4, 4, 4),
+        child: Container(
+          height: 50,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: List.generate(
+                durationInDays,
+                (int index) {
+                  return type == SadhanaType.BOOLEAN
+                      ? InkWell(
+                          onTap: () {
+                            setState(() {
+                              _userSadhanaData[sadhanaIndex]['sadhanaData']
+                                      [index][1] =
+                                  !_userSadhanaData[sadhanaIndex]['sadhanaData']
+                                      [index][1];
+                            });
+                          },
+                          child: Container(
+                            width: 48,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color[theme == Brightness.light ? 0 : 1]
+                                  .withAlpha(_userSadhanaData[sadhanaIndex]
+                                          ['sadhanaData'][index][1]
+                                      ? 20
+                                      : 0),
+                              border: Border.all(
+                                color: theme == Brightness.light
+                                    ? color[0]
+                                    : color[1],
+                                width: 2,
+                                style: _userSadhanaData[sadhanaIndex]
+                                        ['sadhanaData'][index][1]
+                                    ? BorderStyle.solid
+                                    : BorderStyle.none,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Container(
+                                width: 48,
+                                child: _userSadhanaData[sadhanaIndex]
+                                        ['sadhanaData'][index][1]
+                                    ? Icon(
+                                        Icons.done,
+                                        size: 20.0,
+                                        color: theme == Brightness.light
+                                            ? color[0]
+                                            : color[1],
+                                      )
+                                    : Icon(
+                                        Icons.close,
+                                        size: 20.0,
+                                        color: Colors.grey,
+                                      ),
+                              ),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: 34,
+                          margin: EdgeInsets.all(7),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color[theme == Brightness.light ? 0 : 1]
+                                .withAlpha(_userSadhanaData[sadhanaIndex]
+                                            ['sadhanaData'][index][1] !=
+                                        0
+                                    ? 20
+                                    : 0),
+                            border: Border.all(
+                              color: theme == Brightness.light
+                                  ? color[0]
+                                  : color[1],
+                              width: 2,
+                              style: _userSadhanaData[sadhanaIndex]
+                                          ['sadhanaData'][index][1] !=
+                                      0
+                                  ? BorderStyle.solid
+                                  : BorderStyle.none,
+                            ),
+                          ),
+                          child: Container(
+                            width: 48,
+                            child: Center(
+                              child: FlatButton(
+                                padding: EdgeInsets.all(0),
+                                onPressed: () {
+                                  showDialog<List>(
+                                      context: context,
+                                      builder: (_) {
+                                        return new NumberPickerDialog.integer(
+                                          title: Text(
+                                            'Change No. of ' +
+                                                (sadhanaIndex == 1
+                                                    ? 'page'
+                                                    : 'hour'),
+                                          ),
+                                          color: theme == Brightness.light
+                                              ? color[0]
+                                              : color[1],
+                                          initialIntegerValue:
+                                              _userSadhanaData[sadhanaIndex]
+                                                  ['sadhanaData'][index][1],
+                                          minValue: 0,
+                                          maxValue:
+                                              sadhanaIndex == 1 ? 100 : 24,
+                                          remark: _userSadhanaData[sadhanaIndex]
+                                              ['sadhanaData'][index][2],
+                                        );
+                                      }).then(
+                                    (List onValue) {
+                                      if (onValue != null &&
+                                          onValue[0] != null) {
+                                        setState(
+                                          () {
+                                            _userSadhanaData[sadhanaIndex]
+                                                    ['sadhanaData'][index][1] =
+                                                onValue[0];
+                                            _userSadhanaData[sadhanaIndex]
+                                                    ['sadhanaData'][index][2] =
+                                                onValue[1];
+                                          },
+                                        );
+                                      }
+                                    },
+                                  );
+                                },
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      _userSadhanaData[sadhanaIndex]
+                                              ['sadhanaData'][index][1]
+                                          .toString(),
+                                      style: TextStyle(
+                                          color: _userSadhanaData[sadhanaIndex]
+                                                          ['sadhanaData'][index]
+                                                      [1] !=
+                                                  0
+                                              ? theme == Brightness.light ? color[0] : color[1]
+                                              : Colors.grey),
+                                    ),
+                                    CircleAvatar(
+                                      maxRadius: _userSadhanaData[sadhanaIndex]
+                                                  ['sadhanaData'][index][2] !=
+                                              ""
+                                          ? 2
+                                          : 0,
+                                      backgroundColor: theme == Brightness.light
+                                          ? color[0]
+                                          : color[1],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                },
+              ),
+            ),
+          ),
+//          decoration: BoxDecoration(
+//            border: BorderDirectional(
+//              bottom: BorderSide(
+//                  width: 1.0,
+//                  color: theme == Brightness.light ? color[0] : color[1]),
+//              top: BorderSide(
+//                  width: 1.0,
+//                  color: theme == Brightness.light ? color[0] : color[1]),
+//              end: BorderSide(
+//                  width: 1.0,
+//                  color: theme == Brightness.light ? color[0] : color[1]),
+//            ),
+//          ),
+        ),
+      );
+    }
+
+    Widget _createHeading(
+      int index,
+      String title,
+      List<Color> color,
+      SadhanaType type,
+    ) {
+      return Card(
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0.0),
+        ),
+        margin: EdgeInsets.fromLTRB(4, 4, 0, 4),
+        child: Container(
+          height: 50,
+          alignment: Alignment(-1, 0),
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: MaterialButton(
+                minWidth: headerWidth,
+                padding: EdgeInsets.all(0),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => SadhanaEditPage(
+                          title: title,
+                          color:
+                              theme == Brightness.light ? color[0] : color[1],
+                          appBarColor: color[0],
+                          type: type),
+                      fullscreenDialog: true,
+                    ),
+                  );
+                },
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 5.0),
+                      child: Icon(Icons.data_usage,
+                          color:
+                              theme == Brightness.light ? color[0] : color[1]),
+                    ),
+                    Container(
+                      width: headerWidth - 54,
+                      child: Tooltip(
+                        message: '$title',
+                        child: Text(
+                          '$title',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: theme == Brightness.light
+                                  ? color[0]
+                                  : color[1]),
+                        ),
+                      ),
+                    )
+                  ],
+                )),
+          ),
+//          decoration: BoxDecoration(
+//            border: BorderDirectional(
+//              bottom: BorderSide(
+//                  width: 1.0,
+//                  color: theme == Brightness.light ? color[0] : color[1]),
+//              top: BorderSide(
+//                  width: 1.0,
+//                  color: theme == Brightness.light ? color[0] : color[1]),
+//              start: BorderSide(
+//                  width: 1.0,
+//                  color: theme == Brightness.light ? color[0] : color[1]),
+//            ),
+//          ),
+        ),
+      );
+    }
 
     _addNewSadhana() {
       showDialog(
@@ -581,10 +618,11 @@ class CreateSadhanaDialog extends StatefulWidget {
 class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   final sadhanaNameCtrl = TextEditingController();
   int radioValue = 0;
-  Color _mainColor = const Color(0xFFD32F2F);
+  List<Color> _mainColor = Constant.colors[0];
 
   @override
   Widget build(BuildContext context) {
+    Brightness theme = Theme.of(context).brightness;
     void _openDialog() {
       showDialog(
         context: context,
@@ -598,7 +636,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 alignment: WrapAlignment.center,
                 runSpacing: 10,
                 spacing: 10,
-                children: Constant.color.map((c) {
+                children: Constant.colors.map((c) {
                   return Container(
                     height: 50,
                     width: 50,
@@ -613,7 +651,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                       },
                       child: CircleAvatar(
                         radius: 25,
-                        backgroundColor: c,
+                        backgroundColor:
+                            theme == Brightness.light ? c[0] : c[1],
                         child: c == _mainColor
                             ? Icon(Icons.done, size: 30, color: Colors.black)
                             : Container(),
@@ -692,7 +731,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             child: ListTile(
               title: const Text('Change Color'),
               trailing: CircleAvatar(
-                backgroundColor: _mainColor,
+                backgroundColor:
+                    theme == Brightness.light ? _mainColor[0] : _mainColor[1],
               ),
             ),
           ),
@@ -736,7 +776,7 @@ class SadhanaHeading {
   int index;
   String title;
   SadhanaType type;
-  Color color;
+  List<Color> color;
   bool isHeading;
 
   SadhanaHeading(
@@ -750,7 +790,7 @@ class SadhanaHeading {
 class SadhanaData {
   int index;
   SadhanaType type;
-  Color color;
+  List<Color> color;
   bool isHeading;
 
   SadhanaData(

@@ -43,7 +43,7 @@ ThemeData _buildDarkTheme() {
     scaffoldBackgroundColor: const Color(0xFF24252B),
     backgroundColor: const Color(0xFF202124),
     errorColor: const Color(0xFFB00020),
-    cardColor: const Color(0xFF1E1E1E),
+    cardColor: const Color(0xFF1A1E1E),
     inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(),
     ),

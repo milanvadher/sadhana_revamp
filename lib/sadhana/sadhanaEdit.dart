@@ -14,10 +14,11 @@ final Map<DateTime, List> _holidays = {
 class SadhanaEditPage extends StatefulWidget {
   static const String routeName = '/sadhanaEdit';
 
-  SadhanaEditPage({this.title, this.color, this.type});
+  SadhanaEditPage({this.title, this.color, this.appBarColor, this.type});
 
   final String title;
   final Color color;
+  final Color appBarColor;
   final SadhanaType type;
 
   @override
@@ -79,7 +80,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        backgroundColor: widget.color,
+        backgroundColor: widget.appBarColor,
         actions: <Widget>[IconButton(icon: Icon(Icons.edit), onPressed: () {})],
       ),
       body: SafeArea(
