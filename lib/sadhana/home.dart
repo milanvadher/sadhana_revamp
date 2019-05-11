@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
@@ -183,9 +184,14 @@ class HomePageState extends State<HomePage> {
     ));
   }
 
+//  Future getSadhana() async {
+//    for (int ; )
+//  }
+
   @override
   void initState() {
     super.initState();
+//    getSadhana();
     createSadhana(
       type: SadhanaType.BOOLEAN,
       title: 'Samayik',
@@ -219,6 +225,167 @@ class HomePageState extends State<HomePage> {
 
     double mobileWidth = MediaQuery.of(context).size.width;
 
+    Widget sadhanaNoUi(List<Color> color, sadhanaIndex, index) {
+      return Container(
+        width: 34,
+        margin: EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color[theme == Brightness.light ? 0 : 1]
+              .withAlpha(_userSadhanaData[sadhanaIndex]
+          ['sadhanaData'][index][1] !=
+              0
+              ? 20
+              : 0),
+          border: Border.all(
+            color: theme == Brightness.light
+                ? color[0]
+                : color[1],
+            width: 2,
+            style: _userSadhanaData[sadhanaIndex]
+            ['sadhanaData'][index][1] !=
+                0
+                ? BorderStyle.solid
+                : BorderStyle.none,
+          ),
+        ),
+        child: Container(
+          width: 48,
+          child: Center(
+            child: FlatButton(
+              padding: EdgeInsets.all(0),
+              onPressed: () {
+                showDialog<List>(
+                    context: context,
+                    builder: (_) {
+                      return new NumberPickerDialog.integer(
+                        title: Text(
+                          'Change No. of ' +
+                              (sadhanaIndex == 1
+                                  ? 'page'
+                                  : 'hour'),
+                        ),
+                        color: theme == Brightness.light
+                            ? color[0]
+                            : color[1],
+                        initialIntegerValue:
+                        _userSadhanaData[sadhanaIndex]
+                        ['sadhanaData'][index][1],
+                        minValue: 0,
+                        maxValue:
+                        sadhanaIndex == 1 ? 100 : 24,
+                        remark: _userSadhanaData[sadhanaIndex]
+                        ['sadhanaData'][index][2],
+                      );
+                    }).then(
+                      (List onValue) {
+                    if (onValue != null &&
+                        onValue[0] != null) {
+                      setState(
+                            () {
+                          _userSadhanaData[sadhanaIndex]
+                          ['sadhanaData'][index][1] =
+                          onValue[0];
+                          _userSadhanaData[sadhanaIndex]
+                          ['sadhanaData'][index][2] =
+                          onValue[1];
+                        },
+                      );
+                    }
+                  },
+                );
+              },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    _userSadhanaData[sadhanaIndex]
+                    ['sadhanaData'][index][1]
+                        .toString(),
+                    style: TextStyle(
+                        color: _userSadhanaData[sadhanaIndex]
+                        ['sadhanaData'][index]
+                        [1] !=
+                            0
+                            ? theme == Brightness.light
+                            ? color[0]
+                            : color[1]
+                            : Colors.grey),
+                  ),
+                  CircleAvatar(
+                    maxRadius: _userSadhanaData[sadhanaIndex]
+                    ['sadhanaData'][index][2] !=
+                        ""
+                        ? 2
+                        : 0,
+                    backgroundColor: theme == Brightness.light
+                        ? color[0]
+                        : color[1],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget sadhanaTickUi(List<Color> color, int sadhanaIndex, int index) {
+      return InkWell(
+        onTap: () {
+          setState(() {
+            _userSadhanaData[sadhanaIndex]['sadhanaData']
+            [index][1] =
+            !_userSadhanaData[sadhanaIndex]['sadhanaData']
+            [index][1];
+          });
+        },
+        child: Container(
+          width: 48,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color[theme == Brightness.light ? 0 : 1]
+                .withAlpha(_userSadhanaData[sadhanaIndex]
+            ['sadhanaData'][index][1]
+                ? 20
+                : 0),
+            border: Border.all(
+              color: theme == Brightness.light
+                  ? color[0]
+                  : color[1],
+              width: 2,
+              style: _userSadhanaData[sadhanaIndex]
+              ['sadhanaData'][index][1]
+                  ? BorderStyle.solid
+                  : BorderStyle.none,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: AnimatedContainer(
+              duration: Duration(seconds: 5),
+              width: 48,
+              child: _userSadhanaData[sadhanaIndex]
+              ['sadhanaData'][index][1]
+                  ? Icon(
+                Icons.done,
+                size: 20.0,
+                color: theme == Brightness.light
+                    ? color[0]
+                    : color[1],
+              )
+                  : Icon(
+                Icons.close,
+                size: 20.0,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     Widget _horizontalList(
         int sadhanaIndex, List<Color> color, SadhanaType type) {
       return Card(
@@ -236,158 +403,8 @@ class HomePageState extends State<HomePage> {
                 durationInDays,
                 (int index) {
                   return type == SadhanaType.BOOLEAN
-                      ? InkWell(
-                          onTap: () {
-                            setState(() {
-                              _userSadhanaData[sadhanaIndex]['sadhanaData']
-                                      [index][1] =
-                                  !_userSadhanaData[sadhanaIndex]['sadhanaData']
-                                      [index][1];
-                            });
-                          },
-                          child: Container(
-                            width: 48,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: color[theme == Brightness.light ? 0 : 1]
-                                  .withAlpha(_userSadhanaData[sadhanaIndex]
-                                          ['sadhanaData'][index][1]
-                                      ? 20
-                                      : 0),
-                              border: Border.all(
-                                color: theme == Brightness.light
-                                    ? color[0]
-                                    : color[1],
-                                width: 2,
-                                style: _userSadhanaData[sadhanaIndex]
-                                        ['sadhanaData'][index][1]
-                                    ? BorderStyle.solid
-                                    : BorderStyle.none,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Container(
-                                width: 48,
-                                child: _userSadhanaData[sadhanaIndex]
-                                        ['sadhanaData'][index][1]
-                                    ? Icon(
-                                        Icons.done,
-                                        size: 20.0,
-                                        color: theme == Brightness.light
-                                            ? color[0]
-                                            : color[1],
-                                      )
-                                    : Icon(
-                                        Icons.close,
-                                        size: 20.0,
-                                        color: Colors.grey,
-                                      ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : Container(
-                          width: 34,
-                          margin: EdgeInsets.all(7),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: color[theme == Brightness.light ? 0 : 1]
-                                .withAlpha(_userSadhanaData[sadhanaIndex]
-                                            ['sadhanaData'][index][1] !=
-                                        0
-                                    ? 20
-                                    : 0),
-                            border: Border.all(
-                              color: theme == Brightness.light
-                                  ? color[0]
-                                  : color[1],
-                              width: 2,
-                              style: _userSadhanaData[sadhanaIndex]
-                                          ['sadhanaData'][index][1] !=
-                                      0
-                                  ? BorderStyle.solid
-                                  : BorderStyle.none,
-                            ),
-                          ),
-                          child: Container(
-                            width: 48,
-                            child: Center(
-                              child: FlatButton(
-                                padding: EdgeInsets.all(0),
-                                onPressed: () {
-                                  showDialog<List>(
-                                      context: context,
-                                      builder: (_) {
-                                        return new NumberPickerDialog.integer(
-                                          title: Text(
-                                            'Change No. of ' +
-                                                (sadhanaIndex == 1
-                                                    ? 'page'
-                                                    : 'hour'),
-                                          ),
-                                          color: theme == Brightness.light
-                                              ? color[0]
-                                              : color[1],
-                                          initialIntegerValue:
-                                              _userSadhanaData[sadhanaIndex]
-                                                  ['sadhanaData'][index][1],
-                                          minValue: 0,
-                                          maxValue:
-                                              sadhanaIndex == 1 ? 100 : 24,
-                                          remark: _userSadhanaData[sadhanaIndex]
-                                              ['sadhanaData'][index][2],
-                                        );
-                                      }).then(
-                                    (List onValue) {
-                                      if (onValue != null &&
-                                          onValue[0] != null) {
-                                        setState(
-                                          () {
-                                            _userSadhanaData[sadhanaIndex]
-                                                    ['sadhanaData'][index][1] =
-                                                onValue[0];
-                                            _userSadhanaData[sadhanaIndex]
-                                                    ['sadhanaData'][index][2] =
-                                                onValue[1];
-                                          },
-                                        );
-                                      }
-                                    },
-                                  );
-                                },
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      _userSadhanaData[sadhanaIndex]
-                                              ['sadhanaData'][index][1]
-                                          .toString(),
-                                      style: TextStyle(
-                                          color: _userSadhanaData[sadhanaIndex]
-                                                          ['sadhanaData'][index]
-                                                      [1] !=
-                                                  0
-                                              ? theme == Brightness.light ? color[0] : color[1]
-                                              : Colors.grey),
-                                    ),
-                                    CircleAvatar(
-                                      maxRadius: _userSadhanaData[sadhanaIndex]
-                                                  ['sadhanaData'][index][2] !=
-                                              ""
-                                          ? 2
-                                          : 0,
-                                      backgroundColor: theme == Brightness.light
-                                          ? color[0]
-                                          : color[1],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
+                      ? sadhanaTickUi(color, sadhanaIndex, index)
+                      : sadhanaNoUi(color, sadhanaIndex, index);
                 },
               ),
             ),

@@ -47,8 +47,8 @@ class LoginPageState extends State<LoginPage> {
   ];
 
   _login() async {
-    var user = await DBProvider.db.getUser(123456);
-    print(user.toMap());
+//    var user = await DBProvider.db.getUser(123456);
+//    print(user.toMap());
 //    if (_formKey.currentState.validate()) {
 //      _formKey.currentState.save();
 //      print('Login');
@@ -159,9 +159,9 @@ class LoginPageState extends State<LoginPage> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () async {
-          User rnd = testUsers[math.Random().nextInt(testUsers.length)];
-          await DBProvider.db.newUser(rnd);
-          setState(() {});
+//          User rnd = testUsers[math.Random().nextInt(testUsers.length)];
+//          await DBProvider.db.newUser(rnd);
+//          setState(() {});
         },
       ),
     );

@@ -1,18 +1,19 @@
 import 'dart:ui';
 import 'package:sadhana/common.dart';
+import 'package:sadhana/model/activity.dart';
 
 class Sadhana {
-  final String tableSadhana = 'Sadhana';
-  final String columnId = '_id';
-  final String columnIndex = 'index';
-  final String columnName = 'name';
-  final String columnDescription = 'description';
-  final String columnType = 'type';
-  final String columnIsPreloaded = 'is_preloaded';
-  final String columnDColor = 'd_color';
-  final String columnLColor = 'l_color';
-  final String columnReminderTime = 'reminder_time';
-  final String columnReminderDays = 'reminder_days';
+  static final String tableSadhana = 'Sadhana';
+  static final String columnId = '_id';
+  static final String columnIndex = 'index';
+  static final String columnName = 'name';
+  static final String columnDescription = 'description';
+  static final String columnType = 'type';
+  static final String columnIsPreloaded = 'is_preloaded';
+  static final String columnDColor = 'd_color';
+  static final String columnLColor = 'l_color';
+  static final String columnReminderTime = 'reminder_time';
+  static final String columnReminderDays = 'reminder_days';
 
   int id;
   String sadhanaName;
@@ -24,6 +25,7 @@ class Sadhana {
   Color lColor;
   DateTime reminderTime;
   String reminderDays;
+  List<Activity> sadhanaData;
 
   Sadhana({
     this.id,
@@ -36,6 +38,7 @@ class Sadhana {
     this.lColor,
     this.reminderTime,
     this.reminderDays,
+    this.sadhanaData
   })  : assert(id != null),
         assert(sadhanaName != null),
         assert(sadhanaDescription != null),
