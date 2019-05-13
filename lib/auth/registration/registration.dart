@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/common.dart';
+import 'package:sadhana/model/register.dart';
 
 class RegistrationPage extends StatefulWidget {
   static const String routeName = '/registration';
@@ -11,7 +12,9 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class RegistrationPageState extends State<RegistrationPage> {
+  final _register = Register();
   final _formKeyStep1 = GlobalKey<FormState>();
+  final _formKeyStep2 = GlobalKey<FormState>();
   DateTime bDate = DateTime.now();
   DateTime gDate = DateTime.now();
   int currantStep = 0;
@@ -20,6 +23,16 @@ class RegistrationPageState extends State<RegistrationPage> {
   @override
   initState() {
     super.initState();
+    _register.mhtId = '123456';
+    _register.firstName = 'Milan';
+    _register.middleName = 'D';
+    _register.lastName = 'Vadher';
+    _register.bDate = DateTime.now();
+    _register.gDate = DateTime.now();
+    _register.email = 'milandv06@gmail.com';
+    _register.mobileNos = [1234567890, 1234567890];
+    _register.fatherName = 'D';
+    _register.center = 'Sim-City';
   }
 
   @override
@@ -30,60 +43,97 @@ class RegistrationPageState extends State<RegistrationPage> {
         child: Column(
           children: <Widget>[
             // MhtId
-            _FormInput(
+            _FormTextInput(
               keyboardType: TextInputType.text,
               enabled: false,
               labelText: 'Mht Id',
-              valueText: '129719',
+              valueText: _register.mhtId,
             ),
             // FirstName
-            _FormInput(
+            _FormTextInput(
               keyboardType: TextInputType.text,
               enabled: false,
               labelText: 'First name',
-              valueText: 'Milan',
+              valueText: _register.firstName,
             ),
             // MiddleName
-            _FormInput(
+            _FormTextInput(
               keyboardType: TextInputType.text,
               enabled: false,
               labelText: 'Middle name',
-              valueText: 'D',
+              valueText: _register.middleName,
             ),
             // LastName
-            _FormInput(
+            _FormTextInput(
               keyboardType: TextInputType.text,
               enabled: false,
               labelText: 'Last name',
-              valueText: 'Vadher',
+              valueText: _register.lastName,
             ),
             // DOB
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              alignment: Alignment.bottomLeft,
-              child: _DatePicker(
-                labelText: 'DOB',
-                selectedDate: bDate,
-                selectDate: (DateTime date) {
-                  setState(() {
-                    bDate = date;
-                  });
-                },
-              ),
+            _DatePicker(
+              labelText: 'DOB',
+              selectedDate: bDate,
+              selectDate: (DateTime date) {
+                setState(() {
+                  _register.bDate = date;
+                });
+              },
             ),
             // G_date
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10.0),
-              alignment: Alignment.bottomLeft,
-              child: _DatePicker(
-                labelText: 'Ganan Date',
-                selectedDate: gDate,
-                selectDate: (DateTime date) {
-                  setState(() {
-                    gDate = date;
-                  });
-                },
-              ),
+            _DatePicker(
+              labelText: 'Ganan Date',
+              selectedDate: gDate,
+              selectDate: (DateTime date) {
+                setState(() {
+                  _register.gDate = date;
+                });
+              },
+            ),
+            // Mobile1
+            _FormNumberInput(
+              keyboardType: TextInputType.number,
+              enabled: false,
+              labelText: 'Mobile 1',
+              valueText: _register.mobileNos.length > 0 ? _register.mobileNos[0].toString() : "",
+            ),
+            // Mobile2
+            _FormNumberInput(
+              keyboardType: TextInputType.number,
+              enabled: true,
+              labelText: 'Mobile 2',
+              valueText: _register.mobileNos.length > 1 ? _register.mobileNos[1].toString() : "",
+            ),
+            // Email
+            _FormTextInput(
+              keyboardType: TextInputType.emailAddress,
+              enabled: true,
+              labelText: 'Email',
+              valueText: _register.email,
+            ),
+            // FatherName
+            _FormTextInput(
+              keyboardType: TextInputType.text,
+              enabled: true,
+              labelText: 'Father Name',
+              valueText: _register.fatherName,
+            ),
+          ],
+        ),
+      );
+    }
+
+    Widget buildStep2() {
+      return Form(
+        key: _formKeyStep2,
+        child: Column(
+          children: <Widget>[
+            // Center
+            _FormNumberInput(
+              keyboardType: TextInputType.text,
+              enabled: false,
+              labelText: 'Center',
+              valueText: _register.center,
             ),
           ],
         ),
@@ -91,21 +141,9 @@ class RegistrationPageState extends State<RegistrationPage> {
     }
 
     registrationSteps = [
-      Step(
-          title: Text('Step : 1'),
-          content: buildStep1(),
-          isActive: true,
-          subtitle: Text('Basic Information')),
-      Step(
-          title: Text('Step : 2'),
-          content: Text('MBA Information'),
-          isActive: true,
-          subtitle: Text('MBA Information')),
-      Step(
-          title: Text('Step : 3'),
-          content: Text('Other Information'),
-          isActive: true,
-          subtitle: Text('Other Information')),
+      Step(title: Text('Step : 1'), content: buildStep1(), isActive: true, subtitle: Text('Basic Information')),
+      Step(title: Text('Step : 2'), content: buildStep2(), isActive: true, subtitle: Text('MBA Information')),
+      Step(title: Text('Step : 3'), content: Text('Other Information'), isActive: true, subtitle: Text('Other Information')),
     ];
 
     Widget home = Scaffold(
@@ -116,6 +154,9 @@ class RegistrationPageState extends State<RegistrationPage> {
         child: Stepper(
           currentStep: currantStep,
           onStepContinue: () {
+            _formKeyStep1.currentState.save();
+            _formKeyStep2.currentState.save();
+            print('Register Data :: ${_register.mobileNos}');
             setState(() {
               if (currantStep < registrationSteps.length - 1) {
                 currantStep += 1;
@@ -157,20 +198,24 @@ class _DatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Expanded(
-          flex: 4,
-          child: _InputDate(
-            labelText: labelText,
-            valueText: DateFormat.yMMMd().format(selectedDate),
-            onPressed: () {
-              _selectDate(context);
-            },
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      alignment: Alignment.bottomLeft,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Expanded(
+            flex: 4,
+            child: _InputDate(
+              labelText: labelText,
+              valueText: DateFormat.yMMMd().format(selectedDate),
+              onPressed: () {
+                _selectDate(context);
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -194,8 +239,7 @@ class _InputDate extends StatelessWidget {
     return InkWell(
       onTap: onPressed,
       child: InputDecorator(
-        decoration:
-            InputDecoration(labelText: labelText, border: OutlineInputBorder()),
+        decoration: InputDecoration(labelText: labelText, border: OutlineInputBorder()),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.min,
@@ -209,8 +253,8 @@ class _InputDate extends StatelessWidget {
   }
 }
 
-class _FormInput extends StatelessWidget {
-  const _FormInput({
+class _FormTextInput extends StatelessWidget {
+  const _FormTextInput({
     Key key,
     this.labelText,
     this.valueText,
@@ -229,11 +273,56 @@ class _FormInput extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: TextFormField(
-          decoration: InputDecoration(
-              labelText: labelText, border: OutlineInputBorder()),
-          initialValue: valueText,
-          enabled: enabled,
-          keyboardType: keyboardType),
+        decoration: InputDecoration(labelText: labelText, border: OutlineInputBorder()),
+        initialValue: valueText,
+        enabled: enabled,
+        keyboardType: keyboardType,
+        onSaved: (value) {
+          return value;
+        },
+        validator: (value) {
+          if (value.isEmpty) {
+            return labelText + ' is required';
+          }
+        },
+      ),
+    );
+  }
+}
+
+class _FormNumberInput extends StatelessWidget {
+  _FormNumberInput({
+    Key key,
+    this.labelText,
+    this.valueText,
+    this.enabled,
+    this.keyboardType,
+  }) : super(key: key);
+
+  final String labelText;
+  String valueText;
+  final bool enabled;
+  final TextInputType keyboardType;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      alignment: Alignment.bottomLeft,
+      child: TextFormField(
+        decoration: InputDecoration(labelText: labelText, border: OutlineInputBorder()),
+        initialValue: valueText,
+        enabled: enabled,
+        keyboardType: keyboardType,
+        onSaved: (value) {
+          valueText = value;
+        },
+        validator: (value) {
+          if (value.isEmpty) {
+            return labelText + ' is required';
+          }
+        },
+      ),
     );
   }
 }
