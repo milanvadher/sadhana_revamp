@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as prefix0;
 import 'package:sadhana/auth/login.dart';
+import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
 import 'package:sadhana/sadhana/time-table.dart';
@@ -520,7 +521,7 @@ class HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.sync),
             onPressed: () {
-              Navigator.pushNamed(context, LoginPage.routeName);
+              Navigator.pushNamed(context, RegistrationPage.routeName);
             },
             tooltip: 'Sync Data',
           ),
