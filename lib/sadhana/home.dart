@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as prefix0;
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
 import 'package:sadhana/sadhana/time-table.dart';
+import 'package:sadhana/utils/appcsvutils.dart';
 import '../attendance/attendance_home.dart';
 import '../setup/numberpicker.dart';
 import 'package:sadhana/common.dart';
@@ -37,7 +40,8 @@ class HomePageState extends State<HomePage> {
   ];
   List<List<dynamic>> userSadhanaData = [];
   List _userSadhanaData = [];
-
+  DateTime selectedDate = DateTime.now();
+  DateTime initialDate = DateTime.now();
   double headerWidth = 150.0;
 
   void handleOptionClick(String value) {
@@ -46,7 +50,8 @@ class HomePageState extends State<HomePage> {
       case 'save_excel':
         {
           print('$userSadhanaData');
-          showDialog(
+          onSaveExcel();
+          /* showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
@@ -61,7 +66,7 @@ class HomePageState extends State<HomePage> {
                 ),
               );
             },
-          );
+          ); */
         }
         break;
 
@@ -87,6 +92,38 @@ class HomePageState extends State<HomePage> {
         }
         break;
     }
+  }
+
+  void onSaveExcel() {
+
+    showMonthPicker(context: context, initialDate: selectedDate ?? initialDate)
+        .then((date) => generateCSV(date));
+  }
+
+  generateCSV(date) async {
+    List<Activity> activities = new List();
+    activities.add(Activity(sadhanaId: 12,sadhanaDate: DateTime.now(),sadhanaValue: 1,remarks: 'Test'));
+    activities.add(Activity(sadhanaId: 13,sadhanaDate: DateTime.now(),sadhanaValue: 1,remarks: 'Test'));
+    activities.add(Activity(sadhanaId: 14,sadhanaDate: DateTime.now(),sadhanaValue: 1,remarks: 'Test'));
+    selectedDate = date;
+    String file = await AppCSVUtils.generateCSV(activities);
+    print(file);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: Wrap(
+            children: <Widget>[
+              Text(
+                'Your File is successuflly created, Path: $file',
+                overflow: TextOverflow.clip,
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   static Widget _headerListData(String weekDay, int date) {
