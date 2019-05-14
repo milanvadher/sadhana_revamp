@@ -4,13 +4,14 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
 import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
 import '../attendance/attendance_home.dart';
 import '../setup/numberpicker.dart';
-import 'package:sadhana/common.dart';
+import 'package:sadhana/commonvalidation.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
@@ -35,6 +36,7 @@ class HomePageState extends State<HomePage> {
       isHeading: true,
     ),
   ];
+  List<String> title = ['May'];
   List<SadhanaData> sadhanaData = [
     SadhanaData(isHeading: true),
   ];
@@ -95,7 +97,6 @@ class HomePageState extends State<HomePage> {
   }
 
   void onSaveExcel() {
-
     showMonthPicker(context: context, initialDate: selectedDate ?? initialDate)
         .then((date) => generateCSV(date));
   }
@@ -615,15 +616,8 @@ class HomePageState extends State<HomePage> {
                 Container(
                   width: headerWidth,
                   child: Column(
-                    children: titleHeader.map((heading) {
-                      return heading.isHeading
-                          ? _mainHeaderTitle(heading.title)
-                          : _createHeading(
-                              heading.index,
-                              heading.title,
-                              heading.color,
-                              heading.type,
-                            );
+                    children: title.map((str) {
+                      return _mainHeaderTitle(str);
                     }).toList(),
                   ),
                 ),

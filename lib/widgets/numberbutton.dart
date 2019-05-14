@@ -5,14 +5,30 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/setup/numberpicker.dart';
 import 'package:sadhana/utils/apputils.dart';
 
-class NumberButton extends StatelessWidget {
+class NumberButton extends StatefulWidget {
   Function onClick;
   Sadhana sadhana;
   Activity activity;
+
+  NumberButton({this.onClick, @required this.sadhana, @required this.activity});
+
+  @override
+  _NumberButtonState createState() => _NumberButtonState();
+}
+
+class _NumberButtonState extends State<NumberButton> {
   String title;
+  Activity activity;
+  Sadhana sadhana;
+  Brightness theme;
+
   @override
   Widget build(BuildContext context) {
-    Brightness theme = Theme.of(context).brightness;
+    activity = widget.activity;
+    sadhana = widget.sadhana;
+    title = sadhana.sadhanaName;
+    theme = Theme.of(context).brightness;
+    
     return Container(
       width: 34,
       margin: EdgeInsets.all(7),
@@ -44,9 +60,7 @@ class NumberButton extends StatelessWidget {
                     );
                   }).then(
                 (List onValue) {
-                  if (onValue != null && onValue[0] != null) {
-                    onClick(activity);
-                  }
+                  onValueSelected(onValue);
                 },
               );
             },
@@ -70,5 +84,18 @@ class NumberButton extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  onValueSelected(List onValue) {
+    if (onValue != null && onValue[0] != null) {
+      setState(() {
+        activity.sadhanaValue = onValue[0];
+        activity.remarks = onValue[1];
+        sadhana.sadhanaData[activity.sadhanaDate] = activity;
+        widget.onClick(activity);
+      });
+      if(widget.onClick != null)
+        widget.onClick(widget.activity);
+    }
   }
 }

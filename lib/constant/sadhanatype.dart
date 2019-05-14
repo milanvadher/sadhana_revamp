@@ -1,0 +1,1 @@
+enum SadhanaType { BOOLEAN, NUMBER }
