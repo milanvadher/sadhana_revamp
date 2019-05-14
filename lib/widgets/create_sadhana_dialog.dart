@@ -25,7 +25,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       showDialog(
         context: context,
         builder: (_) {
-          ColorPickerDialog.getColorPickerDialog(context, _mainColor, (color) {
+          return ColorPickerDialog.getColorPickerDialog(context, _mainColor, (color) {
             setState(() {
               _mainColor = color;
             });

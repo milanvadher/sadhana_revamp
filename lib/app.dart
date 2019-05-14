@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/sadhana/home.dart';
-import 'package:sadhana/sadhana/homekk.dart';
 
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/themes.dart';
@@ -60,7 +59,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   @override
   Widget build(BuildContext context) {
-    Widget home = HomeKKPage(
+    Widget home = HomePage(
       optionsPage: AppOptionsPage(
         options: _options,
         onOptionsChanged: _handleOptionsChanged,
