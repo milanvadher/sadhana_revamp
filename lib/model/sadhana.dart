@@ -1,5 +1,6 @@
 import 'dart:ui';
-import 'package:sadhana/common.dart';
+
+import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 
 class Sadhana {
@@ -25,8 +26,7 @@ class Sadhana {
   Color lColor;
   DateTime reminderTime;
   String reminderDays;
-  List<Activity> sadhanaData;
-
+  Map<DateTime,Activity> sadhanaData = new Map();
   Sadhana({
     this.id,
     this.sadhanaName,
@@ -38,17 +38,12 @@ class Sadhana {
     this.lColor,
     this.reminderTime,
     this.reminderDays,
-    this.sadhanaData
+    this.sadhanaData,
   })  : assert(id != null),
         assert(sadhanaName != null),
-        assert(sadhanaDescription != null),
-        assert(sadhanaDescription != null),
         assert(sadhanaType != null),
-        assert(isPreloaded != null),
         assert(dColor != null),
-        assert(lColor != null),
-        assert(reminderTime != null),
-        assert(reminderDays != null);
+        assert(lColor != null);
 
   convertForJson(dynamic source, dynamic dest) {
     dest.id = source.id;

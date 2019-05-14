@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/sadhana/home.dart';
+
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/setup/routes.dart';

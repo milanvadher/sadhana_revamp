@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 class Constant {
 
+
+  static final String vanchanName = "Vanchan";
+  static final String SEVANAME = "Seva";
+
   // Display activity data for no of days
   static int displayDays = 15;
 

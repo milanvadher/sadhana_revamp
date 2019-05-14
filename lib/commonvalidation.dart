@@ -1,4 +1,3 @@
-enum SadhanaType { BOOLEAN, NUMBER }
 
 class CommonValidation {
 
