@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/setup/themes.dart';
 
 class AppOptions {
@@ -36,26 +37,33 @@ class _Heading extends StatelessWidget {
 }
 
 class _ActionItem extends StatelessWidget {
-  const _ActionItem(this.icon, this.iconColor, this.text, this.onTap);
-
+  const _ActionItem(this.icon, this.iconColor, this.text, this.onTap, this.subtitle);
   final IconData icon;
-  final Color iconColor;
+  final List<Color> iconColor;
   final String text;
   final VoidCallback onTap;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      padding: EdgeInsets.all(0),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: iconColor,
+    Brightness theme = Theme.of(context).brightness;
+    return Column(
+      children: <Widget>[
+        ListTile(
+          leading: CircleAvatar(
+            child: Icon(
+              icon,
+              color: theme == Brightness.light ? iconColor[0] : iconColor[1],
+            ),
+            backgroundColor: theme == Brightness.light ? iconColor[0].withAlpha(20) : iconColor[1].withAlpha(20),
+          ),
+          title: Text(text),
+          subtitle: Text(subtitle),
+          trailing: Icon(Icons.chevron_right),
+          onTap: onTap,
         ),
-        title: Text(text),
-        trailing: Icon(Icons.arrow_right),
-      ),
-      onPressed: onTap,
+        Divider(height: 0),
+      ],
     );
   }
 }
@@ -68,27 +76,30 @@ class _ThemeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _BooleanItem(
-      Icons.brightness_6,
-      Colors.grey,
-      'Dark Theme',
-      options.theme == kDarkAppTheme,
-      (bool value) {
-        onOptionsChanged(
-          options.copyWith(
-            theme: value ? kDarkAppTheme : kLightAppTheme,
-          ),
-        );
-      },
-      switchKey: const Key('dark_theme'),
+    return Column(
+      children: <Widget>[
+        _BooleanItem(
+          options.theme == kDarkAppTheme ? Icons.brightness_high : Icons.brightness_low,
+          Colors.grey,
+          'Dark Theme',
+          options.theme == kDarkAppTheme,
+              (bool value) {
+            onOptionsChanged(
+              options.copyWith(
+                theme: value ? kDarkAppTheme : kLightAppTheme,
+              ),
+            );
+          },
+          switchKey: const Key('dark_theme'),
+        ),
+        Divider(height: 0),
+      ],
     );
   }
 }
 
 class _BooleanItem extends StatelessWidget {
-  const _BooleanItem(
-      this.icon, this.iconColor, this.title, this.value, this.onChanged,
-      {this.switchKey});
+  const _BooleanItem(this.icon, this.iconColor, this.title, this.value, this.onChanged, {this.switchKey});
 
   final IconData icon;
   final Color iconColor;
@@ -104,11 +115,15 @@ class _BooleanItem extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return ListTile(
-      leading: Icon(
-        icon,
-        color: iconColor,
+      leading: CircleAvatar(
+        child: Icon(
+          icon,
+          color: iconColor,
+        ),
+        backgroundColor: iconColor.withAlpha(20),
       ),
       title: Text(title),
+      subtitle: Text('Customise app theme'),
       trailing: Switch(
         key: switchKey,
         value: value,
@@ -140,26 +155,21 @@ class AppOptionsPage extends StatelessWidget {
         child: ListView(
           children: <Widget>[
             _Heading('Settings'),
-            Card(
-              elevation: 3.0,
-              child: Column(
-                children: <Widget>[
-                  _ActionItem(Icons.person, Colors.red, 'Profile', () {}),
-                  _ThemeItem(options, onOptionsChanged),
-                  _ActionItem(Icons.sync, Colors.blue, 'Sync Data', () {}),
-                ],
-              ),
+            Column(
+              children: <Widget>[
+                Divider(height: 0),
+                _ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
+                _ThemeItem(options, onOptionsChanged),
+                _ActionItem(Icons.sync, Constant.colors[3], 'Sync Data', () {}, 'Sync your sadhana data with server'),
+              ],
             ),
           ]..addAll(<Widget>[
               _Heading('Sadhana App'),
-              Card(
-                elevation: 3.0,
-                child: Column(
-                  children: <Widget>[
-                    _ActionItem(
-                        Icons.info, Colors.indigo, 'About Sadhana App', () {}),
-                  ],
-                ),
+              Column(
+                children: <Widget>[
+                  Divider(height: 0),
+                  _ActionItem(Icons.info_outline, Constant.colors[12], 'About', () {},'About Sadhana App and report bug'),
+                ],
               ),
             ]),
         ),

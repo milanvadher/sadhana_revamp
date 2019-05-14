@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as prefix0;
+import 'package:flutter/material.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/constant/constant.dart';
