@@ -2,11 +2,11 @@ import 'dart:ui';
 
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/entity.dart';
 
-class Sadhana {
+class Sadhana extends Entity {
   static final String tableSadhana = 'Sadhana';
-  static final String columnId = '_id';
-  static final String columnIndex = 'index';
+  static final String columnIndex = 'sadhana_index';
   static final String columnName = 'name';
   static final String columnDescription = 'description';
   static final String columnType = 'type';
@@ -16,7 +16,7 @@ class Sadhana {
   static final String columnReminderTime = 'reminder_time';
   static final String columnReminderDays = 'reminder_days';
 
-  int id;
+
   String sadhanaName;
   int sadhanaIndex;
   String sadhanaDescription;
@@ -28,7 +28,7 @@ class Sadhana {
   String reminderDays;
   Map<DateTime,Activity> sadhanaData = new Map();
   Sadhana({
-    this.id,
+    id,
     this.sadhanaName,
     this.sadhanaIndex,
     this.sadhanaDescription,
@@ -39,11 +39,10 @@ class Sadhana {
     this.reminderTime,
     this.reminderDays,
     this.sadhanaData,
-  })  : assert(id != null),
-        assert(sadhanaName != null),
+  })  /*: assert(sadhanaName != null),
         assert(sadhanaType != null),
         assert(dColor != null),
-        assert(lColor != null);
+        assert(lColor != null)*/;
 
   convertForJson(dynamic source, dynamic dest) {
     dest.id = source.id;
@@ -68,17 +67,19 @@ class Sadhana {
     return data;
   }
 
-  Sadhana.fromMap(Map<String, dynamic> map) {
-    id = map[columnId];
+  Sadhana fromMap(Map<String, dynamic> map) {
+    id = map[Entity.columnId];
     sadhanaName = map[columnName];
     sadhanaIndex = map[columnIndex];
     sadhanaDescription = map[columnDescription];
-    sadhanaType = map[columnType];
+    sadhanaType = map[columnType] == 1 ? SadhanaType.NUMBER : SadhanaType.BOOLEAN;
     isPreloaded = map[columnIsPreloaded];
-    dColor = map[columnDColor];
-    lColor = map[columnLColor];
+    dColor = Color(map[columnDColor]);
+    lColor = Color(map[columnLColor]);
     reminderTime = map[columnReminderTime];
     reminderDays = map[columnReminderDays];
+    sadhanaData = new Map();
+    return this;
   }
 
   Map<String, dynamic> toMap() {
@@ -86,17 +87,18 @@ class Sadhana {
       columnName: sadhanaName,
       columnIndex: sadhanaIndex,
       columnDescription: sadhanaDescription,
-      columnType: sadhanaType,
+      columnType: sadhanaType.index,
       columnIsPreloaded: isPreloaded,
-      columnDColor: dColor,
-      columnLColor: lColor,
+      columnDColor: dColor.value,
+      columnLColor: lColor.value,
       columnReminderTime: reminderDays,
       columnReminderDays: reminderTime,
-      columnId: id
+      Entity.columnId: id
     };
     if (id != null) {
-      map[columnId] = id;
+      map[Entity.columnId] = id;
     }
     return map;
   }
+
 }

@@ -1,4 +1,4 @@
-package com.mba.sadhana.sadhana;
+package org.dadabhagwan.sadhana;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

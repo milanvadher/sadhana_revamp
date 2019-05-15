@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
-import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/dao/sadhanadao.dart';
+import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/color_picker_dialog.dart';
 
 class CreateSadhanaDialog extends StatefulWidget {
@@ -18,6 +19,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   int radioValue = 0;
   List<Color> _mainColor = Constant.colors[0];
   Brightness theme;
+  SadhanaDAO sadhanaDAO = SadhanaDAO();
+
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;
@@ -113,25 +116,30 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
               child: Text('Cancel'),
             ),
             FlatButton(
-              onPressed: sadhanaNameCtrl.text != ""
-                  ? () {
-                      print(sadhanaNameCtrl.text);
-                      print(radioValue);
-                      setState(() {
-                        widget.crateSadhana(
-                          type: radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER,
-                          title: sadhanaNameCtrl.text,
-                          color: _mainColor,
-                        );
-                      });
-                      Navigator.pop(context);
-                    }
-                  : null,
+              onPressed: sadhanaNameCtrl.text != "" ? onOKClick : null,
               child: Text('Add'),
             )
           ],
         )
       ],
     );
+  }
+
+  onOKClick() {
+    print(sadhanaNameCtrl.text);
+    print(radioValue);
+    Sadhana sadhana = Sadhana(
+        sadhanaName: sadhanaNameCtrl.text,
+        lColor: _mainColor[0],
+        dColor: _mainColor[1],
+        sadhanaIndex: 0,
+        sadhanaType: radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER,
+        sadhanaData: new Map(),
+    );
+    sadhanaDAO.insert(sadhana);
+    setState(() {
+      widget.crateSadhana(sadhana);
+    });
+    Navigator.pop(context);
   }
 }

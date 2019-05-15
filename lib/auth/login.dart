@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/model/user.dart';
 import 'package:sadhana/commonvalidation.dart';
-import 'package:sadhana/service/sqflite_service.dart';
+import 'package:sadhana/service/dbprovider.dart';
 import 'dart:math' as math;
 
 class LoginPage extends StatefulWidget {
