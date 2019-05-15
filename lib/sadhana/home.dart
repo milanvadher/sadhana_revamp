@@ -5,11 +5,13 @@ import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
+import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
 import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/checkmarkbutton.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
@@ -38,6 +40,7 @@ class HomePageState extends State<HomePage> {
   static DateTime now = new DateTime.now();
   DateTime today = new DateTime(now.year, now.month, now.day);
   static int durationInDays = Constant.displayDays;
+  List<Sadhana> tmpSadhanas = new List();
   List<Sadhana> sadhanas = new List();
   DateTime selectedDate = DateTime.now();
   DateTime initialDate = DateTime.now();
@@ -45,55 +48,64 @@ class HomePageState extends State<HomePage> {
   Brightness theme;
   BuildContext context;
   double mobileWidth;
+  SadhanaDAO sadhanaDAO = SadhanaDAO();
+  int sadhanaIndex = 0;
 
-  /// Add new Sadhana at end
   void addSadhana({
     @required int id,
     @required SadhanaType type,
     @required String title,
     @required List<Color> color,
   }) {
-    sadhanas.add(Sadhana(id: id, sadhanaName: title, lColor: color[0], dColor: color[1], sadhanaType: type, sadhanaData: new Map()));
+    tmpSadhanas.add(Sadhana(
+        sadhanaName: title,
+        lColor: color[0],
+        dColor: color[1],
+        sadhanaType: type,
+        sadhanaData: new Map(),
+        sadhanaIndex: sadhanaIndex++));
   }
-
-//  Future getSadhana() async {
-//    for (int ; )
-//  }
 
   @override
   void initState() {
     super.initState();
-//    getSadhana();
+    loadSadhana();
+  }
+
+  void loadSadhana() async {
+    await createPreloadedSadhana();
+    sadhanaDAO.getAll().then((dbSadhanas) {
+      setState(() {
+        sadhanas.addAll(dbSadhanas);
+      });
+    });
+  }
+
+  void addNewSadhana(Sadhana sadhana) {
+    sadhanas.add(sadhana);
+  }
+
+  void loadPreloadedSadhana() {
     addSadhana(
       id: 1,
       type: SadhanaType.BOOLEAN,
       title: 'Samayik',
       color: Constant.colors[0],
     );
-    addSadhana(
-      id: 2,
-      type: SadhanaType.NUMBER,
-      title: 'Vanchan',
-      color: Constant.colors[3],
-    );
-    addSadhana(
-      id: 3,
-      type: SadhanaType.BOOLEAN,
-      title: 'Vidhi',
-      color: Constant.colors[7],
-    );
-    addSadhana(
-      id: 4,
-      type: SadhanaType.BOOLEAN,
-      title: 'G. Satsang',
-      color: Constant.colors[8],
-    );
-    addSadhana(
-      id: 5,
-      type: SadhanaType.NUMBER,
-      title: 'Seva',
-      color: Constant.colors[12],
-    );
+    addSadhana(id: 2, type: SadhanaType.NUMBER, title: 'Vanchan', color: Constant.colors[3]);
+    addSadhana(id: 3, type: SadhanaType.BOOLEAN, title: 'Vidhi', color: Constant.colors[7]);
+    addSadhana(id: 4, type: SadhanaType.BOOLEAN, title: 'G. Satsang', color: Constant.colors[8]);
+    addSadhana(id: 5, type: SadhanaType.NUMBER, title: 'Seva', color: Constant.colors[12]);
+  }
+
+  void createPreloadedSadhana() async {
+    if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana()) {
+      loadPreloadedSadhana();
+      tmpSadhanas.forEach((sadhana) {
+        sadhanaDAO.insert(sadhana);
+      });
+      AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
+    }
   }
 
   @override
@@ -143,7 +155,7 @@ class HomePageState extends State<HomePage> {
   }
 
   _addNewSadhana() {
-    showDialog(context: context, builder: (_) => CreateSadhanaDialog(addSadhana)).then((value) {
+    showDialog(context: context, builder: (_) => CreateSadhanaDialog(addNewSadhana)).then((value) {
       setState(() {});
     });
   }

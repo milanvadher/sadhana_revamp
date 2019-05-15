@@ -1,4 +1,6 @@
-class Activity {
+import 'package:sadhana/model/entity.dart';
+
+class Activity extends Entity {
   static final String tableActivity = 'Activity';
   static final String columnId = '_id';
   static final String columnSadhanaId = 'sadhana_id';
@@ -46,7 +48,7 @@ class Activity {
     return data;
   }
 
-  Activity.fromMap(Map<String, dynamic> map) {
+  fromMap(Map<String, dynamic> map) {
     id = map[columnId];
     sadhanaId = map[columnSadhanaId];
     sadhanaDate = map[columnSadhanaDate];
@@ -70,6 +72,26 @@ class Activity {
       map[columnId] = id;
     }
     return map;
+  }
+
+  @override
+  getColumnID() {
+    return columnId;
+  }
+
+  @override
+  getTableName() {
+    return tableActivity;
+  }
+
+  @override
+  setID(int id) {
+    this.id = id;
+  }
+
+  @override
+  int getID() {
+    return id;
   }
 
 }

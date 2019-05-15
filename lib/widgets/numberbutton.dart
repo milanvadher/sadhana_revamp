@@ -75,7 +75,7 @@ class _NumberButtonState extends State<NumberButton> {
                           activity.sadhanaValue > 0 ? theme == Brightness.light ? sadhana.lColor : sadhana.dColor : Colors.grey),
                 ),
                 CircleAvatar(
-                  maxRadius: activity.sadhanaValue > 0 ? 2 : 0,
+                  maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
                   backgroundColor: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
                 )
               ],
