@@ -20,7 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: 0.5.2
-  sqflite: 1.1.0
+  sqflite: 1.1.5
   path_provider: ^1.1.0
   table_calendar: ^1.2.0
   month_picker_dialog: ^0.0.8

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 
@@ -6,8 +7,7 @@ class CheckmarkButton extends StatefulWidget {
   Function onClick;
   Sadhana sadhana;
   Activity activity;
-
-  CheckmarkButton({@required this.sadhana,@required this.activity, this.onClick});
+  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick});
 
   @override
   _CheckmarkButtonState createState() => _CheckmarkButtonState();
@@ -18,6 +18,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Activity activity;
   Sadhana sadhana;
   Brightness theme;
+  ActivityDAO activityDAO = ActivityDAO();
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
@@ -32,7 +33,8 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
         width: 48,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: (theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor).withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
+          color: (theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor)
+              .withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
           border: Border.all(
             color: theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor,
             width: 2,
@@ -62,11 +64,13 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   }
 
   onClicked() {
-    setState(() {
-      activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
-      sadhana.sadhanaData[activity.sadhanaDate] = activity;
-      if(widget.onClick != null)
-        widget.onClick(widget.activity);
+    activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
+    activityDAO.insert(activity).then((dbActivity) {
+      setState(() {
+        sadhana.sadhanaData[activity.sadhanaDate] = dbActivity;
+        if (widget.onClick != null)
+          widget.onClick(widget.activity);
+      });
     });
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/setup/numberpicker.dart';
@@ -21,7 +22,7 @@ class _NumberButtonState extends State<NumberButton> {
   Activity activity;
   Sadhana sadhana;
   Brightness theme;
-
+  ActivityDAO activityDAO = ActivityDAO();
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
@@ -88,14 +89,16 @@ class _NumberButtonState extends State<NumberButton> {
 
   onValueSelected(List onValue) {
     if (onValue != null && onValue[0] != null) {
-      setState(() {
-        activity.sadhanaValue = onValue[0];
-        activity.remarks = onValue[1];
-        sadhana.sadhanaData[activity.sadhanaDate] = activity;
-        widget.onClick(activity);
+      activity.sadhanaValue = onValue[0];
+      activity.remarks = onValue[1];
+      activityDAO.insert(activity).then((dbActivity) {
+        setState(() {
+          sadhana.sadhanaData[activity.sadhanaDate] = dbActivity;
+          if (widget.onClick != null)
+            widget.onClick(widget.activity);
+        });
       });
-      if(widget.onClick != null)
-        widget.onClick(widget.activity);
+
     }
   }
 }

@@ -14,6 +14,17 @@ abstract class BaseDAO<T extends Entity> {
     return entity;
   }
 
+  Future<List<T>> getEntityBySearchKey(String searchKey, dynamic value) async {
+    final db = await dbProvider.database;
+    List<Map> listOfDBData = await db.query(
+      getTableName(),
+      where: '$searchKey = ?',
+      whereArgs: [value],
+    );
+    return fromList(listOfDBData);
+    ;
+  }
+
   Future<List<T>> getAll() async {
     final db = await dbProvider.database;
     List<Map> listOfDBData = await db.query(getTableName());

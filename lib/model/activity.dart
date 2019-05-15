@@ -2,7 +2,6 @@ import 'package:sadhana/model/entity.dart';
 
 class Activity extends Entity {
   static final String tableActivity = 'Activity';
-  static final String columnId = '_id';
   static final String columnSadhanaId = 'sadhana_id';
   static final String columnSadhanaDate = 'sadhana_date';
   static final String columnSadhanaActivityDate = 'sadhana_activity_date';
@@ -10,7 +9,6 @@ class Activity extends Entity {
   static final String columnIsSynced = 'is_synced';
   static final String columnRemarks = 'remarks';
 
-  int id;
   int sadhanaId;
   DateTime sadhanaDate;
   DateTime sadhanaActivityDate;
@@ -19,7 +17,7 @@ class Activity extends Entity {
   String remarks;
 
   Activity({
-    this.id,
+    id,
     this.sadhanaId,
     this.sadhanaDate,
     this.sadhanaActivityDate,
@@ -49,7 +47,7 @@ class Activity extends Entity {
   }
 
   fromMap(Map<String, dynamic> map) {
-    id = map[columnId];
+    id = map[Entity.columnId];
     sadhanaId = map[columnSadhanaId];
     sadhanaDate = map[columnSadhanaDate];
     sadhanaActivityDate = map[columnSadhanaActivityDate];
@@ -60,7 +58,7 @@ class Activity extends Entity {
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
-      columnId: id,
+      Entity.columnId: id,
       columnSadhanaId: sadhanaId,
       columnSadhanaDate: sadhanaDate,
       columnSadhanaActivityDate: sadhanaActivityDate,
@@ -69,29 +67,12 @@ class Activity extends Entity {
       columnRemarks: remarks
     };
     if (id != null) {
-      map[columnId] = id;
+      map[Entity.columnId] = id;
     }
     return map;
   }
-
-  @override
-  getColumnID() {
-    return columnId;
-  }
-
   @override
   getTableName() {
     return tableActivity;
   }
-
-  @override
-  setID(int id) {
-    this.id = id;
-  }
-
-  @override
-  int getID() {
-    return id;
-  }
-
 }
