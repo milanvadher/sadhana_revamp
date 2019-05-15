@@ -7,11 +7,10 @@ class ActivityDAO extends BaseDAO<Activity> {
   static final createActivityTable = ''' create table ${Activity.tableActivity} ( 
   ${Entity.columnId} integer primary key autoincrement, 
   ${Activity.columnSadhanaId} integer not null,
-  ${Activity.columnSadhanaDate} integer not null,
+  ${Activity.columnSadhanaDate} integer not null ON CONFLICT REPLACE,
   ${Activity.columnSadhanaActivityDate} integer not null,
   ${Activity.columnSadhanaValue} integer not null,
-  ${Activity.columnIsSynced} integer not null,
-  ${Sadhana.columnReminderTime} date,
+  ${Activity.columnIsSynced} integer,
   ${Activity.columnRemarks} text)
 ''';
 
@@ -24,7 +23,6 @@ class ActivityDAO extends BaseDAO<Activity> {
   getTableName() {
     return Activity.tableActivity;
   }
-
   Future<List<Activity>> getActivityBySadhanaId(int sadhanaId) {
       return getEntityBySearchKey(Activity.columnSadhanaId, sadhanaId);
   }

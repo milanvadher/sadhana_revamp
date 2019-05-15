@@ -31,7 +31,7 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
 
   @override
   Future<List<Sadhana>> getAll() async {
-    List<Sadhana> sadhanas = await super.getAll()
+    List<Sadhana> sadhanas = await super.getAll();
     for (Sadhana sadhana in sadhanas) {
       List<Activity> activities = await activityDAO.getActivityBySadhanaId(sadhana.id);
       if (activities != null && activities.isNotEmpty) {

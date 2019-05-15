@@ -1,5 +1,6 @@
 import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/service/dbprovider.dart';
+import 'package:sqflite/sqflite.dart';
 
 abstract class BaseDAO<T extends Entity> {
   DBProvider dbProvider = DBProvider.db;
@@ -10,7 +11,7 @@ abstract class BaseDAO<T extends Entity> {
 
   Future<T> insert(T entity) async {
     final db = await dbProvider.database;
-    entity.setID(await db.insert(getTableName(), entity.toMap()));
+    entity.setID(await db.insert(getTableName(), entity.toMap(), conflictAlgorithm: ConflictAlgorithm.replace));
     return entity;
   }
 

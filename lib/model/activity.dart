@@ -13,18 +13,19 @@ class Activity extends Entity {
   DateTime sadhanaDate;
   DateTime sadhanaActivityDate;
   int sadhanaValue;
-  int isSynced;
+  bool isSynced;
   String remarks;
+
 
   Activity({
     id,
     this.sadhanaId,
     this.sadhanaDate,
-    this.sadhanaActivityDate,
+    sadhanaActivityDate,
     this.sadhanaValue,
-    this.isSynced,
+    this.isSynced = false,
     this.remarks,
-  });
+  }) : this.sadhanaActivityDate = sadhanaActivityDate ?? DateTime.now();
 
   convertForJson(dynamic source, dynamic dest) {
     dest.id = source.id;
@@ -46,24 +47,25 @@ class Activity extends Entity {
     return data;
   }
 
-  fromMap(Map<String, dynamic> map) {
+  Activity fromMap(Map<String, dynamic> map) {
     id = map[Entity.columnId];
     sadhanaId = map[columnSadhanaId];
-    sadhanaDate = map[columnSadhanaDate];
-    sadhanaActivityDate = map[columnSadhanaActivityDate];
+    sadhanaDate = DateTime.fromMillisecondsSinceEpoch(map[columnSadhanaDate]);
+    sadhanaActivityDate = DateTime.fromMillisecondsSinceEpoch(map[columnSadhanaActivityDate]);
     sadhanaValue = map[columnSadhanaValue];
-    isSynced = map[columnIsSynced];
+    isSynced = map[columnIsSynced] == 0 ? false : true;
     remarks = map[columnRemarks];
+    return this;
   }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       Entity.columnId: id,
       columnSadhanaId: sadhanaId,
-      columnSadhanaDate: sadhanaDate,
-      columnSadhanaActivityDate: sadhanaActivityDate,
+      columnSadhanaDate: sadhanaDate.millisecondsSinceEpoch,
+      columnSadhanaActivityDate: sadhanaActivityDate != null ? sadhanaActivityDate.millisecondsSinceEpoch : null,
       columnSadhanaValue: sadhanaValue,
-      columnIsSynced: isSynced,
+      columnIsSynced: isSynced ? 1 : 0,
       columnRemarks: remarks
     };
     if (id != null) {

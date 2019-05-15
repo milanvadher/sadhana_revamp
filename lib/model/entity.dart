@@ -11,7 +11,7 @@ abstract class Entity {
   int getID() {
     return id;
   }
-  fromMap(Map<String, dynamic> map);
+  Entity fromMap(Map<String, dynamic> map);
   toMap();
 }
 
