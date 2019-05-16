@@ -13,7 +13,7 @@ class NameHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String title = sadhana.sadhanaName;
+    String title = sadhana.name;
     this.context = context;
     theme = Theme.of(context).brightness;
     return Card(
@@ -74,10 +74,10 @@ class NameHeading extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => SadhanaEditPage(
-            title: sadhana.sadhanaName,
+            title: sadhana.name,
             color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
             appBarColor: sadhana.lColor,
-            type: sadhana.sadhanaType),
+            type: sadhana.type),
         fullscreenDialog: true,
       ),
     );

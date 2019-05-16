@@ -23,7 +23,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
-    title = sadhana.sadhanaName;
+    title = sadhana.name;
     theme = Theme.of(context).brightness;
     return InkWell(
       onTap: () {
@@ -65,9 +65,12 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
 
   onClicked() {
     activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
-    activityDAO.insert(activity).then((dbActivity) {
+    setState(() {
+      sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
+    });
+    activityDAO.insertOrUpdate(activity).then((dbActivity) {
       setState(() {
-        sadhana.sadhanaData[activity.sadhanaDate] = dbActivity;
+        sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;
         if (widget.onClick != null)
           widget.onClick(widget.activity);
       });

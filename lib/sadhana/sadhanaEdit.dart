@@ -34,50 +34,6 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   @override
   Widget build(BuildContext context) {
-    Widget _buildTableCalendar() {
-      return TableCalendar(
-        daysOfWeekStyle: DaysOfWeekStyle(
-          weekendStyle: TextStyle(color: widget.color),
-          weekdayStyle: TextStyle(color: widget.color),
-        ),
-        forcedCalendarFormat: CalendarFormat.month,
-        formatAnimation: FormatAnimation.slide,
-        startingDayOfWeek: StartingDayOfWeek.monday,
-        calendarStyle: CalendarStyle(
-          selectedColor: widget.color,
-          todayColor: widget.color.withAlpha(130),
-          weekendStyle: TextStyle().copyWith(),
-          holidayStyle: TextStyle(color: Colors.red),
-          outsideHolidayStyle: TextStyle(color: Colors.green),
-        ),
-        builders: CalendarBuilders(
-          holidayDayBuilder: (context, date, _) {
-            return Container(
-              margin: const EdgeInsets.all(4.0),
-              child: CircleAvatar(
-                child: Text(
-                  '${date.day}',
-                  style: TextStyle().copyWith(color: Colors.white),
-                ),
-                backgroundColor: _holidays[date][0] == (widget.type == SadhanaType.BOOLEAN ? true : 0) ? Colors.green : Colors.red,
-              ),
-            );
-          },
-        ),
-        holidays: _holidays,
-        headerStyle: HeaderStyle(
-          formatButtonShowsNext: true,
-          leftChevronIcon: Icon(Icons.chevron_left, color: widget.color),
-          rightChevronIcon: Icon(Icons.chevron_right, color: widget.color),
-          formatButtonTextStyle: TextStyle().copyWith(color: Colors.white, fontSize: 15.0),
-          formatButtonDecoration: BoxDecoration(
-            color: widget.color,
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -118,6 +74,50 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             ),
             _buildTableCalendar(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTableCalendar() {
+    return TableCalendar(
+      daysOfWeekStyle: DaysOfWeekStyle(
+        weekendStyle: TextStyle(color: widget.color),
+        weekdayStyle: TextStyle(color: widget.color),
+      ),
+      forcedCalendarFormat: CalendarFormat.month,
+      formatAnimation: FormatAnimation.slide,
+      startingDayOfWeek: StartingDayOfWeek.monday,
+      calendarStyle: CalendarStyle(
+        selectedColor: widget.color,
+        todayColor: widget.color.withAlpha(130),
+        weekendStyle: TextStyle().copyWith(),
+        holidayStyle: TextStyle(color: Colors.red),
+        outsideHolidayStyle: TextStyle(color: Colors.green),
+      ),
+      builders: CalendarBuilders(
+        holidayDayBuilder: (context, date, _) {
+          return Container(
+            margin: const EdgeInsets.all(4.0),
+            child: CircleAvatar(
+              child: Text(
+                '${date.day}',
+                style: TextStyle().copyWith(color: Colors.white),
+              ),
+              backgroundColor: _holidays[date][0] == (widget.type == SadhanaType.BOOLEAN ? true : 0) ? Colors.green : Colors.red,
+            ),
+          );
+        },
+      ),
+      holidays: _holidays,
+      headerStyle: HeaderStyle(
+        formatButtonShowsNext: true,
+        leftChevronIcon: Icon(Icons.chevron_left, color: widget.color),
+        rightChevronIcon: Icon(Icons.chevron_right, color: widget.color),
+        formatButtonTextStyle: TextStyle().copyWith(color: Colors.white, fontSize: 15.0),
+        formatButtonDecoration: BoxDecoration(
+          color: widget.color,
+          borderRadius: BorderRadius.circular(16.0),
         ),
       ),
     );

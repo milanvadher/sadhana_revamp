@@ -58,12 +58,12 @@ class HomePageState extends State<HomePage> {
     @required List<Color> color,
   }) {
     tmpSadhanas.add(Sadhana(
-        sadhanaName: title,
+        name: title,
         lColor: color[0],
         dColor: color[1],
-        sadhanaType: type,
+        type: type,
         sadhanaData: new Map(),
-        sadhanaIndex: sadhanaIndex++));
+        index: sadhanaIndex++));
   }
 
   @override
@@ -102,7 +102,7 @@ class HomePageState extends State<HomePage> {
     if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana()) {
       loadPreloadedSadhana();
       tmpSadhanas.forEach((sadhana) {
-        sadhanaDAO.insert(sadhana);
+        sadhanaDAO.insertOrUpdate(sadhana);
       });
       AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
     }
@@ -155,7 +155,7 @@ class HomePageState extends State<HomePage> {
   }
 
   _addNewSadhana() {
-    showDialog(context: context, builder: (_) => CreateSadhanaDialog(addNewSadhana)).then((value) {
+    showDialog(context: context, builder: (_) => CreateSadhanaDialog(onDone: addNewSadhana)).then((value) {
       setState(() {});
     });
   }

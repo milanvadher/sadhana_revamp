@@ -34,10 +34,10 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
           child: Row(
             children: List.generate(
               daysToDisplay.length, (int index) {
-                Activity activity = sadhana.sadhanaData[widget.daysToDisplay[index]];
+                Activity activity = sadhana.activitiesByDate[widget.daysToDisplay[index].millisecondsSinceEpoch];
                 if (activity == null)
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
-                return sadhana.sadhanaType == SadhanaType.BOOLEAN
+                return sadhana.type == SadhanaType.BOOLEAN
                     ? CheckmarkButton(sadhana: sadhana, activity: activity, onClick: onClick)
                     : NumberButton(sadhana: sadhana, activity: activity, onClick: onClick);
               },

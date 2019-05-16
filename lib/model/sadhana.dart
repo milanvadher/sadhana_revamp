@@ -17,39 +17,56 @@ class Sadhana extends Entity {
   static final String columnReminderDays = 'reminder_days';
 
 
-  String sadhanaName;
-  int sadhanaIndex;
-  String sadhanaDescription;
-  SadhanaType sadhanaType;
+  String name;
+  int index;
+  String description;
+  SadhanaType type;
   bool isPreloaded;
   Color dColor;
   Color lColor;
+  List<Color> _colors;
   DateTime reminderTime;
   String reminderDays;
-  Map<DateTime,Activity> sadhanaData = new Map();
+  Map<int,Activity> activitiesByDate = new Map();
   Sadhana({
     id,
-    this.sadhanaName,
-    this.sadhanaIndex,
-    this.sadhanaDescription,
-    this.sadhanaType,
+    this.name,
+    this.index,
+    this.description,
+    this.type,
     this.isPreloaded,
     this.dColor,
     this.lColor,
     this.reminderTime,
     this.reminderDays,
-    this.sadhanaData,
-  })  /*: assert(sadhanaName != null),
-        assert(sadhanaType != null),
+    sadhanaData,
+  })  : /*assert(name != null),
+        assert(type != null),
         assert(dColor != null),
-        assert(lColor != null)*/;
+        assert(lColor != null),*/
+        this.activitiesByDate = sadhanaData ?? new Map()
+  ;
+
+  Sadhana.clone(Sadhana original) {
+    this.id = original.id;
+    this.name = original.name;
+    this.index = original.index;
+    this.description = original.description;
+    this.type = original.type;
+    this.isPreloaded = original.isPreloaded;
+    this.dColor = original.dColor;
+    this.lColor = original.lColor;
+    this.reminderTime = original.reminderTime;
+    this.reminderDays = original.reminderDays;
+    this.activitiesByDate = original.activitiesByDate;
+  }
 
   convertForJson(dynamic source, dynamic dest) {
     dest.id = source.id;
-    dest.sadhanaName = source.sadhanaName;
-    dest.sadhanaIndex = source.sadhanaIndex;
-    dest.sadhanaDescription = source.sadhanaDescription;
-    dest.sadhanaType = source.sadhanaType;
+    dest.name = source.name;
+    dest.index = source.index;
+    dest.description = source.description;
+    dest.type = source.type;
     dest.isPreloaded = source.isPreloaded;
     dest.dColor = source.dColor;
     dest.lColor = source.lColor;
@@ -60,6 +77,14 @@ class Sadhana extends Entity {
   Sadhana.fromJson(Map<String, dynamic> json) {
     convertForJson(json, this);
   }
+  List<Color> getColors() {
+      return [lColor,dColor];
+  }
+
+  setColors(List<Color> colors) {
+      this.lColor = colors[0];
+      this.dColor = colors[1];
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -69,25 +94,25 @@ class Sadhana extends Entity {
 
   Sadhana fromMap(Map<String, dynamic> map) {
     id = map[Entity.columnId];
-    sadhanaName = map[columnName];
-    sadhanaIndex = map[columnIndex];
-    sadhanaDescription = map[columnDescription];
-    sadhanaType = map[columnType] == 1 ? SadhanaType.NUMBER : SadhanaType.BOOLEAN;
+    name = map[columnName];
+    index = map[columnIndex];
+    description = map[columnDescription];
+    type = map[columnType] == 1 ? SadhanaType.NUMBER : SadhanaType.BOOLEAN;
     isPreloaded = map[columnIsPreloaded];
     dColor = Color(map[columnDColor]);
     lColor = Color(map[columnLColor]);
     reminderTime = map[columnReminderTime];
     reminderDays = map[columnReminderDays];
-    sadhanaData = new Map();
+    activitiesByDate = new Map();
     return this;
   }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
-      columnName: sadhanaName,
-      columnIndex: sadhanaIndex,
-      columnDescription: sadhanaDescription,
-      columnType: sadhanaType.index,
+      columnName: name,
+      columnIndex: index,
+      columnDescription: description,
+      columnType: type.index,
       columnIsPreloaded: isPreloaded,
       columnDColor: dColor.value,
       columnLColor: lColor.value,

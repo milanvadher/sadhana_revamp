@@ -6,9 +6,9 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/color_picker_dialog.dart';
 
 class CreateSadhanaDialog extends StatefulWidget {
-  final Function crateSadhana;
-
-  CreateSadhanaDialog(this.crateSadhana);
+  final Function onDone;
+  Sadhana sadhana;
+  CreateSadhanaDialog({this.sadhana,this.onDone});
 
   @override
   _CreateSadhanaDialogState createState() => new _CreateSadhanaDialogState();
@@ -17,29 +17,29 @@ class CreateSadhanaDialog extends StatefulWidget {
 class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   final sadhanaNameCtrl = TextEditingController();
   int radioValue = 0;
-  List<Color> _mainColor = Constant.colors[0];
   Brightness theme;
   SadhanaDAO sadhanaDAO = SadhanaDAO();
+  bool isEditMode = false;
+  Sadhana sadhana;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.sadhana == null) {
+      widget.sadhana = new Sadhana(name: "",
+        type: SadhanaType.BOOLEAN,
+        lColor: Constant.colors[0][0],
+        dColor: Constant.colors[0][1],);
+    }
+    sadhana = Sadhana.clone(widget.sadhana);
+  }
 
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;
-    void _openDialog() {
-      showDialog(
-        context: context,
-        builder: (_) {
-          return ColorPickerDialog.getColorPickerDialog(context, _mainColor, (color) {
-            setState(() {
-              _mainColor = color;
-            });
-          });
-        },
-      );
-    }
-
     return SimpleDialog(
       contentPadding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-      title: Text('Add New Sadhana'),
+      title: Text( isEditMode ? 'Add New Sadhana' : 'Edit Sadhana'),
       children: <Widget>[
         Padding(
           padding: EdgeInsets.symmetric(vertical: 10),
@@ -62,13 +62,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             children: <Widget>[
               new Radio(
                 value: 0,
-                groupValue: radioValue,
-                onChanged: (int value) {
-                  print(value);
-                  setState(() {
-                    radioValue = value;
-                  });
-                },
+                groupValue: sadhana.type.index,
+                onChanged: onChangeType,
               ),
               new Text(
                 'Yes / No',
@@ -76,13 +71,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
               ),
               new Radio(
                 value: 1,
-                groupValue: radioValue,
-                onChanged: (int value) {
-                  print(value);
-                  setState(() {
-                    radioValue = value;
-                  });
-                },
+                groupValue: sadhana.type.index,
+                onChanged: onChangeType,
               ),
               new Text(
                 'Number',
@@ -101,7 +91,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             child: ListTile(
               title: const Text('Change Color'),
               trailing: CircleAvatar(
-                backgroundColor: theme == Brightness.light ? _mainColor[0] : _mainColor[1],
+                backgroundColor: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
               ),
             ),
           ),
@@ -125,20 +115,33 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     );
   }
 
+  void onChangeType(int value) {
+    setState(() {
+      sadhana.type = value == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
+    });
+  }
+
+  void _openDialog() {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return ColorPickerDialog.getColorPickerDialog(context, sadhana.getColors(), (color) {
+          setState(() {
+            sadhana.setColors(color);
+          });
+        });
+      },
+    );
+  }
+
   onOKClick() {
     print(sadhanaNameCtrl.text);
     print(radioValue);
-    Sadhana sadhana = Sadhana(
-        sadhanaName: sadhanaNameCtrl.text,
-        lColor: _mainColor[0],
-        dColor: _mainColor[1],
-        sadhanaIndex: 0,
-        sadhanaType: radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER,
-        sadhanaData: new Map(),
-    );
-    sadhanaDAO.insert(sadhana);
+    sadhana.name = sadhanaNameCtrl.text;
+    sadhana.index = 1;
+    sadhanaDAO.insertOrUpdate(sadhana);
     setState(() {
-      widget.crateSadhana(sadhana);
+      widget.onDone(sadhana);
     });
     Navigator.pop(context);
   }

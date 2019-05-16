@@ -35,9 +35,9 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
     for (Sadhana sadhana in sadhanas) {
       List<Activity> activities = await activityDAO.getActivityBySadhanaId(sadhana.id);
       if (activities != null && activities.isNotEmpty) {
-        sadhana.sadhanaData = new Map.fromIterable(activities, key: (v) => (v as Activity).sadhanaDate, value: (v) => v);
+        sadhana.activitiesByDate = new Map.fromIterable(activities, key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch, value: (v) => v);
       } else {
-        sadhana.sadhanaData = new Map();
+        sadhana.activitiesByDate = new Map();
       }
     }
     return sadhanas;

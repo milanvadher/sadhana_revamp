@@ -9,7 +9,7 @@ abstract class BaseDAO<T extends Entity> {
 
   T getDefaultInstance();
 
-  Future<T> insert(T entity) async {
+  Future<T> insertOrUpdate(T entity) async {
     final db = await dbProvider.database;
     entity.setID(await db.insert(getTableName(), entity.toMap(), conflictAlgorithm: ConflictAlgorithm.replace));
     return entity;
