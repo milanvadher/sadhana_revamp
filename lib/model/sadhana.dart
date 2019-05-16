@@ -34,16 +34,16 @@ class Sadhana extends Entity {
     this.index,
     this.description,
     this.type,
-    this.isPreloaded,
+    this.isPreloaded = false,
     this.dColor,
     this.lColor,
     this.reminderTime,
     this.reminderDays,
     sadhanaData,
-  })  : /*assert(name != null),
+  })  : assert(name != null),
         assert(type != null),
         assert(dColor != null),
-        assert(lColor != null),*/
+        assert(lColor != null),
         this.activitiesByDate = sadhanaData ?? new Map()
   ;
 
@@ -98,7 +98,7 @@ class Sadhana extends Entity {
     index = map[columnIndex];
     description = map[columnDescription];
     type = map[columnType] == 1 ? SadhanaType.NUMBER : SadhanaType.BOOLEAN;
-    isPreloaded = map[columnIsPreloaded];
+    isPreloaded = map[columnIsPreloaded] == 1 ? true : false;
     dColor = Color(map[columnDColor]);
     lColor = Color(map[columnLColor]);
     reminderTime = map[columnReminderTime];
@@ -113,7 +113,7 @@ class Sadhana extends Entity {
       columnIndex: index,
       columnDescription: description,
       columnType: type.index,
-      columnIsPreloaded: isPreloaded,
+      columnIsPreloaded: isPreloaded ? 1 : 0,
       columnDColor: dColor.value,
       columnLColor: lColor.value,
       columnReminderTime: reminderDays,

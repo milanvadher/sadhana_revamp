@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
-import 'package:sadhana/utils/apputils.dart';
 
 class NameHeading extends StatelessWidget {
   double headerWidth = 150.0;
@@ -73,11 +72,7 @@ class NameHeading extends StatelessWidget {
   _onSadhanaHeadingClick() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SadhanaEditPage(
-            title: sadhana.name,
-            color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
-            appBarColor: sadhana.lColor,
-            type: sadhana.type),
+        builder: (context) => SadhanaEditPage(sadhana: sadhana),
         fullscreenDialog: true,
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:sadhana/dao/basedao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/entity.dart';
-import 'package:sadhana/model/sadhana.dart';
 
 class ActivityDAO extends BaseDAO<Activity> {
   static final createActivityTable = ''' create table ${Activity.tableActivity} ( 
@@ -27,4 +26,7 @@ class ActivityDAO extends BaseDAO<Activity> {
       return getEntityBySearchKey(Activity.columnSadhanaId, sadhanaId);
   }
 
+  Future<int> deleteBySadhanaId(int sadhanaId) async {
+    return await super.deleteByColumn(Activity.columnSadhanaId, sadhanaId);
+  }
 }

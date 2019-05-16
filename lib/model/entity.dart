@@ -2,9 +2,6 @@ abstract class Entity {
 
   static final String columnId = '_id';
   int id;
-  String getColumnID() {
-    return columnId;
-  }
   setID(int id) {
     this.id = id;
   }

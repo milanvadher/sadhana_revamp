@@ -23,7 +23,6 @@ abstract class BaseDAO<T extends Entity> {
       whereArgs: [value],
     );
     return fromList(listOfDBData);
-    ;
   }
 
   Future<List<T>> getAll() async {
@@ -45,8 +44,18 @@ abstract class BaseDAO<T extends Entity> {
     return await db.update(
       getTableName(),
       entity.toMap(),
-      where: '${entity.getColumnID()} = ?',
+      where: '${Entity.columnId} = ?',
       whereArgs: [entity.getID()],
     );
+  }
+
+  Future<int> delete(int id) async {
+    final db = await dbProvider.database;
+    return await db.delete(getTableName(), where: '${Entity.columnId} = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteByColumn(String columnName, dynamic value) async {
+    final db = await dbProvider.database;
+    return await db.delete(getTableName(), where: '$columnName = ?', whereArgs: [value]);
   }
 }
