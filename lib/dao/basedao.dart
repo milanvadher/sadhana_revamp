@@ -1,5 +1,6 @@
 import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/service/dbprovider.dart';
+import 'package:sqflite/sqflite.dart';
 
 abstract class BaseDAO<T extends Entity> {
   DBProvider dbProvider = DBProvider.db;
@@ -8,10 +9,20 @@ abstract class BaseDAO<T extends Entity> {
 
   T getDefaultInstance();
 
-  Future<T> insert(T entity) async {
+  Future<T> insertOrUpdate(T entity) async {
     final db = await dbProvider.database;
-    entity.setID(await db.insert(getTableName(), entity.toMap()));
+    entity.setID(await db.insert(getTableName(), entity.toMap(), conflictAlgorithm: ConflictAlgorithm.replace));
     return entity;
+  }
+
+  Future<List<T>> getEntityBySearchKey(String searchKey, dynamic value) async {
+    final db = await dbProvider.database;
+    List<Map> listOfDBData = await db.query(
+      getTableName(),
+      where: '$searchKey = ?',
+      whereArgs: [value],
+    );
+    return fromList(listOfDBData);
   }
 
   Future<List<T>> getAll() async {
@@ -33,8 +44,18 @@ abstract class BaseDAO<T extends Entity> {
     return await db.update(
       getTableName(),
       entity.toMap(),
-      where: '${entity.getColumnID()} = ?',
+      where: '${Entity.columnId} = ?',
       whereArgs: [entity.getID()],
     );
+  }
+
+  Future<int> delete(int id) async {
+    final db = await dbProvider.database;
+    return await db.delete(getTableName(), where: '${Entity.columnId} = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteByColumn(String columnName, dynamic value) async {
+    final db = await dbProvider.database;
+    return await db.delete(getTableName(), where: '$columnName = ?', whereArgs: [value]);
   }
 }

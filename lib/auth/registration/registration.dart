@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/commonvalidation.dart';
 import 'package:sadhana/model/register.dart';
 
 class RegistrationPage extends StatefulWidget {

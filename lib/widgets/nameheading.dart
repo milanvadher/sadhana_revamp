@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
-import 'package:sadhana/utils/apputils.dart';
 
 class NameHeading extends StatelessWidget {
   double headerWidth = 150.0;
@@ -13,7 +12,7 @@ class NameHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String title = sadhana.sadhanaName;
+    String title = sadhana.name;
     this.context = context;
     theme = Theme.of(context).brightness;
     return Card(
@@ -73,11 +72,7 @@ class NameHeading extends StatelessWidget {
   _onSadhanaHeadingClick() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SadhanaEditPage(
-            title: sadhana.sadhanaName,
-            color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
-            appBarColor: sadhana.lColor,
-            type: sadhana.sadhanaType),
+        builder: (context) => SadhanaEditPage(sadhana: sadhana),
         fullscreenDialog: true,
       ),
     );

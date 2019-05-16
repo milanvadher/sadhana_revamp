@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/constant.dart';
 
@@ -27,7 +28,7 @@ class ColorPickerDialog {
                 child: CircleAvatar(
                   radius: 25,
                   backgroundColor: theme == Brightness.light ? c[0] : c[1],
-                  child: c == defaultColor ? Icon(Icons.done, size: 30, color: Colors.black) : Container(),
+                  child: IterableEquality().equals(c,defaultColor) ? Icon(Icons.done, size: 30, color: Colors.black) : Container(),
                 ),
               ),
             );

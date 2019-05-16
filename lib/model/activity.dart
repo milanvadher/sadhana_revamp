@@ -2,7 +2,6 @@ import 'package:sadhana/model/entity.dart';
 
 class Activity extends Entity {
   static final String tableActivity = 'Activity';
-  static final String columnId = '_id';
   static final String columnSadhanaId = 'sadhana_id';
   static final String columnSadhanaDate = 'sadhana_date';
   static final String columnSadhanaActivityDate = 'sadhana_activity_date';
@@ -10,23 +9,23 @@ class Activity extends Entity {
   static final String columnIsSynced = 'is_synced';
   static final String columnRemarks = 'remarks';
 
-  int id;
   int sadhanaId;
   DateTime sadhanaDate;
   DateTime sadhanaActivityDate;
   int sadhanaValue;
-  int isSynced;
+  bool isSynced;
   String remarks;
 
+
   Activity({
-    this.id,
+    id,
     this.sadhanaId,
     this.sadhanaDate,
-    this.sadhanaActivityDate,
+    sadhanaActivityDate,
     this.sadhanaValue,
-    this.isSynced,
+    this.isSynced = false,
     this.remarks,
-  });
+  }) : this.sadhanaActivityDate = sadhanaActivityDate ?? DateTime.now();
 
   convertForJson(dynamic source, dynamic dest) {
     dest.id = source.id;
@@ -48,50 +47,34 @@ class Activity extends Entity {
     return data;
   }
 
-  fromMap(Map<String, dynamic> map) {
-    id = map[columnId];
+  Activity fromMap(Map<String, dynamic> map) {
+    id = map[Entity.columnId];
     sadhanaId = map[columnSadhanaId];
-    sadhanaDate = map[columnSadhanaDate];
-    sadhanaActivityDate = map[columnSadhanaActivityDate];
+    sadhanaDate = DateTime.fromMillisecondsSinceEpoch(map[columnSadhanaDate]);
+    sadhanaActivityDate = DateTime.fromMillisecondsSinceEpoch(map[columnSadhanaActivityDate]);
     sadhanaValue = map[columnSadhanaValue];
-    isSynced = map[columnIsSynced];
+    isSynced = map[columnIsSynced] == 0 ? false : true;
     remarks = map[columnRemarks];
+    return this;
   }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
-      columnId: id,
+      Entity.columnId: id,
       columnSadhanaId: sadhanaId,
-      columnSadhanaDate: sadhanaDate,
-      columnSadhanaActivityDate: sadhanaActivityDate,
+      columnSadhanaDate: sadhanaDate.millisecondsSinceEpoch,
+      columnSadhanaActivityDate: sadhanaActivityDate != null ? sadhanaActivityDate.millisecondsSinceEpoch : null,
       columnSadhanaValue: sadhanaValue,
-      columnIsSynced: isSynced,
+      columnIsSynced: isSynced ? 1 : 0,
       columnRemarks: remarks
     };
     if (id != null) {
-      map[columnId] = id;
+      map[Entity.columnId] = id;
     }
     return map;
   }
-
-  @override
-  getColumnID() {
-    return columnId;
-  }
-
   @override
   getTableName() {
     return tableActivity;
   }
-
-  @override
-  setID(int id) {
-    this.id = id;
-  }
-
-  @override
-  int getID() {
-    return id;
-  }
-
 }

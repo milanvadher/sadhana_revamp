@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
-import 'package:sadhana/auth/registration/registration.dart';
+import 'package:flutter/material.dart';
 import 'package:sadhana/sadhana/home.dart';
-
 import 'package:sadhana/setup/options.dart';
-import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/setup/routes.dart';
+import 'package:sadhana/setup/themes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SadhanaApp extends StatefulWidget {

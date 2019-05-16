@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
-import 'package:sadhana/model/sadhana.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBProvider {
@@ -24,7 +24,7 @@ class DBProvider {
     String path = join(documentsDirectory.path, "Sadhana.db");
     return await openDatabase(path, version: 1, onOpen: (db) {}, onCreate: (Database db, int version) async {
       await db.execute(SadhanaDAO.createSadhanaTable);
-
+      await db.execute(ActivityDAO.createActivityTable);
     });
   }
 

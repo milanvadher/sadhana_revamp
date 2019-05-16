@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as prefix0;
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
-import 'package:sadhana/sadhana/sadhanaEdit.dart';
 import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
-import 'package:sadhana/widgets/base_state.dart';
-import 'package:sadhana/widgets/checkmarkbutton.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
-import 'package:sadhana/widgets/numberbutton.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
+
 import '../attendance/attendance_home.dart';
-import '../setup/numberpicker.dart';
-import 'package:sadhana/commonvalidation.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
@@ -58,12 +52,12 @@ class HomePageState extends State<HomePage> {
     @required List<Color> color,
   }) {
     tmpSadhanas.add(Sadhana(
-        sadhanaName: title,
+        name: title,
         lColor: color[0],
         dColor: color[1],
-        sadhanaType: type,
-        sadhanaData: new Map(),
-        sadhanaIndex: sadhanaIndex++));
+        isPreloaded: true,
+        type: type,
+        index: sadhanaIndex++));
   }
 
   @override
@@ -76,7 +70,8 @@ class HomePageState extends State<HomePage> {
     await createPreloadedSadhana();
     sadhanaDAO.getAll().then((dbSadhanas) {
       setState(() {
-        sadhanas.addAll(dbSadhanas);
+        CacheData.addSadhanas(dbSadhanas);
+        sadhanas = CacheData.getSadhanas();
       });
     });
   }
@@ -102,7 +97,7 @@ class HomePageState extends State<HomePage> {
     if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana()) {
       loadPreloadedSadhana();
       tmpSadhanas.forEach((sadhana) {
-        sadhanaDAO.insert(sadhana);
+        sadhanaDAO.insertOrUpdate(sadhana);
       });
       AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
     }
@@ -119,7 +114,7 @@ class HomePageState extends State<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('Sadhana'),
+        title: Text('JIO'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -154,8 +149,8 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  _addNewSadhana() {
-    showDialog(context: context, builder: (_) => CreateSadhanaDialog(addNewSadhana)).then((value) {
+  _onAddSadhanaClick() {
+    showDialog(context: context, builder: (_) => CreateSadhanaDialog(onDone: addNewSadhana)).then((value) {
       setState(() {});
     });
   }
@@ -251,7 +246,7 @@ class HomePageState extends State<HomePage> {
       ),
       IconButton(
         icon: Icon(Icons.add),
-        onPressed: _addNewSadhana,
+        onPressed: _onAddSadhanaClick,
         tooltip: 'Add new Sadhana',
       ),
       PopupMenuButton(
@@ -322,12 +317,9 @@ class HomePageState extends State<HomePage> {
   }
 
   generateCSV(date) async {
-    List<Activity> activities = new List();
-    activities.add(Activity(sadhanaId: 12, sadhanaDate: DateTime.now(), sadhanaValue: 1, remarks: 'Test'));
-    activities.add(Activity(sadhanaId: 13, sadhanaDate: DateTime.now(), sadhanaValue: 1, remarks: 'Test'));
-    activities.add(Activity(sadhanaId: 14, sadhanaDate: DateTime.now(), sadhanaValue: 1, remarks: 'Test'));
-    selectedDate = date;
-    String file = await AppCSVUtils.generateCSV(activities);
+    DateTime selectedMonth = date as DateTime;
+    DateTime toDate = new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
+    String file = await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
     print(file);
     showDialog(
       context: context,
