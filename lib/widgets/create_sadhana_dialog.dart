@@ -43,7 +43,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     theme = Theme.of(context).brightness;
     return SimpleDialog(
       contentPadding: EdgeInsets.fromLTRB(20, 20, 20, 10),
-      title: Text(widget.isEditMode ? 'Edit JIO' : 'Add New JIO'),
+      title: Text(widget.isEditMode ? 'Edit Sadhana' : 'Add New Sadhana'),
       children: <Widget>[
         Padding(
           padding: EdgeInsets.symmetric(vertical: 10),

@@ -22,11 +22,34 @@ class ActivityDAO extends BaseDAO<Activity> {
   getTableName() {
     return Activity.tableActivity;
   }
+  Future<Activity> insertOrUpdate(Activity entity) async {
+    entity.sadhanaActivityDate = DateTime.now();
+    Activity activity = await super.insertOrUpdate(entity);
+    sendToServer(activity);
+    return activity;
+  }
+
+  sendToServer(Activity activity) {
+    if(!activity.isSynced) {
+      bool isSendToServer = true;
+      if(isSendToServer) {
+        activity.isSynced = true;
+        updateActivitySync(activity);
+      }
+    }
+  }
+
   Future<List<Activity>> getActivityBySadhanaId(int sadhanaId) {
       return getEntityBySearchKey(Activity.columnSadhanaId, sadhanaId);
   }
 
   Future<int> deleteBySadhanaId(int sadhanaId) async {
     return await super.deleteByColumn(Activity.columnSadhanaId, sadhanaId);
+  }
+
+  Future<int> updateActivitySync(Activity activity) {
+      String where = getWhereAndCondition([Activity.columnSadhanaActivityDate, Entity.columnId]);
+      List values = [activity.sadhanaActivityDate, activity.id];
+      return super.update(activity, where: where, values: values);
   }
 }

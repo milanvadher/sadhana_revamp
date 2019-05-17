@@ -91,6 +91,9 @@ class _NumberButtonState extends State<NumberButton> {
     if (onValue != null && onValue[0] != null) {
       activity.sadhanaValue = onValue[0];
       activity.remarks = onValue[1];
+      setState(() {
+        sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
+      });
       activityDAO.insertOrUpdate(activity).then((dbActivity) {
         setState(() {
           sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;

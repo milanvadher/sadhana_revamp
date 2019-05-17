@@ -39,14 +39,37 @@ abstract class BaseDAO<T extends Entity> {
     return entities;
   }
 
-  Future<int> update(T entity) async {
+  Future<int> update(T entity, {String where, List<dynamic> values}) async {
     final db = await dbProvider.database;
     return await db.update(
       getTableName(),
       entity.toMap(),
-      where: '${Entity.columnId} = ?',
-      whereArgs: [entity.getID()],
+      where: where,
+      whereArgs: values,
     );
+  }
+
+/*  Future<int> updateWithWhere(T entity, {String where, List<dynamic> values}) async {
+    final db = await dbProvider.database;
+    return await db.update(
+      getTableName(),
+      entity.toMap(),
+      where: where,
+      whereArgs: values,
+    );
+  }*/
+
+  String getWhereAndCondition(List<String> columns) {
+    String where = '';
+    bool first = true;
+    for (String column in columns) {
+      if (first)
+        where = where + '$column = ?';
+      else
+        where = where + 'and $column = ?';
+      first = false;
+    }
+    return where;
   }
 
   Future<int> delete(int id) async {
