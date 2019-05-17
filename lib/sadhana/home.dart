@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:path/path.dart';
 import 'package:sadhana/auth/registration/registration.dart';
+import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
@@ -13,7 +17,8 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
-
+import 'package:share/share.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../attendance/attendance_home.dart';
 
 class HomePage extends StatefulWidget {
@@ -51,13 +56,8 @@ class HomePageState extends State<HomePage> {
     @required String title,
     @required List<Color> color,
   }) {
-    tmpSadhanas.add(Sadhana(
-        name: title,
-        lColor: color[0],
-        dColor: color[1],
-        isPreloaded: true,
-        type: type,
-        index: sadhanaIndex++));
+    tmpSadhanas
+        .add(Sadhana(name: title, lColor: color[0], dColor: color[1], isPreloaded: true, type: type, index: sadhanaIndex++));
   }
 
   @override
@@ -114,7 +114,7 @@ class HomePageState extends State<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('JIO'),
+        title: Text('Sadhana'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -297,7 +297,8 @@ class HomePageState extends State<HomePage> {
         onSaveExcel();
         break;
       case 'share_excel':
-        Navigator.pushNamed(context, TimeTablePage.routeName);
+        //Navigator.pushNamed(context, TimeTablePage.routeName);
+        onShareExcel();
         break;
       case 'options':
         print('On press options');
@@ -312,30 +313,57 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void onSaveExcel() {
-    showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => generateCSV(date));
-  }
-
-  generateCSV(date) async {
+  Future<File> getGeneratedCSVPath(date) async {
     DateTime selectedMonth = date as DateTime;
     DateTime toDate = new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
-    String file = await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
-    print(file);
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Success'),
-          content: Wrap(
-            children: <Widget>[
-              Text(
-                'Your File is successuflly created, Path: $file',
-                overflow: TextOverflow.clip,
-              )
-            ],
-          ),
-        );
-      },
-    );
+    return await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
+  }
+
+  void onShareExcel() {
+    showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => shareExcel(date));
+  }
+
+  shareExcel(date) async {
+    if (date != null) {
+      File file = await getGeneratedCSVPath(date);
+      if (file != null) {
+        final RenderBox box = context.findRenderObject();
+        Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
+            .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+      }
+    }
+  }
+
+  void onSaveExcel() {
+    showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => saveExcel(date));
+  }
+
+  saveExcel(date) async {
+    if (date != null) {
+      File file = await getGeneratedCSVPath(date);
+      if (file != null) {
+        CommonFunction.alertDialog(
+            context: context,
+            msg: 'Your File is successuflly created, Path: ${file.path}',
+            doneButtonFn: () {
+              Navigator.pop(context);
+              openFile(file);
+            });
+      }
+    }
+  }
+
+  openFile(File file) async {
+    try {
+      String uriToShare = file.uri.toString();
+      // at this point uriToShare looks like: 'file:///storage/emulated/0/jpg_example.jpg'
+      uriToShare = uriToShare.replaceFirst("file://", "content://");
+      if (await canLaunch(uriToShare)) {
+        await launch(uriToShare);
+      } else {
+      }
+    } catch (error) {
+      print(error);
+    }
   }
 }
