@@ -20,6 +20,7 @@ import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
 import 'package:url_launcher/url_launcher.dart';
 //import 'package:share_extend/share_extend.dart';
 import '../attendance/attendance_home.dart';
+import 'package:share/share.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
