@@ -89,6 +89,7 @@ class _NumberButtonState extends State<NumberButton> {
 
   onValueSelected(List onValue) {
     if (onValue != null && onValue[0] != null) {
+      AppUtils.vibratePhone(duration: 10);
       activity.sadhanaValue = onValue[0];
       activity.remarks = onValue[1];
       setState(() {

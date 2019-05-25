@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/apputils.dart';
+import 'package:vibration/vibration.dart';
 
 class CheckmarkButton extends StatefulWidget {
   Function onClick;
@@ -64,6 +66,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   }
 
   onClicked() {
+    AppUtils.vibratePhone(duration: 10);
     activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
     setState(() {
       sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;

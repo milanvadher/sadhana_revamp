@@ -17,9 +17,10 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
-import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
+//import 'package:share_extend/share_extend.dart';
 import '../attendance/attendance_home.dart';
+import 'package:share/share.dart';
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
@@ -328,6 +329,7 @@ class HomePageState extends State<HomePage> {
       File file = await getGeneratedCSVPath(date);
       if (file != null) {
         final RenderBox box = context.findRenderObject();
+        //ShareExtend.share(file.path, "file");
         Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
             .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       }

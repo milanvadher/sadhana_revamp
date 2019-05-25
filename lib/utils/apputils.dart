@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:vibration/vibration.dart';
 
 class AppUtils {
 
@@ -19,5 +20,16 @@ class AppUtils {
         return true;
     }
     return false;
+  }
+
+  static vibratePhone({int duration}) {
+    Vibration.hasVibrator().then((canVibrate) {
+      if(canVibrate) {
+        if(duration != null && duration > 0)
+          Vibration.vibrate(duration: duration);
+        else
+          Vibration.vibrate();
+      }
+    });
   }
 }
