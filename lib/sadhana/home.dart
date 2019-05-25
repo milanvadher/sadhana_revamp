@@ -329,6 +329,8 @@ class HomePageState extends State<HomePage> {
       if (file != null) {
         final RenderBox box = context.findRenderObject();
         //ShareExtend.share(file.path, "file");
+        Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
+            .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       }
     }
   }
