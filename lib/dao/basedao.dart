@@ -11,8 +11,22 @@ abstract class BaseDAO<T extends Entity> {
 
   Future<T> insertOrUpdate(T entity) async {
     final db = await dbProvider.database;
-    entity.setID(await db.insert(getTableName(), entity.toMap(), conflictAlgorithm: ConflictAlgorithm.replace));
+    entity.setID(await db.insert(
+      getTableName(),
+      entity.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    ));
     return entity;
+  }
+
+  Future<int> update(T entity, {String where, List<dynamic> values}) async {
+    final db = await dbProvider.database;
+    return await db.update(
+      getTableName(),
+      entity.toMap(),
+      where: where,
+      whereArgs: values,
+    );
   }
 
   Future<List<T>> getEntityBySearchKey(String searchKey, dynamic value) async {
@@ -39,15 +53,6 @@ abstract class BaseDAO<T extends Entity> {
     return entities;
   }
 
-  Future<int> update(T entity, {String where, List<dynamic> values}) async {
-    final db = await dbProvider.database;
-    return await db.update(
-      getTableName(),
-      entity.toMap(),
-      where: where,
-      whereArgs: values,
-    );
-  }
 
 /*  Future<int> updateWithWhere(T entity, {String where, List<dynamic> values}) async {
     final db = await dbProvider.database;

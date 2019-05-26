@@ -9,14 +9,27 @@ import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/apputils.dart';
-import 'package:simple_permissions/simple_permissions.dart';
+//import 'package:simple_permissions/simple_permissions.dart';
+import 'package:permission/permission.dart';
 
 class AppCSVUtils {
   static List<String> sadhanasName = ['Samayik', 'Vanchan', 'Vidhi', 'G. Satsang', 'Seva'];
 
   static Future<File> writeCSV(List<List<dynamic>> rows) async {
-    await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
-    bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
+    //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
+    //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
+    bool checkPermission;
+    if(Platform.isAndroid) {
+      await Permission.requestPermissions([PermissionName.Storage]);
+      List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
+      if(permissions != null && permissions.isNotEmpty) {
+        checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
+      }
+    } else {
+      await Permission.requestSinglePermission(PermissionName.Storage);
+      PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
+        checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
+    }
     if (checkPermission) {
       String dir = (await getExternalStorageDirectory()).absolute.path + "/Sadhana";
       await new Directory('$dir').create(recursive: true);
