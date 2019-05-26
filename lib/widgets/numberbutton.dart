@@ -27,7 +27,7 @@ class _NumberButtonState extends State<NumberButton> {
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
-    title = sadhana.name;
+    title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
     
     return Container(
@@ -56,7 +56,7 @@ class _NumberButtonState extends State<NumberButton> {
                       color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
                       initialIntegerValue: activity.sadhanaValue,
                       minValue: 0,
-                      maxValue: AppUtils.equalsIgnoreCase(sadhana.name, Constant.SEVANAME) ? 24 : 100,
+                      maxValue: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME) ? 24 : 100,
                       remark: activity.remarks,
                     );
                   }).then(
@@ -97,7 +97,6 @@ class _NumberButtonState extends State<NumberButton> {
       });
       activityDAO.insertOrUpdate(activity).then((dbActivity) {
         setState(() {
-          sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;
           if (widget.onClick != null)
             widget.onClick(widget.activity);
         });

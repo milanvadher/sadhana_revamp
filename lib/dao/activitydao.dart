@@ -1,17 +1,9 @@
 import 'package:sadhana/dao/basedao.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/entity.dart';
 
 class ActivityDAO extends BaseDAO<Activity> {
-  static final createActivityTable = ''' create table ${Activity.tableActivity} ( 
-  ${Entity.columnId} integer primary key autoincrement, 
-  ${Activity.columnSadhanaId} integer not null,
-  ${Activity.columnSadhanaDate} integer not null ON CONFLICT REPLACE,
-  ${Activity.columnSadhanaActivityDate} integer not null,
-  ${Activity.columnSadhanaValue} integer not null,
-  ${Activity.columnIsSynced} integer,
-  ${Activity.columnRemarks} text)
-''';
 
   @override
   getDefaultInstance() {
@@ -25,6 +17,7 @@ class ActivityDAO extends BaseDAO<Activity> {
   Future<Activity> insertOrUpdate(Activity entity) async {
     entity.sadhanaActivityDate = DateTime.now();
     Activity activity = await super.insertOrUpdate(entity);
+    CacheData.addActivity(activity);
     sendToServer(activity);
     return activity;
   }

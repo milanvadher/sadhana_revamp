@@ -14,14 +14,12 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
     theme = Theme.of(context).brightness;
     this.context = context;
     mobileWidth = MediaQuery.of(context).size.width;
-    return new BackgroundGredient(
-      child: new Stack(
+    return new Stack(
         children: <Widget>[
           !isLoading ? pageToDisplay() : buildLoading(),
           isOverlay ? buildLoading() : new Container(),
         ],
-      ),
-    );
+      );
   }
 
   Widget buildLoading() {

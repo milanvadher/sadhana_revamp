@@ -16,10 +16,14 @@ class AppUtils {
 
   static bool isSadhanaExist(String name) {
     for(Sadhana sadhana in CacheData.getSadhanas()) {
-      if(equalsIgnoreCase(sadhana.name, name))
+      if(equalsIgnoreCase(sadhana.sadhanaName, name))
         return true;
     }
     return false;
+  }
+
+  static Color hexToColor(String code) {
+    return new Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);
   }
 
   static vibratePhone({int duration}) {

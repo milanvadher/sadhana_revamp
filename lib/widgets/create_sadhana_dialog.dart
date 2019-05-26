@@ -47,7 +47,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     sadhana = widget.sadhana;
     if (sadhana != null) {
       isPreloaded = sadhana.isPreloaded;
-      nameCtrl.text = sadhana.name;
+      nameCtrl.text = sadhana.sadhanaName;
       desCtrl.text = sadhana.description;
       radioValue = sadhana.type.index;
       reminderTime = sadhana.reminderTime;
@@ -205,7 +205,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       if (sadhana == null) {
         int index = CacheData.getSadhanas().length;
         sadhana = Sadhana(
-          name: nameCtrl.text,
+          sadhanaName: nameCtrl.text,
           description: desCtrl.text,
           lColor: _mainColor[0],
           dColor: _mainColor[1],
@@ -213,7 +213,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
           type: radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER,
         );
       } else {
-        sadhana.name = nameCtrl.text;
+        sadhana.sadhanaName = nameCtrl.text;
         sadhana.description = desCtrl.text;
         sadhana.lColor = _mainColor[0];
         sadhana.dColor = _mainColor[1];
@@ -238,7 +238,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     bool isCheckSadhanaExist = false;
     if (!widget.isEditMode)
       isCheckSadhanaExist = true;
-    else if (sadhana != null && !AppUtils.equalsIgnoreCase(sadhana.name, nameCtrl.text)) isCheckSadhanaExist = true;
+    else if (sadhana != null && !AppUtils.equalsIgnoreCase(sadhana.sadhanaName, nameCtrl.text)) isCheckSadhanaExist = true;
     if (isCheckSadhanaExist && AppUtils.isSadhanaExist(nameCtrl.text)) {
       CommonFunction.alertDialog(
         context: context,

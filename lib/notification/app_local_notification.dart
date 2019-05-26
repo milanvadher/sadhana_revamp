@@ -25,8 +25,8 @@ class AppLocalNotification {
 
   Future<void> scheduleSadhanaDailyAtTime(Sadhana sadhana, Time time) async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      sadhana.name,
-      sadhana.name,
+      sadhana.sadhanaName,
+      sadhana.sadhanaName,
       sadhana.description,
       importance: Importance.Max,
       priority: Priority.High,
@@ -36,7 +36,7 @@ class AppLocalNotification {
     var platformChannelSpecifics = NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.showDailyAtTime(
       sadhana.id,
-      sadhana.name,
+      sadhana.sadhanaName,
       sadhana.description,
       time,
       platformChannelSpecifics,
