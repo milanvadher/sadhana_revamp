@@ -1,27 +1,25 @@
 class Register {
   String mhtId;
-  String firstName;
-  String middleName;
-  String lastName;
+  String fullName;
   DateTime bDate;
   DateTime gDate;
   String center;
-  List<int> mobileNos;
+  int mobileNo;
   String email;
   String fatherName;
   bool fatherGnan;
-  String fatherGDate;
+  DateTime fatherGDate;
   bool fatherMbaApproval;
   String motherName;
   bool motherGnan;
-  String motherGDate;
+  DateTime motherGDate;
   bool motherMbaApproval;
   int brotherCount;
   int sisterCount;
   String studyDetails;
   String occupation;
   int workExp;
-  String jobStartDate;
+  DateTime jobStartDate;
   String companyName;
   String workCity;
   List<String> skills;
@@ -34,13 +32,11 @@ class Register {
 
   Register(
       {this.mhtId,
-        this.firstName,
-        this.middleName,
-        this.lastName,
+        this.fullName,
         this.bDate,
         this.gDate,
         this.center,
-        this.mobileNos,
+        this.mobileNo,
         this.email,
         this.fatherName,
         this.fatherGnan,
@@ -68,13 +64,11 @@ class Register {
 
   Register.fromJson(Map<String, dynamic> json) {
     mhtId = json['mht_id'];
-    firstName = json['first_name'];
-    middleName = json['middle_name'];
-    lastName = json['last_name'];
+    fullName = json['full_name'];
     bDate = json['b_date'];
     gDate = json['g_date'];
     center = json['center'];
-    mobileNos = json['mobile_nos'].cast<int>();
+    mobileNo = json['mobile_no'].cast<int>();
     email = json['email'];
     fatherName = json['father_name'];
     fatherGnan = json['father_gnan'];
@@ -108,13 +102,11 @@ class Register {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['mht_id'] = this.mhtId;
-    data['first_name'] = this.firstName;
-    data['middle_name'] = this.middleName;
-    data['last_name'] = this.lastName;
+    data['full_name'] = this.fullName;
     data['b_date'] = this.bDate;
     data['g_date'] = this.gDate;
     data['center'] = this.center;
-    data['mobile_nos'] = this.mobileNos;
+    data['mobile_nos'] = this.mobileNo;
     data['email'] = this.email;
     data['father_name'] = this.fatherName;
     data['father_gnan'] = this.fatherGnan;
