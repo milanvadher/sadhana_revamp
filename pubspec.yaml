@@ -25,16 +25,24 @@ dependencies:
   table_calendar: ^1.2.0
   month_picker_dialog: ^0.0.8
   csv: ^4.0.3
-  simple_permissions: "^0.1.2"
+  #simple_permissions: ^0.1.9
+  #permission: ^0.1.1
+  permission:
+    git:
+      url: https://github.com/devadrianapostol/permission
   flutter_spinkit: "3.1.0"
   url_launcher: ^5.0.2
   autocomplete_textfield: ^1.6.6
+  vibration: ^1.0.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  share:
-      git:
-       url: https://github.com/d-silveira/flutter-share.git
+  flutter_local_notifications: ^0.7.1+1
+  datetime_picker_formfield: ^0.1.8
+  share_extend: ^1.0.8
+  #share:
+  #  git:
+  #    url: https://github.com/d-silveira/flutter-share.git
 
 dev_dependencies:
   flutter_test:

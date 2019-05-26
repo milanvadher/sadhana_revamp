@@ -41,6 +41,7 @@ class Sadhana extends Entity {
     this.reminderDays,
     sadhanaData,
   })  : assert(name != null),
+        assert(description != null),
         assert(type != null),
         assert(dColor != null),
         assert(lColor != null),
@@ -101,7 +102,7 @@ class Sadhana extends Entity {
     isPreloaded = map[columnIsPreloaded] == 1 ? true : false;
     dColor = Color(map[columnDColor]);
     lColor = Color(map[columnLColor]);
-    reminderTime = map[columnReminderTime];
+    reminderTime = map[columnReminderTime] != null ? DateTime.fromMillisecondsSinceEpoch(map[columnReminderTime]) : null;
     reminderDays = map[columnReminderDays];
     activitiesByDate = new Map();
     return this;
@@ -116,8 +117,8 @@ class Sadhana extends Entity {
       columnIsPreloaded: isPreloaded ? 1 : 0,
       columnDColor: dColor.value,
       columnLColor: lColor.value,
-      columnReminderTime: reminderDays,
-      columnReminderDays: reminderTime,
+      columnReminderDays: reminderDays,
+      columnReminderTime: reminderTime != null ? reminderTime.millisecondsSinceEpoch : null,
       Entity.columnId: id
     };
     if (id != null) {

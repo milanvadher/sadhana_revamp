@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sadhana/comman.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
@@ -72,7 +74,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                   title: Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
                     child: Text(
-                      'Have you completed ' + sadhana.name + '?',
+                      sadhana.description,
                       style: TextStyle(color: color),
                     ),
                   ),
@@ -84,7 +86,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                       Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
                       Icon(Icons.alarm, size: 15),
                       Padding(padding: EdgeInsets.only(right: 5)),
-                      Text('11:00 PM'),
+                      Text(_getReminderText()),
                     ],
                   ),
                 ),
@@ -97,6 +99,9 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     );
   }
 
+  String _getReminderText() {
+    return sadhana.reminderTime != null ? new DateFormat(Constant.timeDisplayFormat).format(sadhana.reminderTime) : "Off";
+  }
   _onEditClick() {
     showDialog(
         context: context,

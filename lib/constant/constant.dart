@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class Constant {
 
-
+  static final String timeDisplayFormat = "hh:mm a";
   static final String vanchanName = "Vanchan";
   static final String SEVANAME = "Seva";
 

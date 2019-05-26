@@ -49,7 +49,7 @@ class ActivityDAO extends BaseDAO<Activity> {
 
   Future<int> updateActivitySync(Activity activity) {
       String where = getWhereAndCondition([Activity.columnSadhanaActivityDate, Entity.columnId]);
-      List values = [activity.sadhanaActivityDate, activity.id];
+      List values = [activity.sadhanaActivityDate.millisecondsSinceEpoch, activity.id];
       return super.update(activity, where: where, values: values);
   }
 }

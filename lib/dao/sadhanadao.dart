@@ -25,7 +25,7 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
 
   @override
   getDefaultInstance() {
-    return Sadhana(name: "",type:SadhanaType.BOOLEAN,lColor: Constant.colors[0][0], dColor: Constant.colors[0][1]);
+    return Sadhana(name: "",description: "",type:SadhanaType.BOOLEAN,lColor: Constant.colors[0][0], dColor: Constant.colors[0][1]);
   }
 
   @override

@@ -1,25 +1,28 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:path/path.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
-import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
-import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
-import 'package:share/share.dart';
+import 'package:share_extend/share_extend.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../attendance/attendance_home.dart';
+//import 'package:share/share.dart';
+
+
 
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
@@ -49,7 +52,6 @@ class HomePageState extends State<HomePage> {
   double mobileWidth;
   SadhanaDAO sadhanaDAO = SadhanaDAO();
   int sadhanaIndex = 0;
-
   void addSadhana({
     @required int id,
     @required SadhanaType type,
@@ -57,7 +59,7 @@ class HomePageState extends State<HomePage> {
     @required List<Color> color,
   }) {
     tmpSadhanas
-        .add(Sadhana(name: title, lColor: color[0], dColor: color[1], isPreloaded: true, type: type, index: sadhanaIndex++));
+        .add(Sadhana(name: title, description: "Have you completed sadhana?", lColor: color[0], dColor: color[1], isPreloaded: true, type: type, index: sadhanaIndex++));
   }
 
   @override
@@ -328,8 +330,9 @@ class HomePageState extends State<HomePage> {
       File file = await getGeneratedCSVPath(date);
       if (file != null) {
         final RenderBox box = context.findRenderObject();
-        Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
-            .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+        ShareExtend.share(file.path, "file");
+        //Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
+        //    .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       }
     }
   }
