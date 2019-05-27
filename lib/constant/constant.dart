@@ -5,7 +5,7 @@ class Constant {
   static final String timeDisplayFormat = "hh:mm a";
   static final String vanchanName = "Vanchan";
   static final String SEVANAME = "Seva";
-
+  static final String MBA_MAILID = "mbaapps@googlegroups.com";
   // Display activity data for no of days
   static int displayDays = 15;
 

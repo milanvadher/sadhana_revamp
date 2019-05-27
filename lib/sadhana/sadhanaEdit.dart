@@ -53,7 +53,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Scaffold(
       appBar: AppBar(
-        title: Text(sadhana.name),
+        title: Text(sadhana.sadhanaName),
         backgroundColor: color,
         actions: <Widget>[
           IconButton(icon: Icon(Icons.edit), onPressed: _onEditClick),

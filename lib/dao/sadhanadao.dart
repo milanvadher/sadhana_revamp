@@ -9,23 +9,12 @@ import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/model/sadhana.dart';
 
 class SadhanaDAO extends BaseDAO<Sadhana> {
-  static final createSadhanaTable = ''' create table ${Sadhana.tableSadhana} ( 
-  ${Entity.columnId} integer primary key autoincrement, 
-  ${Sadhana.columnName} text not null,
-  ${Sadhana.columnDescription} text,
-  ${Sadhana.columnIndex} integer not null,
-  ${Sadhana.columnLColor} integer not null,
-  ${Sadhana.columnDColor} integer not null,
-  ${Sadhana.columnType} integer not null,
-  ${Sadhana.columnIsPreloaded} boolean,
-  ${Sadhana.columnReminderTime} date,
-  ${Sadhana.columnReminderDays} text)
-''';
   static ActivityDAO _activityDAO = ActivityDAO();
 
   @override
   getDefaultInstance() {
-    return Sadhana(name: "",description: "",type:SadhanaType.BOOLEAN,lColor: Constant.colors[0][0], dColor: Constant.colors[0][1]);
+    return Sadhana(
+        sadhanaName: "", description: "", type: SadhanaType.BOOLEAN, lColor: Constant.colors[0][0], dColor: Constant.colors[0][1]);
   }
 
   @override
@@ -34,8 +23,8 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
   }
 
   Future<Sadhana> insertOrUpdate(Sadhana entity) async {
-      Sadhana sadhana = await super.insertOrUpdate(entity);
-      return sadhana;
+    Sadhana sadhana = await super.insertOrUpdate(entity);
+    return sadhana;
   }
 
   @override
@@ -44,23 +33,27 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
     for (Sadhana sadhana in sadhanas) {
       List<Activity> activities = await _activityDAO.getActivityBySadhanaId(sadhana.id);
       if (activities != null && activities.isNotEmpty) {
-        sadhana.activitiesByDate = new Map.fromIterable(activities, key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch, value: (v) => v);
+        sadhana.activitiesByDate = new Map.fromIterable(
+          activities,
+          key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch,
+          value: (v) => v,
+        );
       } else {
         sadhana.activitiesByDate = new Map();
       }
     }
+    sadhanas.sort((a, b) => a.index.compareTo(b.index));
+    CacheData.addSadhanas(sadhanas);
     return sadhanas;
   }
 
   Future<int> delete(int id) async {
     int i = await super.delete(id);
-    if(i > 0) {
+    if (i > 0) {
       await _activityDAO.deleteBySadhanaId(id);
       CacheData.removeSadhana(id);
       main();
     }
     return i;
   }
-
-
 }

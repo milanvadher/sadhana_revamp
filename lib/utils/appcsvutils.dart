@@ -82,7 +82,7 @@ class AppCSVUtils {
             }
           }
           row.add(value);
-          if (activity != null && AppUtils.equalsIgnoreCase(sadhana.name, Constant.SEVANAME)) {
+          if (activity != null && AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME)) {
             row.add(activity.remarks);
           }
         }
@@ -114,6 +114,6 @@ class AppCSVUtils {
   }
 
   static Map<String, Sadhana> getSadhanaByName() {
-    return new Map.fromIterable(CacheData.getSadhanas(), key: (v) => (v as Sadhana).name, value: (v) => v);
+    return new Map.fromIterable(CacheData.getSadhanas(), key: (v) => (v as Sadhana).sadhanaName, value: (v) => v);
   }
 }

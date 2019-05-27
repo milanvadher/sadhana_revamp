@@ -9,6 +9,16 @@ class Activity extends Entity {
   static final String columnIsSynced = 'is_synced';
   static final String columnRemarks = 'remarks';
 
+  static final createActivityTable = ''' create table ${Activity.tableActivity} ( 
+  ${Entity.columnId} integer primary key autoincrement, 
+  ${Activity.columnSadhanaId} integer not null,
+  ${Activity.columnSadhanaDate} integer not null ON CONFLICT REPLACE,
+  ${Activity.columnSadhanaActivityDate} integer not null,
+  ${Activity.columnSadhanaValue} integer not null,
+  ${Activity.columnIsSynced} integer,
+  ${Activity.columnRemarks} text)
+''';
+
   int sadhanaId;
   DateTime sadhanaDate;
   DateTime sadhanaActivityDate;

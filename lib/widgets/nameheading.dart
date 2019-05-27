@@ -12,7 +12,7 @@ class NameHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String title = sadhana.name;
+    String title = sadhana.sadhanaName;
     this.context = context;
     theme = Theme.of(context).brightness;
     return Card(
