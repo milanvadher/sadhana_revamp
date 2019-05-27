@@ -1,10 +1,17 @@
+import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 
 class CacheData {
-  static Map<int, Sadhana> _sadhanasById = new Map();
 
-  static Map<int, Sadhana> getSadhanasById() {
+  static Map<int, Sadhana> _sadhanasById = new Map();
+  static String lastSyncTime;
+
+  static SadhanaDAO sadhanaDAO = SadhanaDAO();
+  static Future<Map<int, Sadhana>> getSadhanasById() async {
+    if(_sadhanasById.isEmpty) {
+      await sadhanaDAO.getAll();
+    }
     return _sadhanasById;
   }
 

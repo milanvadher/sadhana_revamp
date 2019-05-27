@@ -68,15 +68,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   onClicked() {
     AppUtils.vibratePhone(duration: 10);
     activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
-    activity.isSynced = false;
-    setState(() {
-      sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
-    });
-    activityDAO.insertOrUpdate(activity).then((dbActivity) {
-      setState(() {
-        if (widget.onClick != null)
-          widget.onClick(widget.activity);
-      });
-    });
+    if (widget.onClick != null)
+      widget.onClick(widget.activity);
   }
 }

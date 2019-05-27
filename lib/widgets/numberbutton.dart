@@ -22,7 +22,6 @@ class _NumberButtonState extends State<NumberButton> {
   Activity activity;
   Sadhana sadhana;
   Brightness theme;
-  ActivityDAO activityDAO = ActivityDAO();
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
@@ -92,17 +91,8 @@ class _NumberButtonState extends State<NumberButton> {
       AppUtils.vibratePhone(duration: 10);
       activity.sadhanaValue = onValue[0];
       activity.remarks = onValue[1];
-      activity.isSynced = false;
-      setState(() {
-        sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
-      });
-      activityDAO.insertOrUpdate(activity).then((dbActivity) {
-        setState(() {
-          if (widget.onClick != null)
-            widget.onClick(widget.activity);
-        });
-      });
-
+      if (widget.onClick != null)
+        widget.onClick(widget.activity);
     }
   }
 }

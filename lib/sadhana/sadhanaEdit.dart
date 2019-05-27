@@ -100,7 +100,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   }
 
   String _getReminderText() {
-    return sadhana.reminderTime != null ? new DateFormat(Constant.timeDisplayFormat).format(sadhana.reminderTime) : "Off";
+    return sadhana.reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(sadhana.reminderTime) : "Off";
   }
   _onEditClick() {
     showDialog(
