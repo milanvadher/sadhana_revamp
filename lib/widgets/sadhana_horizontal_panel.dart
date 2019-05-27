@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
+import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/checkmarkbutton.dart';
@@ -16,11 +17,12 @@ class SadhanaHorizontalPanel extends StatefulWidget {
 }
 
 class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
-
+  Sadhana sadhana;
+  ActivityDAO activityDAO = ActivityDAO();
   @override
   Widget build(BuildContext context) {
     List<DateTime> daysToDisplay = widget.daysToDisplay;
-    Sadhana sadhana = widget.sadhana;
+    sadhana = widget.sadhana;
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(
@@ -48,6 +50,18 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
     );
   }
   onClick(Activity activity) {
+    if(sadhana.isPreloaded)
+      activity.isSynced = false;
+    else
+      activity.isSynced = true;
+    setState(() {
+      sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
+    });
+    activityDAO.insertOrUpdate(activity).then((dbActivity) {
+      setState(() {
+        sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;
+      });
+    });
     /*setState(() {
       widget.sadhana.sadhanaData[activity.sadhanaDate] = activity;
     });*/
