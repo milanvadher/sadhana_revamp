@@ -7,6 +7,7 @@ import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/model/register.dart';
+import 'package:intl/intl.dart';
 
 class RegistrationPage extends StatefulWidget {
   static const String routeName = '/registration';
@@ -17,12 +18,11 @@ class RegistrationPage extends StatefulWidget {
 
 class RegistrationPageState extends State<RegistrationPage> {
   final _register = Register();
+  var dateFormatter = new DateFormat('yyyy-MM-dd');
   final _formKeyStep1 = GlobalKey<FormState>();
   final _formKeyStep2 = GlobalKey<FormState>();
   final _formKeyStep3 = GlobalKey<FormState>();
   List<String> skills = [];
-  DateTime bDate = DateTime.now();
-  DateTime gDate = DateTime.now();
   int currantStep = 0;
   List<Step> registrationSteps = [];
 
@@ -30,15 +30,15 @@ class RegistrationPageState extends State<RegistrationPage> {
   initState() {
     super.initState();
     _register.mhtId = '123456';
-    _register.fullName = 'Milan Vadher';
-    _register.bDate = DateTime.now();
-    _register.gDate = DateTime.now();
+    _register.fullName = '${_register.firstName} ${_register.middleName} ${_register.lastName}';
+    _register.bDate = '2018-05-20';
+    _register.gDate = '2018-05-20';
     _register.email = 'milandv06@gmail.com';
-    _register.mobileNo = 1234567890;
+    _register.mobileNo1 = "1234567890";
     _register.fatherName = 'D';
     _register.center = 'Sim-City';
-    _register.fatherMbaApproval = true;
-    _register.motherMbaApproval = false;
+    _register.fatherMbaApproval = 0;
+    _register.motherMbaApproval = 1;
     _register.skills = [];
     skills.add('Skill 1');
     skills.add('Skill 2');
@@ -63,13 +63,13 @@ class RegistrationPageState extends State<RegistrationPage> {
             TextInputField(
               enabled: false,
               labelText: 'Full Name',
-              valueText: _register.fullName,
+              valueText: '${_register.firstName} ${_register.middleName} ${_register.lastName}',
             ),
             // Mobile
             NumberInput(
               enabled: false,
               labelText: 'Mobile',
-              valueText: _register.mobileNo.toString(),
+              valueText: _register.mobileNo1,
             ),
             // Email
             TextInputField(
@@ -87,10 +87,10 @@ class RegistrationPageState extends State<RegistrationPage> {
             DateInput(
               labelText: 'Birth Date',
               selectedDate:
-                  _register.bDate == null ? DateTime.now() : _register.bDate,
+                  _register.bDate == null ? DateTime.now() : dateFormatter.parse(_register.bDate),
               selectDate: (DateTime date) {
                 setState(() {
-                  _register.bDate = date;
+                  _register.bDate = dateFormatter.format(date);
                 });
               },
             ),
@@ -101,7 +101,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                   _register.gDate == null ? DateTime.now() : _register.gDate,
               selectDate: (DateTime date) {
                 setState(() {
-                  _register.gDate = date;
+                  _register.gDate = dateFormatter.format(date);
                 });
               },
             ),
@@ -169,7 +169,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                   : _register.fatherGDate,
               selectDate: (DateTime date) {
                 setState(() {
-                  _register.fatherGDate = date;
+                  _register.fatherGDate = dateFormatter.format(date);
                 });
               },
             ),
@@ -217,7 +217,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                   : _register.motherGDate,
               selectDate: (DateTime date) {
                 setState(() {
-                  _register.motherGDate = date;
+                  _register.motherGDate = dateFormatter.format(date);
                 });
               },
             ),
@@ -271,10 +271,10 @@ class RegistrationPageState extends State<RegistrationPage> {
             DropDownInput(
               items: ['Test1', 'Test2'],
               labelText: 'Education Qualification',
-              valueText: _register.studyDetails,
+              valueText: _register.studyDetail,
               onChange: (value) {
                 setState(() {
-                  _register.studyDetails = value;
+                  _register.studyDetail = value;
                 });
               },
             ),
@@ -301,7 +301,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                   : _register.jobStartDate,
               selectDate: (DateTime date) {
                 setState(() {
-                  _register.jobStartDate = date;
+                  _register.jobStartDate = dateFormatter.format(date);
                 });
               },
             ),
