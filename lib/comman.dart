@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/colors.dart';
+import 'package:sadhana/constant/message_constant.dart';
 
 class CommonFunction {
+  static displayErrorDialog({@required BuildContext context, String msg}) {
+    if(msg != null && msg.toUpperCase().contains("SOCKET"))
+      msg = "Looks like you lost your Internet !!";
+    if (msg == null) msg = MessageConstant.COMMON_ERROR_MSG;
+    alertDialog(
+      context: context,
+      msg: msg,
+      barrierDismissible: false,
+    );
+  }
   // common Alert dialog
   static alertDialog({
     @required BuildContext context,

@@ -2,6 +2,8 @@ import 'package:sadhana/dao/basedao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/entity.dart';
+import 'package:sadhana/service/apiservice.dart';
+import 'package:sadhana/utils/sync_activity_utlils.dart';
 
 class ActivityDAO extends BaseDAO<Activity> {
 
@@ -14,22 +16,14 @@ class ActivityDAO extends BaseDAO<Activity> {
   getTableName() {
     return Activity.tableActivity;
   }
+
+  @override
   Future<Activity> insertOrUpdate(Activity entity) async {
     entity.sadhanaActivityDate = DateTime.now();
     Activity activity = await super.insertOrUpdate(entity);
     CacheData.addActivity(activity);
-    sendToServer(activity);
+    SyncActivityUtils.sendToServer(activity);
     return activity;
-  }
-
-  sendToServer(Activity activity) {
-    if(!activity.isSynced) {
-      bool isSendToServer = true;
-      if(isSendToServer) {
-        activity.isSynced = true;
-        updateActivitySync(activity);
-      }
-    }
   }
 
   Future<List<Activity>> getActivityBySadhanaId(int sadhanaId) {
@@ -38,6 +32,10 @@ class ActivityDAO extends BaseDAO<Activity> {
 
   Future<int> deleteBySadhanaId(int sadhanaId) async {
     return await super.deleteByColumn(Activity.columnSadhanaId, sadhanaId);
+  }
+
+  Future<List<Activity>> getAllUnSyncActivity() async {
+    return await getEntityBySearchKey(Activity.columnIsSynced, 0);
   }
 
   Future<int> updateActivitySync(Activity activity) {

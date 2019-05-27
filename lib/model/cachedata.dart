@@ -4,6 +4,10 @@ import 'package:sadhana/model/sadhana.dart';
 class CacheData {
   static Map<int, Sadhana> _sadhanasById = new Map();
 
+  static Map<int, Sadhana> getSadhanasById() {
+    return _sadhanasById;
+  }
+
   static List<Sadhana> getSadhanas() {
     return _sadhanasById.values.toList();
   }
@@ -18,7 +22,7 @@ class CacheData {
 
   static addActivity(Activity activity) {
     Sadhana sadhana = _sadhanasById[activity.sadhanaId];
-    if(sadhana != null) {
+    if (sadhana != null) {
       sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
     }
   }

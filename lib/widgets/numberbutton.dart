@@ -92,6 +92,7 @@ class _NumberButtonState extends State<NumberButton> {
       AppUtils.vibratePhone(duration: 10);
       activity.sadhanaValue = onValue[0];
       activity.remarks = onValue[1];
+      activity.isSynced = false;
       setState(() {
         sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
       });
