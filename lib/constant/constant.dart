@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 class Constant {
 
-  static final String timeDisplayFormat = "hh:mm a";
+  static final String APP_TIME_FORMAT = "hh:mm a";
   static final String vanchanName = "Vanchan";
   static final String SEVANAME = "Seva";
   static final String MBA_MAILID = "mbaapps@googlegroups.com";
+  static final String APP_DATE_TIME_FORMAT = "dd-MM-yyyy hh:mm a";
   // Display activity data for no of days
   static int displayDays = 15;
 

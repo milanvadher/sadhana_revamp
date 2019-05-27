@@ -14,7 +14,7 @@ void main() async  {
 
   // Start the AlarmManager service.
   await AndroidAlarmManager.initialize();
-  await AndroidAlarmManager.periodic(const Duration(seconds: 5), periodicID, printPeriodic, wakeup: true);
-  await AndroidAlarmManager.oneShot(const Duration(seconds: 5), oneShotID, printOneShot);
+  //await AndroidAlarmManager.periodic(const Duration(seconds: 5), periodicID, printPeriodic, wakeup: true);
+  //await AndroidAlarmManager.oneShot(const Duration(seconds: 5), oneShotID, printOneShot);
   initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
 }

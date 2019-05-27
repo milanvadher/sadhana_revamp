@@ -5,6 +5,7 @@ import 'package:sadhana/model/sadhana.dart';
 class CacheData {
 
   static Map<int, Sadhana> _sadhanasById = new Map();
+  static String lastSyncTime;
 
   static SadhanaDAO sadhanaDAO = SadhanaDAO();
   static Future<Map<int, Sadhana>> getSadhanasById() async {

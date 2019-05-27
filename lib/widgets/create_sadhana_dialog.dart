@@ -172,7 +172,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   }
 
   String _getReminderText() {
-    return reminderTime != null ? new DateFormat(Constant.timeDisplayFormat).format(reminderTime) : "Off";
+    return reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime) : "Off";
   }
 
   void _onChangeType(int value) {

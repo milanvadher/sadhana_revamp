@@ -119,8 +119,7 @@ class HomePageState extends BaseState<HomePage> {
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity =
-            wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
         Map<String, Sadhana> sadhanaByServerSName = new Map();
         sadhanas.forEach((sadhana) {
           sadhanaByServerSName[sadhana.serverSName] = sadhana;
@@ -199,6 +198,7 @@ class HomePageState extends BaseState<HomePage> {
           ],
         ),
       ),
+      bottomNavigationBar: CacheData.lastSyncTime != null ? new Container(child: new Text(CacheData.lastSyncTime)) : new Container(),
     );
   }
 
@@ -377,7 +377,7 @@ class HomePageState extends BaseState<HomePage> {
         setState(() {
           isOverlay = true;
         });
-        if(await SyncActivityUtils.syncAllUnSyncActivity()) {
+        if (await SyncActivityUtils.syncAllUnSyncActivity()) {
           CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
         }
       } else {
