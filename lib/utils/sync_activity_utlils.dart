@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
@@ -21,7 +22,7 @@ class SyncActivityUtils {
       Sadhana sadhana = (await CacheData.getSadhanasById())[activity.sadhanaId];
       WSSadhanaActivity wsSadhanaActivity = WSSadhanaActivity.fromActivity(sadhana.serverSName, [activity]);
       Response res = await apiService.syncActivity([wsSadhanaActivity]);
-      AppResponse appResponse = AppResponseParser.parseResponse(res);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: null);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         activity.isSynced = true;
         _activityDAO.updateActivitySync(activity);
@@ -42,7 +43,7 @@ class SyncActivityUtils {
     return await _activityDAO.getAllUnSyncActivity();
   }
 
-  static Future<bool> syncAllUnSyncActivity() async {
+  static Future<bool> syncAllUnSyncActivity({bool onBackground = true, BuildContext context}) async {
     bool isSynced = false;
     try {
       if (await AppUtils.isInternetConnected()) {
@@ -60,17 +61,22 @@ class SyncActivityUtils {
             }
           }
           List<WSSadhanaActivity> wsSadhanaActivities = new List();
-          activitiesByServerSName.forEach(
-                  (serverSName, activities) => wsSadhanaActivities.add(WSSadhanaActivity.fromActivity(serverSName, activities)));
+          activitiesByServerSName
+              .forEach((serverSName, activities) => wsSadhanaActivities.add(WSSadhanaActivity.fromActivity(serverSName, activities)));
           Response res = await apiService.syncActivity(wsSadhanaActivities);
-          AppResponse appResponse = AppResponseParser.parseResponse(res);
+          AppResponse appResponse;
+          if (onBackground)
+            appResponse = AppResponseParser.parseResponse(res, context: null);
+          else
+            appResponse = AppResponseParser.parseResponse(res, context: context);
+
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
             for (Activity activity in activities) {
               activity.isSynced = true;
               _activityDAO.updateActivitySync(activity);
             }
+            isSynced = true;
           }
-          isSynced = true;
         } else
           isSynced = true;
       }
@@ -80,7 +86,7 @@ class SyncActivityUtils {
     }
     if (isSynced) {
       print('All activity is synced successfully');
-      checkNUpdateForLastSyncTime();
+      await checkNUpdateForLastSyncTime();
     }
     return isSynced;
   }

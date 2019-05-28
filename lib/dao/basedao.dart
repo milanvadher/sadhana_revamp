@@ -45,6 +45,12 @@ abstract class BaseDAO<T extends Entity> {
     return fromList(listOfDBData);
   }
 
+  Future<List<T>> rawQuery(String sql) async {
+    final db = await dbProvider.database;
+    List<Map> listOfDBData = await db.rawQuery(sql);
+    return fromList(listOfDBData);
+  }
+
   List<T> fromList(List<Map<String, dynamic>> listOfDBData) {
     List<T> entities = List<T>();
     for (Map map in listOfDBData) {

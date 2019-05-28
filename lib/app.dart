@@ -45,7 +45,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       try {
         print('on Connectivity change');
-        SyncActivityUtils.syncAllUnSyncActivity();
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
       } catch(error) {
         print("Error while sync all activity:" + error);
       }

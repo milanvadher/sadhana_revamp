@@ -24,6 +24,7 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
 
   Future<Sadhana> insertOrUpdate(Sadhana entity) async {
     Sadhana sadhana = await super.insertOrUpdate(entity);
+    CacheData.addSadhanas([sadhana]);
     return sadhana;
   }
 

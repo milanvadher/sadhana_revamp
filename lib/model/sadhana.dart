@@ -38,7 +38,7 @@ class Sadhana extends Entity {
   int index;
   String description;
   SadhanaType type;
-  bool isPreloaded;
+  bool isPreloaded = false;
   Color dColor;
   Color lColor;
   List<Color> _colors;
@@ -112,7 +112,7 @@ class Sadhana extends Entity {
       columnIndex: index,
       columnDescription: description,
       columnType: type.index,
-      columnIsPreloaded: isPreloaded == null ? 0 : 1,
+      columnIsPreloaded: isPreloaded == null ? 0 : isPreloaded,
       columnDColor: dColor.value,
       columnLColor: lColor.value,
       columnReminderDays: reminderDays,

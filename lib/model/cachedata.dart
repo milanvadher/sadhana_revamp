@@ -1,11 +1,16 @@
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 
 class CacheData {
 
   static Map<int, Sadhana> _sadhanasById = new Map();
   static String lastSyncTime;
+
+  static Future<String> getLastSyncTime() async {
+    await AppSharedPrefUtil.getLastSyncTime();
+  }
 
   static SadhanaDAO sadhanaDAO = SadhanaDAO();
   static Future<Map<int, Sadhana>> getSadhanasById() async {

@@ -69,11 +69,12 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void loadSadhana() async {
+    await AppSharedPrefUtil.getLastSyncTime();
     await createPreloadedSadhana();
     sadhanaDAO.getAll().then((dbSadhanas) {
       setState(() {
         sadhanas = CacheData.getSadhanas();
-        SyncActivityUtils.syncAllUnSyncActivity();
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
       });
     });
   }
@@ -198,7 +199,16 @@ class HomePageState extends BaseState<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: CacheData.lastSyncTime != null ? new Container(child: new Text(CacheData.lastSyncTime)) : new Container(),
+      bottomNavigationBar: CacheData.lastSyncTime != null
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: Text('Sync Upto: ' + CacheData.lastSyncTime),
+                )
+              ],
+            )
+          : null,
     );
   }
 
@@ -310,14 +320,14 @@ class HomePageState extends BaseState<HomePage> {
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.save_alt, color: Colors.red),
-                title: Text('Save as Excel'),
+                title: Text('Save CSV'),
               ),
               value: 'save_excel',
             ),
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.share, color: Colors.green),
-                title: Text('Share Excel'),
+                title: Text('Share CSV'),
               ),
               value: 'share_excel',
             ),
@@ -377,7 +387,7 @@ class HomePageState extends BaseState<HomePage> {
         setState(() {
           isOverlay = true;
         });
-        if (await SyncActivityUtils.syncAllUnSyncActivity()) {
+        if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context)) {
           CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
         }
       } else {

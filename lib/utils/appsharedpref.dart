@@ -67,8 +67,9 @@ class AppSharedPrefUtil {
   }
 
   static Future<String> getLastSyncTime() async {
-
-    return await getString(SharedPrefConstant.s_last_sync_time);
+    String sLastSyncTime = await getString(SharedPrefConstant.s_last_sync_time);
+    CacheData.lastSyncTime = sLastSyncTime;
+    return sLastSyncTime;
   }
 
   static Future<String> getToken() async {
