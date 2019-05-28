@@ -72,7 +72,7 @@ class NameHeading extends StatelessWidget {
   _onSadhanaHeadingClick() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => SadhanaEditPage(sadhana: sadhana),
+        builder: (context) => SadhanaEditPage(sadhana: sadhana,),
         fullscreenDialog: true,
       ),
     );

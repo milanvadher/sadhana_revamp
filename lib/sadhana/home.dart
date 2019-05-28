@@ -158,6 +158,7 @@ class HomePageState extends BaseState<HomePage> {
   @override
   //Widget build(BuildContext context) {
   Widget pageToDisplay() {
+    sadhanas = CacheData.getSadhanas();
     theme = Theme.of(context).brightness;
     this.context = context;
     mobileWidth = MediaQuery.of(context).size.width;
@@ -213,9 +214,15 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   _onAddSadhanaClick() {
-    showDialog(context: context, builder: (_) => CreateSadhanaDialog(onDone: addNewSadhana)).then((value) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateSadhanaDialog(onDone: addNewSadhana),
+        fullscreenDialog: true,
+      ),
+    );
+    /*showDialog(context: context, builder: (_) => CreateSadhanaDialog(onDone: addNewSadhana)).then((value) {
       setState(() {});
-    });
+    });*/
   }
 
   List<Widget> _buildLeftPanel() {

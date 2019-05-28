@@ -13,6 +13,7 @@ class Sadhana extends Entity {
   static final String columnServerSName = 'server_sname';
   static final String columnDescription = 'description';
   static final String columnType = 'type';
+  static final String columnTargetValue = 'targetvalue';
   static final String columnIsPreloaded = 'is_preloaded';
   static final String columnDColor = 'd_color';
   static final String columnLColor = 'l_color';
@@ -28,6 +29,7 @@ class Sadhana extends Entity {
   ${Sadhana.columnLColor} integer not null,
   ${Sadhana.columnDColor} integer not null,
   ${Sadhana.columnType} integer not null,
+  ${Sadhana.columnTargetValue} integer not null,
   ${Sadhana.columnIsPreloaded} boolean,
   ${Sadhana.columnReminderTime} date,
   ${Sadhana.columnReminderDays} text)
@@ -38,6 +40,7 @@ class Sadhana extends Entity {
   int index;
   String description;
   SadhanaType type;
+  int targetValue = 1;
   bool isPreloaded = false;
   Color dColor;
   Color lColor;
@@ -52,6 +55,7 @@ class Sadhana extends Entity {
     this.index,
     this.description,
     this.type,
+    this.targetValue = 1,
     this.isPreloaded = false,
     this.dColor,
     this.lColor,
@@ -64,21 +68,6 @@ class Sadhana extends Entity {
         assert(dColor != null),
         assert(lColor != null),
         this.activitiesByDate = sadhanaData ?? new Map();
-
-  Sadhana.clone(Sadhana original) {
-    this.id = original.id;
-    this.sadhanaName = original.sadhanaName;
-    this.serverSName = original.serverSName;
-    this.index = original.index;
-    this.description = original.description;
-    this.type = original.type;
-    this.isPreloaded = original.isPreloaded;
-    this.dColor = original.dColor;
-    this.lColor = original.lColor;
-    this.reminderTime = original.reminderTime;
-    this.reminderDays = original.reminderDays;
-    this.activitiesByDate = original.activitiesByDate;
-  }
 
   List<Color> getColors() {
     return [lColor, dColor];
@@ -96,6 +85,7 @@ class Sadhana extends Entity {
     index = map[columnIndex];
     description = map[columnDescription];
     type = map[columnType] == SadhanaType.NUMBER.index ? SadhanaType.NUMBER : SadhanaType.BOOLEAN;
+    targetValue = map[columnTargetValue]?? 1;
     isPreloaded = map[columnIsPreloaded] == 1 ? true : false;
     dColor = Color(map[columnDColor]);
     lColor = Color(map[columnLColor]);
@@ -112,6 +102,7 @@ class Sadhana extends Entity {
       columnIndex: index,
       columnDescription: description,
       columnType: type.index,
+      columnTargetValue: targetValue?? 1,
       columnIsPreloaded: isPreloaded == null ? 0 : isPreloaded,
       columnDColor: dColor.value,
       columnLColor: lColor.value,
@@ -134,6 +125,7 @@ class Sadhana extends Entity {
     description = json['description'];
     sadhanaName = json['sadhana_name'];
     isPreloaded = json['isPreloaded'] ?? true;
+    targetValue = json['target_value']?? 1;
     index = json['sadhana_index'] ?? 0;
   }
 
@@ -150,6 +142,7 @@ class Sadhana extends Entity {
     data['description'] = this.description;
     data['sadhana_name'] = this.sadhanaName;
     data['sadhana_index'] = this.index;
+    data['target_value'] = this.targetValue?? 1;
     return data;
   }
 }

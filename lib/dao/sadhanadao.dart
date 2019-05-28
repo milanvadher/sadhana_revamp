@@ -14,7 +14,11 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
   @override
   getDefaultInstance() {
     return Sadhana(
-        sadhanaName: "", description: "", type: SadhanaType.BOOLEAN, lColor: Constant.colors[0][0], dColor: Constant.colors[0][1]);
+        sadhanaName: "",
+        description: "",
+        type: SadhanaType.BOOLEAN,
+        lColor: Constant.colors[0][0],
+        dColor: Constant.colors[0][1]);
   }
 
   @override
@@ -50,11 +54,9 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
 
   Future<int> delete(int id) async {
     int i = await super.delete(id);
-    if (i > 0) {
-      await _activityDAO.deleteBySadhanaId(id);
-      CacheData.removeSadhana(id);
-      main();
-    }
+    await _activityDAO.deleteBySadhanaId(id);
+    CacheData.removeSadhana(id);
+    main();
     return i;
   }
 }

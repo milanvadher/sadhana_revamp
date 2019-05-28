@@ -35,11 +35,11 @@ class _NumberButtonState extends State<NumberButton> {
       margin: EdgeInsets.all(7),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: (theme == Brightness.light ? sadhana.lColor : sadhana.dColor).withAlpha(activity.sadhanaValue > 0 ? 20 : 0),
+        color: (theme == Brightness.light ? sadhana.lColor : sadhana.dColor).withAlpha(isActivityDone() ? 20 : 0),
         border: Border.all(
           color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
           width: 2,
-          style: activity.sadhanaValue > 0 ? BorderStyle.solid : BorderStyle.none,
+          style: isActivityDone() ? BorderStyle.solid : BorderStyle.none,
         ),
       ),
       child: Container(
@@ -55,7 +55,7 @@ class _NumberButtonState extends State<NumberButton> {
                 Text(
                   activity.sadhanaValue.toString(),
                   style: TextStyle(
-                      color: activity.sadhanaValue > 0 ? theme == Brightness.light ? sadhana.lColor : sadhana.dColor : Colors.grey),
+                      color: isActivityDone() ? theme == Brightness.light ? sadhana.lColor : sadhana.dColor : Colors.grey),
                 ),
                 CircleAvatar(
                   maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
@@ -67,6 +67,10 @@ class _NumberButtonState extends State<NumberButton> {
         ),
       ),
     );
+  }
+
+  bool isActivityDone() {
+    return activity.sadhanaValue >= sadhana.targetValue;
   }
 
   onPressed() {

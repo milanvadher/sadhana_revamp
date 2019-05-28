@@ -9,6 +9,20 @@ class AppUtils {
     return string1?.toLowerCase() == string2?.toLowerCase();
   }
 
+  static bool isNumeric(String s) {
+    if(s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
+  }
+
+  static bool isInteger(String s) {
+    if(s == null) {
+      return false;
+    }
+    return int.tryParse(s) != null;
+  }
+
   static bool isLightBrightness(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light;
   }
