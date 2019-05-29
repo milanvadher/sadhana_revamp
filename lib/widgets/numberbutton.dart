@@ -82,6 +82,7 @@ class _NumberButtonState extends State<NumberButton> {
             color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
             initialIntegerValue: activity.sadhanaValue,
             minValue: 0,
+            isForSevaSadhana: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME),
             maxValue: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME) ? 24 : 100,
             remark: activity.remarks,
           );
@@ -100,4 +101,5 @@ class _NumberButtonState extends State<NumberButton> {
       if (widget.onClick != null) widget.onClick(widget.activity);
     }
   }
+
 }

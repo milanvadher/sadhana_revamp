@@ -5,8 +5,11 @@ class Constant {
   static final String APP_TIME_FORMAT = "hh:mm a";
   static final String vanchanName = "Vanchan";
   static final String SEVANAME = "Seva";
+  static final int REMARK_MANDATORY_VALUE = 4;
   static final String MBA_MAILID = "mbaapps@googlegroups.com";
   static final String APP_DATE_TIME_FORMAT = "dd-MM-yyyy hh:mm a";
+  static final String BASE_PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=";
+  static final String BASE_APPSTORE_URL = "https://itunes.apple.com/app/id1457589389";
   // Display activity data for no of days
   static int displayDays = 15;
 

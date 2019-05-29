@@ -77,6 +77,12 @@ class ApiService {
     return new Future.delayed(const Duration(seconds: 15), () => res);*/
   }
 
+  Future<http.Response> getAppSetting() async {
+    http.Response res = await getApi(url: '/mba.sadhana.settings');
+    return res;
+  }
+
+
   // Check Login Status
   Future<bool> checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

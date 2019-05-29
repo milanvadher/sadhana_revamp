@@ -16,6 +16,8 @@ import 'package:sadhana/wsmodel/ws_sadhana_activity.dart';
 class SyncActivityUtils {
   static ActivityDAO _activityDAO = ActivityDAO();
   static ApiService apiService = ApiService();
+  static bool isSyncing = false;
+
 
   static sendToServer(Activity activity) async {
     if (!activity.isSynced && await AppUtils.isInternetConnected()) {
@@ -43,50 +45,59 @@ class SyncActivityUtils {
     return await _activityDAO.getAllUnSyncActivity();
   }
 
-  static Future<bool> syncAllUnSyncActivity({bool onBackground = true, BuildContext context}) async {
+  static Future<bool> syncAllUnSyncActivity({bool onBackground = true, BuildContext context, bool forceSync = false}) async {
     bool isSynced = false;
-    try {
-      if (await AppUtils.isInternetConnected()) {
-        List<Activity> activities = await getUnSyncActivity();
-        if (activities.length > 0) {
-          Map<int, Sadhana> sadhanaById = await CacheData.getSadhanasById();
-          Map<String, List<Activity>> activitiesByServerSName = new Map();
-          for (Activity activity in activities) {
-            Sadhana sadhana = sadhanaById[activity.sadhanaId];
-            if (sadhana != null) {
-              List<Activity> mapActivities = activitiesByServerSName[sadhana.serverSName];
-              if (mapActivities == null) mapActivities = List();
-              mapActivities.add(activity);
-              activitiesByServerSName[sadhana.serverSName] = mapActivities;
-            }
-          }
-          List<WSSadhanaActivity> wsSadhanaActivities = new List();
-          activitiesByServerSName
-              .forEach((serverSName, activities) => wsSadhanaActivities.add(WSSadhanaActivity.fromActivity(serverSName, activities)));
-          Response res = await apiService.syncActivity(wsSadhanaActivities);
-          AppResponse appResponse;
-          if (onBackground)
-            appResponse = AppResponseParser.parseResponse(res, context: null);
-          else
-            appResponse = AppResponseParser.parseResponse(res, context: context);
-
-          if (appResponse.status == WSConstant.SUCCESS_CODE) {
+    if (!isSyncing || forceSync) {
+      try {
+        if (await AppUtils.isInternetConnected()) {
+          isSyncing = true;
+          List<Activity> activities = await getUnSyncActivity();
+          if (activities.length > 0) {
+            Map<int, Sadhana> sadhanaById = await CacheData.getSadhanasById();
+            Map<String, List<Activity>> activitiesByServerSName = new Map();
             for (Activity activity in activities) {
-              activity.isSynced = true;
-              _activityDAO.updateActivitySync(activity);
+              Sadhana sadhana = sadhanaById[activity.sadhanaId];
+              if (sadhana != null) {
+                List<Activity> mapActivities = activitiesByServerSName[sadhana.serverSName];
+                if (mapActivities == null) mapActivities = List();
+                mapActivities.add(activity);
+                activitiesByServerSName[sadhana.serverSName] = mapActivities;
+              }
             }
+            List<WSSadhanaActivity> wsSadhanaActivities = new List();
+            activitiesByServerSName
+                .forEach((serverSName, activities) => wsSadhanaActivities.add(WSSadhanaActivity.fromActivity(serverSName, activities)));
+            Response res = await apiService.syncActivity(wsSadhanaActivities);
+            AppResponse appResponse;
+            if (onBackground)
+              appResponse = AppResponseParser.parseResponse(res, context: null);
+            else
+              appResponse = AppResponseParser.parseResponse(res, context: context);
+
+            if (appResponse.status == WSConstant.SUCCESS_CODE) {
+              for (Activity activity in activities) {
+                activity.isSynced = true;
+                _activityDAO.updateActivitySync(activity);
+              }
+              isSynced = true;
+            }
+          } else
             isSynced = true;
-          }
-        } else
-          isSynced = true;
+        } else {
+          print('Internet is not available to sync all');
+        }
+      } catch (error) {
+        isSyncing = false;
+        print('Error while sync all activity:' + error);
+        throw error;
       }
-    } catch (error) {
-      print('Error while sync all activity:' + error);
-      throw error;
-    }
-    if (isSynced) {
-      print('All activity is synced successfully');
-      await checkNUpdateForLastSyncTime();
+      if (isSynced) {
+        print('All activity is synced successfully');
+        await checkNUpdateForLastSyncTime();
+      }
+      isSyncing = false;
+    } else {
+      print('Thread is already syncing.....');
     }
     return isSynced;
   }

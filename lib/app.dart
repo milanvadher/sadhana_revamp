@@ -1,14 +1,17 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:permission/permission.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
+import 'package:sadhana/widgets/appupdatecheck.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SadhanaApp extends StatefulWidget {
@@ -20,7 +23,6 @@ class SadhanaApp extends StatefulWidget {
 
 class _SadhanaAppState extends State<SadhanaApp> {
   AppOptions _options;
-  StreamSubscription<ConnectivityResult> _connectivitySubscription;
   @override
   initState() {
     super.initState();
@@ -31,25 +33,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
     new Future.delayed(Duration.zero, () {
       AppLocalNotification.initAppLocalNotification(context);
     });
-    subscribeConnnectivityChange();
     _getUserSelectedTheme();
-  }
-
-  @override
-  void dispose() {
-    _connectivitySubscription.cancel();
-    super.dispose();
-  }
-
-  void subscribeConnnectivityChange() {
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      try {
-        print('on Connectivity change');
-        SyncActivityUtils.syncAllUnSyncActivity(context: context);
-      } catch(error) {
-        print("Error while sync all activity:" + error);
-      }
-    });
   }
 
   void _getUserSelectedTheme() async {

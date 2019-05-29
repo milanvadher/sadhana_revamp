@@ -1,6 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:permission/permission.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
 
@@ -10,17 +16,26 @@ class AppUtils {
   }
 
   static bool isNumeric(String s) {
-    if(s == null) {
+    if (s == null) {
       return false;
     }
     return double.tryParse(s) != null;
   }
 
   static bool isInteger(String s) {
-    if(s == null) {
+    if (s == null) {
       return false;
     }
     return int.tryParse(s) != null;
+  }
+
+  static askForPermission() async {
+    List<PermissionName> permissions = [PermissionName.Storage];
+    if (Platform.isAndroid) {
+      await Permission.requestPermissions(permissions);
+    } else {
+      for (PermissionName permissionName in permissions) await Permission.requestSinglePermission(permissionName);
+    }
   }
 
   static bool isLightBrightness(BuildContext context) {
@@ -55,5 +70,27 @@ class AppUtils {
       return false;
     }
     return true;
+  }
+
+  static launchStoreApp() {
+    return Platform.isIOS ? launchAppstoreApp() : launchPlaystoreApp();
+  }
+
+  static void launchPlaystoreApp() async {
+    String appId = await AppSettingUtil.getAppID();
+    launch(Constant.BASE_PLAYSTORE_URL + appId);
+    /*LaunchReview.launch(androidAppId: "org.dadabhagwan.AKonnect",
+        iOSAppId: "585027354");*/
+  }
+
+  static void launchAppstoreApp() async {
+    String appId = await AppSettingUtil.getAppID();
+    launch(Constant.BASE_APPSTORE_URL);
+    /*LaunchReview.launch(androidAppId: "org.dadabhagwan.AKonnect",
+        iOSAppId: "585027354");*/
+  }
+
+  static void showInSnackBar(BuildContext context, String value) {
+    Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(value)));
   }
 }

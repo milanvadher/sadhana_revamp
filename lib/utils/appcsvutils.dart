@@ -15,7 +15,7 @@ import 'package:permission/permission.dart';
 class AppCSVUtils {
   static List<String> sadhanasName = ['Samayik', 'Vanchan', 'Vidhi', 'G. Satsang', 'Seva'];
 
-  static Future<File> writeCSV(List<List<dynamic>> rows) async {
+  static Future<File> writeCSV(String fileName, List<List<dynamic>> rows) async {
     //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
     //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
     bool checkPermission;
@@ -35,7 +35,7 @@ class AppCSVUtils {
       await new Directory('$dir').create(recursive: true);
       String file = "$dir";
       print(" FILE " + file);
-      File f = new File(file + "/sadhanaactivity.csv");
+      File f = new File(file + "/$fileName");
       String csv = const ListToCsvConverter().convert(rows);
       f.writeAsString(csv);
       print("Successfully written file");
@@ -44,7 +44,9 @@ class AppCSVUtils {
     return null;
   }
 
-  static String getFileName() {}
+  static String getFileName(int month) {
+    return "61758_$month.csv";
+  }
 
   static Future<File> generateCSVBetween(DateTime from, DateTime to) async {
     List<List<dynamic>> rows = new List();
@@ -92,7 +94,7 @@ class AppCSVUtils {
     rows.addAll(activityData);
     totals.insert(0,'Total');
     rows.add(totals);
-    return writeCSV(rows);
+    return writeCSV(getFileName(from.month),rows);
   }
 
   static List<dynamic> getHeaderRow(String month, String center, String name, String mhtId) {

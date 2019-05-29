@@ -5,6 +5,7 @@ import 'package:sadhana/model/activity.dart';
 class WSSadhanaActivity {
   String name;
   List<WSActivity> data;
+
   WSSadhanaActivity({this.name, this.data});
 
   WSSadhanaActivity.fromJson(Map<String, dynamic> json) {
@@ -37,12 +38,14 @@ class WSActivity {
   String remark;
   DateTime date;
   DateTime activityTime;
+
   WSActivity({this.value, this.remark, this.date});
 
   WSActivity.fromJson(Map<String, dynamic> json) {
     value = (json['value'] != null) ? int.parse(json['value']) : 0;
     remark = json['remark'];
     date = json['sadhana_date'] != null ? DateFormat(WSConstant.DATE_FORMAT).parse(json['sadhana_date']) : null;
+    activityTime = json['activity_datetime'] != null ? DateFormat(WSConstant.DATE_TIME_FORMAT).parse(json['activity_datetime']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -50,7 +53,7 @@ class WSActivity {
     data['value'] = this.value;
     data['remark'] = this.remark ?? '';
     data['sadhana_date'] = DateFormat(WSConstant.DATE_FORMAT).format(this.date);
-    data['activity_date'] = this.activityTime != null ? DateFormat(WSConstant.DATE_TIME_FORMAT).format(this.activityTime) : null;
+    data['activity_datetime'] = this.activityTime != null ? DateFormat(WSConstant.DATE_TIME_FORMAT).format(this.activityTime) : null;
     return data;
   }
 

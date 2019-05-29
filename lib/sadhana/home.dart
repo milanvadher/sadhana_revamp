@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -19,6 +20,7 @@ import 'package:sadhana/utils/appcsvutils.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
+import 'package:sadhana/widgets/appupdatecheck.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
@@ -61,11 +63,34 @@ class HomePageState extends BaseState<HomePage> {
   ActivityDAO activityDAO = ActivityDAO();
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     loadSadhana();
+    new Future.delayed(Duration.zero, () {
+      AppUpdateCheck.startAppUpdateCheckThread(context);
+    });
+    subscribeConnnectivityChange();
+  }
+
+  void subscribeConnnectivityChange() {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      try {
+        print('on Connectivity change');
+        AppUpdateCheck.startAppUpdateCheckThread(context);
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
+      } catch (error) {
+        print("Error while sync all activity:" + error);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   void loadSadhana() async {
@@ -84,7 +109,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   Future<void> createPreloadedSadhana() async {
-    if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana()) {
+    if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
       Response res = await _api.getSadhanas();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -101,11 +126,21 @@ class HomePageState extends BaseState<HomePage> {
 
   void askForPreloadActivity(List<Sadhana> sadhanaList) {
     CommonFunction.alertDialog(
+      closeable: false,
       context: context,
-      msg: "Do you want to load preload sadhana activity from server?",
+      msg: "Do you want to load activity of sadhana from server?",
+      doneButtonText: 'Yes',
       doneButtonFn: () {
         Navigator.pop(context);
-        loadPreloadedActivity(sadhanaList);
+        CommonFunction.alertDialog(
+            context: context,
+            msg: "It's takes server minutes, Pls wait to compelete.",
+            closeable: false,
+            doneButtonText: 'OK',
+            doneButtonFn: () {
+              Navigator.pop(context);
+              loadPreloadedActivity(sadhanaList);
+            });
       },
       showCancelButton: true,
     );
@@ -394,7 +429,7 @@ class HomePageState extends BaseState<HomePage> {
         setState(() {
           isOverlay = true;
         });
-        if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context)) {
+        if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
           CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
         }
       } else {
@@ -410,6 +445,8 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onShareExcel() {
+    AppUtils.askForPermission();
+    AppUtils.askForPermission();
     showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => shareExcel(date));
   }
 

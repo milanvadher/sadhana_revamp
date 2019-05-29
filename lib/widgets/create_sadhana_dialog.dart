@@ -60,13 +60,14 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       target = sadhana.targetValue;
       reminderTime = sadhana.reminderTime;
       _mainColor = [sadhana.lColor, sadhana.dColor];
-      color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;
+    if(sadhana != null)
+      color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     operation = widget.isEditMode ? 'Edit' : 'Create';
     //AppLocalNotification.initAppLocalNotification(context);
     return Scaffold(
