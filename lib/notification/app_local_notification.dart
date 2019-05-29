@@ -30,6 +30,7 @@ class AppLocalNotification {
       sadhana.description,
       importance: Importance.Max,
       priority: Priority.High,
+      playSound: true,
       //ongoing: true,  // Sticky Notification
     );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
@@ -39,6 +40,7 @@ class AppLocalNotification {
       sadhana.sadhanaName,
       sadhana.description,
       time,
+
       platformChannelSpecifics,
     );
   }

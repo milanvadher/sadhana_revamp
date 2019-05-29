@@ -14,6 +14,7 @@ import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/notification/notifcation_setup.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
@@ -72,6 +73,7 @@ class HomePageState extends BaseState<HomePage> {
     new Future.delayed(Duration.zero, () {
       AppUpdateCheck.startAppUpdateCheckThread(context);
     });
+    AppUtils.askForPermission();
     subscribeConnnectivityChange();
   }
 
@@ -110,6 +112,7 @@ class HomePageState extends BaseState<HomePage> {
 
   Future<void> createPreloadedSadhana() async {
     if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
+      await NotificationSetup.setupNotification(userInfo: null, context: context);
       Response res = await _api.getSadhanas();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -155,7 +158,8 @@ class HomePageState extends BaseState<HomePage> {
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+        List<WSSadhanaActivity> wsSadhanaActivity =
+            wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
         Map<String, Sadhana> sadhanaByServerSName = new Map();
         sadhanas.forEach((sadhana) {
           sadhanaByServerSName[sadhana.serverSName] = sadhana;
@@ -430,7 +434,8 @@ class HomePageState extends BaseState<HomePage> {
           isOverlay = true;
         });
         if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
-          CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
+          CommonFunction.alertDialog(
+              context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
         }
       } else {
         CommonFunction.alertDialog(context: context, msg: "Please connect to internet to sync");
@@ -445,8 +450,6 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onShareExcel() {
-    AppUtils.askForPermission();
-    AppUtils.askForPermission();
     showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => shareExcel(date));
   }
 
@@ -454,8 +457,7 @@ class HomePageState extends BaseState<HomePage> {
     if (date != null) {
       File file = await getGeneratedCSVPath(date);
       if (file != null) {
-        final RenderBox box = context.findRenderObject();
-        ShareExtend.share(file.path, "file");
+        await ShareExtend.share(file.path, "file");
         //Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
         //    .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       }

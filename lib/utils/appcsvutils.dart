@@ -15,6 +15,8 @@ import 'package:permission/permission.dart';
 class AppCSVUtils {
   static List<String> sadhanasName = ['Samayik', 'Vanchan', 'Vidhi', 'G. Satsang', 'Seva'];
 
+  static String sadhanaDirPath = 'Sadhana';
+  static String backupDirName = 'Backup';
   static Future<File> writeCSV(String fileName, List<List<dynamic>> rows) async {
     //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
     //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
@@ -31,8 +33,7 @@ class AppCSVUtils {
         checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
     }
     if (checkPermission) {
-      String dir = (await getExternalStorageDirectory()).absolute.path + "/Sadhana";
-      await new Directory('$dir').create(recursive: true);
+      String dir = await getSadhanaDir();
       String file = "$dir";
       print(" FILE " + file);
       File f = new File(file + "/$fileName");
@@ -46,6 +47,18 @@ class AppCSVUtils {
 
   static String getFileName(int month) {
     return "61758_$month.csv";
+  }
+
+  static Future<String> getSadhanaDir() async {
+    String dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath";
+    await new Directory('$dir').create(recursive: true);
+    return dir;
+  }
+
+  static Future<String> getBackupDir() async {
+    String dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
+    await new Directory('$dir').create(recursive: true);
+    return dir;
   }
 
   static Future<File> generateCSVBetween(DateTime from, DateTime to) async {
@@ -94,7 +107,7 @@ class AppCSVUtils {
     rows.addAll(activityData);
     totals.insert(0,'Total');
     rows.add(totals);
-    return writeCSV(getFileName(from.month),rows);
+    return await writeCSV(getFileName(from.month),rows);
   }
 
   static List<dynamic> getHeaderRow(String month, String center, String name, String mhtId) {

@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/utils/apputils.dart';
 
 class WSSadhanaActivity {
   String name;
@@ -45,7 +46,9 @@ class WSActivity {
     value = (json['value'] != null) ? int.parse(json['value']) : 0;
     remark = json['remark'];
     date = json['sadhana_date'] != null ? DateFormat(WSConstant.DATE_FORMAT).parse(json['sadhana_date']) : null;
-    activityTime = json['activity_datetime'] != null ? DateFormat(WSConstant.DATE_TIME_FORMAT).parse(json['activity_datetime']) : null;
+    activityTime = json['activity_datetime'] != null
+        ? AppUtils.tryParse(json['activity_datetime'], [WSConstant.DATE_TIME_FORMAT, WSConstant.DATE_TIME_FORMAT2])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -53,7 +56,8 @@ class WSActivity {
     data['value'] = this.value;
     data['remark'] = this.remark ?? '';
     data['sadhana_date'] = DateFormat(WSConstant.DATE_FORMAT).format(this.date);
-    data['activity_datetime'] = this.activityTime != null ? DateFormat(WSConstant.DATE_TIME_FORMAT).format(this.activityTime) : null;
+    data['activity_datetime'] =
+        this.activityTime != null ? DateFormat(WSConstant.DATE_TIME_FORMAT).format(this.activityTime) : null;
     return data;
   }
 

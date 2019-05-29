@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:permission/permission.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/cachedata.dart';
@@ -29,6 +30,31 @@ class AppUtils {
     return int.tryParse(s) != null;
   }
 
+  static DateTime tryParse(String dateString, List<String> formats) {
+    dynamic throwError;
+    for (String format in formats) {
+      try {
+        return DateFormat(format).parse(dateString);
+      } catch (error) {
+        throwError = error;
+        print('Cannot parse $dateString using $format');
+      }
+    }
+    //throw throwError;
+  }
+
+  static tryToExecute(int numOfTry, Function function) async {
+    int tried = 0;
+    while(tried < numOfTry) {
+      try {
+        return await function();
+      } catch(error) {
+        print('error on trying');
+        print(error);
+      }
+      tried++;
+    }
+  }
   static askForPermission() async {
     List<PermissionName> permissions = [PermissionName.Storage];
     if (Platform.isAndroid) {

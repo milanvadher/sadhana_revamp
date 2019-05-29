@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
@@ -42,7 +43,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   final formats = {
     //InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
     //InputType.date: DateFormat('yyyy-MM-dd'),
-    InputType.time: DateFormat("hh:mm a"),
+    InputType.time: DateFormat(Constant.APP_TIME_FORMAT),
   };
   final InputType inputType = InputType.time;
   DateTime reminderTime;
@@ -213,12 +214,26 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   }
 
   void _openDialog() {
+    _addColorIfNotExist();
     showDialog(
       context: context,
       builder: (_) {
         return ColorPickerDialog.getColorPickerDialog(context, _mainColor, _onColorSelected);
       },
     );
+  }
+
+  _addColorIfNotExist() {
+    bool isPresent = false;
+    for(List<Color> c in Constant.colors) {
+      if(IterableEquality().equals(c,_mainColor)) {
+        isPresent = true;
+        break;
+      }
+    }
+    if(!isPresent)
+      Constant.colors.add(_mainColor);
+
   }
 
   _onColorSelected(List<Color> colors) {
