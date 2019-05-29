@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -286,7 +287,8 @@ class HomePageState extends BaseState<HomePage> {
       IconButton(
         icon: Icon(Icons.sync),
         onPressed: () {
-          Navigator.pushNamed(context, RegistrationPage.routeName);
+          // Navigator.pushNamed(context, RegistrationPage.routeName);
+          Navigator.pushNamed(context, LoginPage.routeName);
         },
         tooltip: 'Sync Data',
       ),
