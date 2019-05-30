@@ -1,4 +1,7 @@
+import 'package:intl/intl.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSharedPrefUtil {
@@ -32,6 +35,11 @@ class AppSharedPrefUtil {
     return _pref.getString(prefStr) == null ? defaultValue : _pref.getString(prefStr);
   }
 
+  static Future<void> saveString(String prefStr, String value) async {
+    await loadPref();
+    _pref.setString(prefStr, value);
+  }
+
   static Future<bool> isCreatedPreloadedSadhana() async {
     return await getBool(SharedPrefConstant.b_isCreatedPreloadedSadhana);
   }
@@ -50,6 +58,18 @@ class AppSharedPrefUtil {
 
   static Future<bool> isUserLoggedIn() async {
     return await getBool(SharedPrefConstant.b_isUserLoggedIn, defaultValue: false);
+  }
+
+  static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
+    String sLastSyncTime = DateFormat(Constant.APP_DATE_TIME_FORMAT).format(lastSyncTime);
+    CacheData.lastSyncTime = sLastSyncTime;
+    return saveString(SharedPrefConstant.s_last_sync_time, sLastSyncTime);
+  }
+
+  static Future<String> getLastSyncTime() async {
+    String sLastSyncTime = await getString(SharedPrefConstant.s_last_sync_time);
+    CacheData.lastSyncTime = sLastSyncTime;
+    return sLastSyncTime;
   }
 
   static Future<String> getToken() async {

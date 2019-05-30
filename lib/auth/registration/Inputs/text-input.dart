@@ -6,14 +6,19 @@ class TextInputField extends StatelessWidget {
     this.labelText,
     this.valueText,
     this.enabled,
+    this.onSaved,
+    this.hintText,
+    this.validation,
     this.isRequiredValidation = false,
   }) : super(key: key);
 
   final String labelText;
   final String valueText;
+  final String hintText;
   final bool enabled;
   final bool isRequiredValidation;
-
+  final Function(String) onSaved;
+  final Function(String) validation;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,17 +28,22 @@ class TextInputField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: labelText,
           border: OutlineInputBorder(),
+          hintText: hintText?? 'Enter a $labelText',
         ),
         initialValue: valueText,
         enabled: enabled,
         keyboardType: TextInputType.text,
         onSaved: (value) {
+          if(onSaved != null)
+            onSaved(value);
           return value;
         },
         validator: (value) {
-          if (isRequiredValidation && value.isEmpty) {
-            return labelText + ' is required';
+          if (isRequiredValidation && (value == null || value.trim().isEmpty)) {
+            return  '$labelText is required';
           }
+          if(validation != null)
+            return validation(value);
         },
       ),
     );

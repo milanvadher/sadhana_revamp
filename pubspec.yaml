@@ -14,7 +14,7 @@ description: Sadhana App and Attendance revamp
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -41,6 +41,12 @@ dependencies:
   flutter_local_notifications: ^0.7.1+1
   datetime_picker_formfield: ^0.1.8
   share_extend: ^1.0.8
+  android_alarm_manager: ^0.4.1+6
+  connectivity: ^0.4.3+1
+  package_info: ^0.4.0+3
+  onesignal: ^1.1.0
+  flutter_launcher_icons: ^0.7.2
+
   #share:
   #  git:
   #    url: https://github.com/d-silveira/flutter-share.git
@@ -49,7 +55,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
+flutter_icons:
+  android: "ic_launcher"
+  ios: "ic_launcher"
+  image_path: "assets/icon/ic_launcher.png"
+  adaptive_icon_background: "#FFFAFAFA"
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 

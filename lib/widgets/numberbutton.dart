@@ -22,24 +22,24 @@ class _NumberButtonState extends State<NumberButton> {
   Activity activity;
   Sadhana sadhana;
   Brightness theme;
-  ActivityDAO activityDAO = ActivityDAO();
+
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-    
+
     return Container(
       width: 34,
       margin: EdgeInsets.all(7),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: (theme == Brightness.light ? sadhana.lColor : sadhana.dColor).withAlpha(activity.sadhanaValue > 0 ? 20 : 0),
+        color: (theme == Brightness.light ? sadhana.lColor : sadhana.dColor).withAlpha(isActivityDone() ? 20 : 0),
         border: Border.all(
           color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
           width: 2,
-          style: activity.sadhanaValue > 0 ? BorderStyle.solid : BorderStyle.none,
+          style: isActivityDone() ? BorderStyle.solid : BorderStyle.none,
         ),
       ),
       child: Container(
@@ -47,24 +47,7 @@ class _NumberButtonState extends State<NumberButton> {
         child: Center(
           child: FlatButton(
             padding: EdgeInsets.all(0),
-            onPressed: () {
-              showDialog<List>(
-                  context: context,
-                  builder: (_) {
-                    return new NumberPickerDialog.integer(
-                      title: Text(title),
-                      color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
-                      initialIntegerValue: activity.sadhanaValue,
-                      minValue: 0,
-                      maxValue: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME) ? 24 : 100,
-                      remark: activity.remarks,
-                    );
-                  }).then(
-                (List onValue) {
-                  onValueSelected(onValue);
-                },
-              );
-            },
+            onPressed: onPressed,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -72,8 +55,7 @@ class _NumberButtonState extends State<NumberButton> {
                 Text(
                   activity.sadhanaValue.toString(),
                   style: TextStyle(
-                      color:
-                          activity.sadhanaValue > 0 ? theme == Brightness.light ? sadhana.lColor : sadhana.dColor : Colors.grey),
+                      color: isActivityDone() ? theme == Brightness.light ? sadhana.lColor : sadhana.dColor : Colors.grey),
                 ),
                 CircleAvatar(
                   maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
@@ -87,22 +69,37 @@ class _NumberButtonState extends State<NumberButton> {
     );
   }
 
+  bool isActivityDone() {
+    return activity.sadhanaValue >= sadhana.targetValue;
+  }
+
+  onPressed() {
+    showDialog<List>(
+        context: context,
+        builder: (_) {
+          return new NumberPickerDialog.integer(
+            title: Text(title),
+            color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
+            initialIntegerValue: activity.sadhanaValue,
+            minValue: 0,
+            isForSevaSadhana: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME),
+            maxValue: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME) ? 24 : 100,
+            remark: activity.remarks,
+          );
+        }).then(
+      (List onValue) {
+        onValueSelected(onValue);
+      },
+    );
+  }
+
   onValueSelected(List onValue) {
     if (onValue != null && onValue[0] != null) {
       AppUtils.vibratePhone(duration: 10);
       activity.sadhanaValue = onValue[0];
       activity.remarks = onValue[1];
-      activity.isSynced = false;
-      setState(() {
-        sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
-      });
-      activityDAO.insertOrUpdate(activity).then((dbActivity) {
-        setState(() {
-          if (widget.onClick != null)
-            widget.onClick(widget.activity);
-        });
-      });
-
+      if (widget.onClick != null) widget.onClick(widget.activity);
     }
   }
+
 }

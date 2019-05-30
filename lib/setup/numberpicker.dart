@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:sadhana/comman.dart';
+import 'package:sadhana/constant/constant.dart';
 
 /// Created by Marcin Szałek
 
@@ -385,7 +387,7 @@ class NumberPickerDialog extends StatefulWidget {
   final int step;
   final String remark;
   final Color color;
-
+  final bool isForSevaSadhana;
   ///constructor for integer values
   NumberPickerDialog.integer({
     @required this.minValue,
@@ -396,6 +398,7 @@ class NumberPickerDialog extends StatefulWidget {
     this.step = 1,
     Widget confirmWidget,
     Widget cancelWidget,
+    this.isForSevaSadhana = false,
     this.remark = "",
     this.color,
   })  : confirmWidget = confirmWidget ?? new Text("OK"),
@@ -411,6 +414,7 @@ class NumberPickerDialog extends StatefulWidget {
     this.decimalPlaces = 1,
     this.title,
     this.titlePadding,
+    this.isForSevaSadhana = false,
     Widget confirmWidget,
     Widget cancelWidget,
     this.remark = "",
@@ -503,12 +507,20 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
                     child: widget.cancelWidget,
                   ),
                   new FlatButton(
-                    onPressed: () => Navigator.of(context).pop([
+                    onPressed: () {
+                      if(widget.isForSevaSadhana) {
+                        if(selectedIntValue >= Constant.REMARK_MANDATORY_VALUE && (remarkCtrl.text == null || remarkCtrl.text.trim().isEmpty)) {
+                          CommonFunction.alertDialog(context: context, msg: "Remark is manadatory");
+                          return;
+                        }
+                      }
+                      Navigator.of(context).pop([
                           widget.decimalPlaces > 0
                               ? selectedDoubleValue
                               : selectedIntValue,
                           remarkCtrl.text
-                        ]),
+                        ]);
+                    },
                     child: widget.confirmWidget,
                   ),
                 ],

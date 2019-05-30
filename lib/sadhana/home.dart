@@ -1,11 +1,12 @@
+import 'dart:async';
 import 'dart:io';
 
+// import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:sadhana/auth/login.dart';
-import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -14,10 +15,14 @@ import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/notification/notifcation_setup.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
+import 'package:sadhana/utils/sync_activity_utlils.dart';
+import 'package:sadhana/widgets/appupdatecheck.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
@@ -60,19 +65,44 @@ class HomePageState extends BaseState<HomePage> {
   ActivityDAO activityDAO = ActivityDAO();
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
-
+  // StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     loadSadhana();
+    new Future.delayed(Duration.zero, () {
+      AppUpdateCheck.startAppUpdateCheckThread(context);
+    });
+    AppUtils.askForPermission();
+    subscribeConnnectivityChange();
+  }
+
+  void subscribeConnnectivityChange() {
+    // _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    //   try {
+    //     print('on Connectivity change');
+    //     AppUpdateCheck.startAppUpdateCheckThread(context);
+    //     SyncActivityUtils.syncAllUnSyncActivity(context: context);
+    //   } catch (error) {
+    //     print("Error while sync all activity:" + error);
+    //   }
+    // });
+  }
+
+  @override
+  void dispose() {
+    // _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   void loadSadhana() async {
+    await AppSharedPrefUtil.getLastSyncTime();
     await createPreloadedSadhana();
     sadhanaDAO.getAll().then((dbSadhanas) {
       setState(() {
         sadhanas = CacheData.getSadhanas();
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
       });
     });
   }
@@ -82,7 +112,8 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   Future<void> createPreloadedSadhana() async {
-    if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana()) {
+    if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
+      await NotificationSetup.setupNotification(userInfo: null, context: context);
       Response res = await _api.getSadhanas();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -91,18 +122,32 @@ class HomePageState extends BaseState<HomePage> {
         for (Sadhana sadhana in sadhanaList) {
           await sadhanaDAO.insertOrUpdate(sadhana);
         }
-        CommonFunction.alertDialog(
-          context: context,
-          msg: "Do you want to load preload sadhana activity from server?",
-          doneButtonFn: () {
-            Navigator.pop(context);
-            loadPreloadedActivity(sadhanaList);
-          },
-          showCancelButton: true,
-        );
+        askForPreloadActivity(sadhanaList);
         AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
       }
     }
+  }
+
+  void askForPreloadActivity(List<Sadhana> sadhanaList) {
+    CommonFunction.alertDialog(
+      closeable: false,
+      context: context,
+      msg: "Do you want to load activity of sadhana from server?",
+      doneButtonText: 'Yes',
+      doneButtonFn: () {
+        Navigator.pop(context);
+        CommonFunction.alertDialog(
+            context: context,
+            msg: "It's takes server minutes, Pls wait to compelete.",
+            closeable: false,
+            doneButtonText: 'OK',
+            doneButtonFn: () {
+              Navigator.pop(context);
+              loadPreloadedActivity(sadhanaList);
+            });
+      },
+      showCancelButton: true,
+    );
   }
 
   void loadPreloadedActivity(List<Sadhana> sadhanas) async {
@@ -114,7 +159,8 @@ class HomePageState extends BaseState<HomePage> {
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+        List<WSSadhanaActivity> wsSadhanaActivity =
+            wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
         Map<String, Sadhana> sadhanaByServerSName = new Map();
         sadhanas.forEach((sadhana) {
           sadhanaByServerSName[sadhana.serverSName] = sadhana;
@@ -140,7 +186,7 @@ class HomePageState extends BaseState<HomePage> {
           isOverlay = false;
         });
       }
-    } catch(error) {
+    } catch (error) {
       print(error);
       CommonFunction.displayErrorDialog(context: context);
       setState(() {
@@ -152,6 +198,7 @@ class HomePageState extends BaseState<HomePage> {
   @override
   //Widget build(BuildContext context) {
   Widget pageToDisplay() {
+    sadhanas = CacheData.getSadhanas();
     theme = Theme.of(context).brightness;
     this.context = context;
     mobileWidth = MediaQuery.of(context).size.width;
@@ -193,13 +240,29 @@ class HomePageState extends BaseState<HomePage> {
           ],
         ),
       ),
+      bottomNavigationBar: CacheData.lastSyncTime != null
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  child: Text('Sync Upto: ' + CacheData.lastSyncTime),
+                )
+              ],
+            )
+          : null,
     );
   }
 
   _onAddSadhanaClick() {
-    showDialog(context: context, builder: (_) => CreateSadhanaDialog(onDone: addNewSadhana)).then((value) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CreateSadhanaDialog(onDone: addNewSadhana),
+        fullscreenDialog: true,
+      ),
+    );
+    /*showDialog(context: context, builder: (_) => CreateSadhanaDialog(onDone: addNewSadhana)).then((value) {
       setState(() {});
-    });
+    });*/
   }
 
   List<Widget> _buildLeftPanel() {
@@ -307,14 +370,14 @@ class HomePageState extends BaseState<HomePage> {
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.save_alt, color: Colors.red),
-                title: Text('Save as Excel'),
+                title: Text('Save CSV'),
               ),
               value: 'save_excel',
             ),
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.share, color: Colors.green),
-                title: Text('Share Excel'),
+                title: Text('Share CSV'),
               ),
               value: 'share_excel',
             ),
@@ -367,6 +430,29 @@ class HomePageState extends BaseState<HomePage> {
     return await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
   }
 
+  void _onSyncClicked() async {
+    //Navigator.pushNamed(context, RegistrationPage.routeName);
+    try {
+      if (await AppUtils.isInternetConnected()) {
+        setState(() {
+          isOverlay = true;
+        });
+        if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
+          CommonFunction.alertDialog(
+              context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
+        }
+      } else {
+        CommonFunction.alertDialog(context: context, msg: "Please connect to internet to sync");
+      }
+    } catch (error) {
+      print(error);
+      CommonFunction.displayErrorDialog(context: context);
+    }
+    setState(() {
+      isOverlay = false;
+    });
+  }
+
   void onShareExcel() {
     showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => shareExcel(date));
   }
@@ -375,8 +461,7 @@ class HomePageState extends BaseState<HomePage> {
     if (date != null) {
       File file = await getGeneratedCSVPath(date);
       if (file != null) {
-        final RenderBox box = context.findRenderObject();
-        ShareExtend.share(file.path, "file");
+        await ShareExtend.share(file.path, "file");
         //Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
         //    .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       }
@@ -414,7 +499,6 @@ class HomePageState extends BaseState<HomePage> {
       print(error);
     }
   }
-
 
 /*
   void addSadhana({

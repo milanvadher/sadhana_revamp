@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "208680760148",
+    "firebase_url": "https://sadhana-1146a.firebaseio.com",
+    "project_id": "sadhana-1146a",
+    "storage_bucket": "sadhana-1146a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:208680760148:android:4e9e9438aee15094",
+        "android_client_info": {
+          "package_name": "org.dadabhagwan.sadhana"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "208680760148-mbuk0mvgvkmj5vnshbam8o1h7412efb8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDLeWTL4p3PSJvxk7Z0jk2OQg6fr-BKtM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "208680760148-mbuk0mvgvkmj5vnshbam8o1h7412efb8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

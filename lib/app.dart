@@ -1,10 +1,17 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:permission/permission.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
+import 'package:sadhana/utils/sync_activity_utlils.dart';
+import 'package:sadhana/widgets/appupdatecheck.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SadhanaApp extends StatefulWidget {
@@ -16,7 +23,6 @@ class SadhanaApp extends StatefulWidget {
 
 class _SadhanaAppState extends State<SadhanaApp> {
   AppOptions _options;
-
   @override
   initState() {
     super.initState();
@@ -24,7 +30,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
       theme: kDarkAppTheme,
       platform: defaultTargetPlatform,
     );
-    new Future.delayed(Duration.zero,() {
+    new Future.delayed(Duration.zero, () {
       AppLocalNotification.initAppLocalNotification(context);
     });
     _getUserSelectedTheme();
@@ -32,13 +38,9 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void _getUserSelectedTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isDarkMode = prefs.getBool('isDarkMode') != null
-        ? prefs.getBool('isDarkMode')
-        : false;
+    bool isDarkMode = prefs.getBool('isDarkMode') != null ? prefs.getBool('isDarkMode') : false;
     setState(() {
-      _options = AppOptions(
-          theme: isDarkMode ? kDarkAppTheme : kLightAppTheme,
-          platform: defaultTargetPlatform);
+      _options = AppOptions(theme: isDarkMode ? kDarkAppTheme : kLightAppTheme, platform: defaultTargetPlatform);
     });
   }
 
@@ -47,8 +49,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
       _options = newOptions;
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool(
-        'isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
+    prefs.setBool('isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
   }
 
   Map<String, WidgetBuilder> _buildRoutes() {

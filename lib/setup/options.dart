@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/setup/themes.dart';
+import 'package:sadhana/widgets/base_state.dart';
 
 class AppOptions {
   AppOptions({this.theme, this.platform});
@@ -83,7 +88,7 @@ class _ThemeItem extends StatelessWidget {
           Colors.grey,
           'Dark Theme',
           options.theme == kDarkAppTheme,
-              (bool value) {
+          (bool value) {
             onOptionsChanged(
               options.copyWith(
                 theme: value ? kDarkAppTheme : kLightAppTheme,
@@ -135,7 +140,7 @@ class _BooleanItem extends StatelessWidget {
   }
 }
 
-class AppOptionsPage extends StatelessWidget {
+class AppOptionsPage extends StatefulWidget {
   const AppOptionsPage({
     Key key,
     this.options,
@@ -146,7 +151,12 @@ class AppOptionsPage extends StatelessWidget {
   final ValueChanged<AppOptions> onOptionsChanged;
 
   @override
-  Widget build(BuildContext context) {
+  _AppOptionsPageState createState() => _AppOptionsPageState();
+}
+
+class _AppOptionsPageState extends BaseState<AppOptionsPage> {
+  @override
+  Widget pageToDisplay() {
     return Scaffold(
       appBar: AppBar(
         title: Text('Options'),
@@ -159,8 +169,9 @@ class AppOptionsPage extends StatelessWidget {
               children: <Widget>[
                 Divider(height: 0),
                 _ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
-                _ThemeItem(options, onOptionsChanged),
+                _ThemeItem(widget.options, widget.onOptionsChanged),
                 _ActionItem(Icons.sync, Constant.colors[3], 'Sync Data', () {}, 'Sync your sadhana data with server'),
+                _ActionItem(Icons.backup, Constant.colors[4], 'Buckup Data', _onBackup, 'Backup your data'),
               ],
             ),
           ]..addAll(<Widget>[
@@ -168,12 +179,31 @@ class AppOptionsPage extends StatelessWidget {
               Column(
                 children: <Widget>[
                   Divider(height: 0),
-                  _ActionItem(Icons.info_outline, Constant.colors[12], 'About', () {},'About Sadhana App and report bug'),
+                  _ActionItem(Icons.info_outline, Constant.colors[12], 'About', () {}, 'About Sadhana App and report bug'),
                 ],
               ),
             ]),
         ),
       ),
     );
+  }
+
+  _onBackup() async {
+    try {
+      setState(() {
+        isOverlay = true;
+      });
+      File exportedFile = await DBProvider.db.exportDB();
+      if (exportedFile != null) {
+        CommonFunction.alertDialog(context: context, msg: 'Your Backup file is generated at ${exportedFile.path}');
+      }
+    } catch (error) {
+      print('Error while exporting backup:');
+      print(error);
+      CommonFunction.displayErrorDialog(context: context);
+    }
+    setState(() {
+      isOverlay = false;
+    });
   }
 }

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
+import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -100,7 +101,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   }
 
   String _getReminderText() {
-    return sadhana.reminderTime != null ? new DateFormat(Constant.timeDisplayFormat).format(sadhana.reminderTime) : "Off";
+    return sadhana.reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(sadhana.reminderTime) : "Off";
   }
   _onEditClick() {
     showDialog(
@@ -117,15 +118,15 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
         context: context,
         msg: "Are you sure you want to delete Sadhana and all data?",
         showCancelButton: true,
-        doneButtonFn: () {
-          Navigator.pop(context);
-          sadhanaDAO.delete(sadhana.id).then((i) {
-            if (i > 0) {
-              Navigator.pop(context);
-              if (widget.onDelete != null) widget.onDelete(sadhana.id);
-            }
-          });
-        });
+        doneButtonFn: deleteSadhana);
+  }
+
+  Future<void> deleteSadhana() async {
+    await sadhanaDAO.delete(sadhana.id);
+    Navigator.pop(context);
+    Navigator.pop(context);
+    if (widget.onDelete != null) widget.onDelete(sadhana.id);
+    main();
   }
 
   _onSadhanaEdited(Sadhana sadhana) {

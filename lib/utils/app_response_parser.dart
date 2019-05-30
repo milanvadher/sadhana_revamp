@@ -9,7 +9,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AppResponseParser {
-  static AppResponse parseResponse(Response res, {BuildContext context, bool showDialog = true}) {
+  static AppResponse parseResponse(Response res, {@required BuildContext context, bool showDialog = true}) {
     ApiService _api = new ApiService();
     ServerResponse serverResponse;
     if (res.statusCode == 500 || res.statusCode == 502)
