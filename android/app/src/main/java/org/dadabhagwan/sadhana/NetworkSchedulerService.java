@@ -50,7 +50,7 @@ public class NetworkSchedulerService extends JobService implements
     @Override
     public boolean onStartJob(JobParameters params) {
         Log.i(TAG, "onStartJob" + mConnectivityReceiver);
-        registerReceiver(mConnectivityReceiver, new IntentFilter(Constants.CONNECTIVITY_ACTION));
+        registerReceiver(mConnectivityReceiver, new IntentFilter(org.dadabhagwan.sadhana.Constants.CONNECTIVITY_ACTION));
         return true;
     }
 
@@ -63,12 +63,22 @@ public class NetworkSchedulerService extends JobService implements
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
-        //if (!MyApplication.isInterestingActivityVisible()) {
-        Log.i(TAG, "Trying to call flutterFunction");
-        sBackgroundChannel.invokeMethod("flutterFunction", null);
-        String message = isConnected ? "Good!KKK Sadhana Connected to Internet" : "Sorry!KKK Sadhana Not connected to internet";
-        Toast.makeText(getApplicationContext(), message + " Service", Toast.LENGTH_LONG).show();
-        //}
+        try {
+            //if (!MyApplication.isInterestingActivityVisible()) {
+            Log.i(TAG, "Trying to call flutterFunction");
+            if(sBackgroundChannel != null)
+                sBackgroundChannel.invokeMethod("flutterFunction", null);
+            else {
+                Log.i(TAG, "Background channel is null");
+            }
+            String message = isConnected ? "Good!KKK Sadhana Connected to Internet" : "Sorry!KKK Sadhana Not connected to internet";
+            Toast.makeText(getApplicationContext(), message + " Service", Toast.LENGTH_LONG).show();
+            //}
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error on network change", e);
+        }
+
 
     }
 }

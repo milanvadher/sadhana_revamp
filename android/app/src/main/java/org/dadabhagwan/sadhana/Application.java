@@ -1,11 +1,11 @@
 package org.dadabhagwan.sadhana;
 
+import android.util.Log;
 import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.PluginRegistrantCallback;
 import io.flutter.plugins.GeneratedPluginRegistrant;
 import io.flutter.plugins.androidalarmmanager.AlarmService;
-import main.java.org.dadabhagwan.sadhana.SadhanaPlugin;
 
 public class Application extends FlutterApplication implements PluginRegistrantCallback {
   private static final String TAG = Application.class.getSimpleName();
