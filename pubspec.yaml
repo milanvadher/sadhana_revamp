@@ -76,6 +76,9 @@ flutter:
     - images/logo.png
     - images/logo_dada.png
 
+  #plugin:
+  #  androidPackage: org.dadabhagwan.sadhana
+  #  pluginClass: SadhanaPlugin
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
