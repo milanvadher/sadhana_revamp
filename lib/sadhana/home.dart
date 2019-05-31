@@ -65,6 +65,7 @@ class HomePageState extends BaseState<HomePage> {
   ActivityDAO activityDAO = ActivityDAO();
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
+
   // StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
@@ -112,19 +113,32 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   Future<void> createPreloadedSadhana() async {
-    if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
-      await NotificationSetup.setupNotification(userInfo: null, context: context);
-      Response res = await _api.getSadhanas();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        List<Sadhana> sadhanaList = Sadhana.fromJsonList(appResponse.data);
-        print(sadhanaList);
-        for (Sadhana sadhana in sadhanaList) {
-          await sadhanaDAO.insertOrUpdate(sadhana);
+    try {
+      if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
+        await NotificationSetup.setupNotification(userInfo: null, context: context);
+        setState(() {
+          isOverlay = true;
+        });
+        Response res = await _api.getSadhanas();
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          List<Sadhana> sadhanaList = Sadhana.fromJsonList(appResponse.data);
+          print(sadhanaList);
+          for (Sadhana sadhana in sadhanaList) {
+            await sadhanaDAO.insertOrUpdate(sadhana);
+          }
+          setState(() {
+            isOverlay = false;
+          });
+          askForPreloadActivity(sadhanaList);
+          AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
         }
-        askForPreloadActivity(sadhanaList);
-        AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
+        setState(() {
+          isOverlay = false;
+        });
       }
+    } catch (error) {
+      CommonFunction.displayErrorDialog(context: context);
     }
   }
 
@@ -159,8 +173,7 @@ class HomePageState extends BaseState<HomePage> {
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity =
-            wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
         Map<String, Sadhana> sadhanaByServerSName = new Map();
         sadhanas.forEach((sadhana) {
           sadhanaByServerSName[sadhana.serverSName] = sadhana;
@@ -182,9 +195,6 @@ class HomePageState extends BaseState<HomePage> {
             }
           }
         }
-        setState(() {
-          isOverlay = false;
-        });
       }
     } catch (error) {
       print(error);
@@ -193,6 +203,9 @@ class HomePageState extends BaseState<HomePage> {
         isOverlay = false;
       });
     }
+    setState(() {
+      isOverlay = false;
+    });
   }
 
   @override
@@ -348,11 +361,16 @@ class HomePageState extends BaseState<HomePage> {
   List<Widget> _buildActions() {
     return <Widget>[
       IconButton(
-        icon: Icon(Icons.sync),
+        icon: Icon(Icons.person_add),
         onPressed: () {
           // Navigator.pushNamed(context, RegistrationPage.routeName);
           Navigator.pushNamed(context, LoginPage.routeName);
         },
+        tooltip: 'Temp Login',
+      ),
+      IconButton(
+        icon: Icon(Icons.sync),
+        onPressed: _onSyncClicked,
         tooltip: 'Sync Data',
       ),
       IconButton(
@@ -438,8 +456,7 @@ class HomePageState extends BaseState<HomePage> {
           isOverlay = true;
         });
         if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
-          CommonFunction.alertDialog(
-              context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
+          CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
         }
       } else {
         CommonFunction.alertDialog(context: context, msg: "Please connect to internet to sync");
