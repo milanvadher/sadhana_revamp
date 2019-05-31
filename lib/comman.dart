@@ -6,11 +6,13 @@ class CommonFunction {
   static displayErrorDialog({@required BuildContext context, String msg}) {
     if (msg != null && msg.toUpperCase().contains("SOCKET")) msg = "Looks like you lost your Internet !!";
     if (msg == null) msg = MessageConstant.COMMON_ERROR_MSG;
-    alertDialog(
-      context: context,
-      msg: msg,
-      barrierDismissible: false,
-    );
+    if(context != null) {
+      alertDialog(
+        context: context,
+        msg: msg,
+        barrierDismissible: false,
+      );
+    }
   }
 
   // common Alert dialog
@@ -20,7 +22,8 @@ class CommonFunction {
     String title,
     @required String msg,
     bool showDoneButton = true,
-    String doneButtonText = 'Okay',
+    String doneButtonText = 'OK',
+    String cancelButtonText = 'Cancel',
     Function doneButtonFn,
     bool barrierDismissible = true,
     bool showCancelButton = false,
@@ -66,7 +69,7 @@ class CommonFunction {
                         child: Row(
                           children: <Widget>[
                             Text(
-                              doneButtonText != null ? doneButtonText : type == 'error' ? "Okeh..." : "Hooray!",
+                              doneButtonText = doneButtonText?? "OK",
                               textScaleFactor: 1.2,
                               style: TextStyle(color: kQuizBackgroundWhite),
                             )
@@ -84,7 +87,7 @@ class CommonFunction {
                               padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
                               color: kQuizErrorRed,
                               child: Row(
-                                children: <Widget>[Text("Cancel", textScaleFactor: 1.2, style: TextStyle(color: kQuizBackgroundWhite))],
+                                children: <Widget>[Text(cancelButtonText?? 'Cancel', textScaleFactor: 1.2, style: TextStyle(color: kQuizBackgroundWhite))],
                               ),
                               onPressed: doneCancelFn != null
                                   ? doneCancelFn

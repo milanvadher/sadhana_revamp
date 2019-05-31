@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSharedPrefUtil {
@@ -60,6 +63,14 @@ class AppSharedPrefUtil {
     return await getBool(SharedPrefConstant.b_isUserLoggedIn, defaultValue: false);
   }
 
+  static Future<bool> isNeedsToLoadPreloadActivity() async {
+    return await getBool(SharedPrefConstant.b_needs_activity_load, defaultValue: false);
+  }
+
+  static Future<void> saveNeedsToLoadPreloadActivity(bool isNeedToLoadPreloadActivity) async {
+    await saveBoolean(SharedPrefConstant.b_needs_activity_load, isNeedToLoadPreloadActivity);
+  }
+
   static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
     String sLastSyncTime = DateFormat(Constant.APP_DATE_TIME_FORMAT).format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
@@ -74,5 +85,18 @@ class AppSharedPrefUtil {
 
   static Future<String> getToken() async {
     return await getString('token');
+  }
+
+  static Future<AppSetting> getServerSetting() async {
+    String serverSetting = await getString(SharedPrefConstant.s_server_setting);
+    if(serverSetting == null) {
+      return AppSetting.getDefaulServerAppSetting();
+    } else {
+      return json.decode(serverSetting);
+    }
+  }
+
+  static Future<void> saveServerSetting(AppSetting appSetting) async {
+    await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting));
   }
 }

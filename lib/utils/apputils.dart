@@ -30,7 +30,7 @@ class AppUtils {
     return int.tryParse(s) != null;
   }
 
-  static DateTime tryParse(String dateString, List<String> formats) {
+  static DateTime tryParse(String dateString, List<String> formats, {bool throwErrorIfNotParse = false}) {
     dynamic throwError;
     for (String format in formats) {
       try {
@@ -40,7 +40,8 @@ class AppUtils {
         print('Cannot parse $dateString using $format');
       }
     }
-    //throw throwError;
+    if(throwErrorIfNotParse)
+      throw throwError;
   }
 
   static tryToExecute(int numOfTry, Function function) async {

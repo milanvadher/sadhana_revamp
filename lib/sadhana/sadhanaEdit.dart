@@ -146,7 +146,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarStyle: CalendarStyle(
         selectedColor: color,
-        todayColor: color.withAlpha(130),
+        todayColor: null,
         weekendStyle: TextStyle().copyWith(),
         holidayStyle: TextStyle(color: Colors.red),
         outsideHolidayStyle: TextStyle(color: Colors.green),
@@ -168,6 +168,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       holidays: _holidays,
       headerStyle: HeaderStyle(
         formatButtonShowsNext: true,
+        centerHeaderTitle: true,
         leftChevronIcon: Icon(Icons.chevron_left, color: color),
         rightChevronIcon: Icon(Icons.chevron_right, color: color),
         formatButtonTextStyle: TextStyle().copyWith(color: Colors.white, fontSize: 15.0),

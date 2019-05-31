@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-// import 'package:connectivity/connectivity.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -18,6 +18,7 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/notifcation_setup.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appcsvutils.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
@@ -65,9 +66,8 @@ class HomePageState extends BaseState<HomePage> {
   ActivityDAO activityDAO = ActivityDAO();
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
-
-  // StreamSubscription<ConnectivityResult> _connectivitySubscription;
-
+  bool isNeedToLoadPreloadActivity = false;
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
   @override
   void initState() {
     super.initState();
@@ -80,32 +80,40 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void subscribeConnnectivityChange() {
-    // _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-    //   try {
-    //     print('on Connectivity change');
-    //     AppUpdateCheck.startAppUpdateCheckThread(context);
-    //     SyncActivityUtils.syncAllUnSyncActivity(context: context);
-    //   } catch (error) {
-    //     print("Error while sync all activity:" + error);
-    //   }
-    // });
+     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
+  }
+  bool isFirst = true;
+  void onConnectivityChanged(ConnectivityResult result) async {
+    try {
+      if(!isFirst) {
+        print('on Connectivity change');
+        await AppSettingUtil.getServerAppSetting(forceFromServer: true);
+        AppUpdateCheck.startAppUpdateCheckThread(context);
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
+      }
+      isFirst = false;
+    } catch (error) {
+      print("Error while sync all activity:" + error);
+    }
   }
 
   @override
   void dispose() {
-    // _connectivitySubscription.cancel();
+    _connectivitySubscription.cancel();
     super.dispose();
   }
 
   void loadSadhana() async {
     await AppSharedPrefUtil.getLastSyncTime();
     await createPreloadedSadhana();
-    sadhanaDAO.getAll().then((dbSadhanas) {
+    await sadhanaDAO.getAll();
+    sadhanas = CacheData.getSadhanas();
+    AppSharedPrefUtil.isNeedsToLoadPreloadActivity().then((value) {
       setState(() {
-        sadhanas = CacheData.getSadhanas();
-        SyncActivityUtils.syncAllUnSyncActivity(context: context);
+        isNeedToLoadPreloadActivity = value;
       });
     });
+    SyncActivityUtils.syncAllUnSyncActivity(context: context);
   }
 
   void addNewSadhana(Sadhana sadhana) {
@@ -148,6 +156,7 @@ class HomePageState extends BaseState<HomePage> {
       context: context,
       msg: "Do you want to load activity of sadhana from server?",
       doneButtonText: 'Yes',
+      cancelButtonText: 'No',
       doneButtonFn: () {
         Navigator.pop(context);
         CommonFunction.alertDialog(
@@ -169,6 +178,7 @@ class HomePageState extends BaseState<HomePage> {
       isOverlay = true;
     });
     try {
+      AppSharedPrefUtil.saveNeedsToLoadPreloadActivity(true);
       Response res = await _api.getActivity();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -195,6 +205,10 @@ class HomePageState extends BaseState<HomePage> {
             }
           }
         }
+        setState(() {
+          isNeedToLoadPreloadActivity = false;
+        });
+        AppSharedPrefUtil.saveNeedsToLoadPreloadActivity(false);
       }
     } catch (error) {
       print(error);
@@ -373,6 +387,11 @@ class HomePageState extends BaseState<HomePage> {
         onPressed: _onSyncClicked,
         tooltip: 'Sync Data',
       ),
+      isNeedToLoadPreloadActivity ? IconButton(
+        icon: Icon(Icons.get_app),
+        onPressed: () {askForPreloadActivity(sadhanas);},
+        tooltip: 'Load Sadhana From Server',
+      ) : Container(),
       IconButton(
         icon: Icon(Icons.add),
         onPressed: _onAddSadhanaClick,
