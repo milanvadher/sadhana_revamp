@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-// import 'package:connectivity/connectivity.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -66,7 +66,7 @@ class HomePageState extends BaseState<HomePage> {
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
 
-  // StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
@@ -80,15 +80,15 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void subscribeConnnectivityChange() {
-    // _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-    //   try {
-    //     print('on Connectivity change');
-    //     AppUpdateCheck.startAppUpdateCheckThread(context);
-    //     SyncActivityUtils.syncAllUnSyncActivity(context: context);
-    //   } catch (error) {
-    //     print("Error while sync all activity:" + error);
-    //   }
-    // });
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      try {
+        print('on Connectivity change');
+        AppUpdateCheck.startAppUpdateCheckThread(context);
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
+      } catch (error) {
+        print("Error while sync all activity:" + error);
+      }
+    });
   }
 
   @override
