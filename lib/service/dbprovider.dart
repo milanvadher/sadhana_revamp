@@ -35,11 +35,14 @@ class DBProvider {
   }
 
   Future<File> exportDB() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "Sadhana.db");
-    File dbFile = new File(path);
-    String backupDir = await AppCSVUtils.getBackupDir();
-    String fileName = 'Sadhana_' + DateFormat(Constant.APP_DATE_FORMAT).format(DateTime.now()) + '.db';
-    return await dbFile.copy('$backupDir/$fileName');
+    if(await AppUtils.checkPermission()) {
+      Directory documentsDirectory = await getApplicationDocumentsDirectory();
+      String path = join(documentsDirectory.path, "Sadhana.db");
+      File dbFile = new File(path);
+      String backupDir = await AppCSVUtils.getBackupDir();
+      String fileName = 'Sadhana_' + DateFormat(Constant.APP_DATE_FORMAT).format(DateTime.now()) + '.db';
+      return await dbFile.copy('$backupDir/$fileName');
+    }
+    return null;
   }
 }

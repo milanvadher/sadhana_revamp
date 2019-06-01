@@ -10,8 +10,8 @@ class NumberButton extends StatefulWidget {
   Function onClick;
   Sadhana sadhana;
   Activity activity;
-
-  NumberButton({this.onClick, @required this.sadhana, @required this.activity});
+  bool isDisabled;
+  NumberButton({this.onClick, @required this.sadhana, @required this.activity, this.isDisabled = false});
 
   @override
   _NumberButtonState createState() => _NumberButtonState();
@@ -22,22 +22,22 @@ class _NumberButtonState extends State<NumberButton> {
   Activity activity;
   Sadhana sadhana;
   Brightness theme;
-
+  Color color;
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-
+    color = widget.isDisabled ? Colors.grey : theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Container(
       width: 34,
       margin: EdgeInsets.all(7),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: (theme == Brightness.light ? sadhana.lColor : sadhana.dColor).withAlpha(isActivityDone() ? 20 : 0),
+        color: (color).withAlpha(isActivityDone() ? 20 : 0),
         border: Border.all(
-          color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
+          color: color,
           width: 2,
           style: isActivityDone() ? BorderStyle.solid : BorderStyle.none,
         ),
@@ -47,7 +47,7 @@ class _NumberButtonState extends State<NumberButton> {
         child: Center(
           child: FlatButton(
             padding: EdgeInsets.all(0),
-            onPressed: onPressed,
+            onPressed: widget.isDisabled ? null : onPressed,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -55,11 +55,11 @@ class _NumberButtonState extends State<NumberButton> {
                 Text(
                   activity.sadhanaValue.toString(),
                   style: TextStyle(
-                      color: isActivityDone() ? theme == Brightness.light ? sadhana.lColor : sadhana.dColor : Colors.grey),
+                      color: isActivityDone() ? color : Colors.grey),
                 ),
                 CircleAvatar(
                   maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
-                  backgroundColor: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
+                  backgroundColor: color,
                 )
               ],
             ),

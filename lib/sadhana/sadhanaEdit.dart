@@ -31,6 +31,8 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   Brightness theme;
   Color color;
   SadhanaDAO sadhanaDAO = SadhanaDAO();
+  static DateTime now = new DateTime.now();
+  DateTime today = new DateTime(now.year, now.month, now.day);
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
           events.add(DateTime.fromMillisecondsSinceEpoch(timeInt));
     });
     _holidays = new Map.fromIterable(events, key: (v) => v , value: (v) => [true]);
+
   }
 
   @override
@@ -143,15 +146,28 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       ),
       forcedCalendarFormat: CalendarFormat.month,
       formatAnimation: FormatAnimation.slide,
+      availableGestures: AvailableGestures.horizontalSwipe,
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarStyle: CalendarStyle(
-        selectedColor: color,
-        todayColor: color.withAlpha(130),
+        todayColor: _holidays.containsKey(today) ? color : Colors.transparent,
+        todayStyle: TextStyle().copyWith(color: Colors.black),
         weekendStyle: TextStyle().copyWith(),
         holidayStyle: TextStyle(color: Colors.red),
         outsideHolidayStyle: TextStyle(color: Colors.green),
       ),
       builders: CalendarBuilders(
+        selectedDayBuilder: (context, date, _) {
+          return Container(
+            margin: const EdgeInsets.all(4.0),
+            child: CircleAvatar(
+              child: Text(
+                '${date.day}',
+                style: TextStyle().copyWith(color: _holidays.containsKey(date) ? Colors.white : Colors.black),
+              ),
+              backgroundColor: _holidays.containsKey(date) ? color : Colors.transparent,
+            ),
+          );
+        },
         holidayDayBuilder: (context, date, _) {
           return Container(
             margin: const EdgeInsets.all(4.0),
@@ -168,6 +184,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       holidays: _holidays,
       headerStyle: HeaderStyle(
         formatButtonShowsNext: true,
+        centerHeaderTitle: true,
         leftChevronIcon: Icon(Icons.chevron_left, color: color),
         rightChevronIcon: Icon(Icons.chevron_right, color: color),
         formatButtonTextStyle: TextStyle().copyWith(color: Colors.white, fontSize: 15.0),

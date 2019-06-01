@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/colors.dart';
-import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/version.dart';
-import 'package:sadhana/service/apiservice.dart';
-import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
-import 'package:sadhana/wsmodel/appresponse.dart';
+import 'package:synchronized/synchronized.dart';
 
 class AppUpdateCheck {
   static bool isAreladyChecking = false;
+  static var lock = new Lock();
   static void startAppUpdateCheckThread(BuildContext context) {
     Future.delayed(Duration(seconds: 1), () => AppUpdateCheck().checkForNewAppUpdate(context));
   }
 
-  ApiService _api = ApiService();
-
-  void checkForNewAppUpdate(BuildContext context) async {
+  void checkForNewAppUpdate(BuildContext context, {forceSetting = false}) async {
     /*bool check = true;
     int checkAfter = await AppSharedPrefUtil.getAppUpdateCheckAfter();
     if (checkAfter > 0) {
@@ -32,20 +27,17 @@ class AppUpdateCheck {
     if (checkapp_setting_util.dart) {*/
     if (await AppUtils.isInternetConnected() && !isAreladyChecking) {
       isAreladyChecking = true;
-      Response res = await _api.getAppSetting();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        AppSetting appSetting = AppSetting.fromJson(appResponse.data);
-        if (appSetting.version != null) {
-          String version = await AppSettingUtil.getAppVersion();
-          Version currentVersion = Version(version: version);
-          Version playStoreVersion = Version(version: appSetting.version);
-          if (playStoreVersion.compareTo(currentVersion) > 0) {
-            showUpdateDialog(context: context);
-          }
+      AppSetting appSetting = await AppSettingUtil.getServerAppSetting();
+      if (appSetting != null && appSetting.version != null) {
+        String version = await AppSettingUtil.getAppVersion();
+        Version currentVersion = Version(version: version);
+        Version playStoreVersion = Version(version: appSetting.version);
+        if (playStoreVersion.compareTo(currentVersion) > 0) {
+          showUpdateDialog(context: context);
         }
       }
     }
+    isAreladyChecking = false;
 
     //}
   }
@@ -65,55 +57,6 @@ class AppUpdateCheck {
         onUpdateNow(context);
       },
     );
-    /*showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            contentPadding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 2, left: 2),
-            shape: new RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            title: Center(child: Text("App Update")),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    "New App Version is avaliable.\n You need to update the app to continue ... !!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.blueGrey, height: 1.5),
-                    textScaleFactor: 1.1,
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    FlatButton(
-                      color: kQuizMain500,
-                      padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                      child: Text(
-                        "Update Now",
-                        textScaleFactor: 1,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        onUpdateNow(context);
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );*/
   }
 
   void onUpdateNow(BuildContext context) {

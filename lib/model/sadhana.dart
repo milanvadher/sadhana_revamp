@@ -22,7 +22,7 @@ class Sadhana extends Entity {
 
   static final createSadhanaTable = ''' create table ${Sadhana.tableSadhana} ( 
   ${Entity.columnId} integer primary key autoincrement, 
-  ${Sadhana.columnName} text not null,
+  ${Sadhana.columnName} text not null ON CONFLICT REPLACE,
   ${Sadhana.columnServerSName} text,
   ${Sadhana.columnDescription} text,
   ${Sadhana.columnIndex} integer not null,

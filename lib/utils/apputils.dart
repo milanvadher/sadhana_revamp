@@ -30,7 +30,7 @@ class AppUtils {
     return int.tryParse(s) != null;
   }
 
-  static DateTime tryParse(String dateString, List<String> formats) {
+  static DateTime tryParse(String dateString, List<String> formats, {bool throwErrorIfNotParse = false}) {
     dynamic throwError;
     for (String format in formats) {
       try {
@@ -40,7 +40,8 @@ class AppUtils {
         print('Cannot parse $dateString using $format');
       }
     }
-    //throw throwError;
+    if(throwErrorIfNotParse)
+      throw throwError;
   }
 
   static tryToExecute(int numOfTry, Function function) async {
@@ -62,6 +63,21 @@ class AppUtils {
     } else {
       for (PermissionName permissionName in permissions) await Permission.requestSinglePermission(permissionName);
     }
+  }
+
+  static Future<bool> checkPermission() async {
+    await askForPermission();
+    bool checkPermission;
+    if(Platform.isAndroid) {
+      List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
+      if(permissions != null && permissions.isNotEmpty) {
+        checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
+      }
+    } else {
+      PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
+      checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
+    }
+    return checkPermission;
   }
 
   static bool isLightBrightness(BuildContext context) {
