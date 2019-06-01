@@ -65,6 +65,21 @@ class AppUtils {
     }
   }
 
+  static Future<bool> checkPermission() async {
+    await askForPermission();
+    bool checkPermission;
+    if(Platform.isAndroid) {
+      List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
+      if(permissions != null && permissions.isNotEmpty) {
+        checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
+      }
+    } else {
+      PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
+      checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
+    }
+    return checkPermission;
+  }
+
   static bool isLightBrightness(BuildContext context) {
     return Theme.of(context).brightness == Brightness.light;
   }

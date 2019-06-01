@@ -3,6 +3,7 @@ import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/widgets/checkmarkbutton.dart';
 import 'package:sadhana/widgets/numberbutton.dart';
 
@@ -19,6 +20,19 @@ class SadhanaHorizontalPanel extends StatefulWidget {
 class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
   Sadhana sadhana;
   ActivityDAO activityDAO = ActivityDAO();
+  int disabledDays = 3;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    AppSettingUtil.getServerAppSetting().then((appSetting) {
+      setState(() {
+        disabledDays = int.parse(appSetting.editableDays);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<DateTime> daysToDisplay = widget.daysToDisplay;
@@ -39,9 +53,12 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
                 Activity activity = sadhana.activitiesByDate[widget.daysToDisplay[index].millisecondsSinceEpoch];
                 if (activity == null)
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
+                bool isDisabled = false;
+                if(sadhana.isPreloaded)
+                    isDisabled = index >= disabledDays ? true : false;
                 return sadhana.type == SadhanaType.BOOLEAN
-                    ? CheckmarkButton(sadhana: sadhana, activity: activity, onClick: onClick)
-                    : NumberButton(sadhana: sadhana, activity: activity, onClick: onClick);
+                    ? CheckmarkButton(sadhana: sadhana, activity: activity, onClick: onClick, isDisabled: isDisabled,)
+                    : NumberButton(sadhana: sadhana, activity: activity, onClick: onClick, isDisabled: isDisabled,);
               },
             ),
           ),
@@ -49,6 +66,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
       ),
     );
   }
+
   onClick(Activity activity) {
     if(sadhana.isPreloaded)
       activity.isSynced = false;

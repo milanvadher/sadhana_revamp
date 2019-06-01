@@ -10,8 +10,8 @@ class CheckmarkButton extends StatefulWidget {
   Function onClick;
   Sadhana sadhana;
   Activity activity;
-
-  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick});
+  bool isDisabled;
+  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick, this.isDisabled = false});
 
   @override
   _CheckmarkButtonState createState() => _CheckmarkButtonState();
@@ -23,24 +23,25 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Sadhana sadhana;
   Brightness theme;
   ActivityDAO activityDAO = ActivityDAO();
-
+  Color color;
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
+    color = widget.isDisabled ? Colors.grey : theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor;
     return InkWell(
-      onTap: onClicked,
-      onLongPress: onLongPress,
+      onTap: widget.isDisabled ? null : onClicked,
+      onLongPress: widget.isDisabled ? null : onLongPress,
       child: Container(
         width: 48,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: (theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor)
+          color: (color)
               .withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
           border: Border.all(
-            color: theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor,
+            color: color,
             width: 2,
             style: widget.activity.sadhanaValue > 0 ? BorderStyle.solid : BorderStyle.none,
           ),
@@ -54,7 +55,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
                 ? Icon(
                     Icons.done,
                     size: 20.0,
-                    color: theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor,
+                    color: color,
                   )
                 : Icon(
                     Icons.close,

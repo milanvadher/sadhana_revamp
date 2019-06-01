@@ -20,18 +20,7 @@ class AppCSVUtils {
   static Future<File> writeCSV(String fileName, List<List<dynamic>> rows) async {
     //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
     //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
-    bool checkPermission;
-    if(Platform.isAndroid) {
-      await Permission.requestPermissions([PermissionName.Storage]);
-      List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
-      if(permissions != null && permissions.isNotEmpty) {
-        checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
-      }
-    } else {
-      await Permission.requestSinglePermission(PermissionName.Storage);
-      PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
-        checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
-    }
+    bool checkPermission = await AppUtils.checkPermission();
     if (checkPermission) {
       String dir = await getSadhanaDir();
       String file = "$dir";
@@ -57,7 +46,7 @@ class AppCSVUtils {
 
   static Future<String> getBackupDir() async {
     String dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
-    await new Directory('$dir').create(recursive: true);
+    new Directory('$dir').createSync(recursive: true);
     return dir;
   }
 
