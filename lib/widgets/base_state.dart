@@ -33,9 +33,9 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
           ),
         ),
         new Center(
-          child: SpinKitThreeBounce(
+          child: SpinKitRing(
             color: kQuizBackgroundWhite,
-            size: 50.0,
+            size: 60.0,
           ),
         ),
       ],
