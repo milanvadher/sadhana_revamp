@@ -46,12 +46,14 @@ class Register {
   String jobStartDate;
   String companyName;
   String workCity;
-  String skills;
+  List<dynamic> skills;
   String health;
   String personalNotes;
   String bloodGroup;
   String tshirtSize;
   int registered;
+  Address permanentAddress;
+  Address currentAddress;
 
   Register(
       {this.mhtId,
@@ -84,7 +86,8 @@ class Register {
       this.personalNotes,
       this.bloodGroup,
       this.tshirtSize,
-      this.registered});
+      this.registered,
+      this.permanentAddress});
 
   Register.fromJson(Map<String, dynamic> json) {
     mhtId = json['mht_id'];
@@ -118,6 +121,8 @@ class Register {
     bloodGroup = json['blood_group'];
     tshirtSize = json['tshirt_size'];
     registered = json['registered'];
+    permanentAddress = json['permanent_address'];
+    currentAddress = json['current_address'];
   }
 
   Map<String, dynamic> toJson() {
@@ -153,6 +158,61 @@ class Register {
     data['blood_group'] = this.bloodGroup;
     data['tshirt_size'] = this.tshirtSize;
     data['registered'] = this.registered;
+    data['permanent_address'] = this.permanentAddress;
+    data['current_address'] = this.currentAddress;
+    return data;
+  }
+}
+
+class Address {
+  String addressType;
+  String addressLine1;
+  String addressLine2;
+  String city;
+  String cityDisp;
+  String state;
+  String country;
+  String pincode;
+  String emailId;
+  String phone;
+
+  Address(
+      {this.addressType,
+      this.addressLine1,
+      this.addressLine2,
+      this.city,
+      this.cityDisp,
+      this.state,
+      this.country,
+      this.pincode,
+      this.emailId,
+      this.phone});
+
+  Address.fromJson(Map<String, dynamic> json) {
+    addressType = json['address_type'];
+    addressLine1 = json['address_line1'];
+    addressLine2 = json['address_line2'];
+    city = json['city'];
+    cityDisp = json['city_disp'];
+    state = json['state'];
+    country = json['country'];
+    pincode = json['pincode'];
+    emailId = json['email_id'];
+    phone = json['phone'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['address_type'] = this.addressType;
+    data['address_line1'] = this.addressLine1;
+    data['address_line2'] = this.addressLine2;
+    data['city'] = this.city;
+    data['city_disp'] = this.cityDisp;
+    data['state'] = this.state;
+    data['country'] = this.country;
+    data['pincode'] = this.pincode;
+    data['email_id'] = this.emailId;
+    data['phone'] = this.phone;
     return data;
   }
 }

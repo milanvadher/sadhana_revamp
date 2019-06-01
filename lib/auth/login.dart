@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/commonvalidation.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
+import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/widgets/base_state.dart';
@@ -47,7 +49,7 @@ class LoginPageState extends BaseState<LoginPage> {
   OtpData otpData;
   int registerMethod = 0;
 
-  _login() async {
+  _login(BuildContext context) async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       print('Login');
@@ -94,7 +96,7 @@ class LoginPageState extends BaseState<LoginPage> {
     }
   }
 
-  _sendOtp() async {
+  _sendOtp(BuildContext context) async {
     if (registerMethod == 0 && _formKeyMobile.currentState.validate() ||
         registerMethod == 1 && _formKeyEmail.currentState.validate()) {
       registerMethod == 0
@@ -127,11 +129,6 @@ class LoginPageState extends BaseState<LoginPage> {
             currantStep += 1;
           });
         }
-        //  Navigator.pop(context);
-        //  Navigator.pushReplacementNamed(
-        //    context,
-        //    HomePage.routeName,
-        //  );
       } catch (error) {
         print(error);
         CommonFunction.displayErrorDialog(context: context);
@@ -197,7 +194,7 @@ class LoginPageState extends BaseState<LoginPage> {
         child: Row(
           children: <Widget>[
             Container(
-              width: 100,
+              width: 80,
               child: Text(
                 '$title : ',
                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -493,6 +490,10 @@ class LoginPageState extends BaseState<LoginPage> {
                   child: Text('Restart'),
                   onPressed: () {
                     setState(() {
+                      mhtIdController.clear();
+                      mobileController.clear();
+                      emailController.clear();
+                      otpController.clear();
                       stepState = [
                         StepState.editing,
                         StepState.disabled,
@@ -511,8 +512,57 @@ class LoginPageState extends BaseState<LoginPage> {
     }
 
     Widget buildStep4() {
-      return Center(
-        child: Text('You are done'),
+      return Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: CircleAvatar(
+              child: Icon(
+                Icons.done,
+                size: 80,
+                color: Colors.white,
+              ),
+              minRadius: 50,
+              backgroundColor: Colors.green,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'You are successfully verified\n',
+              style: TextStyle(fontSize: 30),
+            ),
+          ),
+          Card(
+            child: Container(
+              padding: const EdgeInsets.all(15),
+              alignment: Alignment.bottomLeft,
+              child: Column(
+                children: <Widget>[
+                  getTitleAndName(
+                    title: 'Mht Id',
+                    value: profileData != null ? '${profileData.mhtId}' : "",
+                  ),
+                  getTitleAndName(
+                    title: 'Full name',
+                    value: profileData != null
+                        ? '${profileData.firstName} ${profileData.lastName}'
+                        : "",
+                  ),
+                  getTitleAndName(
+                    title: 'Mobile',
+                    value:
+                        profileData != null ? '${profileData.mobileNo1}' : "",
+                  ),
+                  getTitleAndName(
+                    title: 'Email',
+                    value: profileData != null ? '${profileData.email}' : "",
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       );
     }
 
@@ -551,24 +601,31 @@ class LoginPageState extends BaseState<LoginPage> {
           onStepContinue: () {
             switch (currantStep) {
               case 0:
-                _login();
+                _login(context);
                 break;
               case 1:
-                _sendOtp();
+                _sendOtp(context);
                 break;
               case 2:
                 _verify(context);
                 break;
               case 3:
-                setState(() {
-                  stepState = [
-                    StepState.editing,
-                    StepState.disabled,
-                    StepState.disabled,
-                    StepState.disabled,
-                  ];
-                  currantStep = 0;
-                });
+                Navigator.pop(context);
+                if (otpData.profile.registered == 0) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => RegistrationPage(
+                            registrationData: otpData.profile,
+                          ),
+                    ),
+                  );
+                } else {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => HomePage(),
+                    ),
+                  );
+                }
                 break;
             }
           },
