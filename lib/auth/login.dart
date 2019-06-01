@@ -4,6 +4,7 @@ import 'package:sadhana/comman.dart';
 import 'package:sadhana/commonvalidation.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/profile.dart';
+import 'package:sadhana/model/register.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/widgets/base_state.dart';
@@ -27,9 +28,11 @@ class LoginPageState extends BaseState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _formKeyMobile = GlobalKey<FormState>();
   final _formKeyEmail = GlobalKey<FormState>();
+  final _formKeyOtp = GlobalKey<FormState>();
   final mhtIdController = TextEditingController();
   final mobileController = TextEditingController();
   final emailController = TextEditingController();
+  final otpController = TextEditingController();
   bool _autoValidate = false;
   ApiService api = new ApiService();
   int currantStep = 0;
@@ -41,6 +44,7 @@ class LoginPageState extends BaseState<LoginPage> {
     StepState.disabled
   ];
   Profile profileData;
+  OtpData otpData;
   int registerMethod = 0;
 
   _login() async {
@@ -105,12 +109,14 @@ class LoginPageState extends BaseState<LoginPage> {
           "mht_id": mhtIdController.text,
           "email": emailController.text,
           "mobile_no_1": mobileController.text,
+          "otp_required": "1"
         });
         AppResponse appResponse =
             AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** OTP Data ::: ');
           print(appResponse.data);
+          otpData = OtpData.fromJson(appResponse.data);
           setState(() {
             stepState = [
               StepState.complete,
@@ -132,6 +138,49 @@ class LoginPageState extends BaseState<LoginPage> {
         setState(() {
           isOverlay = false;
         });
+      }
+    } else {
+      setState(() {
+        _autoValidate = true;
+      });
+    }
+  }
+
+  _verify(BuildContext context) async {
+    if (_formKeyOtp.currentState.validate()) {
+      _formKeyOtp.currentState.save();
+      print('Verify');
+      setState(() {
+        isOverlay = true;
+      });
+      if (otpController.text == otpData.otp.toString()) {
+        setState(() {
+          stepState = [
+            StepState.complete,
+            StepState.complete,
+            StepState.complete,
+            StepState.editing,
+          ];
+          currantStep += 1;
+        });
+      } else {
+        showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text('Verification Failed'),
+              content: Text('Entered OTP does not match !!! '),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Retry'),
+                )
+              ],
+            );
+          },
+        );
       }
     } else {
       setState(() {
@@ -165,15 +214,6 @@ class LoginPageState extends BaseState<LoginPage> {
       );
     }
 
-    Widget booleanPoint({@required String text, TextStyle textStyle}) {
-      return Wrap(
-        children: <Widget>[
-          Icon(Icons.rounded_corner),
-          Text(text, style: textStyle ?? textStyle)
-        ],
-      );
-    }
-
     Widget buildStep1() {
       return Form(
         key: _formKey,
@@ -181,14 +221,6 @@ class LoginPageState extends BaseState<LoginPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            // // Image
-            // Container(
-            //   padding: const EdgeInsets.all(30.0),
-            //   child: Image.asset(
-            //     'images/logo_dada.png',
-            //     height: 140,
-            //   ),
-            // ),
             Container(
               padding: const EdgeInsets.all(15.0),
               child: Column(
@@ -313,6 +345,7 @@ class LoginPageState extends BaseState<LoginPage> {
             ),
           ),
           Card(
+            // color: Colors.purple.shade50,
             child: Container(
               padding: EdgeInsets.all(5),
               child: Column(
@@ -413,8 +446,67 @@ class LoginPageState extends BaseState<LoginPage> {
     }
 
     Widget buildStep3() {
-      return Center(
-        child: Text('Verify Here'),
+      return Form(
+        key: _formKeyOtp,
+        autovalidate: _autoValidate,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                'Enter Verification Code',
+                style: TextStyle(fontSize: 25),
+              ),
+            ),
+            // OTP
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              alignment: Alignment.bottomLeft,
+              child: TextFormField(
+                controller: otpController,
+                validator: CommonValidation.otpValidation,
+                keyboardType: TextInputType.text,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.phonelink_lock),
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter OTP',
+                ),
+                maxLines: 1,
+              ),
+            ),
+            // Resend Verification code
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: OutlineButton(
+                  child: Text('Resend Verification Code'),
+                  onPressed: () {},
+                ),
+              ),
+            ),
+            // Back
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: OutlineButton(
+                  child: Text('Restart'),
+                  onPressed: () {
+                    setState(() {
+                      stepState = [
+                        StepState.editing,
+                        StepState.disabled,
+                        StepState.disabled,
+                        StepState.disabled,
+                      ];
+                      currantStep = 0;
+                    });
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
       );
     }
 
@@ -465,15 +557,7 @@ class LoginPageState extends BaseState<LoginPage> {
                 _sendOtp();
                 break;
               case 2:
-                setState(() {
-                  stepState = [
-                    StepState.complete,
-                    StepState.complete,
-                    StepState.complete,
-                    StepState.editing,
-                  ];
-                  currantStep += 1;
-                });
+                _verify(context);
                 break;
               case 3:
                 setState(() {

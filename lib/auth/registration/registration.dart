@@ -30,7 +30,6 @@ class RegistrationPageState extends State<RegistrationPage> {
   initState() {
     super.initState();
     _register.mhtId = '123456';
-    _register.fullName = '${_register.firstName} ${_register.middleName} ${_register.lastName}';
     _register.bDate = '2018-05-20';
     _register.gDate = '2018-05-20';
     _register.email = 'milandv06@gmail.com';
@@ -39,11 +38,11 @@ class RegistrationPageState extends State<RegistrationPage> {
     _register.center = 'Sim-City';
     _register.fatherMbaApproval = 0;
     _register.motherMbaApproval = 1;
-    _register.skills = [];
-    skills.add('Skill 1');
-    skills.add('Skill 2');
-    skills.add('Skill 3');
-    skills.add('Skill 4');
+    // _register.skills;
+    // skills.add('Skill 1');
+    // skills.add('Skill 2');
+    // skills.add('Skill 3');
+    // skills.add('Skill 4');
   }
 
   @override
@@ -306,24 +305,24 @@ class RegistrationPageState extends State<RegistrationPage> {
               },
             ),
             // Skills
-            ComboboxInput(
-              lableText: 'Skills',
-              listData: skills,
-              selectedData: _register.skills,
-              handleValueSelect: (value) {
-                print('onselect : $value');
-                setState(() {
-                  _register.skills.add(value);
-                  skills.remove(value);
-                });
-              },
-              onDelete: (value) {
-                setState(() {
-                  _register.skills.remove(value);
-                  skills.add(value);
-                });
-              },
-            ),
+            // ComboboxInput(
+            //   lableText: 'Skills',
+            //   listData: skills,
+            //   selectedData: _register.skills,
+            //   handleValueSelect: (value) {
+            //     print('onselect : $value');
+            //     setState(() {
+            //       _register.skills.add(value);
+            //       skills.remove(value);
+            //     });
+            //   },
+            //   onDelete: (value) {
+            //     setState(() {
+            //       _register.skills.remove(value);
+            //       skills.add(value);
+            //     });
+            //   },
+            // ),
             // Work City
             DropDownInput(
               items: ['Ahmedabad', 'Gandhinagar'],
