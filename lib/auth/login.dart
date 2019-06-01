@@ -293,7 +293,7 @@ class LoginPageState extends BaseState<LoginPage> {
                   getTitleAndName(
                     title: 'Full name',
                     value: profileData != null
-                        ? '${profileData.firstName.substring(0, 2)}***** ${profileData.lastName.substring(0, 2)}*****'
+                        ? '${profileData.firstName.substring(0, 2)}****** ${profileData.lastName.substring(0, 2)}******'
                         : "",
                   ),
                   getTitleAndName(
@@ -320,7 +320,7 @@ class LoginPageState extends BaseState<LoginPage> {
                   Padding(
                     padding: EdgeInsets.all(10),
                     child: Text(
-                      'Enter the Mobile Number or the Email ID as specified on the I-Card = ${profileData.mhtId != null ? profileData.mhtId : ""}',
+                      'Enter the Mobile Number or the Email ID as specified on the I-Card = ${profileData != null ? profileData.mhtId : ""}',
                     ),
                   ),
                   Divider(
@@ -487,19 +487,11 @@ class LoginPageState extends BaseState<LoginPage> {
                 });
                 break;
             }
-            // setState(() {
-            //   if (currantStep < loginSteps.length - 1) {
-            //     currantStep += 1;
-            //     isActiveStep[currantStep] = true;
-            //   } else {
-            //     currantStep = 0;
-            //   }
-            // });
           },
           onStepTapped: (value) {
-            setState(() {
-              currantStep = value;
-            });
+            // setState(() {
+            //   currantStep = value;
+            // });
           },
         ),
       ),
@@ -508,7 +500,6 @@ class LoginPageState extends BaseState<LoginPage> {
 
   @override
   Widget pageToDisplay() {
-    // TODO: implement pageToDisplay
     return null;
   }
 }
