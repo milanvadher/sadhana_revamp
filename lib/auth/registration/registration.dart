@@ -9,10 +9,12 @@ import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/city.dart';
 import 'package:sadhana/model/country.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/model/skill.dart';
+import 'package:sadhana/model/state.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
@@ -38,9 +40,9 @@ class RegistrationPageState extends State<RegistrationPage> {
   bool sameAsPermenentAddress = false;
   List<Step> registrationSteps = [];
   List<String> skills = [];
-  List<Geo> countryList = [];
-  List<Geo> stateList = [];
-  List<Geo> cityList = [];
+  List<String> countryList = [];
+  List<String> stateList = [];
+  List<String> cityList = [];
   List<bool> isExpandedAddress = [false, false];
 
   loadCountries() async {
@@ -52,7 +54,11 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        countryList = Geo.fromJsonList(appResponse.data);
+        setState(() {
+          Country.fromJsonList(appResponse.data).forEach((item) {
+            countryList.add(item.name);
+          });
+        });
       }
     } catch (error) {
       print(error);
@@ -69,7 +75,11 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        stateList = Geo.fromJsonList(appResponse.data);
+        setState(() {
+          StateList.fromJsonList(appResponse.data).forEach((item) {
+            stateList.add(item.name);
+          });
+        });
       }
     } catch (error) {
       print(error);
@@ -86,7 +96,11 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        stateList = Geo.fromJsonList(appResponse.data);
+        setState(() {
+          City.fromJsonList(appResponse.data).forEach((item) {
+            cityList.add(item.name);
+          });
+        });
       }
     } catch (error) {
       print(error);
@@ -120,6 +134,14 @@ class RegistrationPageState extends State<RegistrationPage> {
     print('***************** Data ');
     print(_register.permanentAddress.toString());
     loadCountries();
+    if (_register.permanentAddress.country != null &&
+        _register.permanentAddress.country.trim().isNotEmpty) {
+      getStateByCountry(country: _register.permanentAddress.country);
+    }
+    if (_register.permanentAddress.state != null &&
+        _register.permanentAddress.state.trim().isNotEmpty) {
+      getCityByState(state: _register.permanentAddress.state);
+    }
     loadSkills();
   }
 
@@ -141,7 +163,7 @@ class RegistrationPageState extends State<RegistrationPage> {
               enabled: false,
               labelText: 'Full Name',
               valueText:
-                  '${_register.firstName} ${_register.middleName} ${_register.lastName}',
+                  '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
             ),
             // Mobile
             NumberInput(
@@ -165,7 +187,7 @@ class RegistrationPageState extends State<RegistrationPage> {
             DateInput(
               labelText: 'Birth Date',
               selectedDate: _register.bDate == null
-                  ? DateTime.now()
+                  ? null
                   : DateTime.parse(_register.bDate),
               selectDate: (DateTime date) {
                 setState(() {
@@ -177,7 +199,7 @@ class RegistrationPageState extends State<RegistrationPage> {
             DateInput(
               labelText: 'Gnan Date',
               selectedDate: _register.gDate == null
-                  ? DateTime.now()
+                  ? null
                   : DateTime.parse(_register.gDate),
               selectDate: (DateTime date) {
                 setState(() {
@@ -207,7 +229,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                 });
               },
             ),
-            // Permenent Address
+            // Permanent Address
             new ExpansionPanelList(
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
@@ -219,7 +241,7 @@ class RegistrationPageState extends State<RegistrationPage> {
                   canTapOnHeader: true,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return ListTile(
-                      title: Text('Permenent Address'),
+                      title: Text('Permanent Address'),
                     );
                   },
                   isExpanded: isExpandedAddress[0],
@@ -229,37 +251,48 @@ class RegistrationPageState extends State<RegistrationPage> {
                       children: <Widget>[
                         // Address Line 1
                         TextInputField(
-                          enabled: false,
+                          enabled: true,
                           labelText: 'Address Line 1',
                           valueText: _register?.permanentAddress?.addressLine1,
                         ),
                         // Address Line 2
                         TextInputField(
-                          enabled: false,
+                          enabled: true,
                           labelText: 'Address Line 2',
                           valueText: _register?.permanentAddress?.addressLine2,
                         ),
-                        // City
-                        TextInputField(
-                          enabled: false,
-                          labelText: 'City',
-                          valueText: _register?.permanentAddress?.cityDisp,
+                        // Country
+                        DropDownInput(
+                          labelText: "Country",
+                          items: countryList ?? [],
+                          onChange: (value) {
+                            _register.permanentAddress.country = value;
+                            getStateByCountry(country: value);
+                          },
+                          valueText: _register.permanentAddress.country ?? "",
                         ),
                         // State
-                        TextInputField(
-                          enabled: false,
-                          labelText: 'State',
-                          valueText: _register?.permanentAddress?.state,
+                        DropDownInput(
+                          labelText: "State",
+                          items: stateList ?? [],
+                          onChange: (value) {
+                            _register.permanentAddress.state = value;
+                            getCityByState(state: value);
+                          },
+                          valueText: _register.permanentAddress.state ?? "",
                         ),
-                        // Country
-                        TextInputField(
-                          enabled: false,
-                          labelText: 'Country',
-                          valueText: _register?.permanentAddress?.country,
+                        // City
+                        DropDownInput(
+                          labelText: "City",
+                          items: cityList ?? [],
+                          onChange: (value) {
+                            _register.permanentAddress.city = value;
+                          },
+                          valueText: _register.permanentAddress.city ?? "",
                         ),
                         // Pincode
                         TextInputField(
-                          enabled: false,
+                          enabled: true,
                           labelText: 'Pincode',
                           valueText: _register?.permanentAddress?.pincode,
                         ),
@@ -402,7 +435,7 @@ class RegistrationPageState extends State<RegistrationPage> {
               labelText: 'Father Gnan Date',
               enable: _register.fatherGnan == 0 ? false : _register.fatherGnan,
               selectedDate: _register.fatherGDate == null
-                  ? DateTime.now()
+                  ? null
                   : DateTime.parse(_register.fatherGDate),
               selectDate: (DateTime date) {
                 setState(() {
@@ -449,7 +482,7 @@ class RegistrationPageState extends State<RegistrationPage> {
               labelText: 'Mother Gnan Date',
               enable: _register.motherGnan == 0 ? false : _register.motherGnan,
               selectedDate: _register.motherGDate == null
-                  ? DateTime.now()
+                  ? null
                   : DateTime.parse(_register.motherGDate),
               selectDate: (DateTime date) {
                 setState(() {
@@ -534,7 +567,7 @@ class RegistrationPageState extends State<RegistrationPage> {
             DateInput(
               labelText: 'Job/Business Start Date',
               selectedDate: _register.jobStartDate == null
-                  ? DateTime.now()
+                  ? null
                   : DateTime.parse(_register.jobStartDate),
               selectDate: (DateTime date) {
                 setState(() {
@@ -558,17 +591,6 @@ class RegistrationPageState extends State<RegistrationPage> {
                 setState(() {
                   _register.skills.remove(value);
                   skills.add(value);
-                });
-              },
-            ),
-            // Work City
-            DropDownInput(
-              items: ['Ahmedabad', 'Gandhinagar'],
-              labelText: 'Work city',
-              valueText: _register.workCity,
-              onChange: (value) {
-                setState(() {
-                  _register.workCity = value;
                 });
               },
             ),

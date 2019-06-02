@@ -18,7 +18,7 @@ class DateInput extends StatelessWidget {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
+      initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime(1950, 1),
       lastDate: DateTime.now(),
     );
@@ -50,7 +50,7 @@ class DateInput extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(DateFormat.yMMMd().format(selectedDate)),
+                    selectedDate != null ? Text(DateFormat.yMMMd().format(selectedDate)) : Container(),
                     Icon(Icons.today, size: 20),
                   ],
                 ),

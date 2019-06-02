@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class DropDownInput extends StatelessWidget {
+class DropDownInput extends StatefulWidget {
   const DropDownInput({
     Key key,
     @required this.labelText,
@@ -19,24 +19,32 @@ class DropDownInput extends StatelessWidget {
   final bool enabled;
 
   @override
+  State<StatefulWidget> createState() {
+    return DropDownInputState();
+  }
+}
+
+class DropDownInputState extends State<DropDownInput> {
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: labelText,
+          labelText: widget.labelText,
           border: OutlineInputBorder(),
-          enabled: enabled,
+          enabled: widget.enabled,
         ),
-        isEmpty: items == null,
+        isEmpty: widget.items == null,
         child: DropdownButtonHideUnderline(
           child: new IgnorePointer(
-            ignoring: !enabled,
+            ignoring: !widget.enabled,
             child: new DropdownButton<dynamic>(
               isExpanded: true,
               isDense: true,
-              items: items.map((value) {
+              items: widget.items.map((value) {
                 return new DropdownMenuItem<dynamic>(
                   value: value,
                   child: new Text(value.toString()),
@@ -44,9 +52,9 @@ class DropDownInput extends StatelessWidget {
               }).toList(),
               onChanged: (value) {
                 FocusScope.of(context).requestFocus(new FocusNode());
-                onChange(value);
+                widget.onChange(value);
               },
-              value: valueText,
+              value: widget.items.contains(widget.valueText) ? widget.valueText : null,
             ),
           ),
         ),

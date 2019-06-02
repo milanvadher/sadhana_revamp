@@ -1,14 +1,14 @@
-class Geo {
+class Country {
   String name;
 
-  Geo({this.name});
+  Country({this.name});
 
-  Geo.fromJson(Map<String, dynamic> json) {
+  Country.fromJson(Map<String, dynamic> json) {
     name = json['name'];
   }
   
-  static List<Geo> fromJsonList(List<dynamic> jsonList) {
-    return jsonList.map((json) => Geo.fromJson(json)).toList();
+  static List<Country> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => Country.fromJson(json)).toList();
   }
 
   Map<String, dynamic> toJson() {
