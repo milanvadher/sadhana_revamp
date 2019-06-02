@@ -87,7 +87,8 @@ class Register {
       this.bloodGroup,
       this.tshirtSize,
       this.registered,
-      this.permanentAddress});
+      this.permanentAddress,
+      this.currentAddress});
 
   Register.fromJson(Map<String, dynamic> json) {
     mhtId = json['mht_id'];
@@ -121,8 +122,8 @@ class Register {
     bloodGroup = json['blood_group'];
     tshirtSize = json['tshirt_size'];
     registered = json['registered'];
-    permanentAddress = json['permanent_address'];
-    currentAddress = json['current_address'];
+    permanentAddress = json['permanent_address'] != null ? new Address.fromJson(json['permanent_address']) : null;
+    currentAddress = json['current_address'] != null ? new Address.fromJson(json['current_address']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -158,8 +159,12 @@ class Register {
     data['blood_group'] = this.bloodGroup;
     data['tshirt_size'] = this.tshirtSize;
     data['registered'] = this.registered;
-    data['permanent_address'] = this.permanentAddress;
-    data['current_address'] = this.currentAddress;
+    if (this.permanentAddress != null) {
+      data['permanent_address'] = this.permanentAddress.toJson();
+    }
+    if (this.currentAddress != null) {
+      data['current_address'] = this.currentAddress.toJson();
+    }
     return data;
   }
 }

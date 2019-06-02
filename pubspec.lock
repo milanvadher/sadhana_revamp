@@ -231,8 +231,8 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "14db841ab09886bfbac60fd95002e8b9a1b2529b"
-      url: "https://github.com/devadrianapostol/permission"
+      resolved-ref: "2052d5780032adb76b7160948a925982d5626fa5"
+      url: "https://github.com/kamlesh9070/permission"
     source: git
     version: "0.1.1"
   petitparser:

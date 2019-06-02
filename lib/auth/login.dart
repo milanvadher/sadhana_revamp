@@ -110,8 +110,7 @@ class LoginPageState extends BaseState<LoginPage> {
         Response res = await api.postApi(url: '/mba.user.send_otp', data: {
           "mht_id": mhtIdController.text,
           "email": emailController.text,
-          "mobile_no_1": mobileController.text,
-          "otp_required": "1"
+          "mobile_no_1": mobileController.text
         });
         AppResponse appResponse =
             AppResponseParser.parseResponse(res, context: context);
@@ -334,7 +333,7 @@ class LoginPageState extends BaseState<LoginPage> {
                   getTitleAndName(
                     title: 'Email',
                     value: profileData != null
-                        ? '${profileData.email.substring(0, 2)}******@${profileData.email.substring(profileData.email.indexOf('@') + 1, profileData.email.indexOf('@') + 3)}******${profileData.email.substring(profileData.email.lastIndexOf('.'), profileData.email.length)}'
+                        ? profileData.email.trim().isNotEmpty ? '${profileData.email.substring(0, 2)}******@${profileData.email.substring(profileData.email.indexOf('@') + 1, profileData.email.indexOf('@') + 3)}******${profileData.email.substring(profileData.email.lastIndexOf('.'), profileData.email.length)}' : ""
                         : "",
                   ),
                 ],
@@ -595,7 +594,7 @@ class LoginPageState extends BaseState<LoginPage> {
       ),
       body: SafeArea(
         child: Stepper(
-          type: StepperType.horizontal,
+          type: StepperType.vertical,
           steps: loginSteps,
           currentStep: currantStep,
           onStepContinue: () {

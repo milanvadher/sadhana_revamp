@@ -35,11 +35,13 @@ class RegistrationPageState extends State<RegistrationPage> {
   final _formKeyStep2 = GlobalKey<FormState>();
   final _formKeyStep3 = GlobalKey<FormState>();
   int currantStep = 0;
+  bool sameAsPermenentAddress = false;
   List<Step> registrationSteps = [];
-  List<Skills> skills = [];
-  List<Geo> countryList = []; 
+  List<String> skills = [];
+  List<Geo> countryList = [];
   List<Geo> stateList = [];
   List<Geo> cityList = [];
+  List<bool> isExpandedAddress = [false, false];
 
   loadCountries() async {
     try {
@@ -91,7 +93,7 @@ class RegistrationPageState extends State<RegistrationPage> {
       CommonFunction.displayErrorDialog(context: context);
     }
   }
-  
+
   loadSkills() async {
     try {
       Response res = await api.postApi(
@@ -101,7 +103,9 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        skills = Skills.fromJsonList(appResponse.data);
+        Skills.fromJsonList(appResponse.data).forEach((item) {
+          skills.add(item.name);
+        });
       }
     } catch (error) {
       print(error);
@@ -113,6 +117,8 @@ class RegistrationPageState extends State<RegistrationPage> {
   initState() {
     super.initState();
     _register = widget.registrationData;
+    print('***************** Data ');
+    print(_register.permanentAddress.toString());
     loadCountries();
     loadSkills();
   }
@@ -201,13 +207,165 @@ class RegistrationPageState extends State<RegistrationPage> {
                 });
               },
             ),
-            Text('Permenent Address'),
-            // TODO : address (P/T)
-            // Father Name
-            TextInputField(
-              enabled: false,
-              labelText: 'Father Name',
-              // valueText: _register.,
+            // Permenent Address
+            new ExpansionPanelList(
+              expansionCallback: (int index, bool isExpanded) {
+                setState(() {
+                  isExpandedAddress[0] = !isExpandedAddress[0];
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  headerBuilder: (BuildContext context, bool isExpanded) {
+                    return ListTile(
+                      title: Text('Permenent Address'),
+                    );
+                  },
+                  isExpanded: isExpandedAddress[0],
+                  body: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      children: <Widget>[
+                        // Address Line 1
+                        TextInputField(
+                          enabled: false,
+                          labelText: 'Address Line 1',
+                          valueText: _register?.permanentAddress?.addressLine1,
+                        ),
+                        // Address Line 2
+                        TextInputField(
+                          enabled: false,
+                          labelText: 'Address Line 2',
+                          valueText: _register?.permanentAddress?.addressLine2,
+                        ),
+                        // City
+                        TextInputField(
+                          enabled: false,
+                          labelText: 'City',
+                          valueText: _register?.permanentAddress?.cityDisp,
+                        ),
+                        // State
+                        TextInputField(
+                          enabled: false,
+                          labelText: 'State',
+                          valueText: _register?.permanentAddress?.state,
+                        ),
+                        // Country
+                        TextInputField(
+                          enabled: false,
+                          labelText: 'Country',
+                          valueText: _register?.permanentAddress?.country,
+                        ),
+                        // Pincode
+                        TextInputField(
+                          enabled: false,
+                          labelText: 'Pincode',
+                          valueText: _register?.permanentAddress?.pincode,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Copy checkbox
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: <Widget>[
+                  Text('Same as Permenent Address'),
+                  Checkbox(
+                    value: sameAsPermenentAddress,
+                    onChanged: (value) {
+                      setState(() {
+                        sameAsPermenentAddress = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Current Address
+            new ExpansionPanelList(
+              expansionCallback: (int index, bool isExpanded) {
+                if (!sameAsPermenentAddress) {
+                  setState(() {
+                    isExpandedAddress[1] = !isExpandedAddress[1];
+                  });
+                }
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  headerBuilder: (BuildContext context, bool isExpanded) {
+                    return ListTile(
+                      title: Text('Current Address'),
+                    );
+                  },
+                  isExpanded: isExpandedAddress[1],
+                  body: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      children: <Widget>[
+                        // Address Line 1
+                        TextInputField(
+                          enabled: !sameAsPermenentAddress,
+                          labelText: 'Address Line 1',
+                          valueText: sameAsPermenentAddress
+                              ? _register?.permanentAddress?.addressLine1
+                              : _register?.currentAddress?.addressLine1,
+                        ),
+                        // Address Line 2
+                        TextInputField(
+                          enabled: !sameAsPermenentAddress,
+                          labelText: 'Address Line 2',
+                          valueText: sameAsPermenentAddress
+                              ? _register?.permanentAddress?.addressLine2
+                              : _register?.currentAddress?.addressLine2,
+                        ),
+                        // City
+                        TextInputField(
+                          enabled: !sameAsPermenentAddress,
+                          labelText: 'City',
+                          valueText: sameAsPermenentAddress
+                              ? _register?.permanentAddress?.cityDisp
+                              : _register?.currentAddress?.cityDisp,
+                        ),
+                        // State
+                        TextInputField(
+                          enabled: !sameAsPermenentAddress,
+                          labelText: 'State',
+                          valueText: sameAsPermenentAddress
+                              ? _register?.permanentAddress?.state
+                              : _register?.currentAddress?.state,
+                        ),
+                        // Country
+                        TextInputField(
+                          enabled: !sameAsPermenentAddress,
+                          labelText: 'Country',
+                          valueText: sameAsPermenentAddress
+                              ? _register?.permanentAddress?.country
+                              : _register?.currentAddress?.country,
+                        ),
+                        // Pincode
+                        TextInputField(
+                          enabled: !sameAsPermenentAddress,
+                          labelText: 'Pincode',
+                          valueText: sameAsPermenentAddress
+                              ? _register?.permanentAddress?.pincode
+                              : _register?.currentAddress?.pincode,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // Current Address
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Text('Current Address'),
             ),
           ],
         ),
@@ -385,24 +543,24 @@ class RegistrationPageState extends State<RegistrationPage> {
               },
             ),
             // Skills
-            // ComboboxInput(
-            //   lableText: 'Skills',
-            //   listData: skills,
-            //   selectedData: _register.skills,
-            //   handleValueSelect: (value) {
-            //     print('onselect : $value');
-            //     setState(() {
-            //       _register.skills.add(value);
-            //       skills.remove(value);
-            //     });
-            //   },
-            //   onDelete: (value) {
-            //     setState(() {
-            //       _register.skills.remove(value);
-            //       skills.add(value);
-            //     });
-            //   },
-            // ),
+            ComboboxInput(
+              lableText: 'Skills',
+              listData: skills,
+              selectedData: _register.skills,
+              handleValueSelect: (value) {
+                print('onselect : $value');
+                setState(() {
+                  _register.skills.add(value);
+                  skills.remove(value);
+                });
+              },
+              onDelete: (value) {
+                setState(() {
+                  _register.skills.remove(value);
+                  skills.add(value);
+                });
+              },
+            ),
             // Work City
             DropDownInput(
               items: ['Ahmedabad', 'Gandhinagar'],

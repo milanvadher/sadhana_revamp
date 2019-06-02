@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
-import 'package:sadhana/model/skill.dart';
 
 class ComboboxInput extends StatelessWidget {
   ComboboxInput({
@@ -15,7 +14,7 @@ class ComboboxInput extends StatelessWidget {
   final Function handleValueSelect;
   final Function onDelete;
   final String lableText;
-  final List<Skills> listData;
+  final List<String> listData;
   final List<dynamic> selectedData;
 
   @override
