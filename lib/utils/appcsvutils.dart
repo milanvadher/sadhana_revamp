@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -11,23 +13,24 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/apputils.dart';
 //import 'package:simple_permissions/simple_permissions.dart';
 import 'package:permission/permission.dart';
+import 'package:share_extend/share_extend.dart';
 
 class AppCSVUtils {
   static List<String> sadhanasName = ['Samayik', 'Vanchan', 'Vidhi', 'G. Satsang', 'Seva'];
 
   static String sadhanaDirPath = 'Sadhana';
-  static String backupDirName = 'Backup';
+  static String backupDirName = 'Backups';
   static Future<File> writeCSV(String fileName, List<List<dynamic>> rows) async {
-    //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
-    //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
     bool checkPermission = await AppUtils.checkPermission();
     if (checkPermission) {
       String dir = await getSadhanaDir();
+      await new Directory('$dir').create(recursive: true);
       String file = "$dir";
       print(" FILE " + file);
       File f = new File(file + "/$fileName");
+      f.createSync(recursive: true);
       String csv = const ListToCsvConverter().convert(rows);
-      f.writeAsString(csv);
+      await f.writeAsString(csv);
       print("Successfully written file");
       return f;
     }

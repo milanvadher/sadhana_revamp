@@ -72,6 +72,8 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
       activity.isSynced = false;
     else
       activity.isSynced = true;
+    /*if(activity.sadhanaValue <= 0)
+      activity.remarks = '';*/
     setState(() {
       sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
     });

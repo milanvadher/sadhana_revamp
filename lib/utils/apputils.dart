@@ -66,6 +66,8 @@ class AppUtils {
   }
 
   static Future<bool> checkPermission() async {
+    //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
+    //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
     await askForPermission();
     bool checkPermission;
     if(Platform.isAndroid) {

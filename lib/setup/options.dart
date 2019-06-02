@@ -171,7 +171,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
                 _ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
                 _ThemeItem(widget.options, widget.onOptionsChanged),
                 _ActionItem(Icons.sync, Constant.colors[3], 'Sync Data', () {}, 'Sync your sadhana data with server'),
-                _ActionItem(Icons.backup, Constant.colors[4], 'Buckup Data', _onBackup, 'Backup your data'),
+                _ActionItem(Icons.backup, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
               ],
             ),
           ]..addAll(<Widget>[

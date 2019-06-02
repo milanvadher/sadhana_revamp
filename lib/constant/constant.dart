@@ -5,6 +5,7 @@ class Constant {
   static final String APP_TIME_FORMAT = "hh:mm a";
   static final String APP_DATE_FORMAT = 'dd-MM-yyyy';
   static final String APP_DATE_TIME_FORMAT = "dd-MM-yyyy hh:mm a";
+  static final String APP_DATE_TIME_FILE_FORMAT = "dd-MM-yyyy hh-mm-a";
   static final String vanchanName = "Vanchan";
   static final String SEVANAME = "Seva";
   static final int REMARK_MANDATORY_VALUE = 4;

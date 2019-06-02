@@ -40,7 +40,7 @@ class DBProvider {
       String path = join(documentsDirectory.path, "Sadhana.db");
       File dbFile = new File(path);
       String backupDir = await AppCSVUtils.getBackupDir();
-      String fileName = 'Sadhana_' + DateFormat(Constant.APP_DATE_FORMAT).format(DateTime.now()) + '.db';
+      String fileName = 'Sadhana_Backup_' + DateFormat(Constant.APP_DATE_TIME_FILE_FORMAT).format(DateTime.now()) + '.db';
       return await dbFile.copy('$backupDir/$fileName');
     }
     return null;
