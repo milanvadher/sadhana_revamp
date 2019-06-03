@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:sadhana/auth/login.dart';
+import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/comman.dart';
+import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
@@ -30,6 +32,7 @@ import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:zoomable_image/zoomable_image.dart';
 
 import '../attendance/attendance_home.dart';
 //import 'package:share/share.dart';
@@ -84,6 +87,7 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if(!isFirst) {
         print('on Connectivity change');
+        MBAScheduleCheck.getMBASchedule();
         await AppSettingUtil.getServerAppSetting(forceFromServer: true);
         AppUpdateCheck.startAppUpdateCheckThread(context);
         SyncActivityUtils.syncAllUnSyncActivity(context: context);
@@ -346,7 +350,7 @@ class HomePageState extends BaseState<HomePage> {
       IconButton(
         icon: Icon(Icons.calendar_today),
         onPressed: _onScheduleClick,
-        tooltip: 'Temp Login',
+        tooltip: 'MBA Schedule',
       ),
       IconButton(
         icon: Icon(Icons.sync),
@@ -429,8 +433,33 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void _onScheduleClick() async {
-    String filePath = '/storage/emulated/0/Sadhana/June.jpg';
-    await openFile(File(filePath));
+    try {
+      /*String filePath = '/storage/emulated/0/Sadhana/June.jpg';
+      await openFile(File(filePath));*/
+      setState(() {
+        isOverlay = true;
+      });
+      File file = await MBAScheduleCheck.getMBASchedule(context: context);
+      setState(() {
+        isOverlay = false;
+      });
+      if (file != null) {
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (ctx) => Scaffold(
+            body: Center(
+              child: new ZoomableImage(
+                  Image.file(file).image,
+                  minScale: 0.7,
+                  backgroundColor: kQuizMain400,
+                ),
+            ),
+          ),
+        ));
+      }
+    } catch(error) {
+      print(error);
+      CommonFunction.displayErrorDialog(context: context);
+    }
   }
 
   void _onSyncClicked() async {
@@ -483,7 +512,7 @@ class HomePageState extends BaseState<HomePage> {
             msg: 'Your File is successuflly created, Path: ${file.path}',
             doneButtonFn: () {
               Navigator.pop(context);
-              openFile(file);
+              //openFile(file);
             });
       }
     }

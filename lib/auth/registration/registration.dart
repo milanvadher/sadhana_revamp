@@ -433,7 +433,7 @@ class RegistrationPageState extends State<RegistrationPage> {
             // Father gnan date
             DateInput(
               labelText: 'Father Gnan Date',
-              enable: _register.fatherGnan == 0 ? false : _register.fatherGnan,
+              enable: _register.fatherGnan == 0 ? false : true,
               selectedDate: _register.fatherGDate == null
                   ? null
                   : DateTime.parse(_register.fatherGDate),
@@ -480,7 +480,7 @@ class RegistrationPageState extends State<RegistrationPage> {
             // Mother gnan date
             DateInput(
               labelText: 'Mother Gnan Date',
-              enable: _register.motherGnan == 0 ? false : _register.motherGnan,
+              enable: _register.motherGnan == 0 ? false : true,
               selectedDate: _register.motherGDate == null
                   ? null
                   : DateTime.parse(_register.motherGDate),

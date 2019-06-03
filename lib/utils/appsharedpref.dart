@@ -101,8 +101,11 @@ class AppSharedPrefUtil {
   }
 
   static Future<DateTime> getMBAScheduleMonth() async {
-    String strDate = await getString(SharedPrefConstant.s_mba_schedule_file_path);
-    return DateFormat(Constant.APP_MONTH_FORMAT).parse(strDate);
+    String strDate = await getString(SharedPrefConstant.s_mba_schedule_month);
+    if(strDate != null)
+      return DateFormat(Constant.APP_MONTH_FORMAT).parse(strDate);
+    else
+      return null;
   }
 
   static Future<void> saveMBAScheduleMonth(String month) async {

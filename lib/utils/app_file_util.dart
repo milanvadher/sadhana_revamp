@@ -55,10 +55,6 @@ class AppFileUtil {
   static Future<File> saveImage(String url, String dir) async {
     final File file = await getImageFromNetwork(url);
     String filename = basename(file.path);
-    //Image image = decodeImage(file.readAsBytesSync());
-    File deviceFile = new File('$dir/$filename');
-    deviceFile.createSync(recursive: true);
-    return deviceFile;
-    //return new File('$path/${DateTime.now().toUtc().toIso8601String()}.png')..writeAsBytesSync(encodePng(image));
+    return file.copySync('$dir/$filename');
   }
 }
