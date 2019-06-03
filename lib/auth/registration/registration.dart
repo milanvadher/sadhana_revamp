@@ -40,9 +40,12 @@ class RegistrationPageState extends State<RegistrationPage> {
   bool sameAsPermenentAddress = false;
   List<Step> registrationSteps = [];
   List<String> skills = [];
-  List<String> countryList = [];
-  List<String> stateList = [];
-  List<String> cityList = [];
+  List<String> pCountryList = [];
+  List<String> pStateList = [];
+  List<String> pCityList = [];
+  List<String> cCountryList = [];
+  List<String> cStateList = [];
+  List<String> cCityList = [];
   List<bool> isExpandedAddress = [false, false];
 
   loadCountries() async {
@@ -54,9 +57,12 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        pCountryList = [];
+        cCountryList = [];
         setState(() {
           Country.fromJsonList(appResponse.data).forEach((item) {
-            countryList.add(item.name);
+            pCountryList.add(item.name);
+            cCountryList.add(item.name);
           });
         });
       }
@@ -66,7 +72,7 @@ class RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
-  getStateByCountry({@required String country}) async {
+  getStateByCountry({@required String type, @required String country}) async {
     try {
       Response res = await api.postApi(
         url: '/mba.master.state_list',
@@ -75,11 +81,26 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        setState(() {
-          StateList.fromJsonList(appResponse.data).forEach((item) {
-            stateList.add(item.name);
+        if (type == 'P') {
+          pStateList = [];
+          setState(() {
+            _register.permanentAddress.state = null;
+            _register.permanentAddress.city = null;
+            StateList.fromJsonList(appResponse.data).forEach((item) {
+              pStateList.add(item.name);
+            });
           });
-        });
+        }
+        if (type == 'C') {
+          cStateList = [];
+          setState(() {
+            _register.permanentAddress.state = null;
+            _register.permanentAddress.city = null;
+            StateList.fromJsonList(appResponse.data).forEach((item) {
+              cStateList.add(item.name);
+            });
+          });
+        }
       }
     } catch (error) {
       print(error);
@@ -87,7 +108,7 @@ class RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
-  getCityByState({@required String state}) async {
+  getCityByState({@required String type, @required String state}) async {
     try {
       Response res = await api.postApi(
         url: '/mba.master.city_list',
@@ -96,11 +117,24 @@ class RegistrationPageState extends State<RegistrationPage> {
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        setState(() {
-          City.fromJsonList(appResponse.data).forEach((item) {
-            cityList.add(item.name);
+        if (type == 'P') {
+          pCityList = [];
+          setState(() {
+            _register.permanentAddress.city = null;
+            City.fromJsonList(appResponse.data).forEach((item) {
+              pCityList.add(item.name);
+            });
           });
-        });
+        }
+        if (type == 'C') {
+          cCityList = [];
+          setState(() {
+            _register.permanentAddress.city = null;
+            City.fromJsonList(appResponse.data).forEach((item) {
+              cCityList.add(item.name);
+            });
+          });
+        }
       }
     } catch (error) {
       print(error);
@@ -136,11 +170,11 @@ class RegistrationPageState extends State<RegistrationPage> {
     loadCountries();
     if (_register.permanentAddress.country != null &&
         _register.permanentAddress.country.trim().isNotEmpty) {
-      getStateByCountry(country: _register.permanentAddress.country);
+      getStateByCountry(type: 'P', country: _register.permanentAddress.country);
     }
     if (_register.permanentAddress.state != null &&
         _register.permanentAddress.state.trim().isNotEmpty) {
-      getCityByState(state: _register.permanentAddress.state);
+      getCityByState(type: 'T', state: _register.permanentAddress.state);
     }
     loadSkills();
   }
@@ -264,29 +298,35 @@ class RegistrationPageState extends State<RegistrationPage> {
                         // Country
                         DropDownInput(
                           labelText: "Country",
-                          items: countryList ?? [],
+                          items: pCountryList ?? [],
                           onChange: (value) {
-                            _register.permanentAddress.country = value;
-                            getStateByCountry(country: value);
+                            setState(() {
+                              _register.permanentAddress.country = value;
+                            });
+                            getStateByCountry(type: 'P', country: value);
                           },
                           valueText: _register.permanentAddress.country ?? "",
                         ),
                         // State
                         DropDownInput(
                           labelText: "State",
-                          items: stateList ?? [],
+                          items: pStateList ?? [],
                           onChange: (value) {
-                            _register.permanentAddress.state = value;
-                            getCityByState(state: value);
+                            setState(() {
+                              _register.permanentAddress.state = value;
+                            });
+                            getCityByState(type: 'P', state: value);
                           },
                           valueText: _register.permanentAddress.state ?? "",
                         ),
                         // City
                         DropDownInput(
                           labelText: "City",
-                          items: cityList ?? [],
+                          items: pCityList ?? [],
                           onChange: (value) {
-                            _register.permanentAddress.city = value;
+                            setState(() {
+                              _register.permanentAddress.city = value;
+                            });
                           },
                           valueText: _register.permanentAddress.city ?? "",
                         ),
@@ -357,29 +397,40 @@ class RegistrationPageState extends State<RegistrationPage> {
                               ? _register?.permanentAddress?.addressLine2
                               : _register?.currentAddress?.addressLine2,
                         ),
-                        // City
-                        TextInputField(
-                          enabled: !sameAsPermenentAddress,
-                          labelText: 'City',
-                          valueText: sameAsPermenentAddress
-                              ? _register?.permanentAddress?.cityDisp
-                              : _register?.currentAddress?.cityDisp,
+                        // Country
+                        DropDownInput(
+                          labelText: "Country",
+                          items: cCountryList ?? [],
+                          onChange: (value) {
+                            setState(() {
+                              _register.currentAddress.country = value;
+                            });
+                            getStateByCountry(type: 'P', country: value);
+                          },
+                          valueText: _register.currentAddress.country ?? "",
                         ),
                         // State
-                        TextInputField(
-                          enabled: !sameAsPermenentAddress,
-                          labelText: 'State',
-                          valueText: sameAsPermenentAddress
-                              ? _register?.permanentAddress?.state
-                              : _register?.currentAddress?.state,
+                        DropDownInput(
+                          labelText: "State",
+                          items: cStateList ?? [],
+                          onChange: (value) {
+                            setState(() {
+                              _register.currentAddress.state = value;
+                            });
+                            getCityByState(type: 'P', state: value);
+                          },
+                          valueText: _register.currentAddress.state ?? "",
                         ),
-                        // Country
-                        TextInputField(
-                          enabled: !sameAsPermenentAddress,
-                          labelText: 'Country',
-                          valueText: sameAsPermenentAddress
-                              ? _register?.permanentAddress?.country
-                              : _register?.currentAddress?.country,
+                        // City
+                        DropDownInput(
+                          labelText: "City",
+                          items: cCityList ?? [],
+                          onChange: (value) {
+                            setState(() {
+                              _register.currentAddress.city = value;
+                            });
+                          },
+                          valueText: _register.currentAddress.city ?? "",
                         ),
                         // Pincode
                         TextInputField(
