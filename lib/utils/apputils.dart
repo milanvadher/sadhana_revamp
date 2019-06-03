@@ -10,6 +10,7 @@ import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:device_info/device_info.dart';
 
 class AppUtils {
   static bool equalsIgnoreCase(String string1, String string2) {
@@ -56,30 +57,42 @@ class AppUtils {
       tried++;
     }
   }
+
+  static Future<int> getAndroidOSVersion() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    return androidInfo.version.sdkInt;
+  }
+
   static askForPermission() async {
-    List<PermissionName> permissions = [PermissionName.Storage];
-    if (Platform.isAndroid) {
-      await Permission.requestPermissions(permissions);
-    } else {
-      for (PermissionName permissionName in permissions) await Permission.requestSinglePermission(permissionName);
+    if(await getAndroidOSVersion() >= 23) { //Marshmallow
+      List<PermissionName> permissions = [PermissionName.Storage];
+      if (Platform.isAndroid) {
+        await Permission.requestPermissions(permissions);
+      } else {
+        for (PermissionName permissionName in permissions) await Permission.requestSinglePermission(permissionName);
+      }
     }
   }
 
   static Future<bool> checkPermission() async {
     //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
     //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
-    await askForPermission();
-    bool checkPermission;
-    if(Platform.isAndroid) {
-      List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
-      if(permissions != null && permissions.isNotEmpty) {
-        checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
+    if(await getAndroidOSVersion() >= 23) { //Marshmallow
+      await askForPermission();
+      bool checkPermission;
+      if(Platform.isAndroid) {
+        List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
+        if(permissions != null && permissions.isNotEmpty) {
+          checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
+        }
+      } else {
+        PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
+        checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
       }
-    } else {
-      PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
-      checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
+      return checkPermission;
     }
-    return checkPermission;
+    return true;
   }
 
   static bool isLightBrightness(BuildContext context) {

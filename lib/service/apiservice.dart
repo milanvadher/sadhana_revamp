@@ -10,7 +10,8 @@ import 'package:sadhana/wsmodel/ws_sadhana_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final _apiUrl = 'http://52.140.97.54/api/method';
+  static final _baseServerUrl = 'http://52.140.97.54';
+  static final _apiUrl = '$_baseServerUrl/api/method';
 
   Map<String, String> headers = {'content-type': 'application/json'};
   bool enableMock = false;
@@ -44,7 +45,7 @@ class ApiService {
 
   appendCommonDataToBody(Map<String, dynamic> data) {
     data['token'] = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJtaHRfaWQiOiI2MTc1OCIsImlhdCI6MTU1OTM5MjA5N30.q_VQ0LOX4hqee61UjsFIWp9lhFOEleLG4nqAqyvJgzM';
-    // data['mht_id'] = '123456';
+    data['mht_id'] = '61758';
   }
 
   appendTokenToHeader(token) {
@@ -86,6 +87,16 @@ class ApiService {
   Future<http.Response> getAppSetting() async {
     http.Response res = await getApi(url: '/mba.sadhana.settings');
     return res;
+  }
+
+  Future<http.Response> getMBASchedule(String center, String date) async {
+    Map<String, dynamic> data = {'center': center, 'date' : date };
+    http.Response res = await postApi(url: '/mba.schedule.get_schedule', data: data);
+    return res;
+  }
+
+  String getMBAScheduleAbsoluteUrl(String relativeUrl) {
+    return '$_baseServerUrl/$relativeUrl';
   }
 
 

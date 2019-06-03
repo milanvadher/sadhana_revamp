@@ -7,17 +7,18 @@ class AppSetting {
   static const int DEFAULT_periodicSyncIntervalInMin = 5;
   String appVersionAndroid;
   String appVersionIos;
-  String editableDays;
+  int editableDays;
   String serverDate;
   int periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin;
   String get version => Platform.isIOS ? appVersionIos : appVersionAndroid;
-
+  bool allowSyncFromServer;
   AppSetting(
       {this.appVersionAndroid,
       this.appVersionIos,
-      this.editableDays = '3',
+      this.editableDays =  DEFAULT_EditableDays,
       this.serverDate,
-      this.periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin});
+      this.periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin,
+      this.allowSyncFromServer = false});
 
   static Future<AppSetting> getDefaulServerAppSetting() async {
     String appVersion = await AppSettingUtil.getAppVersion();
@@ -30,6 +31,9 @@ class AppSetting {
     editableDays = json['editable_days'] ?? DEFAULT_EditableDays;
     serverDate = json['server_date'];
     periodicSyncIntervalInMin = json['periodic_sync_interval'] ?? DEFAULT_periodicSyncIntervalInMin;
+    allowSyncFromServer = false;
+    if(json['allow_sync_from_server'] != null)
+      allowSyncFromServer = json['allow_sync_from_server'] > 0 ? true : false;
   }
 
   Map<String, dynamic> toJson() {
@@ -38,6 +42,7 @@ class AppSetting {
     data['app_version_ios'] = this.appVersionIos;
     data['editable_days'] = this.editableDays;
     data['server_date'] = this.serverDate;
+    data['allow_sync_from_server'] = this.allowSyncFromServer ? 1 : 0;
     return data;
   }
 }

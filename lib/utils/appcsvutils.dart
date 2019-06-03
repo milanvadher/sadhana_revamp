@@ -1,56 +1,21 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:csv/csv.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/app_file_util.dart';
 import 'package:sadhana/utils/apputils.dart';
-//import 'package:simple_permissions/simple_permissions.dart';
-import 'package:permission/permission.dart';
-import 'package:share_extend/share_extend.dart';
 
 class AppCSVUtils {
   static List<String> sadhanasName = ['Samayik', 'Vanchan', 'Vidhi', 'G. Satsang', 'Seva'];
+  static final MONTHS_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  static String sadhanaDirPath = 'Sadhana';
-  static String backupDirName = 'Backups';
-  static Future<File> writeCSV(String fileName, List<List<dynamic>> rows) async {
-    bool checkPermission = await AppUtils.checkPermission();
-    if (checkPermission) {
-      String dir = await getSadhanaDir();
-      await new Directory('$dir').create(recursive: true);
-      String file = "$dir";
-      print(" FILE " + file);
-      File f = new File(file + "/$fileName");
-      f.createSync(recursive: true);
-      String csv = const ListToCsvConverter().convert(rows);
-      await f.writeAsString(csv);
-      print("Successfully written file");
-      return f;
-    }
-    return null;
-  }
-
-  static String getFileName(int month) {
-    return "61758_$month.csv";
-  }
-
-  static Future<String> getSadhanaDir() async {
-    String dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath";
-    await new Directory('$dir').create(recursive: true);
-    return dir;
-  }
-
-  static Future<String> getBackupDir() async {
-    String dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
-    new Directory('$dir').createSync(recursive: true);
-    return dir;
+  static String getFileName(DateTime from) {
+    String month = DateFormat('MMM_yyyy').format(from);
+    return 'Kamlesh_Kanazariya_61758_$month';
   }
 
   static Future<File> generateCSVBetween(DateTime from, DateTime to) async {
@@ -97,9 +62,9 @@ class AppCSVUtils {
       activityData.add(row);
     }
     rows.addAll(activityData);
-    totals.insert(0,'Total');
+    totals.insert(0, 'Total');
     rows.add(totals);
-    return await writeCSV(getFileName(from.month),rows);
+    return await AppFileUtil.writeCSV(getFileName(from), rows);
   }
 
   static List<dynamic> getHeaderRow(String month, String center, String name, String mhtId) {

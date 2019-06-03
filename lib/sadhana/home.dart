@@ -12,7 +12,6 @@ import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
-import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/notifcation_setup.dart';
@@ -29,7 +28,6 @@ import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
-import 'package:sadhana/wsmodel/ws_sadhana_activity.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -66,7 +64,6 @@ class HomePageState extends BaseState<HomePage> {
   ActivityDAO activityDAO = ActivityDAO();
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
-  bool isNeedToLoadPreloadActivity = false;
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   @override
   void initState() {
@@ -107,11 +104,8 @@ class HomePageState extends BaseState<HomePage> {
     await AppSharedPrefUtil.getLastSyncTime();
     await createPreloadedSadhana();
     await sadhanaDAO.getAll();
-    sadhanas = CacheData.getSadhanas();
-    AppSharedPrefUtil.isNeedsToLoadPreloadActivity().then((value) {
-      setState(() {
-        isNeedToLoadPreloadActivity = value;
-      });
+    setState(() {
+      sadhanas = CacheData.getSadhanas();
     });
     SyncActivityUtils.syncAllUnSyncActivity(context: context);
   }
@@ -161,9 +155,10 @@ class HomePageState extends BaseState<HomePage> {
         Navigator.pop(context);
         CommonFunction.alertDialog(
             context: context,
-            msg: "It's takes server minutes, Pls wait to compelete.",
+            msg: "It's takes several minutes, Pls wait to compelete.",
             closeable: false,
             doneButtonText: 'OK',
+            type: 'info',
             doneButtonFn: () {
               Navigator.pop(context);
               loadPreloadedActivity(sadhanaList);
@@ -178,44 +173,10 @@ class HomePageState extends BaseState<HomePage> {
       isOverlay = true;
     });
     try {
-      AppSharedPrefUtil.saveNeedsToLoadPreloadActivity(true);
-      Response res = await _api.getActivity();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
-        Map<String, Sadhana> sadhanaByServerSName = new Map();
-        sadhanas.forEach((sadhana) {
-          sadhanaByServerSName[sadhana.serverSName] = sadhana;
-        });
-        for (WSSadhanaActivity wsSadhana in wsSadhanaActivity) {
-          Sadhana sadhana = sadhanaByServerSName[wsSadhana.name];
-          if (sadhana != null) {
-            for (WSActivity wsActivity in wsSadhana.data) {
-              if (wsActivity.date != null) {
-                Activity activity = Activity(
-                  sadhanaId: sadhana.id,
-                  sadhanaDate: wsActivity.date,
-                  sadhanaValue: wsActivity.value,
-                  isSynced: true,
-                  remarks: wsActivity.remark,
-                );
-                await activityDAO.insertOrUpdate(activity);
-              }
-            }
-          }
-        }
-        setState(() {
-          isNeedToLoadPreloadActivity = false;
-        });
-        AppSharedPrefUtil.saveNeedsToLoadPreloadActivity(false);
-      }
+        await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
     } catch (error) {
       print(error);
       CommonFunction.displayErrorDialog(context: context);
-      setState(() {
-        isOverlay = false;
-      });
     }
     setState(() {
       isOverlay = false;
@@ -272,7 +233,7 @@ class HomePageState extends BaseState<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  child: Text('Sync Upto: ' + CacheData.lastSyncTime),
+                  child: Text('Last Sadhana Synced: ' + CacheData.lastSyncTime),
                 )
               ],
             )
@@ -383,15 +344,15 @@ class HomePageState extends BaseState<HomePage> {
         tooltip: 'Temp Login',
       ),
       IconButton(
+        icon: Icon(Icons.calendar_today),
+        onPressed: _onScheduleClick,
+        tooltip: 'Temp Login',
+      ),
+      IconButton(
         icon: Icon(Icons.sync),
         onPressed: _onSyncClicked,
         tooltip: 'Sync Data',
       ),
-      isNeedToLoadPreloadActivity ? IconButton(
-        icon: Icon(Icons.get_app),
-        onPressed: () {askForPreloadActivity(sadhanas);},
-        tooltip: 'Load Sadhana From Server',
-      ) : Container(),
       IconButton(
         icon: Icon(Icons.add),
         onPressed: _onAddSadhanaClick,
@@ -465,6 +426,11 @@ class HomePageState extends BaseState<HomePage> {
     DateTime selectedMonth = date as DateTime;
     DateTime toDate = new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
     return await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
+  }
+
+  void _onScheduleClick() async {
+    String filePath = '/storage/emulated/0/Sadhana/June.jpg';
+    await openFile(File(filePath));
   }
 
   void _onSyncClicked() async {

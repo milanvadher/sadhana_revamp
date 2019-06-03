@@ -18,6 +18,35 @@ class SyncActivityUtils {
   static ApiService apiService = ApiService();
   static bool isSyncing = false;
 
+  static loadActivityFromServer(List<Sadhana> sadhanas, {BuildContext context}) async {
+    Response res = await apiService.getActivity();
+    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+    if (appResponse.status == WSConstant.SUCCESS_CODE) {
+      List<dynamic> wsActivities = appResponse.data;
+      List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+      Map<String, Sadhana> sadhanaByServerSName = new Map();
+      sadhanas.forEach((sadhana) {
+        sadhanaByServerSName[sadhana.serverSName] = sadhana;
+      });
+      for (WSSadhanaActivity wsSadhana in wsSadhanaActivity) {
+        Sadhana sadhana = sadhanaByServerSName[wsSadhana.name];
+        if (sadhana != null) {
+          for (WSActivity wsActivity in wsSadhana.data) {
+            if (wsActivity.date != null) {
+              Activity activity = Activity(
+                sadhanaId: sadhana.id,
+                sadhanaDate: wsActivity.date,
+                sadhanaValue: wsActivity.value,
+                isSynced: true,
+                remarks: wsActivity.remark,
+              );
+              await _activityDAO.insertOrUpdate(activity);
+            }
+          }
+        }
+      }
+    }
+  }
 
   static sendToServer(Activity activity) async {
     if (!activity.isSynced && await AppUtils.isInternetConnected()) {
