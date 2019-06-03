@@ -20,7 +20,7 @@ class SadhanaHorizontalPanel extends StatefulWidget {
 class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
   Sadhana sadhana;
   ActivityDAO activityDAO = ActivityDAO();
-  int disabledDays = 3;
+  int editableDays = 3;
 
   @override
   void initState() {
@@ -28,7 +28,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
     super.initState();
     AppSettingUtil.getServerAppSetting().then((appSetting) {
       setState(() {
-        disabledDays = int.parse(appSetting.editableDays);
+        editableDays = appSetting.editableDays;
       });
     });
   }
@@ -55,7 +55,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
                 bool isDisabled = false;
                 if(sadhana.isPreloaded)
-                    isDisabled = index >= disabledDays ? true : false;
+                    isDisabled = index >= editableDays ? true : false;
                 return sadhana.type == SadhanaType.BOOLEAN
                     ? CheckmarkButton(sadhana: sadhana, activity: activity, onClick: onClick, isDisabled: isDisabled,)
                     : NumberButton(sadhana: sadhana, activity: activity, onClick: onClick, isDisabled: isDisabled,);

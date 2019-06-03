@@ -14,6 +14,10 @@ class AppUpdateCheck {
     Future.delayed(Duration(seconds: 1), () => AppUpdateCheck().checkForNewAppUpdate(context));
   }
 
+  void checkForSchedule() {
+
+  }
+
   void checkForNewAppUpdate(BuildContext context, {forceSetting = false}) async {
     /*bool check = true;
     int checkAfter = await AppSharedPrefUtil.getAppUpdateCheckAfter();

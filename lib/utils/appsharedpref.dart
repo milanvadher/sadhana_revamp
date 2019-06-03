@@ -63,14 +63,6 @@ class AppSharedPrefUtil {
     return await getBool(SharedPrefConstant.b_isUserLoggedIn, defaultValue: false);
   }
 
-  static Future<bool> isNeedsToLoadPreloadActivity() async {
-    return await getBool(SharedPrefConstant.b_needs_activity_load, defaultValue: false);
-  }
-
-  static Future<void> saveNeedsToLoadPreloadActivity(bool isNeedToLoadPreloadActivity) async {
-    await saveBoolean(SharedPrefConstant.b_needs_activity_load, isNeedToLoadPreloadActivity);
-  }
-
   static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
     String sLastSyncTime = DateFormat(Constant.APP_DATE_TIME_FORMAT).format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
@@ -99,4 +91,28 @@ class AppSharedPrefUtil {
   static Future<void> saveServerSetting(AppSetting appSetting) async {
     await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting));
   }
+
+  static Future<String> getMBAScheduleFilePath() async {
+    return await getString(SharedPrefConstant.s_mba_schedule_file_path);
+  }
+
+  static Future<void> saveMBAScheduleFilePath(String filePath) async {
+    return await saveString(SharedPrefConstant.s_mba_schedule_file_path, filePath);
+  }
+
+  static Future<DateTime> getMBAScheduleMonth() async {
+    String strDate = await getString(SharedPrefConstant.s_mba_schedule_file_path);
+    return DateFormat(Constant.APP_MONTH_FORMAT).parse(strDate);
+  }
+
+  static Future<void> saveMBAScheduleMonth(String month) async {
+    return await saveString(SharedPrefConstant.s_mba_schedule_month, month);
+  }
+
+  static Future<void> saveMBASchedule(DateTime date, String filePath) async {
+    await saveMBAScheduleFilePath(filePath);
+    String strDate = DateFormat(Constant.APP_MONTH_FORMAT).format(date);
+    await saveMBAScheduleMonth(strDate);
+  }
+
 }

@@ -10,6 +10,7 @@ class CommonFunction {
       alertDialog(
         context: context,
         msg: msg,
+        type: 'error',
         barrierDismissible: false,
       );
     }
@@ -18,7 +19,7 @@ class CommonFunction {
   // common Alert dialog
   static alertDialog({
     @required BuildContext context,
-    String type = 'error', // 'success' || 'error'
+    String type = 'info', // 'success' || 'error'
     String title,
     @required String msg,
     bool showDoneButton = true,

@@ -3,8 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/setup/themes.dart';
+import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 
 class AppOptions {
@@ -155,6 +159,21 @@ class AppOptionsPage extends StatefulWidget {
 }
 
 class _AppOptionsPageState extends BaseState<AppOptionsPage> {
+
+  bool isAllowSyncFromServer = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AppSettingUtil.getServerAppSetting().then((appSetting) {
+        if(appSetting != null) {
+          setState(() {
+            isAllowSyncFromServer = appSetting.allowSyncFromServer;
+          });
+
+        }
+    });
+  }
   @override
   Widget pageToDisplay() {
     return Scaffold(
@@ -170,7 +189,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
                 Divider(height: 0),
                 _ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
                 _ThemeItem(widget.options, widget.onOptionsChanged),
-                _ActionItem(Icons.sync, Constant.colors[3], 'Sync Data', () {}, 'Sync your sadhana data with server'),
+                _ActionItem(Icons.sync, Constant.colors[3], 'Load Data From Server', askForSyncActivity, 'Load your sadhana data from server'),
                 _ActionItem(Icons.backup, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
               ],
             ),
@@ -186,6 +205,35 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         ),
       ),
     );
+  }
+
+  void askForSyncActivity() {
+    CommonFunction.alertDialog(
+        context: context,
+        msg: "It's takes several minutes, Pls wait to compelete.",
+        closeable: false,
+        doneButtonText: 'OK',
+        doneButtonFn: () {
+          Navigator.pop(context);
+          loadPreloadedActivity();
+        });
+  }
+
+  void loadPreloadedActivity() async {
+    setState(() {
+      isOverlay = true;
+    });
+    try {
+      List<Sadhana> sadhanas = CacheData.getSadhanas();
+      await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
+      CommonFunction.alertDialog(context: context, msg: "Successfully load sadhana from Server.");
+    } catch (error) {
+      print(error);
+      CommonFunction.displayErrorDialog(context: context);
+    }
+    setState(() {
+      isOverlay = false;
+    });
   }
 
   _onBackup() async {
