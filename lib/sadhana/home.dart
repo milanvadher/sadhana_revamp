@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:open_file/open_file.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +31,6 @@ import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:share_extend/share_extend.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:zoomable_image/zoomable_image.dart';
 
 import '../attendance/attendance_home.dart';
 //import 'package:share/share.dart';
@@ -444,17 +442,7 @@ class HomePageState extends BaseState<HomePage> {
         isOverlay = false;
       });
       if (file != null) {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (ctx) => Scaffold(
-            body: Center(
-              child: new ZoomableImage(
-                  Image.file(file).image,
-                  minScale: 0.7,
-                  backgroundColor: kQuizMain400,
-                ),
-            ),
-          ),
-        ));
+        OpenFile.open(file.path);
       }
     } catch(error) {
       print(error);
@@ -493,8 +481,6 @@ class HomePageState extends BaseState<HomePage> {
       File file = await getGeneratedCSVPath(date);
       if (file != null) {
         await ShareExtend.share(file.path, "file");
-        //Share.file(title: basename(file.path), path: file.path, text: basename(file.path))
-        //    .share(sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
       }
     }
   }
@@ -512,22 +498,9 @@ class HomePageState extends BaseState<HomePage> {
             msg: 'Your File is successuflly created, Path: ${file.path}',
             doneButtonFn: () {
               Navigator.pop(context);
-              //openFile(file);
+              OpenFile.open(file.path);
             });
       }
-    }
-  }
-
-  openFile(File file) async {
-    try {
-      String uriToShare = file.uri.toString();
-      // at this point uriToShare looks like: 'file:///storage/emulated/0/jpg_example.jpg'
-      uriToShare = uriToShare.replaceFirst("file://", "content://");
-      if (await canLaunch(uriToShare)) {
-        await launch(uriToShare);
-      } else {}
-    } catch (error) {
-      print(error);
     }
   }
 

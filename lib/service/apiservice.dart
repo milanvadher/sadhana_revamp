@@ -39,7 +39,7 @@ class ApiService {
     String body = json.encode(data);
     print('Post Url:' + postUrl + '\tReq:' + body);
     Response res = await http.post(_apiUrl + url, body: body, headers: headers);
-    print('Response:' + res.body);
+    print('Response: ${res.body} status code: ${res.statusCode} msg: ${res.reasonPhrase}');
     return res;
   }
 

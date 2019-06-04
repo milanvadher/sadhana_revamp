@@ -26,9 +26,13 @@ class DBProvider {
     return _database;
   }
 
-  initDB() async {
+  _getDBPath() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "Sadhana.db");
+    return join(documentsDirectory.path, "Sadhana.db");
+  }
+
+  initDB() async {
+    String path = await _getDBPath();
     return await openDatabase(path, version: 1, onOpen: (db) {}, onCreate: (Database db, int version) async {
       await db.execute(Sadhana.createSadhanaTable);
       await db.execute(Activity.createActivityTable);
@@ -45,5 +49,11 @@ class DBProvider {
       return await dbFile.copy('$backupDir/$fileName');
     }
     return null;
+  }
+
+  void deleteDB() async {
+    _database.close();
+    File file = File(await _getDBPath());
+    file.deleteSync();
   }
 }

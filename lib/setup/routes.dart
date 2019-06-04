@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
+import 'package:sadhana/other/about.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/setup/options.dart';
@@ -55,6 +56,11 @@ List<CreateRoute> _buildAppRoutes() {
       title: 'Time-Table Page',
       routeName: TimeTablePage.routeName,
       buildRoute: (BuildContext context) => TimeTablePage(),
+    ),
+    CreateRoute(
+      title: 'About Page',
+      routeName: About.routeName,
+      buildRoute: (BuildContext context) => About(),
     )
   ];
   return appRoutes;

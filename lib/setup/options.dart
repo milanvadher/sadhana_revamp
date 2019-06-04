@@ -5,6 +5,7 @@ import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/other/about.dart';
 import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
@@ -198,13 +199,17 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               Column(
                 children: <Widget>[
                   Divider(height: 0),
-                  _ActionItem(Icons.info_outline, Constant.colors[12], 'About', () {}, 'About Sadhana App and report bug'),
+                  _ActionItem(Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug'),
                 ],
               ),
             ]),
         ),
       ),
     );
+  }
+
+  void openAboutPage() {
+    Navigator.pushNamed(context, About.routeName);
   }
 
   void askForSyncActivity() {
