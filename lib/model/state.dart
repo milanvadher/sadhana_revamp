@@ -4,7 +4,7 @@ class StateList {
   StateList({this.name});
 
   StateList.fromJson(Map<String, dynamic> json) {
-    name = json['state'];
+    name = json['name'];
   }
   
   static List<StateList> fromJsonList(List<dynamic> jsonList) {
