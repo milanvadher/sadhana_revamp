@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:open_file/open_file.dart';
+
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:open_file/open_file.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/comman.dart';
-import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
@@ -227,6 +227,7 @@ class HomePageState extends BaseState<HomePage> {
                 ),
               ],
             ),
+            SizedBox(height: 20,)
           ],
         ),
       ),
@@ -346,7 +347,7 @@ class HomePageState extends BaseState<HomePage> {
         tooltip: 'Temp Login',
       ),
       IconButton(
-        icon: Icon(Icons.calendar_today),
+        icon: Image.asset('assets/icon/calendar-icon.png'),
         onPressed: _onScheduleClick,
         tooltip: 'MBA Schedule',
       ),

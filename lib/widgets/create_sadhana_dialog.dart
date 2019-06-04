@@ -1,11 +1,11 @@
 import 'package:collection/collection.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
@@ -14,7 +14,6 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/color_picker_dialog.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class CreateSadhanaDialog extends StatefulWidget {
   final Function onDone;
@@ -157,7 +156,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 initialTime: reminderTime != null
                     ? TimeOfDay(hour: reminderTime.hour, minute: reminderTime.minute)
                     : TimeOfDay(hour: 7, minute: 0),
-                decoration: InputDecoration(labelText: _getReminderText(), hasFloatingPlaceholder: false),
+                decoration: InputDecoration(labelText: _getReminderText(), hasFloatingPlaceholder: false, hintText: "Reminder"),
                 onChanged: (dt) => setState(() {
                       if (dt != null) {
                         reminderTime = dt;
@@ -204,7 +203,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   }
 
   String _getReminderText() {
-    return reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime) : "Off";
+    return reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime) : "Reminder";
   }
 
   void _onChangeType(dynamic value) {

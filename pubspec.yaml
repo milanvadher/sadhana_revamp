@@ -80,6 +80,7 @@ flutter:
     - images/logo.png
     - images/logo_dada.png
     - images/about_logo.png
+    - assets/icon/calendar-icon.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
