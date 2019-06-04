@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sadhana/charts/totalstatisticsbarchart.dart';
+import 'package:sadhana/charts/totalstatisticschart.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
@@ -7,7 +9,7 @@ import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
-
+import 'package:charts_flutter/flutter.dart' as charts;
 DateTime now = new DateTime.now();
 
 Map<DateTime, List<bool>> _holidays = {
@@ -43,12 +45,10 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     super.didChangeDependencies();
     sadhana = widget.sadhana;
     List<DateTime> events = new List();
-    sadhana.activitiesByDate.forEach((timeInt,activity) {
-        if(activity.sadhanaValue > 0)
-          events.add(DateTime.fromMillisecondsSinceEpoch(timeInt));
+    sadhana.activitiesByDate.forEach((timeInt, activity) {
+      if (activity.sadhanaValue > 0) events.add(DateTime.fromMillisecondsSinceEpoch(timeInt));
     });
-    _holidays = new Map.fromIterable(events, key: (v) => v , value: (v) => [true]);
-
+    _holidays = new Map.fromIterable(events, key: (v) => v, value: (v) => [true]);
   }
 
   @override
@@ -97,6 +97,13 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               ),
             ),
             _buildTableCalendar(),
+            Padding(
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                child: new SizedBox(
+                  height: 250.0,
+                  child: TotalStatisticsChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
+                  //TotalStatisticsBarChart.withActivity(sadhana.activitiesByDate.values.toList()),
+                )),
           ],
         ),
       ),
@@ -106,6 +113,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   String _getReminderText() {
     return sadhana.reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(sadhana.reminderTime) : "Off";
   }
+
   _onEditClick() {
     showDialog(
         context: context,
@@ -130,6 +138,14 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     Navigator.pop(context);
     if (widget.onDelete != null) widget.onDelete(sadhana.id);
     main();
+  }
+
+  charts.Color getChartColor(Color color) {
+    return charts.Color(
+        r: color.red,
+        g: color.green,
+        b: color.blue,
+        a: color.alpha);
   }
 
   _onSadhanaEdited(Sadhana sadhana) {
