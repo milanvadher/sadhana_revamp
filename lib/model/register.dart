@@ -55,6 +55,7 @@ class Register {
   String bloodGroup;
   String tshirtSize;
   int registered;
+  List<String> holidays;
   Address permanentAddress;
   Address currentAddress;
 
@@ -90,6 +91,7 @@ class Register {
       this.bloodGroup,
       this.tshirtSize,
       this.registered,
+      this.holidays,
       this.permanentAddress,
       this.currentAddress});
 
@@ -125,6 +127,7 @@ class Register {
     bloodGroup = json["blood_group"];
     tshirtSize = json["tshirt_size"];
     registered = json["registered"];
+    holidays = json["holidays"];
     permanentAddress = json["permanent_address"] != null ? new Address.fromJson(json["permanent_address"]) : null;
     currentAddress = json["current_address"] != null ? new Address.fromJson(json["current_address"]) : null;
   }
@@ -162,6 +165,7 @@ class Register {
     data["blood_group"] = this.bloodGroup;
     data["tshirt_size"] = this.tshirtSize;
     data["registered"] = this.registered;
+    data["holidays"] = this.holidays;
     if (this.permanentAddress != null) {
       data["permanent_address"] = this.permanentAddress.toJson();
     }

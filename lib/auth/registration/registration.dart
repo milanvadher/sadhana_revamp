@@ -9,6 +9,7 @@ import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/city.dart';
 import 'package:sadhana/model/country.dart';
@@ -55,12 +56,14 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     print(_register.permanentAddress.toString());
     loadCountries();
     loadSkills();
+    _register.holidays = ['SAT', 'SUN'];
   }
 
   loadCountries() async {
     try {
       Response res = await api.getAllCountries();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         countryList = [];
         setState(() {
@@ -79,9 +82,11 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   loadSkills() async {
     try {
       Response res = await api.getSkills();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        Skills.fromJsonList(appResponse.data).forEach((item) => skills.add(item.name));
+        Skills.fromJsonList(appResponse.data)
+            .forEach((item) => skills.add(item.name));
       }
     } catch (error, s) {
       print(error);
@@ -128,7 +133,8 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
                       return;
                     }
                     _formKeyStep1.currentState.save();
-                    if (sameAsPermanentAddress) _register.currentAddress = _register.permanentAddress;
+                    if (sameAsPermanentAddress)
+                      _register.currentAddress = _register.permanentAddress;
                     break;
                   case 1:
                     if (!_formKeyStep2.currentState.validate()) {
@@ -177,7 +183,8 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           TextInputField(
             enabled: false,
             labelText: 'Full Name',
-            valueText: '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
+            valueText:
+                '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
           ),
           // Mobile
           NumberInput(
@@ -201,7 +208,9 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           // B_date
           DateInput(
             labelText: 'Birth Date',
-            selectedDate: _register.bDate == null ? null : DateTime.parse(_register.bDate),
+            selectedDate: _register.bDate == null
+                ? null
+                : DateTime.parse(_register.bDate),
             selectDate: (DateTime date) {
               setState(() {
                 _register.bDate = dateFormatter.format(date);
@@ -211,7 +220,9 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           // G_date
           DateInput(
             labelText: 'Gnan Date',
-            selectedDate: _register.gDate == null ? null : DateTime.parse(_register.gDate),
+            selectedDate: _register.gDate == null
+                ? null
+                : DateTime.parse(_register.gDate),
             selectDate: (DateTime date) {
               setState(() {
                 _register.gDate = dateFormatter.format(date);
@@ -249,17 +260,18 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             },
             children: [
               ExpansionPanel(
-                  canTapOnHeader: true,
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return ListTile(title: Text('Permanent Address'));
-                  },
-                  isExpanded: isExpandedAddress[0],
-                  body: AddressInput(
-                    address: _register.permanentAddress,
-                    countryList: countryList,
-                    startLoading: startLoading,
-                    stopLoading: stopLoading,
-                  )),
+                canTapOnHeader: true,
+                headerBuilder: (BuildContext context, bool isExpanded) {
+                  return ListTile(title: Text('Permanent Address'));
+                },
+                isExpanded: isExpandedAddress[0],
+                body: AddressInput(
+                  address: _register.permanentAddress,
+                  countryList: countryList,
+                  startLoading: startLoading,
+                  stopLoading: stopLoading,
+                ),
+              ),
             ],
           ),
           // Copy checkbox
@@ -273,6 +285,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
                   onChanged: (value) {
                     setState(() {
                       sameAsPermanentAddress = value;
+                      isExpandedAddress[1] = false;
                     });
                   },
                 ),
@@ -290,19 +303,20 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             },
             children: [
               ExpansionPanel(
-                  canTapOnHeader: true,
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return ListTile(
-                      title: Text('Current Address'),
-                    );
-                  },
-                  isExpanded: isExpandedAddress[1],
-                  body: AddressInput(
-                    address: _register.currentAddress,
-                    countryList: countryList,
-                    startLoading: startLoading,
-                    stopLoading: stopLoading,
-                  )),
+                canTapOnHeader: true,
+                headerBuilder: (BuildContext context, bool isExpanded) {
+                  return ListTile(
+                    title: Text('Current Address'),
+                  );
+                },
+                isExpanded: isExpandedAddress[1],
+                body: AddressInput(
+                  address: _register.currentAddress,
+                  countryList: countryList,
+                  startLoading: startLoading,
+                  stopLoading: stopLoading,
+                ),
+              ),
             ],
           ),
           // Current Address
@@ -337,8 +351,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             handleRadioValueChange: (value) {
               setState(() {
                 _register.fatherGnan = value;
-                if(_register.fatherGnan == 0)
-                  _register.fatherGDate = null;
+                if (_register.fatherGnan == 0) _register.fatherGDate = null;
               });
             },
           ),
@@ -346,7 +359,9 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           DateInput(
             labelText: 'Father Gnan Date',
             enable: _register.fatherGnan == 0 ? false : true,
-            selectedDate: _register.fatherGDate == null ? null : DateTime.parse(_register.fatherGDate),
+            selectedDate: _register.fatherGDate == null
+                ? null
+                : DateTime.parse(_register.fatherGDate),
             selectDate: (DateTime date) {
               setState(() {
                 _register.fatherGDate = dateFormatter.format(date);
@@ -384,8 +399,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             handleRadioValueChange: (value) {
               setState(() {
                 _register.motherGnan = value;
-                if(_register.motherGnan == 0)
-                  _register.motherGDate = null;
+                if (_register.motherGnan == 0) _register.motherGDate = null;
               });
             },
           ),
@@ -393,7 +407,9 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           DateInput(
             labelText: 'Mother Gnan Date',
             enable: _register.motherGnan == 0 ? false : true,
-            selectedDate: _register.motherGDate == null ? null : DateTime.parse(_register.motherGDate),
+            selectedDate: _register.motherGDate == null
+                ? null
+                : DateTime.parse(_register.motherGDate),
             selectDate: (DateTime date) {
               setState(() {
                 _register.motherGDate = dateFormatter.format(date);
@@ -476,12 +492,45 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           // Job/Business Start Date
           DateInput(
             labelText: 'Job/Business Start Date',
-            selectedDate: _register.jobStartDate == null ? null : DateTime.parse(_register.jobStartDate),
+            selectedDate: _register.jobStartDate == null
+                ? null
+                : DateTime.parse(_register.jobStartDate),
             selectDate: (DateTime date) {
               setState(() {
                 _register.jobStartDate = dateFormatter.format(date);
               });
             },
+          ),
+          // No of Holidays
+          Container(  
+            child: ListTile(
+              title: Text('Weekly off in your Job/Occupation/Business'),
+              contentPadding: EdgeInsets.only(left: 5),
+            ),
+          ),
+          // No of holiday
+          Container(
+            child: Wrap(
+                children: List.generate(Constant.weekName.length, (int index) {
+              return Column(
+                children: <Widget>[
+                  Text(Constant.weekName[index]),
+                  Checkbox(
+                    onChanged: (value) {
+                      setState(() {
+                        if (value) {
+                          _register.holidays.add(Constant.weekName[index]);
+                        } else {
+                          _register.holidays.remove(Constant.weekName[index]);
+                        }
+                      });
+                    },
+                    value:
+                        _register.holidays.contains(Constant.weekName[index]),
+                  )
+                ],
+              );
+            })),
           ),
           // Skills
           ComboboxInput(
@@ -530,20 +579,23 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     try {
       print(_register.toJson());
       Response res = await api.generateToken(_register.mhtId);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if(appResponse.status == WSConstant.SUCCESS_CODE) {
-        if(appResponse.data != null && appResponse.data.toString().isNotEmpty) {
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        if (appResponse.data != null &&
+            appResponse.data.toString().isNotEmpty) {
           _register.token = appResponse.data;
           res = await api.register(_register);
           appResponse = AppResponseParser.parseResponse(res, context: context);
-          if(appResponse.status == WSConstant.SUCCESS_CODE) {
+          if (appResponse.status == WSConstant.SUCCESS_CODE) {
             CommonFunction.loginUser(profileData: _register);
             Navigator.pushReplacementNamed(context, HomePage.routeName);
           }
         }
       }
-    } catch(e,s) {
-      print(e);print(s);
+    } catch (e, s) {
+      print(e);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
     stopLoading();
