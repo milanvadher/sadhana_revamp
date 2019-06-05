@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/register.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -63,6 +64,10 @@ class AppSharedPrefUtil {
     return await getBool(SharedPrefConstant.b_isUserLoggedIn, defaultValue: false);
   }
 
+  static Future<void> saveUserLoggedIn(bool isLoggedIn) async {
+    await saveBoolean(SharedPrefConstant.b_isUserLoggedIn, isLoggedIn);
+  }
+
   static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
     String sLastSyncTime = DateFormat(Constant.APP_DATE_TIME_FORMAT).format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
@@ -75,8 +80,38 @@ class AppSharedPrefUtil {
     return sLastSyncTime;
   }
 
+  static Future<void> saveToken(String token) async {
+    await saveString('token', token);
+  }
+
+  static Future<void> saveUserData(String token, String mhtId) async {
+    await saveToken(token);
+    await saveMhtId(mhtId);
+  }
+
   static Future<String> getToken() async {
     return await getString('token');
+  }
+
+  static Future<void> saveMhtId(String mhtId) async {
+    await saveString('mht_id', mhtId);
+  }
+
+  static Future<String> getMhtId() async {
+    return await getString('mht_id');
+  }
+
+  static Future<Register> getUserProfile() async {
+    String userProfile = await getString(SharedPrefConstant.s_profile_data);
+    if(userProfile != null) {
+      return Register.fromJson(json.decode(userProfile));
+    }
+    return null;
+  }
+
+  static Future<void> saveUserProfile(Register userProfile) async {
+    CacheData.setUserProfile(userProfile);
+    await saveString(SharedPrefConstant.s_profile_data, json.encode(userProfile.toJson()));
   }
 
   static Future<AppSetting> getServerSetting() async {

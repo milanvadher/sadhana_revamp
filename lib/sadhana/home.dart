@@ -38,12 +38,12 @@ import '../attendance/attendance_home.dart';
 class HomePage extends StatefulWidget {
   static const String routeName = '/home';
 
-  const HomePage({
+  HomePage({
     Key key,
     this.optionsPage,
   }) : super(key: key);
 
-  final Widget optionsPage;
+  Widget optionsPage;
 
   @override
   HomePageState createState() => HomePageState();
@@ -69,6 +69,8 @@ class HomePageState extends BaseState<HomePage> {
   @override
   void initState() {
     super.initState();
+    if(widget.optionsPage == null)
+      widget.optionsPage = CommonFunction.appOptionsPage;
     loadSadhana();
     new Future.delayed(Duration.zero, () {
       AppUpdateCheck.startAppUpdateCheckThread(context);
@@ -91,7 +93,8 @@ class HomePageState extends BaseState<HomePage> {
         SyncActivityUtils.syncAllUnSyncActivity(context: context);
       }
       isFirst = false;
-    } catch (error) {
+    } catch (error,s) {
+      print(error);print(s);
       print("Error while sync all activity:" + error);
     }
   }
@@ -119,10 +122,7 @@ class HomePageState extends BaseState<HomePage> {
   Future<void> createPreloadedSadhana() async {
     try {
       if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
-        await NotificationSetup.setupNotification(userInfo: null, context: context);
-        setState(() {
-          isOverlay = true;
-        });
+        startLoading();
         Response res = await _api.getSadhanas();
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -131,17 +131,14 @@ class HomePageState extends BaseState<HomePage> {
           for (Sadhana sadhana in sadhanaList) {
             await sadhanaDAO.insertOrUpdate(sadhana);
           }
-          setState(() {
-            isOverlay = false;
-          });
+          stopLoading();
           askForPreloadActivity(sadhanaList);
           AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
         }
-        setState(() {
-          isOverlay = false;
-        });
+        stopLoading();
       }
-    } catch (error) {
+    } catch (error,s) {
+      print(error);print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
   }
@@ -171,18 +168,14 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void loadPreloadedActivity(List<Sadhana> sadhanas) async {
-    setState(() {
-      isOverlay = true;
-    });
+    startLoading();
     try {
         await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
-    } catch (error) {
-      print(error);
+    } catch (error,s) {
+      print(error);print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    setState(() {
-      isOverlay = false;
-    });
+    stopLoading();
   }
 
   @override
@@ -435,13 +428,9 @@ class HomePageState extends BaseState<HomePage> {
     try {
       /*String filePath = '/storage/emulated/0/Sadhana/June.jpg';
       await openFile(File(filePath));*/
-      setState(() {
-        isOverlay = true;
-      });
+      startLoading();
       File file = await MBAScheduleCheck.getMBASchedule(context: context);
-      setState(() {
-        isOverlay = false;
-      });
+      stopLoading();
       if (file != null) {
         OpenFile.open(file.path);
       }
@@ -455,22 +444,18 @@ class HomePageState extends BaseState<HomePage> {
     //Navigator.pushNamed(context, RegistrationPage.routeName);
     try {
       if (await AppUtils.isInternetConnected()) {
-        setState(() {
-          isOverlay = true;
-        });
+        startLoading();
         if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
           CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
         }
       } else {
         CommonFunction.alertDialog(context: context, msg: "Please connect to internet to sync");
       }
-    } catch (error) {
-      print(error);
+    } catch (error,s) {
+      print(error);print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    setState(() {
-      isOverlay = false;
-    });
+    stopLoading();
   }
 
   void onShareExcel() {

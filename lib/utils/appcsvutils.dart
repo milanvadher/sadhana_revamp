@@ -5,6 +5,7 @@ import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_file_util.dart';
 import 'package:sadhana/utils/apputils.dart';
@@ -13,14 +14,17 @@ class AppCSVUtils {
   static List<String> sadhanasName = ['Samayik', 'Vanchan', 'Vidhi', 'G. Satsang', 'Seva'];
   static final MONTHS_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  static String getFileName(DateTime from) {
+  static Future<String> getFileName(DateTime from) async {
     String month = DateFormat('MMM_yyyy').format(from);
-    return 'Kamlesh_Kanazariya_61758_$month';
+    Register userProfile = await CacheData.getUserProfile();
+    return '${userProfile.firstName}_${userProfile.lastName}_${userProfile.mhtId}_$month';
   }
 
   static Future<File> generateCSVBetween(DateTime from, DateTime to) async {
     List<List<dynamic>> rows = new List();
-    rows.add(getHeaderRow(from.month.toString(), 'Sim-City', 'Kamlesh Kanazariya', '61758'));
+    Register userProfile = await CacheData.getUserProfile();
+    rows.add(
+        getHeaderRow(from.month.toString(), userProfile.center, '${userProfile.firstName} ${userProfile.lastName}', userProfile.mhtId));
     rows.add(getSadhanaRow());
     int lastDate = to.day;
     List<DateTime> dates = List.generate(lastDate, (int index) {
@@ -64,7 +68,7 @@ class AppCSVUtils {
     rows.addAll(activityData);
     totals.insert(0, 'Total');
     rows.add(totals);
-    return await AppFileUtil.writeCSV(getFileName(from), rows);
+    return await AppFileUtil.writeCSV(await getFileName(from), rows);
   }
 
   static List<dynamic> getHeaderRow(String month, String center, String name, String mhtId) {

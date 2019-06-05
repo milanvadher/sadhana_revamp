@@ -36,7 +36,7 @@ class AppUtils {
     for (String format in formats) {
       try {
         return DateFormat(format).parse(dateString);
-      } catch (error) {
+      } catch (error,s) {
         throwError = error;
         print('Cannot parse $dateString using $format');
       }
@@ -50,9 +50,9 @@ class AppUtils {
     while(tried < numOfTry) {
       try {
         return await function();
-      } catch(error) {
+      } catch(error,s) {
         print('error on trying');
-        print(error);
+        print(error);print(s);
       }
       tried++;
     }

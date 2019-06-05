@@ -53,9 +53,7 @@ class LoginPageState extends BaseState<LoginPage> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       print('Login');
-      setState(() {
-        isOverlay = true;
-      });
+      startLoading();
       try {
         Response res = await api.postApi(
           url: '/mba.user.user_profile',
@@ -85,10 +83,9 @@ class LoginPageState extends BaseState<LoginPage> {
       } catch (error) {
         print(error);
         CommonFunction.displayErrorDialog(context: context);
-        setState(() {
-          isOverlay = false;
-        });
+        stopLoading();
       }
+      stopLoading();
     } else {
       setState(() {
         _autoValidate = true;
@@ -103,17 +100,14 @@ class LoginPageState extends BaseState<LoginPage> {
           ? _formKeyMobile.currentState.save()
           : _formKeyEmail.currentState.validate();
       print('Send OTP');
-      setState(() {
-        isOverlay = true;
-      });
+      startLoading();
       try {
         Response res = await api.postApi(url: '/mba.user.send_otp', data: {
           "mht_id": mhtIdController.text,
           "email": emailController.text,
           "mobile_no_1": mobileController.text
         });
-        AppResponse appResponse =
-            AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** OTP Data ::: ');
           print(appResponse.data);
@@ -130,11 +124,10 @@ class LoginPageState extends BaseState<LoginPage> {
         }
       } catch (error) {
         print(error);
+        stopLoading();
         CommonFunction.displayErrorDialog(context: context);
-        setState(() {
-          isOverlay = false;
-        });
       }
+      stopLoading();
     } else {
       setState(() {
         _autoValidate = true;
@@ -146,9 +139,8 @@ class LoginPageState extends BaseState<LoginPage> {
     if (_formKeyOtp.currentState.validate()) {
       _formKeyOtp.currentState.save();
       print('Verify');
-      setState(() {
-        isOverlay = true;
-      });
+      startLoading();
+      //if(true) {
       if (otpController.text == otpData.otp.toString()) {
         setState(() {
           stepState = [
@@ -178,6 +170,7 @@ class LoginPageState extends BaseState<LoginPage> {
           },
         );
       }
+      stopLoading();
     } else {
       setState(() {
         _autoValidate = true;
@@ -186,7 +179,10 @@ class LoginPageState extends BaseState<LoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget pageToDisplay() {
+    //mhtIdController.text = '61758';
+    //mobileController.text = '9429520961';
+    //otpController.text = '123456';
     Widget getTitleAndName({@required String title, @required String value}) {
       return Container(
         padding: EdgeInsets.all(5),
@@ -609,8 +605,8 @@ class LoginPageState extends BaseState<LoginPage> {
                 _verify(context);
                 break;
               case 3:
-                Navigator.pop(context);
                 if (otpData.profile.registered == 0) {
+                  Navigator.pop(context);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => RegistrationPage(
@@ -619,11 +615,21 @@ class LoginPageState extends BaseState<LoginPage> {
                     ),
                   );
                 } else {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(),
-                    ),
-                  );
+                  if (otpData.isLoggedIn == 1) {
+                    CommonFunction.alertDialog(context: context,
+                        msg: "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
+                        doneButtonText: 'Yes',
+                        doneButtonFn: () async {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          await CommonFunction.loginUser(profileData: otpData.profile, context: context);
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(),
+                            ),
+                          );
+                        });
+                  }
                 }
                 break;
             }
@@ -638,8 +644,4 @@ class LoginPageState extends BaseState<LoginPage> {
     );
   }
 
-  @override
-  Widget pageToDisplay() {
-    return null;
-  }
 }

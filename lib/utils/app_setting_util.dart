@@ -38,8 +38,8 @@ class AppSettingUtil {
         appSetting = fromServerSetting;
         await AppSharedPrefUtil.saveServerSetting(appSetting);
       }
-    } catch (error) {
-      print(error);
+    } catch (error,s) {
+      print(error);print(s);
     }
     return appSetting;
   }

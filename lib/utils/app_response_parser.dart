@@ -22,8 +22,8 @@ class AppResponseParser {
       else {
         try {
           serverResponse = ServerResponse.fromJson(json.decode(res.body));
-        } catch (error) {
-          print(error);
+        } catch (error,s) {
+          print(error);print(s);
           serverResponse = new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
         }
       }
@@ -46,7 +46,6 @@ class AppResponseParser {
       }
       return appResponse;
     }
-
   }
 
   static logout(BuildContext context) async {
@@ -81,9 +80,9 @@ class AppResponseParser {
           doneButtonFn: logout2,
         );
       }
-    } catch (error) {
+    } catch (error,s) {
       print('Error while exporting backup:');
-      print(error);
+      print(error);print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
   }

@@ -1,17 +1,15 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:permission/permission.dart';
+import 'package:sadhana/auth/login.dart';
+import 'package:sadhana/comman.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
-import 'package:sadhana/utils/sync_activity_utlils.dart';
-import 'package:sadhana/widgets/appupdatecheck.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SadhanaApp extends StatefulWidget {
@@ -23,6 +21,8 @@ class SadhanaApp extends StatefulWidget {
 
 class _SadhanaAppState extends State<SadhanaApp> {
   AppOptions _options;
+
+  Widget pageToDisplay = Container();
   @override
   initState() {
     super.initState();
@@ -34,6 +34,24 @@ class _SadhanaAppState extends State<SadhanaApp> {
       AppLocalNotification.initAppLocalNotification(context);
     });
     _getUserSelectedTheme();
+    AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
+      if(isLoggedIn) {
+        AppOptionsPage appOptionPage = AppOptionsPage(
+          options: _options,
+          onOptionsChanged: _handleOptionsChanged,
+        );
+        CommonFunction.appOptionsPage = appOptionPage;
+        setState(() {
+          pageToDisplay = HomePage(
+            optionsPage: appOptionPage,
+          );
+        });
+      } else {
+        setState(() {
+          pageToDisplay = LoginPage();
+        });
+      }
+    });
   }
 
   void _getUserSelectedTheme() async {
@@ -42,6 +60,17 @@ class _SadhanaAppState extends State<SadhanaApp> {
     setState(() {
       _options = AppOptions(theme: isDarkMode ? kDarkAppTheme : kLightAppTheme, platform: defaultTargetPlatform);
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: _options.theme.data.copyWith(platform: _options.platform),
+      title: 'Sadhana',
+      color: Colors.grey,
+      routes: _buildRoutes(),
+      home: pageToDisplay,
+    );
   }
 
   void _handleOptionsChanged(AppOptions newOptions) async {
@@ -57,24 +86,6 @@ class _SadhanaAppState extends State<SadhanaApp> {
       kAllAppRoutes,
       key: (dynamic demo) => '${demo.routeName}',
       value: (dynamic demo) => demo.buildRoute,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget home = HomePage(
-      optionsPage: AppOptionsPage(
-        options: _options,
-        onOptionsChanged: _handleOptionsChanged,
-      ),
-    );
-
-    return MaterialApp(
-      theme: _options.theme.data.copyWith(platform: _options.platform),
-      title: 'Sadhana',
-      color: Colors.grey,
-      routes: _buildRoutes(),
-      home: home,
     );
   }
 }

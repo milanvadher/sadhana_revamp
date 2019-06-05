@@ -1,19 +1,22 @@
-import 'dart:math';
-
-import 'package:charts_flutter/flutter.dart';
+//import 'dart:math';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
+import 'package:sadhana/charts/custom_bar_label_decorator.dart';
+import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/model/activity.dart';
+import 'package:charts_flutter/flutter.dart';
 import 'package:charts_flutter/src/text_element.dart';
 import 'package:charts_flutter/src/text_style.dart' as style;
-import 'package:flutter/material.dart';
-import 'package:sadhana/model/activity.dart';
 
 class TotalStatisticsBarChart extends StatelessWidget {
-  final List<charts.Series> seriesList;
+  final List<Series> seriesList;
   final bool animate;
+  final Color color;
+  final OrdinalViewport viewport;
 
-  TotalStatisticsBarChart(this.seriesList, {this.animate});
+  TotalStatisticsBarChart(this.seriesList, this.color, {this.animate, this.viewport});
 
-  factory TotalStatisticsBarChart.withActivity(List<Activity> activities) {
+  factory TotalStatisticsBarChart.withActivity(Color color, List<Activity> activities) {
     Map<DateTime, int> countByMonth = new Map();
     activities.forEach((activity) {
       if (activity.sadhanaValue > 0) {
@@ -30,47 +33,81 @@ class TotalStatisticsBarChart extends StatelessWidget {
       timeSeries.add(TimeSeries(month, value));
     });
     timeSeries.sort((a, b) => a.time.compareTo(b.time));
-    List<charts.Series<dynamic, DateTime>> chart_series = [
-      new charts.Series<TimeSeries, DateTime>(
+    List<OrdinalSales> barChartData = timeSeries.map((timeSeries) {
+      String xaxis = Constant.monthName[timeSeries.time.month - 1];
+      if (xaxis == 'Dec') {
+        xaxis = 'Dec ${timeSeries.time.year}';
+      }
+      return OrdinalSales(xaxis, timeSeries.values);
+    }).toList();
+    OrdinalViewport viewport = OrdinalViewport(barChartData.last.year, barChartData.last.sales);
+    List<Series<dynamic, String>> chart_series = [
+      new Series<OrdinalSales, String>(
         id: 'Sadhana',
-        colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (TimeSeries sales, _) => sales.time,
-        measureFn: (TimeSeries sales, _) => sales.values,
-        labelAccessorFn: (TimeSeries sales, _) {
-          print('inside labelAccessorFun');
-          return 'K';
-        },
-        data: timeSeries,
+        colorFn: (_, __) => Color.fromHex(code: color.hexString),
+        domainFn: (OrdinalSales sales, _) => sales.year,
+        measureFn: (OrdinalSales sales, _) => sales.sales,
+        labelAccessorFn: (OrdinalSales sales, _) => sales.sales.toString(),
+        data: barChartData,
       )
     ];
     return new TotalStatisticsBarChart(
       chart_series,
+      color,
       animate: false,
+      viewport: viewport,
     );
   }
-  DateTime today = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
-    return new charts.TimeSeriesChart(
+    return new BarChart(
       seriesList,
       animate: animate,
-      domainAxis: new charts.DateTimeAxisSpec(renderSpec: new charts.NoneRenderSpec()),
-      /*domainAxis: new charts.DateTimeAxisSpec(
-          viewport: new charts.DateTimeExtents(start: DateTime(today.year, today.month - 6), end: today)),*/
-      primaryMeasureAxis: new charts.NumericAxisSpec(
-          tickProviderSpec: new charts.StaticNumericTickProviderSpec(
-        <charts.TickSpec<num>>[
-          charts.TickSpec<num>(0),
-          charts.TickSpec<num>(7),
-          charts.TickSpec<num>(13),
-          charts.TickSpec<num>(19),
-          charts.TickSpec<num>(25),
-          charts.TickSpec<num>(31),
-        ],
-      )),
-      behaviors: [new charts.PanAndZoomBehavior()],
-      dateTimeFactory: const charts.LocalDateTimeFactory(),
-      defaultRenderer: new charts.BarRendererConfig<DateTime>(barRendererDecorator:charts.BarLabelDecorator<String>() ),
+      domainAxis: new OrdinalAxisSpec(
+        renderSpec: new SmallTickRendererSpec(
+            labelStyle: new TextStyleSpec(
+              fontSize: 12, // size in Pts.
+              color: color,
+            ),
+            lineStyle: new LineStyleSpec(
+              color: MaterialPalette.gray.shade500,
+            )),
+        viewport: viewport,
+      ),
+      primaryMeasureAxis: new NumericAxisSpec(
+          renderSpec: new GridlineRendererSpec(
+              labelStyle: new TextStyleSpec(
+                fontSize: 12, // size in Pts.
+                color: color,
+              ),
+              lineStyle: new LineStyleSpec(
+                color: MaterialPalette.gray.shade500,
+              )),
+          tickProviderSpec: new StaticNumericTickProviderSpec(
+            <TickSpec<num>>[
+              TickSpec<num>(0),
+              TickSpec<num>(7),
+              TickSpec<num>(13),
+              TickSpec<num>(19),
+              TickSpec<num>(25),
+              TickSpec<num>(31),
+            ],
+          )),
+      behaviors: [
+        SlidingViewport(),
+        new ChartTitle(
+          'Total',
+          behaviorPosition: BehaviorPosition.top,
+          titleOutsideJustification: OutsideJustification.start,
+          innerPadding: 18,
+          titleStyleSpec: TextStyleSpec(color: color),
+        ),
+        new PanAndZoomBehavior(),
+      ],
+      //defaultRenderer: LineRendererConfig(includePoints: true),
+      defaultRenderer: new charts.BarRendererConfig(strokeWidthPx: 0.8,),
+      //barRendererDecorator: CustomBarLabelDecorator<String>(labelPadding: 5),
     );
   }
 }
@@ -81,4 +118,11 @@ class TimeSeries {
   final int values;
 
   TimeSeries(this.time, this.values);
+}
+
+class OrdinalSales {
+  final String year;
+  final int sales;
+
+  OrdinalSales(this.year, this.sales);
 }

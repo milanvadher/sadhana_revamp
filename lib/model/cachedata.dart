@@ -1,5 +1,6 @@
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 
@@ -7,6 +8,18 @@ class CacheData {
 
   static Map<int, Sadhana> _sadhanasById = new Map();
   static String lastSyncTime;
+  static Register _userProfile;
+
+  static void setUserProfile(Register userProfile) {
+    _userProfile = userProfile;
+  }
+
+  static Future<Register> getUserProfile() async {
+    if(_userProfile == null) {
+      _userProfile = await AppSharedPrefUtil.getUserProfile();
+    }
+    return _userProfile;
+  }
 
   static Future<String> getLastSyncTime() async {
     await AppSharedPrefUtil.getLastSyncTime();

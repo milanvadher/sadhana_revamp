@@ -101,7 +101,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: new SizedBox(
                   height: 250.0,
-                  child: TotalStatisticsChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
+                  child: TotalStatisticsBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
                   //TotalStatisticsBarChart.withActivity(sadhana.activitiesByDate.values.toList()),
                 )),
           ],

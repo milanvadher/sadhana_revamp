@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/message_constant.dart';
+import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/register.dart';
+import 'package:sadhana/notification/notifcation_setup.dart';
+import 'package:sadhana/setup/options.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 
 class CommonFunction {
+  static AppOptionsPage appOptionsPage;
+
   static displayErrorDialog({@required BuildContext context, String msg}) {
     if (msg != null && msg.toUpperCase().contains("SOCKET")) msg = "Looks like you lost your Internet !!";
     if (msg == null) msg = MessageConstant.COMMON_ERROR_MSG;
@@ -14,6 +21,14 @@ class CommonFunction {
         barrierDismissible: false,
       );
     }
+  }
+
+  static Future<bool> loginUser({@required Register profileData, BuildContext context}) async {
+    AppSharedPrefUtil.saveUserData(profileData.token, profileData.mhtId);
+    AppSharedPrefUtil.saveUserProfile(profileData);
+    AppSharedPrefUtil.saveUserLoggedIn(true);
+    await NotificationSetup.setupNotification(userInfo: profileData, context: context);
+    return true;
   }
 
   // common Alert dialog
