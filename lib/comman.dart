@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/message_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/notification/notifcation_setup.dart';
 import 'package:sadhana/setup/options.dart';
@@ -23,11 +24,20 @@ class CommonFunction {
     }
   }
 
-  static Future<bool> loginUser({@required Register profileData, BuildContext context}) async {
-    AppSharedPrefUtil.saveUserData(profileData.token, profileData.mhtId);
-    AppSharedPrefUtil.saveUserProfile(profileData);
+  static Future<bool> registerUser({@required Register register, BuildContext context}) async {
+    AppSharedPrefUtil.saveToken(register.token);
+    Profile profile = Profile.fromRegisterModel(register);
+    loginUser(profile: profile);
+    AppSharedPrefUtil.saveRegisterProfile(register);
+    AppSharedPrefUtil.saveIsUserRegistered(true);
+    await NotificationSetup.setupNotification(userInfo: register, context: context);
+    return true;
+  }
+
+  static Future<bool> loginUser({@required Profile profile}) async {
+    AppSharedPrefUtil.saveMhtId(profile.mhtId);
+    AppSharedPrefUtil.saveUserProfile(profile);
     AppSharedPrefUtil.saveUserLoggedIn(true);
-    await NotificationSetup.setupNotification(userInfo: profileData, context: context);
     return true;
   }
 

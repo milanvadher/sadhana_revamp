@@ -588,7 +588,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           res = await api.register(_register);
           appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
-            CommonFunction.loginUser(profileData: _register);
+            CommonFunction.registerUser(register: _register);
             Navigator.pushReplacementNamed(context, HomePage.routeName);
           }
         }

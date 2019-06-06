@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -68,6 +69,15 @@ class AppSharedPrefUtil {
     await saveBoolean(SharedPrefConstant.b_isUserLoggedIn, isLoggedIn);
   }
 
+  static Future<bool> isUserRegistered() async {
+    return await getBool(SharedPrefConstant.b_isUserRegistered, defaultValue: false);
+  }
+
+  static Future<void> saveIsUserRegistered(bool isUserRegistered) async {
+    await saveBoolean(SharedPrefConstant.b_isUserRegistered, isUserRegistered);
+  }
+
+
   static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
     String sLastSyncTime = DateFormat(Constant.APP_DATE_TIME_FORMAT).format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
@@ -89,6 +99,14 @@ class AppSharedPrefUtil {
     await saveMhtId(mhtId);
   }
 
+  static Future<bool> isForceSyncRemained() async {
+    return await getBool(SharedPrefConstant.b_force_sync_remain, defaultValue: false);
+  }
+
+  static Future<void> saveForceSyncRemained(bool isForceSyncRemained) async {
+    await saveBoolean(SharedPrefConstant.b_force_sync_remain, isForceSyncRemained);
+  }
+
   static Future<String> getToken() async {
     return await getString('token');
   }
@@ -101,17 +119,29 @@ class AppSharedPrefUtil {
     return await getString('mht_id');
   }
 
-  static Future<Register> getUserProfile() async {
+  static Future<Profile> getUserProfile() async {
     String userProfile = await getString(SharedPrefConstant.s_profile_data);
     if(userProfile != null) {
-      return Register.fromJson(json.decode(userProfile));
+      return Profile.fromJson(json.decode(userProfile));
     }
     return null;
   }
 
-  static Future<void> saveUserProfile(Register userProfile) async {
+  static Future<void> saveUserProfile(Profile userProfile) async {
     CacheData.setUserProfile(userProfile);
     await saveString(SharedPrefConstant.s_profile_data, json.encode(userProfile.toJson()));
+  }
+
+  static Future<Register> getRegisterProfile() async {
+    String registerProfile = await getString(SharedPrefConstant.s_register_profile);
+    if(registerProfile != null) {
+      return Register.fromJson(json.decode(registerProfile));
+    }
+    return null;
+  }
+
+  static Future<void> saveRegisterProfile(Register registerProfile) async {
+    await saveString(SharedPrefConstant.s_register_profile, json.encode(registerProfile.toJson()));
   }
 
   static Future<AppSetting> getServerSetting() async {
@@ -122,6 +152,7 @@ class AppSharedPrefUtil {
       return json.decode(serverSetting);
     }
   }
+
 
   static Future<void> saveServerSetting(AppSetting appSetting) async {
     await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting));

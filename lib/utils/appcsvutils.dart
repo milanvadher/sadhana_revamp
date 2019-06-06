@@ -5,6 +5,7 @@ import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_file_util.dart';
@@ -16,13 +17,13 @@ class AppCSVUtils {
 
   static Future<String> getFileName(DateTime from) async {
     String month = DateFormat('MMM_yyyy').format(from);
-    Register userProfile = await CacheData.getUserProfile();
+    Profile userProfile = await CacheData.getUserProfile();
     return '${userProfile.firstName}_${userProfile.lastName}_${userProfile.mhtId}_$month.csv';
   }
 
   static Future<File> generateCSVBetween(DateTime from, DateTime to) async {
     List<List<dynamic>> rows = new List();
-    Register userProfile = await CacheData.getUserProfile();
+    Profile userProfile = await CacheData.getUserProfile();
     String month = DateFormat('MMM yyyy').format(from);
     rows.add(
         getHeaderRow(month, userProfile.center, '${userProfile.firstName} ${userProfile.lastName}', userProfile.mhtId));

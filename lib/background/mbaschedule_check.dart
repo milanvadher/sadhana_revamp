@@ -21,25 +21,27 @@ class MBAScheduleCheck {
   }
 
   static Future<File> getMBASchedule({BuildContext context}) async {
-    String prefFilePath = await getCurrentMonthScheduleFromStorage();
-    if(prefFilePath != null) {
-      File scheduleFile = File(prefFilePath);
-      if(await scheduleFile.exists())
-        return scheduleFile;
-    }
-    if(await AppUtils.isInternetConnected()) {
-      String date = DateFormat(WSConstant.DATE_FORMAT).format(DateTime.now());
-      Response res = await _apiService.getMBASchedule('Sim-City', date);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if(appResponse.status == WSConstant.SUCCESS_CODE) {
-        String fileUrl = appResponse.data;
-        String dir = await AppFileUtil.getMBAScheduleDir();
-        File file = await AppFileUtil.saveImage(_apiService.getMBAScheduleAbsoluteUrl(fileUrl), dir);
-        AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);
-        return file;
+    if(await AppSharedPrefUtil.isUserRegistered()) {
+      String prefFilePath = await getCurrentMonthScheduleFromStorage();
+      if(prefFilePath != null) {
+        File scheduleFile = File(prefFilePath);
+        if(await scheduleFile.exists())
+          return scheduleFile;
       }
-    } else {
-      CommonFunction.alertDialog(context: context, msg: "Please connect to internet to show MBA Schedule");
+      if(await AppUtils.isInternetConnected()) {
+        String date = DateFormat(WSConstant.DATE_FORMAT).format(DateTime.now());
+        Response res = await _apiService.getMBASchedule('Sim-City', date);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if(appResponse.status == WSConstant.SUCCESS_CODE) {
+          String fileUrl = appResponse.data;
+          String dir = await AppFileUtil.getMBAScheduleDir();
+          File file = await AppFileUtil.saveImage(_apiService.getMBAScheduleAbsoluteUrl(fileUrl), dir);
+          AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);
+          return file;
+        }
+      } else {
+        CommonFunction.alertDialog(context: context, msg: "Please connect to internet to show MBA Schedule");
+      }
     }
     return null;
   }

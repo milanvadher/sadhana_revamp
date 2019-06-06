@@ -12,6 +12,7 @@ class AppSetting {
   int periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin;
   String get version => Platform.isIOS ? appVersionIos : appVersionAndroid;
   bool allowSyncFromServer;
+  bool forceSync;
   AppSetting(
       {this.appVersionAndroid,
       this.appVersionIos,
@@ -34,6 +35,9 @@ class AppSetting {
     allowSyncFromServer = false;
     if(json['allow_sync_from_server'] != null)
       allowSyncFromServer = json['allow_sync_from_server'] > 0 ? true : false;
+    forceSync = false;
+    if(json['forceSync'] != null)
+      forceSync = json['forceSync'] > 0 ? true : false;
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +47,7 @@ class AppSetting {
     data['editable_days'] = this.editableDays;
     data['server_date'] = this.serverDate;
     data['allow_sync_from_server'] = this.allowSyncFromServer ? 1 : 0;
+    data['forceSync'] = this.forceSync ? 1 : 0;
     return data;
   }
 }

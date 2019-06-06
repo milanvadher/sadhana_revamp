@@ -47,7 +47,7 @@ class ApiService {
   }
 
   appendCommonDataToBody(Map<String, dynamic> data) async {
-    if(await AppSharedPrefUtil.isUserLoggedIn()) {
+    if(await AppSharedPrefUtil.isUserRegistered()) {
       data['token'] = await AppSharedPrefUtil.getToken();
       data['mht_id'] = await AppSharedPrefUtil.getMhtId();
     }
@@ -133,11 +133,9 @@ class ApiService {
         @required String oneSignalToken}) async {
     Map<String, dynamic> data = {
       'mht_id': mhtId,
-      'fb_token': fbToken,
-      'onesignal_token': oneSignalToken
+      'one_signal_token': oneSignalToken
     };
-    //Response res = await postApi(url: '/update_notification_token', data: data);
-    Response res = Response("", 200);
+    Response res = await postApi(url: '/mba.user.save_one_signal_token', data: data);
     return res;
   }
 

@@ -18,7 +18,7 @@ class AppSettingUtil {
   static Future<AppSetting> getServerAppSetting({forceFromServer = false}) async {
     return await lock.synchronized(() async {
       if (appSetting == null || forceFromServer) {
-        if (await AppUtils. isInternetConnected()) {
+        if (await AppUtils.isInternetConnected()) {
           appSetting = await loadServerAppSetting();
         }
         if(appSetting == null)

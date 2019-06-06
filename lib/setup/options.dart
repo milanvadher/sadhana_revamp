@@ -9,6 +9,7 @@ import 'package:sadhana/other/about.dart';
 import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 
@@ -160,19 +161,19 @@ class AppOptionsPage extends StatefulWidget {
 }
 
 class _AppOptionsPageState extends BaseState<AppOptionsPage> {
-
   bool isAllowSyncFromServer = false;
 
   @override
   void initState() {
     super.initState();
-    AppSettingUtil.getServerAppSetting().then((appSetting) {
-        if(appSetting != null) {
+    AppSettingUtil.getServerAppSetting().then((appSetting) async{
+      if (appSetting != null) {
+        if(await AppSharedPrefUtil.isUserRegistered()) {
           setState(() {
             isAllowSyncFromServer = appSetting.allowSyncFromServer;
           });
-
         }
+      }
     });
   }
 
@@ -191,7 +192,10 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
                 Divider(height: 0),
                 _ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
                 _ThemeItem(widget.options, widget.onOptionsChanged),
-                _ActionItem(Icons.sync, Constant.colors[3], 'Load Data From Server', askForSyncActivity, 'Load your sadhana data from server'),
+                isAllowSyncFromServer
+                    ? _ActionItem(Icons.sync, Constant.colors[3], 'Load Data From Server', askForSyncActivity,
+                        'Load your sadhana data from server')
+                    : Container(),
                 _ActionItem(Icons.backup, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
               ],
             ),
@@ -200,7 +204,8 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               Column(
                 children: <Widget>[
                   Divider(height: 0),
-                  _ActionItem(Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug'),
+                  _ActionItem(
+                      Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug'),
                 ],
               ),
             ]),

@@ -640,7 +640,7 @@ class LoginPageState extends BaseState<LoginPage> {
                 doneButtonFn: () async {
                   Navigator.pop(context);
                   Navigator.pop(context);
-                  await CommonFunction.loginUser(profileData: otpData.profile, context: context);
+                  await CommonFunction.registerUser(register: otpData.profile, context: context);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => HomePage(),

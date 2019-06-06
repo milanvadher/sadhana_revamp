@@ -15,6 +15,8 @@ import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/profile.dart';
+import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/notifcation_setup.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -29,6 +31,7 @@ import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
+import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:share_extend/share_extend.dart';
 
@@ -60,20 +63,28 @@ class HomePageState extends BaseState<HomePage> {
   double headerWidth = 150.0;
   Brightness theme;
   BuildContext context;
+  bool isSimcityMBA = false;
   double mobileWidth;
   SadhanaDAO sadhanaDAO = SadhanaDAO();
   ActivityDAO activityDAO = ActivityDAO();
   ApiService _api = ApiService();
   int sadhanaIndex = 0;
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  bool isUserRegistered = false;
   @override
   void initState() {
     super.initState();
     loadSadhana();
+    checkSimcityMBA();
     new Future.delayed(Duration.zero, () {
       AppUpdateCheck.startAppUpdateCheckThread(context);
     });
     AppUtils.askForPermission();
+    AppSharedPrefUtil.isUserRegistered().then((isUserRegisterd) {
+      setState(() {
+        this.isUserRegistered = isUserRegisterd;
+      });
+    });
     subscribeConnnectivityChange();
   }
 
@@ -85,10 +96,12 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if(!isFirst) {
         print('on Connectivity change');
-        MBAScheduleCheck.getMBASchedule();
         await AppSettingUtil.getServerAppSetting(forceFromServer: true);
-        AppUpdateCheck.startAppUpdateCheckThread(context);
         SyncActivityUtils.syncAllUnSyncActivity(context: context);
+        if(await AppSharedPrefUtil.isUserRegistered()) {
+          MBAScheduleCheck.getMBASchedule();
+          AppUpdateCheck.startAppUpdateCheckThread(context);
+        }
       }
       isFirst = false;
     } catch (error,s) {
@@ -130,8 +143,10 @@ class HomePageState extends BaseState<HomePage> {
             await sadhanaDAO.insertOrUpdate(sadhana);
           }
           stopLoading();
-          askForPreloadActivity(sadhanaList);
           AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
+          if(await AppSharedPrefUtil.isUserRegistered()) {
+            askForPreloadActivity(sadhanaList);
+          }
         }
         stopLoading();
       }
@@ -140,6 +155,16 @@ class HomePageState extends BaseState<HomePage> {
       CommonFunction.displayErrorDialog(context: context);
     }
   }
+
+  /*void checkForForceSync() async {
+      bool check = DateTime.now().isBefore(DateTime(2019,8,15));
+      if(check && await AppSharedPrefUtil.isForceSyncRemained() && await AppUtils.isInternetConnected()) {
+        AppSetting serverAppSetting = await AppSettingUtil.getServerAppSetting(forceFromServer: true);
+        if(serverAppSetting.forceSync) {
+          askForPreloadActivity(sadhanas);
+        }
+      }
+  }*/
 
   void askForPreloadActivity(List<Sadhana> sadhanaList) {
     CommonFunction.alertDialog(
@@ -224,7 +249,7 @@ class HomePageState extends BaseState<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: CacheData.lastSyncTime != null
+      bottomNavigationBar: CacheData.lastSyncTime != null && isUserRegistered
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -233,7 +258,7 @@ class HomePageState extends BaseState<HomePage> {
                 )
               ],
             )
-          : null,
+          : null, // It should null if container then will cover whole page
     );
   }
 
@@ -329,18 +354,30 @@ class HomePageState extends BaseState<HomePage> {
     );
   }
 
+
+  void checkSimcityMBA() async {
+    if(await AppSharedPrefUtil.isUserRegistered()) {
+      Profile profile = await CacheData.getUserProfile();
+      if(profile != null && AppUtils.equalsIgnoreCase('Simandhar City', profile.center)) {
+        setState(() {
+          isSimcityMBA = true;
+        });
+      }
+    }
+  }
+
   List<Widget> _buildActions() {
     return <Widget>[
-      IconButton(
+      isSimcityMBA ? IconButton(
         icon: Image.asset('assets/icon/calendar-icon.png'),
         onPressed: _onScheduleClick,
         tooltip: 'MBA Schedule',
-      ),
-      IconButton(
+      ) : Container(),
+      isUserRegistered ? IconButton(
         icon: Icon(Icons.sync),
         onPressed: _onSyncClicked,
         tooltip: 'Sync Data',
-      ),
+      ) : Container(),
       IconButton(
         icon: Icon(Icons.add),
         onPressed: _onAddSadhanaClick,
