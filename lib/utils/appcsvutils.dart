@@ -17,14 +17,15 @@ class AppCSVUtils {
   static Future<String> getFileName(DateTime from) async {
     String month = DateFormat('MMM_yyyy').format(from);
     Register userProfile = await CacheData.getUserProfile();
-    return '${userProfile.firstName}_${userProfile.lastName}_${userProfile.mhtId}_$month';
+    return '${userProfile.firstName}_${userProfile.lastName}_${userProfile.mhtId}_$month.csv';
   }
 
   static Future<File> generateCSVBetween(DateTime from, DateTime to) async {
     List<List<dynamic>> rows = new List();
     Register userProfile = await CacheData.getUserProfile();
+    String month = DateFormat('MMM yyyy').format(from);
     rows.add(
-        getHeaderRow(from.month.toString(), userProfile.center, '${userProfile.firstName} ${userProfile.lastName}', userProfile.mhtId));
+        getHeaderRow(month, userProfile.center, '${userProfile.firstName} ${userProfile.lastName}', userProfile.mhtId));
     rows.add(getSadhanaRow());
     int lastDate = to.day;
     List<DateTime> dates = List.generate(lastDate, (int index) {

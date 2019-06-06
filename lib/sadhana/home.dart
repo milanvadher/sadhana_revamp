@@ -69,8 +69,6 @@ class HomePageState extends BaseState<HomePage> {
   @override
   void initState() {
     super.initState();
-    if(widget.optionsPage == null)
-      widget.optionsPage = CommonFunction.appOptionsPage;
     loadSadhana();
     new Future.delayed(Duration.zero, () {
       AppUpdateCheck.startAppUpdateCheckThread(context);
@@ -181,6 +179,8 @@ class HomePageState extends BaseState<HomePage> {
   @override
   //Widget build(BuildContext context) {
   Widget pageToDisplay() {
+    if(widget.optionsPage == null)
+      widget.optionsPage = CommonFunction.appOptionsPage;
     sadhanas = CacheData.getSadhanas();
     theme = Theme.of(context).brightness;
     this.context = context;
@@ -332,14 +332,6 @@ class HomePageState extends BaseState<HomePage> {
   List<Widget> _buildActions() {
     return <Widget>[
       IconButton(
-        icon: Icon(Icons.person_add),
-        onPressed: () {
-          // Navigator.pushNamed(context, RegistrationPage.routeName);
-          Navigator.pushNamed(context, LoginPage.routeName);
-        },
-        tooltip: 'Temp Login',
-      ),
-      IconButton(
         icon: Image.asset('assets/icon/calendar-icon.png'),
         onPressed: _onScheduleClick,
         tooltip: 'MBA Schedule',
@@ -378,17 +370,17 @@ class HomePageState extends BaseState<HomePage> {
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.settings, color: Colors.blueGrey),
-                title: Text('Options'),
+                title: Text('Options      '),
               ),
               value: 'options',
             ),
-            PopupMenuItem(
+            /*PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.data_usage, color: Colors.orange),
                 title: Text('Attendance App'),
               ),
               value: 'attendance',
-            ),
+            ),*/
           ];
         },
       )
@@ -434,8 +426,8 @@ class HomePageState extends BaseState<HomePage> {
       if (file != null) {
         OpenFile.open(file.path);
       }
-    } catch(error) {
-      print(error);
+    } catch(e, s) {
+      print(e);print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
   }

@@ -127,7 +127,10 @@ class Register {
     bloodGroup = json["blood_group"];
     tshirtSize = json["tshirt_size"];
     registered = json["registered"];
-    holidays = json["holidays"];
+    holidays = [];
+    List<dynamic> tmpHolidays = json["holidays"];
+    if(tmpHolidays != null && tmpHolidays.isNotEmpty)
+      holidays = tmpHolidays.map((v) => v.toString()).toList(growable: true);
     permanentAddress = json["permanent_address"] != null ? new Address.fromJson(json["permanent_address"]) : null;
     currentAddress = json["current_address"] != null ? new Address.fromJson(json["current_address"]) : null;
   }
@@ -135,6 +138,7 @@ class Register {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data["mht_id"] = this.mhtId;
+    data["token"] = this.token;
     data["first_name"] = this.firstName;
     data["middle_name"] = this.middleName;
     data["last_name"] = this.lastName;
@@ -175,10 +179,10 @@ class Register {
     return data;
   }
 
-  /*@override
+  @override
   String toString() {
     return "Register{mhtId: $mhtId, firstName: $firstName, middleName: $middleName, lastName: $lastName, bDate: $bDate, gDate: $gDate, center: $center, mobileNo1: $mobileNo1, mobileNo2: $mobileNo2, email: $email, fatherName: $fatherName, fatherGnan: $fatherGnan, fatherGDate: $fatherGDate, fatherMbaApproval: $fatherMbaApproval, brotherCount: $brotherCount, motherName: $motherName, motherGnan: $motherGnan, motherGDate: $motherGDate, motherMbaApproval: $motherMbaApproval, sisterCount: $sisterCount, studyDetail: $studyDetail, occupation: $occupation, jobStartDate: $jobStartDate, companyName: $companyName, workCity: $workCity, skills: $skills, health: $health, personalNotes: $personalNotes, bloodGroup: $bloodGroup, tshirtSize: $tshirtSize, registered: $registered, permanentAddress: $permanentAddress, currentAddress: $currentAddress}";
-  }*/
+  }
 
 }
 

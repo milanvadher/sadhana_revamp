@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
@@ -121,8 +122,8 @@ class ApiService {
 
   Future<Response> register(Register register) async {
     Map<String, dynamic> data = register.toJson();
-    //Response res = await postApi(url: '/mba.user.update_mba_profile', data: data);
-    Response res = Response("", 200);
+    Response res = await postApi(url: '/mba.user.update_mba_profile', data: data);
+    //Response res = Response("", 200);
     return res;
   }
 

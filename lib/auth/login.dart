@@ -80,8 +80,8 @@ class LoginPageState extends BaseState<LoginPage> {
         //    context,
         //    HomePage.routeName,
         //  );
-      } catch (error) {
-        print(error);
+      } catch (e, s) {
+        print(e);print(s);
         CommonFunction.displayErrorDialog(context: context);
         stopLoading();
       }
@@ -122,8 +122,8 @@ class LoginPageState extends BaseState<LoginPage> {
             currantStep += 1;
           });
         }
-      } catch (error) {
-        print(error);
+      } catch (e, s) {
+        print(e);print(s);
         stopLoading();
         CommonFunction.displayErrorDialog(context: context);
       }
@@ -180,7 +180,7 @@ class LoginPageState extends BaseState<LoginPage> {
 
   @override
   Widget pageToDisplay() {
-    //mhtIdController.text = '61758';
+    //mhtIdController.text = '78241';
     //mobileController.text = '9429520961';
     //otpController.text = '123456';
     Widget getTitleAndName({@required String title, @required String value}) {
@@ -329,7 +329,7 @@ class LoginPageState extends BaseState<LoginPage> {
                   getTitleAndName(
                     title: 'Email',
                     value: profileData != null
-                        ? profileData.email.trim().isNotEmpty ? '${profileData.email.substring(0, 2)}******@${profileData.email.substring(profileData.email.indexOf('@') + 1, profileData.email.indexOf('@') + 3)}******${profileData.email.substring(profileData.email.lastIndexOf('.'), profileData.email.length)}' : ""
+                        ? profileData.email.trim().isNotEmpty ? getEmailId() : ""
                         : "",
                   ),
                 ],
@@ -593,47 +593,7 @@ class LoginPageState extends BaseState<LoginPage> {
           type: StepperType.vertical,
           steps: loginSteps,
           currentStep: currantStep,
-          onStepContinue: () {
-            switch (currantStep) {
-              case 0:
-                _login(context);
-                break;
-              case 1:
-                _sendOtp(context);
-                break;
-              case 2:
-                _verify(context);
-                break;
-              case 3:
-                if (otpData.profile.registered == 0) {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => RegistrationPage(
-                            registrationData: otpData.profile,
-                          ),
-                    ),
-                  );
-                } else {
-                  if (otpData.isLoggedIn == 1) {
-                    CommonFunction.alertDialog(context: context,
-                        msg: "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
-                        doneButtonText: 'Yes',
-                        doneButtonFn: () async {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          await CommonFunction.loginUser(profileData: otpData.profile, context: context);
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(),
-                            ),
-                          );
-                        });
-                  }
-                }
-                break;
-            }
-          },
+          onStepContinue: onSetupContinue,
           onStepTapped: (value) {
             // setState(() {
             //   currantStep = value;
@@ -644,4 +604,52 @@ class LoginPageState extends BaseState<LoginPage> {
     );
   }
 
+  String getEmailId() {
+    try {
+      return '${profileData.email.substring(0, 2)}******@${profileData.email.substring(profileData.email.indexOf('@') + 1, profileData.email.indexOf('@') + 3)}******${profileData.email.substring(profileData.email.lastIndexOf('.'), profileData.email.length)}';
+    } catch(e,s) {
+      print(e); print(s);
+    }
+    return "";
+  }
+
+  void onSetupContinue() {
+    switch (currantStep) {
+      case 0:
+        _login(context);
+        break;
+      case 1:
+        _sendOtp(context);
+        break;
+      case 2:
+        _verify(context);
+        break;
+      case 3:
+        if (otpData.profile.registered == 0) {
+          Navigator.pop(context);
+          Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) => RegistrationPage(
+              registrationData: otpData.profile,
+            ),
+          ));
+        } else {
+          if (otpData.isLoggedIn == 1) {
+            CommonFunction.alertDialog(context: context,
+                msg: "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
+                doneButtonText: 'Yes',
+                doneButtonFn: () async {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  await CommonFunction.loginUser(profileData: otpData.profile, context: context);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => HomePage(),
+                    ),
+                  );
+                });
+          }
+        }
+        break;
+    }
+  }
 }

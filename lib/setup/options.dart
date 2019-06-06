@@ -175,6 +175,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         }
     });
   }
+
   @override
   Widget pageToDisplay() {
     return Scaffold(

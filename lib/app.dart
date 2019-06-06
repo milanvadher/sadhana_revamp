@@ -12,6 +12,8 @@ import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'main.dart';
+
 class SadhanaApp extends StatefulWidget {
   const SadhanaApp({Key key}) : super(key: key);
 
@@ -21,7 +23,6 @@ class SadhanaApp extends StatefulWidget {
 
 class _SadhanaAppState extends State<SadhanaApp> {
   AppOptions _options;
-
   Widget pageToDisplay = Container();
   @override
   initState() {
@@ -34,16 +35,16 @@ class _SadhanaAppState extends State<SadhanaApp> {
       AppLocalNotification.initAppLocalNotification(context);
     });
     _getUserSelectedTheme();
+    //checkForUserLoggedIn();
+  }
+
+  void checkForUserLoggedIn() {
+    getAppOptionPage();
     AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
       if(isLoggedIn) {
-        AppOptionsPage appOptionPage = AppOptionsPage(
-          options: _options,
-          onOptionsChanged: _handleOptionsChanged,
-        );
-        CommonFunction.appOptionsPage = appOptionPage;
         setState(() {
           pageToDisplay = HomePage(
-            optionsPage: appOptionPage,
+            optionsPage: getAppOptionPage(),
           );
         });
       } else {
@@ -52,6 +53,15 @@ class _SadhanaAppState extends State<SadhanaApp> {
         });
       }
     });
+  }
+
+  AppOptionsPage getAppOptionPage() {
+    AppOptionsPage appOptionsPage = AppOptionsPage(
+      options: _options,
+      onOptionsChanged: _handleOptionsChanged,
+    );
+    CommonFunction.appOptionsPage = appOptionsPage;
+    return appOptionsPage;
   }
 
   void _getUserSelectedTheme() async {
@@ -64,6 +74,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   @override
   Widget build(BuildContext context) {
+    checkForUserLoggedIn();
     return MaterialApp(
       theme: _options.theme.data.copyWith(platform: _options.platform),
       title: 'Sadhana',
@@ -74,11 +85,15 @@ class _SadhanaAppState extends State<SadhanaApp> {
   }
 
   void _handleOptionsChanged(AppOptions newOptions) async {
-    setState(() {
-      _options = newOptions;
-    });
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
+    try {
+      setState(() {
+        _options = newOptions;
+      });
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
+    } catch(e,s) {
+      print(e); print(s);
+    }
   }
 
   Map<String, WidgetBuilder> _buildRoutes() {

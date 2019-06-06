@@ -231,7 +231,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           ),
           // Blood Group
           DropDownInput(
-            items: ['A', 'A+', 'B', 'B+', 'AB', 'AB+', 'O', 'O+'],
+            items: ['A-', 'A+', 'B-', 'B+', 'AB-', 'AB+', 'O-', 'O+'],
             labelText: 'Blood Group',
             valueText: _register.bloodGroup,
             onChange: (value) {

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:onesignal/onesignal.dart';
 import 'package:sadhana/comman.dart';
+import 'package:sadhana/model/register.dart';
 
 class OneSignalNotification {
   static final String ONESIGANL_APPID = "a2e2c4fd-40b8-49e9-aa78-8d6770a11007"; //Live
@@ -12,7 +13,7 @@ class OneSignalNotification {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   static Future<String> setupOneSignalNotification(
-      {BuildContext context, dynamic userInfo}) async {
+      {BuildContext context, Register userInfo}) async {
     String playerId;
     //OneSignal.shared.setLogLevel(OSLogLevel.debug, OSLogLevel.debug);
     try {
@@ -67,8 +68,8 @@ class OneSignalNotification {
       if (userInfo != null) {
         Map<String, dynamic> tags = Map();
         tags['mhtId'] = userInfo.mhtId;
-        tags['mobile'] = userInfo.mobile;
-        tags['name'] = userInfo.name;
+        tags['mobile'] = userInfo.mobileNo1;
+        tags['name'] = '${userInfo.firstName} ${userInfo.lastName}';
         _sendTags(tags);
         if (userInfo.mhtId != null)
           _setExternalUserId(userInfo.mhtId.toString());

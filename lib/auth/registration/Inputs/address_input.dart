@@ -80,9 +80,10 @@ class _AddressInputState extends State<AddressInput> {
             items: countryList ?? [],
             onChange: (value) {
               setState(() {
-                address.country = value;
+                if(value != null)
+                  address.country = value;
               });
-              getStateByCountry(country: value);
+              getStateByCountry(country: value, resetState: true);
             },
             valueText: address.country ?? "",
           ),
@@ -94,9 +95,10 @@ class _AddressInputState extends State<AddressInput> {
                 : {},
             onChange: (value) {
               setState(() {
-                address.state = value;
+                if(value != null)
+                  address.state = value;
               });
-              getCityByState(state: value);
+              getCityByState(state: value, resetCity: true);
             },
             valueText: address.state ?? "",
           ),
@@ -107,7 +109,8 @@ class _AddressInputState extends State<AddressInput> {
                 cityList != null ? new Map.fromIterable(cityList, key: (v) => (v as City).city, value: (v) => (v as City).name) : {},
             onChange: (value) {
               setState(() {
-                address.city = value;
+                if(value != null)
+                  address.city = value;
               });
             },
             valueText: address.city ?? "",
@@ -124,7 +127,7 @@ class _AddressInputState extends State<AddressInput> {
     );
   }
 
-  getStateByCountry({@required String country}) async {
+  getStateByCountry({@required String country, bool resetState = false}) async {
     try {
       widget.startLoading();
       Response res = await api.getStateByCountry(country);
@@ -132,8 +135,10 @@ class _AddressInputState extends State<AddressInput> {
       List<StateList> states = StateList.fromJsonList(appResponse.data);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         setState(() {
-          address.state = null;
-          address.city = null;
+          if(resetState) {
+            address.state = null;
+            address.city = null;
+          }
           stateList = states;
         });
       }
@@ -143,9 +148,10 @@ class _AddressInputState extends State<AddressInput> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
+    widget.stopLoading();
   }
 
-  getCityByState({@required String state}) async {
+  getCityByState({@required String state, bool resetCity = false}) async {
     try {
       widget.startLoading();
       Response res = await api.getCityByState(state);
@@ -153,7 +159,8 @@ class _AddressInputState extends State<AddressInput> {
       List<City> cities = City.fromJsonList(appResponse.data);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         setState(() {
-          address.city = null;
+          if(resetCity)
+            address.city = null;
           cityList = cities;
         });
       }
@@ -163,5 +170,6 @@ class _AddressInputState extends State<AddressInput> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
+    widget.stopLoading();
   }
 }
