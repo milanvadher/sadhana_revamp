@@ -45,7 +45,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   List<Step> registrationSteps = [];
   List<String> skills = [];
   List<String> countryList = [];
-  List<bool> isExpandedAddress = [false, false];
+  List<bool> isExpandedAddress = [true, false];
   bool _autoValidate = false;
 
   @override
@@ -56,7 +56,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     print(_register.permanentAddress.toString());
     loadCountries();
     loadSkills();
-    _register.holidays = ['SAT', 'SUN'];
+    //_register.holidays = ['SAT', 'SUN'];
   }
 
   loadCountries() async {
@@ -192,6 +192,10 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             labelText: 'Mobile',
             valueText: _register.mobileNo1,
           ),
+          NumberInput(
+            labelText: 'Alternate Mobile',
+            valueText: _register.mobileNo2,
+          ),
           // Email
           TextInputField(
             enabled: true,
@@ -242,7 +246,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           ),
           // T-shirt Size
           DropDownInput(
-            items: ['S', 'M', 'XL', 'XXL', 'XXXL'],
+            items: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
             labelText: 'T-shirt Size',
             valueText: _register.tshirtSize,
             onChange: (value) {
@@ -310,19 +314,14 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
                   );
                 },
                 isExpanded: isExpandedAddress[1],
-                body: AddressInput(
+                body: isExpandedAddress[1] ? AddressInput(
                   address: _register.currentAddress,
                   countryList: countryList,
                   startLoading: startLoading,
                   stopLoading: stopLoading,
-                ),
+                ) : Container(),
               ),
             ],
-          ),
-          // Current Address
-          Padding(
-            padding: EdgeInsets.all(10),
-            child: Text('Current Address'),
           ),
         ],
       ),
@@ -463,8 +462,8 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       child: Column(
         children: <Widget>[
           // Education Qualification
-          DropDownInput(
-            items: ['Test1', 'Test2'],
+          /*DropDownInput(
+            items: ["Bachelor"],
             labelText: 'Education Qualification',
             valueText: _register.studyDetail,
             onChange: (value) {
@@ -472,7 +471,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
                 _register.studyDetail = value;
               });
             },
-          ),
+          ),*/
           // Occupation
           RadioInput(
             lableText: 'Occupation',
@@ -579,8 +578,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     try {
       print(_register.toJson());
       Response res = await api.generateToken(_register.mhtId);
-      AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         if (appResponse.data != null &&
             appResponse.data.toString().isNotEmpty) {

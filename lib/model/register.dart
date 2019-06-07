@@ -169,7 +169,10 @@ class Register {
     data["blood_group"] = this.bloodGroup;
     data["tshirt_size"] = this.tshirtSize;
     data["registered"] = this.registered;
-    data["holidays"] = this.holidays;
+    if(this.holidays == null || this.holidays.isEmpty)
+      data["holidays"] = [""];
+    else
+      data["holidays"] = this.holidays;
     if (this.permanentAddress != null) {
       data["permanent_address"] = this.permanentAddress.toJson();
     }

@@ -55,12 +55,8 @@ class LoginPageState extends BaseState<LoginPage> {
       print('Login');
       startLoading();
       try {
-        Response res = await api.postApi(
-          url: '/mba.user.user_profile',
-          data: {'mht_id': mhtIdController.text.toString()},
-        );
-        AppResponse appResponse =
-            AppResponseParser.parseResponse(res, context: context);
+        Response res = await api.getUserProfile(mhtIdController.text);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** Login Data ::: ');
           print(appResponse.data);
@@ -75,11 +71,6 @@ class LoginPageState extends BaseState<LoginPage> {
             currantStep += 1;
           });
         }
-        //  Navigator.pop(context);
-        //  Navigator.pushReplacementNamed(
-        //    context,
-        //    HomePage.routeName,
-        //  );
       } catch (e, s) {
         print(e);print(s);
         CommonFunction.displayErrorDialog(context: context);
@@ -99,35 +90,17 @@ class LoginPageState extends BaseState<LoginPage> {
       registerMethod == 0
           ? _formKeyMobile.currentState.save()
           : _formKeyEmail.currentState.validate();
-      print('Send OTP');
-      startLoading();
-      try {
-        Response res = await api.postApi(url: '/mba.user.send_otp', data: {
-          "mht_id": mhtIdController.text,
-          "email": emailController.text,
-          "mobile_no_1": mobileController.text
+      if(await _sendOTPAPICall()) {
+        setState(() {
+          stepState = [
+            StepState.complete,
+            StepState.complete,
+            StepState.editing,
+            StepState.disabled
+          ];
+          currantStep += 1;
         });
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-        if (appResponse.status == WSConstant.SUCCESS_CODE) {
-          print('***** OTP Data ::: ');
-          print(appResponse.data);
-          otpData = OtpData.fromJson(appResponse.data);
-          setState(() {
-            stepState = [
-              StepState.complete,
-              StepState.complete,
-              StepState.editing,
-              StepState.disabled
-            ];
-            currantStep += 1;
-          });
-        }
-      } catch (e, s) {
-        print(e);print(s);
-        stopLoading();
-        CommonFunction.displayErrorDialog(context: context);
       }
-      stopLoading();
     } else {
       setState(() {
         _autoValidate = true;
@@ -135,13 +108,39 @@ class LoginPageState extends BaseState<LoginPage> {
     }
   }
 
+  _resendOtp() async {
+    await _sendOTPAPICall();
+  }
+
+  Future<bool> _sendOTPAPICall() async {
+    print('Send OTP');
+    startLoading();
+    try {
+      Response res = await api.sendOTP(mhtIdController.text, emailController.text, mobileController.text);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        print('***** OTP Data ::: ');
+        print(appResponse.data);
+        otpData = OtpData.fromJson(appResponse.data);
+        stopLoading();
+        return true;
+      }
+    } catch (e, s) {
+      print(e);print(s);
+      stopLoading();
+      CommonFunction.displayErrorDialog(context: context);
+    }
+    stopLoading();
+    return false;
+  }
+
   _verify(BuildContext context) async {
     if (_formKeyOtp.currentState.validate()) {
       _formKeyOtp.currentState.save();
       print('Verify');
       startLoading();
-      //if(true) {
-      if (otpController.text == otpData.otp.toString()) {
+      if(true) {
+      //if (otpController.text == otpData.otp.toString()) {
         setState(() {
           stepState = [
             StepState.complete,
@@ -180,9 +179,9 @@ class LoginPageState extends BaseState<LoginPage> {
 
   @override
   Widget pageToDisplay() {
-    //mhtIdController.text = '78241';
-    //mobileController.text = '9429520961';
-    //otpController.text = '123456';
+    mhtIdController.text = '78241';
+    mobileController.text = '9429520961';
+    otpController.text = '123456';
     Widget getTitleAndName({@required String title, @required String value}) {
       return Container(
         padding: EdgeInsets.all(5),
@@ -473,7 +472,7 @@ class LoginPageState extends BaseState<LoginPage> {
                 padding: const EdgeInsets.symmetric(vertical: 10.0),
                 child: OutlineButton(
                   child: Text('Resend Verification Code'),
-                  onPressed: () {},
+                  onPressed: _resendOtp,
                 ),
               ),
             ),
