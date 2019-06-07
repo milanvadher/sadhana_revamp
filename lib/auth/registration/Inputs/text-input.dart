@@ -10,12 +10,14 @@ class TextInputField extends StatelessWidget {
     this.hintText,
     this.validation,
     this.isRequiredValidation = false,
+    this.autoFocus = false,
   }) : super(key: key);
 
   final String labelText;
   final String valueText;
   final String hintText;
   final bool enabled;
+  final bool autoFocus;
   final bool isRequiredValidation;
   final Function(String) onSaved;
   final Function(String) validation;
@@ -25,6 +27,7 @@ class TextInputField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: TextFormField(
+        autofocus: autoFocus,
         decoration: InputDecoration(
           labelText: labelText,
           border: OutlineInputBorder(),

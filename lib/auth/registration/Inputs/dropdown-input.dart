@@ -52,6 +52,8 @@ class DropDownInputState extends State<DropDownInput> {
       },
       onSaved: (value) {
         //widget.onChange(value);
+        FocusScope.of(context).detach();
+
       },
       builder: (
           FormFieldState<dynamic> state,

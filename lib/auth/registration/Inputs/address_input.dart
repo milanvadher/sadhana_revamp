@@ -66,6 +66,7 @@ class _AddressInputState extends State<AddressInput> {
             labelText: 'Address Line 1',
             valueText: address?.addressLine1,
             onSaved: (value) => address.addressLine1 = value,
+            isRequiredValidation: true,
           ),
           // Address Line 2
           TextInputField(

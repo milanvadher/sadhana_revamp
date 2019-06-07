@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:sadhana/attendance/attendance_home.dart';
 import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/other/about.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/sadhana/time-table.dart';
-import 'package:sadhana/setup/options.dart';
-import '../attendance/attendance_home.dart';
+
 
 
 class CreateRoute {
@@ -50,7 +50,7 @@ List<CreateRoute> _buildAppRoutes() {
     CreateRoute(
       title: 'Registration Page',
       routeName: RegistrationPage.routeName,
-      buildRoute: (BuildContext context) => RegistrationPage(),
+      buildRoute: (BuildContext context) => RegistrationPage(registrationData: null,),
     ),
     CreateRoute(
       title: 'Time-Table Page',

@@ -26,6 +26,13 @@ class ActivityDAO extends BaseDAO<Activity> {
     return activity;
   }
 
+  Future<void> batchActivityInsertForSync(Sadhana sadhana, List<Activity> activities) async {
+    await super.batchInsertOrUpdate(activities);
+    List<Activity> dbActivities = await getActivityBySadhanaId(sadhana.id);
+    CacheData.addActivities(dbActivities);
+  }
+
+
   Future<List<Activity>> getActivityBySadhanaId(int sadhanaId) {
     return getEntityBySearchKey(Activity.columnSadhanaId, sadhanaId);
   }
