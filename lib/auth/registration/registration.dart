@@ -115,9 +115,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             onPressed: onStepContinue,
             child: Text(currentStep != steps.length - 1 ? 'CONTINUE' : 'Register'),
           ),
-          SizedBox(
-            width: 10,
-          ),
+          SizedBox(width: 10,),
           currentStep != 0
               ? RaisedButton(
                   onPressed: onStepCancel,
