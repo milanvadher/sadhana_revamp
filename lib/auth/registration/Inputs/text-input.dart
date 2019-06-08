@@ -28,7 +28,7 @@ class TextInputField extends StatelessWidget {
       alignment: Alignment.bottomLeft,
       child: TextFormField(
         style: TextStyle(
-          color: !enabled ? Colors.grey : Theme.of(context).textTheme.copyWith().title.color,
+          color: !enabled ? Theme.of(context).copyWith().disabledColor : Theme.of(context).textTheme.copyWith().title.color,
         ),
         autofocus: autoFocus,
         decoration: InputDecoration(

@@ -105,7 +105,14 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
               children: List.generate(Constant.weekName.length, (int index) {
             return Column(
               children: <Widget>[
-                Text(Constant.weekName[index], style: TextStyle(fontSize: 10)),
+                Text(
+                  Constant.weekName[index],
+                  style: TextStyle(
+                    fontSize: 10,
+                    color:
+                        Theme.of(context).copyWith().textTheme.caption.color,
+                  ),
+                ),
                 Checkbox(
                   onChanged: (value) {
                     setState(() {

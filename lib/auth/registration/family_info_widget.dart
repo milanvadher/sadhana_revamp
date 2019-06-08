@@ -30,7 +30,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
     return Column(
       children: <Widget>[
         TextInputField(
-          enabled: false,
+          enabled: true,
           labelText: 'Father Name',
           valueText: _register.fatherName,
         ),
@@ -72,7 +72,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           },
         ),
         TextInputField(
-          enabled: false,
+          enabled: true,
           labelText: 'Mother Name',
           valueText: _register.motherName,
         ),
