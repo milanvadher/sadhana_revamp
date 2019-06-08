@@ -1,17 +1,13 @@
-import 'dart:math' as math;
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class ReamarkPickerDialog extends StatefulWidget {
+class RemarkPickerDialog extends StatefulWidget {
   final Widget title;
   final EdgeInsets titlePadding;
   final Widget confirmWidget;
   final Widget cancelWidget;
   final String remark;
-
-  ReamarkPickerDialog({
+  RemarkPickerDialog({
     this.title,
     this.titlePadding,
     Widget confirmWidget,
@@ -21,14 +17,14 @@ class ReamarkPickerDialog extends StatefulWidget {
         cancelWidget = cancelWidget ?? new Text("CANCEL");
 
   @override
-  _ReamarkPickerDialogControllerState createState() => _ReamarkPickerDialogControllerState();
+  _RemarkPickerDialogControllerState createState() => _RemarkPickerDialogControllerState();
 
 }
 
-class _ReamarkPickerDialogControllerState extends State<ReamarkPickerDialog> {
+class _RemarkPickerDialogControllerState extends State<RemarkPickerDialog> {
   final remarkCtrl = TextEditingController();
 
-  _ReamarkPickerDialogControllerState();
+  _RemarkPickerDialogControllerState();
 
   @override
   void initState() {
@@ -64,10 +60,10 @@ class _ReamarkPickerDialogControllerState extends State<ReamarkPickerDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  new FlatButton(
+                  /*new FlatButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: widget.cancelWidget,
-                  ),
+                  ),*/
                   new FlatButton(
                     onPressed: () => Navigator.of(context).pop(remarkCtrl.text),
                     child: widget.confirmWidget,

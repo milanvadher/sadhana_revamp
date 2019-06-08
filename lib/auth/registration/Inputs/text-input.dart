@@ -5,7 +5,7 @@ class TextInputField extends StatelessWidget {
     Key key,
     this.labelText,
     this.valueText,
-    this.enabled,
+    this.enabled = true,
     this.onSaved,
     this.hintText,
     this.validation,
@@ -27,26 +27,27 @@ class TextInputField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: TextFormField(
+        style: TextStyle(
+          color: !enabled ? Colors.grey : Theme.of(context).textTheme.copyWith().title.color,
+        ),
         autofocus: autoFocus,
         decoration: InputDecoration(
           labelText: labelText,
           border: OutlineInputBorder(),
-          hintText: hintText?? 'Enter a $labelText',
+          hintText: hintText ?? 'Enter a $labelText',
         ),
         initialValue: valueText,
         enabled: enabled,
         keyboardType: TextInputType.text,
         onSaved: (value) {
-          if(onSaved != null)
-            onSaved(value);
+          if (onSaved != null) onSaved(value);
           return value;
         },
         validator: (value) {
           if (isRequiredValidation && (value == null || value.trim().isEmpty)) {
-            return  '$labelText is required';
+            return '$labelText is required';
           }
-          if(validation != null)
-            return validation(value);
+          if (validation != null) return validation(value);
         },
       ),
     );

@@ -6,7 +6,7 @@ class OtpData {
 
   OtpData.fromJson(Map<String, dynamic> json) {
     otp = json["otp"];
-    isLoggedIn = json["is_logged_in"]?? 0;
+    isLoggedIn = json["is_logged_in"] ?? 0;
     profile =
         json["profile"] != null ? new Register.fromJson(json["profile"]) : null;
   }
@@ -58,7 +58,7 @@ class Register {
   List<String> holidays;
   Address permanentAddress;
   Address currentAddress;
-  bool sameAsPermanentAddress = false;
+  bool sameAsPermanentAddress = true;
   Register(
       {this.mhtId,
       this.firstName,
@@ -133,7 +133,7 @@ class Register {
       holidays = tmpHolidays.map((v) => v.toString()).toList(growable: true);
     permanentAddress = json["permanent_address"] != null ? new Address.fromJson(json["permanent_address"]) : null;
     currentAddress = json["current_address"] != null ? new Address.fromJson(json["current_address"]) : null;
-    sameAsPermanentAddress = false;
+    sameAsPermanentAddress = true;
   }
 
   Map<String, dynamic> toJson() {

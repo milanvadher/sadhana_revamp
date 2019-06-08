@@ -41,18 +41,18 @@ class ComboboxInput extends StatelessWidget {
               child: Wrap(
                 alignment: WrapAlignment.start,
                 children: selectedData
-                        .map((item) => Padding(
+                    .map((item) => Padding(
                           padding: EdgeInsets.symmetric(horizontal: 2),
                           child: Chip(
-                              label: Text(item),
-                              deleteButtonTooltipMessage: 'Click to remove',
-                              deleteIcon: Icon(Icons.cancel),
-                              onDeleted: () {
-                                onDelete(item); 
-                              },
-                            ),
+                            label: Text(item),
+                            deleteButtonTooltipMessage: 'Click to remove',
+                            deleteIcon: Icon(Icons.cancel),
+                            onDeleted: () {
+                              onDelete(item);
+                            },
+                          ),
                         ))
-                        .toList(),
+                    .toList(),
               ),
             ),
           ],

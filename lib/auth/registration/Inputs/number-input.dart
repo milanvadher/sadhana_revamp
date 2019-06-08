@@ -7,7 +7,7 @@ class NumberInput extends StatelessWidget {
     Key key,
     this.labelText,
     this.valueText,
-    this.enabled,
+    this.enabled = true,
     this.onSaved,
     this.digitOnly = true,
     this.isRequiredValidation = false,
@@ -27,6 +27,9 @@ class NumberInput extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: TextFormField(
+        style: TextStyle(
+          color: !enabled ? Colors.grey : Theme.of(context).textTheme.copyWith().title.color,
+        ),
         decoration: InputDecoration(
           labelText: labelText,
           border: OutlineInputBorder(),
@@ -43,7 +46,7 @@ class NumberInput extends StatelessWidget {
         validator: (value) {
           if (isRequiredValidation && value.isEmpty) {
             return '$labelText is required';
-          } else if(!AppUtils.isNumeric(value)) {
+          } else if(isRequiredValidation && !AppUtils.isNumeric(value)) {
             return 'Invalid $labelText';
           }
           if(validation != null)

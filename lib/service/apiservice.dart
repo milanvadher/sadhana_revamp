@@ -79,6 +79,12 @@ class ApiService {
     return res;
   }
 
+  Future<Response> changeMobile(String mht_id, String oldNo, String newNo) async {
+    Map<String, dynamic> data = {'mht_id': mht_id, 'old_no': oldNo,
+      'new_no': newNo};
+    Response res = await _postApi(url: '/mba.user.change_mobile_nos', data: data);
+    return res;
+  }
 
   Future<Response> generateToken(String mht_id) async {
     Map<String, dynamic> data = {'mht_id': mht_id};

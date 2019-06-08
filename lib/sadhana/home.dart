@@ -55,11 +55,10 @@ class HomePage extends StatefulWidget {
 class HomePageState extends BaseState<HomePage> {
   static DateTime now = new DateTime.now();
   DateTime today = new DateTime(now.year, now.month, now.day);
+  DateTime previousMonth = DateTime(now.year, now.month - 1);
   static int durationInDays = Constant.displayDays;
   List<Sadhana> tmpSadhanas = new List();
   List<Sadhana> sadhanas = new List();
-  DateTime selectedDate = DateTime.now();
-  DateTime initialDate = DateTime.now();
   double headerWidth = 150.0;
   Brightness theme;
   BuildContext context;
@@ -212,10 +211,7 @@ class HomePageState extends BaseState<HomePage> {
     mobileWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: EdgeInsets.all(10),
-          child: Image.asset('images/logo_dada.png'),
-        ),
+        leading: Image.asset('images/logo_dada.png'),
         title: Text('Sadhana'),
         actions: _buildActions(),
       ),
@@ -475,7 +471,7 @@ class HomePageState extends BaseState<HomePage> {
       if (await AppUtils.isInternetConnected()) {
         startLoading();
         if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
-          CommonFunction.alertDialog(context: context, msg: "Successfully all activity of preloaded sadhana is synced with server.");
+          CommonFunction.alertDialog(context: context, msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
         CommonFunction.alertDialog(context: context, msg: "Please connect to internet to sync");
@@ -488,7 +484,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onShareExcel() {
-    showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => shareExcel(date));
+    showMonthPicker(context: context, initialDate: previousMonth).then((date) => shareExcel(date));
   }
 
   shareExcel(date) async {
@@ -501,7 +497,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onSaveExcel() {
-    showMonthPicker(context: context, initialDate: selectedDate ?? initialDate).then((date) => saveExcel(date));
+    showMonthPicker(context: context, initialDate: previousMonth).then((date) => saveExcel(date));
   }
 
   saveExcel(date) async {

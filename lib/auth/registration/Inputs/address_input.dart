@@ -87,6 +87,7 @@ class _AddressInputState extends State<AddressInput> {
               getStateByCountry(country: value, resetState: true);
             },
             valueText: address.country ?? "",
+            isRequiredValidation: true,
           ),
           // State
           DropDownInput.fromMap(
@@ -102,7 +103,7 @@ class _AddressInputState extends State<AddressInput> {
               getCityByState(state: value, resetCity: true);
             },
             valueText: address.state ?? "",
-            isRequiredValidation: address.country != null ? true : false,
+            isRequiredValidation: true,
           ),
           // City
           DropDownInput.fromMap(
@@ -116,7 +117,7 @@ class _AddressInputState extends State<AddressInput> {
               });
             },
             valueText: address.city ?? "",
-            isRequiredValidation: address.country != null ? true : false,
+            isRequiredValidation: true,
           ),
           // Pincode
           TextInputField(
@@ -124,7 +125,7 @@ class _AddressInputState extends State<AddressInput> {
             labelText: 'Pincode',
             valueText: address.pincode,
             onSaved: (value) => address.pincode = value,
-            isRequiredValidation: address.country != null ? true : false,
+            isRequiredValidation: true,
           ),
         ],
       ),
