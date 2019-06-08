@@ -72,9 +72,11 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     //AppLocalNotification.initAppLocalNotification(context);
     return Scaffold(
       appBar: AppBar(
+        actionsIconTheme: Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         backgroundColor: color,
         // centerTitle: true,
-        title: Text('$operation Sadhana'),
+        title: Text('$operation Sadhana',style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
       ),
       body: SafeArea(
         child: ListView(
@@ -170,10 +172,11 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 RaisedButton(
                   onPressed: onOKClick,
                   color: color,
-                  child: Text('$operation'),
+                  child: Text('$operation',style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
                 ),
-                RaisedButton(
-                  color: color,
+                OutlineButton(
+                  highlightedBorderColor: color,
+                  textColor: color,
                   onPressed: () {
                     Navigator.pop(context);
                   },

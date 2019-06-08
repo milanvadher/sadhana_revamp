@@ -175,7 +175,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     startLoading();
     try {
       print(_register.toJson());
-      //_register.registered = 1;
+      _register.registered = 1;
       Response res = await api.generateToken(_register.mhtId);
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);

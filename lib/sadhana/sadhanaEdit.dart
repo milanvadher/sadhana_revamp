@@ -57,7 +57,9 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Scaffold(
       appBar: AppBar(
-        title: Text(sadhana.sadhanaName),
+        actionsIconTheme: Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        title: Text(sadhana.sadhanaName, style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
         backgroundColor: color,
         actions: <Widget>[
           IconButton(icon: Icon(Icons.edit), onPressed: _onEditClick),
@@ -128,7 +130,8 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   _onDeleteClick() {
     CommonFunction.alertDialog(
         context: context,
-        msg: "Are you sure you want to delete Sadhana and all data?",
+        title: 'Are you sure ?',
+        msg: "Do you want to delete Sadhana and all data?",
         showCancelButton: true,
         doneButtonFn: deleteSadhana);
   }
@@ -179,7 +182,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             child: CircleAvatar(
               child: Text(
                 '${date.day}',
-                style: TextStyle().copyWith(color: _holidays.containsKey(date) ? Colors.white : Colors.black),
+                style: TextStyle().copyWith(color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: _holidays.containsKey(date) ? color : Colors.transparent,
             ),
@@ -191,7 +194,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             child: CircleAvatar(
               child: Text(
                 '${date.day}',
-                style: TextStyle().copyWith(color: Colors.white),
+                style: TextStyle(color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: color,
             ),

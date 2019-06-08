@@ -419,7 +419,7 @@ class NumberPickerDialog extends StatefulWidget {
     Widget cancelWidget,
     this.remark = "",
     this.color,
-  })  : confirmWidget = confirmWidget ?? new Text("OK"),
+  })  : confirmWidget = confirmWidget ?? new Text("OKAY"),
         cancelWidget = cancelWidget ?? new Text("CANCEL"),
         initialIntegerValue = -1,
         step = 1;
@@ -502,10 +502,6 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  new FlatButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: widget.cancelWidget,
-                  ),
                   new FlatButton(
                     onPressed: () {
                       if(widget.isForSevaSadhana) {

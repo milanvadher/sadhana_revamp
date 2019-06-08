@@ -3,12 +3,12 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
 
 class NameHeading extends StatelessWidget {
-  double headerWidth = 150.0;
-  Sadhana sadhana;
-  Function onClick;
+  final double headerWidth;
+  final Sadhana sadhana;
+  final Function onClick;
   Brightness theme;
   BuildContext context;
-  NameHeading({this.headerWidth, @required this.sadhana, this.onClick});
+  NameHeading({this.headerWidth = 150.0, @required this.sadhana, this.onClick});
 
   @override
   Widget build(BuildContext context) {

@@ -17,9 +17,10 @@ class CommonFunction {
   static AppOptionsPage appOptionsPage;
 
   static displayErrorDialog({@required BuildContext context, String msg}) {
-    if (msg != null && msg.toUpperCase().contains("SOCKET")) msg = "Looks like you lost your Internet !!";
+    if (msg != null && msg.toUpperCase().contains("SOCKET"))
+      msg = "Looks like you lost your Internet !!";
     if (msg == null) msg = MessageConstant.COMMON_ERROR_MSG;
-    if(context != null) {
+    if (context != null) {
       alertDialog(
         context: context,
         msg: msg,
@@ -30,7 +31,7 @@ class CommonFunction {
   }
 
   static displayInernetNotAvailableDialog({@required BuildContext context}) {
-    if(context != null) {
+    if (context != null) {
       alertDialog(
         context: context,
         msg: 'Internet is not available, Please connect to internet and retry',
@@ -42,7 +43,8 @@ class CommonFunction {
 
   // email Validation
   static String emailValidation(String value) {
-    String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
     if (value.isEmpty) {
       return 'Email-Id is required';
@@ -61,25 +63,28 @@ class CommonFunction {
     return null;
   }
 
-
-
-  static Future<bool> registerUser({@required Register register, @required BuildContext context, bool generateToken = true}) async {
-    if(generateToken) {
+  static Future<bool> registerUser(
+      {@required Register register,
+      @required BuildContext context,
+      bool generateToken = true}) async {
+    if (generateToken) {
       ApiService apiService = ApiService();
       Response res = await apiService.generateToken(register.mhtId);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if(appResponse.status == WSConstant.SUCCESS_CODE) {
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
         if (appResponse.data != null && appResponse.data.toString().isNotEmpty)
           register.token = appResponse.data;
       }
     }
-    if(register.token != null) {
+    if (register.token != null) {
       AppSharedPrefUtil.saveToken(register.token);
       Profile profile = Profile.fromRegisterModel(register);
       loginUser(profile: profile);
       AppSharedPrefUtil.saveRegisterProfile(register);
       AppSharedPrefUtil.saveIsUserRegistered(true);
-      await NotificationSetup.setupNotification(userInfo: register, context: context);
+      await NotificationSetup.setupNotification(
+          userInfo: register, context: context);
       return true;
     }
     return false;
@@ -93,23 +98,22 @@ class CommonFunction {
   }
 
   // common Alert dialog
-  static alertDialog({
-    @required BuildContext context,
-    String type = 'info', // 'success' || 'error'
-    String title,
-    @required String msg,
-    bool showDoneButton = true,
-    String doneButtonText = 'OK',
-    String cancelButtonText = 'Cancel',
-    Function doneButtonFn,
-    bool barrierDismissible = true,
-    bool showCancelButton = false,
-    Function doneCancelFn,
-    AlertDialog Function() builder,
-    Widget widget,
-    bool closeable = true
-  }) {
-    if(context != null) {
+  static alertDialog(
+      {@required BuildContext context,
+      String type = 'info', // 'success' || 'error'
+      String title,
+      @required String msg,
+      bool showDoneButton = true,
+      String doneButtonText = 'OK',
+      String cancelButtonText = 'Cancel',
+      Function doneButtonFn,
+      bool barrierDismissible = true,
+      bool showCancelButton = false,
+      Function doneCancelFn,
+      AlertDialog Function() builder,
+      Widget widget,
+      bool closeable = true}) {
+    if (context != null) {
       showDialog(
         context: context,
         barrierDismissible: barrierDismissible,
@@ -117,23 +121,25 @@ class CommonFunction {
           return WillPopScope(
               onWillPop: () async => closeable,
               child: AlertDialog(
+                title: Text(title != null ? title : type == 'error' ? 'Error' : 'Success'),
+                contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 15),
                 shape: new RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(5.0),
                 ),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     widget != null ? widget : Container(),
-                    SizedBox(height: 20),
+                    SizedBox(height: 5),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: EdgeInsets.symmetric(horizontal: 5),
                       child: Text(
                         msg != null
                             ? msg
-                            : type == 'error' ? "Looks like your lack of \n Imagination ! " : "Looks like today is your luckyday ... !!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.blueGrey, height: 1.5),
-                        textScaleFactor: 1.1,
+                            : type == 'error'
+                                ? "Looks like your lack of \n Imagination ! "
+                                : "Looks like today is your luckyday ... !!",
+                        style: TextStyle(color: Theme.of(context).textTheme.caption.color),
                       ),
                     ),
                     SizedBox(height: 20.0),
@@ -142,36 +148,37 @@ class CommonFunction {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         FlatButton(
-                          padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                          color: type == 'error' ? kQuizErrorRed : Colors.green[600],
-                          child: Row(
-                            children: <Widget>[
-                              Text(
-                                doneButtonText = doneButtonText?? "OK",
-                                textScaleFactor: 1.2,
-                                style: TextStyle(color: kQuizBackgroundWhite),
-                              )
-                            ],
+                          color: type == 'error'
+                              ? kQuizErrorRed
+                              : Colors.green[600],
+                          child: Text(
+                            doneButtonText = doneButtonText ?? "OK",
+                            style: TextStyle(color: kQuizBackgroundWhite),
                           ),
                           onPressed: doneButtonFn != null
                               ? doneButtonFn
                               : () {
-                            Navigator.pop(context);
-                          },
+                                  Navigator.pop(context);
+                                },
                         ),
-                        showCancelButton ? SizedBox(width: 10) : new Container(),
+                        showCancelButton
+                            ? SizedBox(width: 10)
+                            : new Container(),
                         showCancelButton
                             ? FlatButton(
-                            padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                            color: kQuizErrorRed,
-                            child: Row(
-                              children: <Widget>[Text(cancelButtonText?? 'Cancel', textScaleFactor: 1.2, style: TextStyle(color: kQuizBackgroundWhite))],
-                            ),
-                            onPressed: doneCancelFn != null
-                                ? doneCancelFn
-                                : () {
-                              Navigator.pop(context);
-                            })
+                                color: kQuizErrorRed,
+                                child: Text(
+                                  cancelButtonText ?? 'Cancel',
+                                  style: TextStyle(
+                                    color: kQuizBackgroundWhite,
+                                  ),
+                                ),
+                                onPressed: doneCancelFn != null
+                                    ? doneCancelFn
+                                    : () {
+                                        Navigator.pop(context);
+                                      },
+                              )
                             : new Container(),
                       ],
                     ),
@@ -182,5 +189,4 @@ class CommonFunction {
       );
     }
   }
-
 }

@@ -88,23 +88,26 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void subscribeConnnectivityChange() {
-     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
+    _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
   }
+
   bool isFirst = true;
   void onConnectivityChanged(ConnectivityResult result) async {
     try {
-      if(!isFirst) {
+      if (!isFirst) {
         print('on Connectivity change');
         await AppSettingUtil.getServerAppSetting(forceFromServer: true);
         SyncActivityUtils.syncAllUnSyncActivity(context: context);
-        if(await AppSharedPrefUtil.isUserRegistered()) {
+        if (await AppSharedPrefUtil.isUserRegistered()) {
           MBAScheduleCheck.getMBASchedule();
           AppUpdateCheck.startAppUpdateCheckThread(context);
         }
       }
       isFirst = false;
-    } catch (error,s) {
-      print(error);print(s);
+    } catch (error, s) {
+      print(error);
+      print(s);
       print("Error while sync all activity:" + error);
     }
   }
@@ -131,10 +134,12 @@ class HomePageState extends BaseState<HomePage> {
 
   Future<void> createPreloadedSadhana() async {
     try {
-      if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
+      if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() &&
+          await AppUtils.isInternetConnected()) {
         startLoading();
         Response res = await _api.getSadhanas();
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse =
+            AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           List<Sadhana> sadhanaList = Sadhana.fromJsonList(appResponse.data);
           print(sadhanaList);
@@ -143,14 +148,15 @@ class HomePageState extends BaseState<HomePage> {
           }
           stopLoading();
           AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
-          if(await AppSharedPrefUtil.isUserRegistered()) {
+          if (await AppSharedPrefUtil.isUserRegistered()) {
             askForPreloadActivity(sadhanaList);
           }
         }
         stopLoading();
       }
-    } catch (error,s) {
-      print(error);print(s);
+    } catch (error, s) {
+      print(error);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
   }
@@ -192,9 +198,11 @@ class HomePageState extends BaseState<HomePage> {
   void loadPreloadedActivity(List<Sadhana> sadhanas) async {
     startLoading();
     try {
-        await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
-    } catch (error,s) {
-      print(error);print(s);
+      await SyncActivityUtils.loadActivityFromServer(sadhanas,
+          context: context);
+    } catch (error, s) {
+      print(error);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
     stopLoading();
@@ -203,7 +211,7 @@ class HomePageState extends BaseState<HomePage> {
   @override
   //Widget build(BuildContext context) {
   Widget pageToDisplay() {
-    if(widget.optionsPage == null)
+    if (widget.optionsPage == null)
       widget.optionsPage = CommonFunction.appOptionsPage;
     sadhanas = CacheData.getSadhanas();
     theme = Theme.of(context).brightness;
@@ -211,7 +219,10 @@ class HomePageState extends BaseState<HomePage> {
     mobileWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        leading: Image.asset('images/logo_dada.png'),
+        leading: Padding(
+          padding: EdgeInsets.all(10),
+          child: Image.asset('images/logo_dada.png'),
+        ),
         title: Text('Sadhana'),
         actions: _buildActions(),
       ),
@@ -241,9 +252,16 @@ class HomePageState extends BaseState<HomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 20,)
+            SizedBox(
+              height: 20,
+            )
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: _onAddSadhanaClick,
+        tooltip: 'Add new Sadhana',
       ),
       bottomNavigationBar: CacheData.lastSyncTime != null && isUserRegistered
           ? Row(
@@ -272,7 +290,8 @@ class HomePageState extends BaseState<HomePage> {
 
   List<Widget> _buildLeftPanel() {
     List<Widget> widgets = new List();
-    widgets.add(_mainHeaderTitle('<<' + Constant.monthName[today.month - 1] + '>>'));
+    widgets.add(
+        _mainHeaderTitle('<<' + Constant.monthName[today.month - 1] + '>>'));
     List<Widget> sadhanaHeadings = sadhanas.map((sadhana) {
       return NameHeading(headerWidth: headerWidth, sadhana: sadhana);
     }).toList();
@@ -306,7 +325,8 @@ class HomePageState extends BaseState<HomePage> {
     List<Widget> rightWidgets = new List();
     rightWidgets.add(_headerList(daysToDisplay));
     List<Widget> activityWidgets = sadhanas.map((sadhana) {
-      return SadhanaHorizontalPanel(sadhana: sadhana, daysToDisplay: daysToDisplay);
+      return SadhanaHorizontalPanel(
+          sadhana: sadhana, daysToDisplay: daysToDisplay);
     }).toList();
     rightWidgets.addAll(activityWidgets);
     return rightWidgets;
@@ -326,7 +346,10 @@ class HomePageState extends BaseState<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[Text(weekDay, textScaleFactor: 0.7), Text('$date', textScaleFactor: 0.9)],
+          children: <Widget>[
+            Text(weekDay, textScaleFactor: 0.7),
+            Text('$date', textScaleFactor: 0.9)
+          ],
         ),
       ),
     );
@@ -350,11 +373,11 @@ class HomePageState extends BaseState<HomePage> {
     );
   }
 
-
   void checkSimcityMBA() async {
-    if(await AppSharedPrefUtil.isUserRegistered()) {
+    if (await AppSharedPrefUtil.isUserRegistered()) {
       Profile profile = await CacheData.getUserProfile();
-      if(profile != null && AppUtils.equalsIgnoreCase('Simandhar City', profile.center)) {
+      if (profile != null &&
+          AppUtils.equalsIgnoreCase('Simandhar City', profile.center)) {
         setState(() {
           isSimcityMBA = true;
         });
@@ -364,21 +387,20 @@ class HomePageState extends BaseState<HomePage> {
 
   List<Widget> _buildActions() {
     return <Widget>[
-      isSimcityMBA ? IconButton(
-        icon: Image.asset('assets/icon/calendar-icon.png'),
-        onPressed: _onScheduleClick,
-        tooltip: 'MBA Schedule',
-      ) : Container(),
-      isUserRegistered ? IconButton(
-        icon: Icon(Icons.backup),
-        onPressed: _onSyncClicked,
-        tooltip: 'Sync Data',
-      ) : Container(),
-      IconButton(
-        icon: Icon(Icons.add),
-        onPressed: _onAddSadhanaClick,
-        tooltip: 'Add new Sadhana',
-      ),
+      isSimcityMBA
+          ? IconButton(
+              icon: Image.asset('assets/icon/calendar-icon.png'),
+              onPressed: _onScheduleClick,
+              tooltip: 'MBA Schedule',
+            )
+          : Container(),
+      isUserRegistered
+          ? IconButton(
+              icon: Icon(Icons.backup),
+              onPressed: _onSyncClicked,
+              tooltip: 'Sync Data',
+            )
+          : Container(),
       PopupMenuButton(
         onSelected: (value) {
           handleOptionClick(value);
@@ -396,14 +418,14 @@ class HomePageState extends BaseState<HomePage> {
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.share, color: Colors.green),
-                title: Text('Share CSV'),
+                title: Text('Share CSV     '),
               ),
               value: 'share_excel',
             ),
             PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.settings, color: Colors.blueGrey),
-                title: Text('Options      '),
+                title: Text('Options    '),
               ),
               value: 'options',
             ),
@@ -445,7 +467,8 @@ class HomePageState extends BaseState<HomePage> {
 
   Future<File> getGeneratedCSVPath(date) async {
     DateTime selectedMonth = date as DateTime;
-    DateTime toDate = new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
+    DateTime toDate =
+        new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
     return await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
   }
 
@@ -459,8 +482,9 @@ class HomePageState extends BaseState<HomePage> {
       if (file != null) {
         OpenFile.open(file.path);
       }
-    } catch(e, s) {
-      print(e);print(s);
+    } catch (e, s) {
+      print(e);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
   }
@@ -470,21 +494,27 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if (await AppUtils.isInternetConnected()) {
         startLoading();
-        if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
-          CommonFunction.alertDialog(context: context, msg: "Your sadhana is successfully uploaded to server.");
+        if (await SyncActivityUtils.syncAllUnSyncActivity(
+            onBackground: false, context: context, forceSync: true)) {
+          CommonFunction.alertDialog(
+              context: context,
+              msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
-        CommonFunction.alertDialog(context: context, msg: "Please connect to internet to sync");
+        CommonFunction.alertDialog(
+            context: context, msg: "Please connect to internet to sync");
       }
-    } catch (error,s) {
-      print(error);print(s);
+    } catch (error, s) {
+      print(error);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
     stopLoading();
   }
 
   void onShareExcel() {
-    showMonthPicker(context: context, initialDate: previousMonth).then((date) => shareExcel(date));
+    showMonthPicker(context: context, initialDate: previousMonth)
+        .then((date) => shareExcel(date));
   }
 
   shareExcel(date) async {
@@ -497,7 +527,8 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onSaveExcel() {
-    showMonthPicker(context: context, initialDate: previousMonth).then((date) => saveExcel(date));
+    showMonthPicker(context: context, initialDate: previousMonth)
+        .then((date) => saveExcel(date));
   }
 
   saveExcel(date) async {

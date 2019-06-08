@@ -56,11 +56,9 @@ class AboutState extends BaseState<About> {
 
   @override
   Widget pageToDisplay() {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text("About"),
-        backgroundColor: kBackgroundGrediant3,
       ),
       body: ListView(
         children: <Widget>[

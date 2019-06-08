@@ -11,7 +11,11 @@ class NumberButton extends StatefulWidget {
   Sadhana sadhana;
   Activity activity;
   bool isDisabled;
-  NumberButton({this.onClick, @required this.sadhana, @required this.activity, this.isDisabled = false});
+  NumberButton(
+      {this.onClick,
+      @required this.sadhana,
+      @required this.activity,
+      this.isDisabled = false});
 
   @override
   _NumberButtonState createState() => _NumberButtonState();
@@ -29,39 +33,47 @@ class _NumberButtonState extends State<NumberButton> {
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-    color = widget.isDisabled ? Colors.grey : theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
+    color = widget.isDisabled
+        ? Colors.grey
+        : theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Container(
-      width: 34,
-      margin: EdgeInsets.all(7),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: (color).withAlpha(isActivityDone() ? 20 : 0),
-        border: Border.all(
-          color: color,
-          width: 2,
-          style: isActivityDone() ? BorderStyle.solid : BorderStyle.none,
-        ),
-      ),
+      color: widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
       child: Container(
-        width: 48,
-        child: Center(
-          child: FlatButton(
-            padding: EdgeInsets.all(0),
-            onPressed: widget.isDisabled ? null : onPressed,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  activity.sadhanaValue.toString(),
-                  style: TextStyle(
-                      color: isActivityDone() ? color : Colors.grey),
-                ),
-                CircleAvatar(
-                  maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
-                  backgroundColor: color,
-                )
-              ],
+        width: 34,
+        margin: EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: (color).withAlpha(isActivityDone() ? 20 : 0),
+          border: Border.all(
+            color: color,
+            width: 2,
+            style: isActivityDone() ? BorderStyle.solid : BorderStyle.none,
+          ),
+        ),
+        child: Container(
+          width: 48,
+          child: Center(
+            child: FlatButton(
+              padding: EdgeInsets.all(0),
+              onPressed: widget.isDisabled ? null : onPressed,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    activity.sadhanaValue.toString(),
+                    style: TextStyle(
+                        color: isActivityDone() ? color : Colors.grey),
+                  ),
+                  CircleAvatar(
+                    maxRadius:
+                        activity.remarks != null && activity.remarks.isNotEmpty
+                            ? 2
+                            : 0,
+                    backgroundColor: color,
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -82,8 +94,12 @@ class _NumberButtonState extends State<NumberButton> {
             color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
             initialIntegerValue: activity.sadhanaValue,
             minValue: 0,
-            isForSevaSadhana: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME),
-            maxValue: AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME) ? 24 : 100,
+            isForSevaSadhana: AppUtils.equalsIgnoreCase(
+                sadhana.sadhanaName, Constant.SEVANAME),
+            maxValue: AppUtils.equalsIgnoreCase(
+                    sadhana.sadhanaName, Constant.SEVANAME)
+                ? 24
+                : 100,
             remark: activity.remarks,
           );
         }).then(
@@ -101,5 +117,4 @@ class _NumberButtonState extends State<NumberButton> {
       if (widget.onClick != null) widget.onClick(widget.activity);
     }
   }
-
 }
