@@ -31,8 +31,8 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
     return Column(
       children: <Widget>[
         Container(
-          child: ListView(
-            shrinkWrap: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text('Regular Seva Department:'),
               TextInputField(
@@ -55,8 +55,8 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
         ),
         Container(
           padding: EdgeInsets.only(top: 20),
-          child: ListView(
-            shrinkWrap: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text('Event Based Seva Department:'),
               TextInputField(
@@ -78,50 +78,95 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
           ),
         ),
         Container(
-          child: Row(
+          padding: EdgeInsets.only(top: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text('Seva Alailability'),
-              Container(
-                child: DropDownInput(
-                  labelText: 'Hours',
-                  valueText: 1,
-                  items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-                  onChange: (value) {
-                    setState(() {
-                      print(value);
-                    });
-                  },
+              Row(
+                children: <Widget>[
+                  Container(
+                    width: MediaQuery.of(context).size.width / 4,
+                    child: DropDownInput(
+                      labelText: 'Hours',
+                      valueText: 1,
+                      items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                      onChange: (value) {
+                        setState(() {
+                          print(value);
+                        });
+                      },
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 20),
+                    width: MediaQuery.of(context).size.width / 2,
+                    child: Wrap(
+                      children: List.generate(
+                        Constant.weekName.length,
+                        (int index) {
+                          return Column(
+                            children: <Widget>[
+                              Text(
+                                Constant.weekName[index],
+                                style: TextStyle(fontSize: 10),
+                              ),
+                              Checkbox(
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value) {
+                                      _register.holidays
+                                          .add(Constant.weekName[index]);
+                                    } else {
+                                      _register.holidays
+                                          .remove(Constant.weekName[index]);
+                                    }
+                                  });
+                                },
+                                value: false,
+                                // value: _register.holidays
+                                //     .contains(Constant.weekName[index]),
+                              )
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Text('Remark'),
+              TextInputField(
+                labelText: 'Remarks',
+                valueText: _register.personalNotes,
+                onSaved: (value) => _register.personalNotes = value,
+              ),
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.all(0),
+                subtitle: Text(
+                  'Note: Please give details in remarks. eg., 4Hrs on weekends',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
                 ),
               ),
-              // Container(
-              //   child: Wrap(
-              //       children:
-              //           List.generate(Constant.weekName.length, (int index) {
-              //     return Column(
-              //       children: <Widget>[
-              //         Text(Constant.weekName[index]),
-              //         Checkbox(
-              //           onChanged: (value) {
-              //             setState(() {
-              //               if (value) {
-              //                 _register.holidays.add(Constant.weekName[index]);
-              //               } else {
-              //                 _register.holidays
-              //                     .remove(Constant.weekName[index]);
-              //               }
-              //             });
-              //           },
-              //           value: true,
-              //           // value: _register.holidays
-              //           //     .contains(Constant.weekName[index]),
-              //         )
-              //       ],
-              //     );
-              //   })),
-              // )
             ],
           ),
         ),
+        Container(
+            padding: EdgeInsets.only(top: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text('Interest in Dept/Skill\'s'),
+                TextInputField(
+                  labelText: 'Interest in Dept/Skill\'s',
+                  valueText: _register.personalNotes,
+                  onSaved: (value) => _register.personalNotes = value,
+                ),
+              ],
+            ))
       ],
     );
   }
