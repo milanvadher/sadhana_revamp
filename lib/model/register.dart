@@ -1,12 +1,12 @@
 class OtpData {
   int otp;
   Register profile;
-  int isLoggedIn;
+  bool isLoggedIn;
   OtpData({this.otp, this.profile});
 
   OtpData.fromJson(Map<String, dynamic> json) {
     otp = json["otp"];
-    isLoggedIn = json["is_logged_in"]?? 0;
+    isLoggedIn = json["is_logged_in"] ?? false;
     profile =
         json["profile"] != null ? new Register.fromJson(json["profile"]) : null;
   }
