@@ -35,6 +35,8 @@ class LoginPageState extends BaseState<LoginPage> {
   final mobileController = TextEditingController();
   final emailController = TextEditingController();
   final otpController = TextEditingController();
+  final _mobileChange = TextEditingController();
+  bool _mobileChangeRequestStart = false;
   bool _autoValidate = false;
   ApiService api = new ApiService();
   int currantStep = 0;
@@ -48,6 +50,7 @@ class LoginPageState extends BaseState<LoginPage> {
   Profile profileData;
   OtpData otpData;
   int registerMethod = 0;
+  ScrollController _scrollController = new ScrollController();
 
   _login(BuildContext context) async {
     if (_formKey.currentState.validate()) {
@@ -172,7 +175,7 @@ class LoginPageState extends BaseState<LoginPage> {
       print('Verify');
       startLoading();
       if (true) {
-      //if (otpController.text == otpData.otp.toString()) {
+        //if (otpController.text == otpData.otp.toString()) {
         setState(() {
           stepState = [
             StepState.complete,
@@ -481,75 +484,105 @@ class LoginPageState extends BaseState<LoginPage> {
             Container(
               padding: const EdgeInsets.all(15.0),
               child: Text(
-                'Enter Verification Code',
+                _mobileChangeRequestStart
+                    ? 'Mobile Change Request'
+                    : 'Enter Verification Code',
                 style: TextStyle(fontSize: 25),
               ),
             ),
             // OTP
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              alignment: Alignment.bottomLeft,
-              child: TextFormField(
-                controller: otpController,
-                validator: CommonValidation.otpValidation,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.phonelink_lock),
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter OTP',
-                ),
-                maxLines: 1,
-              ),
-            ),
-            // Resend Verification code
-            Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: OutlineButton(
-                  child: Text('Resend Verification Code'),
-                  onPressed: _resendOtp,
-                ),
-              ),
-            ),
-            // Back
-            Center(
-              child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Row(
-                    children: <Widget>[
-                      OutlineButton(
-                        child: Text('Restart'),
-                        onPressed: () {
-                          setState(() {
-                            mhtIdController.clear();
-                            mobileController.clear();
-                            emailController.clear();
-                            otpController.clear();
-                            stepState = [
-                              StepState.editing,
-                              StepState.disabled,
-                              StepState.disabled,
-                              StepState.disabled,
-                            ];
-                            currantStep = 0;
-                          });
-                        },
+            !_mobileChangeRequestStart
+                ? Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    alignment: Alignment.bottomLeft,
+                    child: TextFormField(
+                      controller: otpController,
+                      validator: CommonValidation.otpValidation,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.phonelink_lock),
+                        border: OutlineInputBorder(),
+                        labelText: 'Enter OTP',
                       ),
-                      new FlatButton(
+                      maxLines: 1,
+                    ),
+                  )
+                : Container(),
+            // Resend Verification code
+            !_mobileChangeRequestStart
+                ? Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: OutlineButton(
+                        child: Text('Resend Verification Code'),
+                        onPressed: _resendOtp,
+                      ),
+                    ),
+                  )
+                : Container(),
+            // Back
+            !_mobileChangeRequestStart
+                ? Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: new FlatButton(
                         child: new Text(
-                          'Mobile change?',
+                          'Mobile change request ?',
                           style: TextStyle(
                             color: Colors.blueAccent,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/forgotPassword');
+                          setState(() {
+                            _mobileChangeRequestStart = true;
+                          });
+                          // Navigator.pushNamed(context, '/forgotPassword');
                         },
                       ),
-                    ],
-                  )),
-            )
+                    ),
+                  )
+                : Container(),
+            // Verify old Number
+            _mobileChangeRequestStart
+                ? Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: new FlatButton(
+                        child: new Text(
+                          'Verify old number ?',
+                          style: TextStyle(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _mobileChangeRequestStart = false;
+                          });
+                        },
+                      ),
+                    ),
+                  )
+                : Container(),
+            // Mobile Change Text-Box !!!
+            _mobileChangeRequestStart
+                ? Container(
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
+                    alignment: Alignment.bottomLeft,
+                    child: TextFormField(
+                      controller: _mobileChange,
+                      validator: CommonValidation.mobileValidation,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        icon: Icon(Icons.phonelink_lock),
+                        border: OutlineInputBorder(),
+                        labelText: 'Enter New Mobile',
+                      ),
+                      maxLines: 1,
+                    ),
+                  )
+                : Container(),
           ],
         ),
       );
@@ -610,6 +643,39 @@ class LoginPageState extends BaseState<LoginPage> {
       );
     }
 
+    Widget buildStep5() {
+      return Column(
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            child: CircleAvatar(
+              child: Icon(
+                Icons.done,
+                size: 80,
+                color: Colors.white,
+              ),
+              minRadius: 50,
+              backgroundColor: Colors.green,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'Your Request is successfully send',
+              style: TextStyle(fontSize: 30),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'You Will be notified within 24hr',
+              style: TextStyle(fontSize: 15, color: Colors.green),
+            ),
+          ),
+        ],
+      );
+    }
+
     loginSteps = [
       Step(
         title: Text('Start'),
@@ -624,17 +690,17 @@ class LoginPageState extends BaseState<LoginPage> {
         state: stepState[1],
       ),
       Step(
-        title: Text('Verify'),
+        title: Text(!_mobileChangeRequestStart ? 'Verify' : 'Mobile Change'),
         content: buildStep3(),
         isActive: currantStep == 2,
         state: stepState[2],
       ),
       Step(
-        title: Text('Linked'),
-        content: buildStep4(),
+        title: Text(!_mobileChangeRequestStart ? 'Linked' : 'Congo'),
+        content: !_mobileChangeRequestStart ? buildStep4() : buildStep5(),
         isActive: currantStep == 3,
         state: stepState[3],
-      ),
+      )
     ];
 
     return new WillPopScope(
@@ -647,6 +713,7 @@ class LoginPageState extends BaseState<LoginPage> {
             child: Stepper(
               type: StepperType.vertical,
               steps: loginSteps,
+              controlsBuilder: buildController,
               currentStep: currantStep,
               onStepContinue: onSetupContinue,
               onStepTapped: (value) {
@@ -656,7 +723,41 @@ class LoginPageState extends BaseState<LoginPage> {
               },
             ),
           ),
-        )
+        ));
+  }
+
+  void scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
+
+  Widget buildController(BuildContext context,
+      {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          RaisedButton(
+            onPressed: onStepContinue,
+            child: Text(currantStep != loginSteps.length - 1
+                ? 'CONTINUE'
+                : _mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          // currantStep != 0
+          //     ? FlatButton(
+          //         onPressed: onStepCancel,
+          //         child: const Text('BACK'),
+          //       )
+          //     : Container()
+        ],
+      ),
     );
   }
 
@@ -682,6 +783,22 @@ class LoginPageState extends BaseState<LoginPage> {
         _verify(context);
         break;
       case 3:
+        if (_mobileChangeRequestStart) {
+          return setState(() {
+            mhtIdController.clear();
+            mobileController.clear();
+            emailController.clear();
+            otpController.clear();
+            _mobileChangeRequestStart = false;
+            stepState = [
+              StepState.editing,
+              StepState.disabled,
+              StepState.disabled,
+              StepState.disabled,
+            ];
+            currantStep = 0;
+          });
+        }
         if (otpData.profile.registered == 0) {
           Navigator.pushReplacement(
             context,
@@ -718,7 +835,5 @@ class LoginPageState extends BaseState<LoginPage> {
     }
   }
 
-  void changeMobilePopup() async {
-
-  }
+  void changeMobilePopup() async {}
 }
