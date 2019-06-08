@@ -4,6 +4,7 @@ import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
 import 'package:sadhana/auth/registration/registration_step.dart';
+import 'package:sadhana/auth/registration/seav_info_widget.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
@@ -63,6 +64,15 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           stopLoading: stopLoading,
         ),
       ),
+      RegistrationStep(
+        title: "Seva Details",
+        builder: SevaInfoWidget(
+          register: _register,
+          startLoading: startLoading,
+          stopLoading: stopLoading,
+        ),
+      ),
+      
     ];
     steps = getSteps(registrationSteps);
   }
