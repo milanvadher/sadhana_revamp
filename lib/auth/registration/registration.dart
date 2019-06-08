@@ -45,7 +45,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   List<Step> registrationSteps = [];
   List<String> skills = [];
   List<String> countryList = [];
-  List<bool> isExpandedAddress = [false, false];
+  List<bool> isExpandedAddress = [true, false];
   bool _autoValidate = false;
 
   @override

@@ -81,7 +81,8 @@ class LoginPageState extends BaseState<LoginPage> {
         //    HomePage.routeName,
         //  );
       } catch (e, s) {
-        print(e);print(s);
+        print(e);
+        print(s);
         CommonFunction.displayErrorDialog(context: context);
         stopLoading();
       }
@@ -100,34 +101,60 @@ class LoginPageState extends BaseState<LoginPage> {
           ? _formKeyMobile.currentState.save()
           : _formKeyEmail.currentState.validate();
       print('Send OTP');
-      startLoading();
-      try {
-        Response res = await api.postApi(url: '/mba.user.send_otp', data: {
-          "mht_id": mhtIdController.text,
-          "email": emailController.text,
-          "mobile_no_1": mobileController.text
-        });
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-        if (appResponse.status == WSConstant.SUCCESS_CODE) {
-          print('***** OTP Data ::: ');
-          print(appResponse.data);
-          otpData = OtpData.fromJson(appResponse.data);
-          setState(() {
-            stepState = [
-              StepState.complete,
-              StepState.complete,
-              StepState.editing,
-              StepState.disabled
-            ];
-            currantStep += 1;
+
+      if ((registerMethod == 0 &&
+              mobileController.text != profileData.mobileNo1) ||
+          (registerMethod == 1 && emailController.text != profileData.email)) {
+        showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text('Details did not match'),
+              content: Text(
+                  'Entered Mobile No / Email Id does not match with I-Card Mobile No / Email Id !!! '),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Retry'),
+                )
+              ],
+            );
+          },
+        );
+      } else {
+        startLoading();
+        try {
+          Response res = await api.postApi(url: '/mba.user.send_otp', data: {
+            "mht_id": mhtIdController.text,
+            "email": registerMethod == 1 ? emailController.text : "",
+            "mobile_no_1": registerMethod == 0 ? mobileController.text : ""
           });
+          AppResponse appResponse =
+              AppResponseParser.parseResponse(res, context: context);
+          if (appResponse.status == WSConstant.SUCCESS_CODE) {
+            print('***** OTP Data ::: ');
+            print(appResponse.data);
+            otpData = OtpData.fromJson(appResponse.data);
+            setState(() {
+              stepState = [
+                StepState.complete,
+                StepState.complete,
+                StepState.editing,
+                StepState.disabled
+              ];
+              currantStep += 1;
+            });
+          }
+        } catch (e, s) {
+          print(e);
+          print(s);
+          stopLoading();
+          CommonFunction.displayErrorDialog(context: context);
         }
-      } catch (e, s) {
-        print(e);print(s);
         stopLoading();
-        CommonFunction.displayErrorDialog(context: context);
       }
-      stopLoading();
     } else {
       setState(() {
         _autoValidate = true;
@@ -329,7 +356,9 @@ class LoginPageState extends BaseState<LoginPage> {
                   getTitleAndName(
                     title: 'Email',
                     value: profileData != null
-                        ? profileData.email.trim().isNotEmpty ? getEmailId() : ""
+                        ? profileData.email.trim().isNotEmpty
+                            ? getEmailId()
+                            : ""
                         : "",
                   ),
                 ],
@@ -607,8 +636,9 @@ class LoginPageState extends BaseState<LoginPage> {
   String getEmailId() {
     try {
       return '${profileData.email.substring(0, 2)}******@${profileData.email.substring(profileData.email.indexOf('@') + 1, profileData.email.indexOf('@') + 3)}******${profileData.email.substring(profileData.email.lastIndexOf('.'), profileData.email.length)}';
-    } catch(e,s) {
-      print(e); print(s);
+    } catch (e, s) {
+      print(e);
+      print(s);
     }
     return "";
   }
@@ -627,20 +657,25 @@ class LoginPageState extends BaseState<LoginPage> {
       case 3:
         if (otpData.profile.registered == 0) {
           Navigator.pop(context);
-          Navigator.pushReplacement(context, MaterialPageRoute(
-            builder: (context) => RegistrationPage(
-              registrationData: otpData.profile,
-            ),
-          ));
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RegistrationPage(
+                      registrationData: otpData.profile,
+                    ),
+              ));
         } else {
           if (otpData.isLoggedIn == 1) {
-            CommonFunction.alertDialog(context: context,
-                msg: "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
+            CommonFunction.alertDialog(
+                context: context,
+                msg:
+                    "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
                 doneButtonText: 'Yes',
                 doneButtonFn: () async {
                   Navigator.pop(context);
                   Navigator.pop(context);
-                  await CommonFunction.registerUser(register: otpData.profile, context: context);
+                  await CommonFunction.registerUser(
+                      register: otpData.profile, context: context);
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => HomePage(),
