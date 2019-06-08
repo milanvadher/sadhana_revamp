@@ -43,7 +43,7 @@ class NumberInput extends StatelessWidget {
         validator: (value) {
           if (isRequiredValidation && value.isEmpty) {
             return '$labelText is required';
-          } else if(!AppUtils.isNumeric(value)) {
+          } else if(isRequiredValidation && !AppUtils.isNumeric(value)) {
             return 'Invalid $labelText';
           }
           if(validation != null)

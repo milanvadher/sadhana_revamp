@@ -65,6 +65,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   @override
   Widget build(BuildContext context) {
     _register = widget.register;
+    isExpandedAddress[1] = !_register.sameAsPermanentAddress;
     return Column(
       children: <Widget>[
         // MhtId
@@ -180,7 +181,8 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
                 onChanged: (value) {
                   setState(() {
                     _register.sameAsPermanentAddress = value;
-                    isExpandedAddress[1] = false;
+                    if(_register.sameAsPermanentAddress)
+                      isExpandedAddress[1] = false;
                   });
                 },
               ),
