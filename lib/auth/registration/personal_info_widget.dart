@@ -44,10 +44,11 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   loadCountries() async {
     try {
       Response res = await api.getAllCountries();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         countryList = [];
-        if(mounted) {
+        if (mounted) {
           setState(() {
             Country.fromJsonList(appResponse.data).forEach((item) {
               countryList.add(item.name);
@@ -77,7 +78,8 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         TextInputField(
           enabled: false,
           labelText: 'Full Name',
-          valueText: '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
+          valueText:
+              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
         ),
         // Mobile
         NumberInput(
@@ -107,7 +109,8 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         // B_date
         DateInput(
           labelText: 'Birth Date',
-          selectedDate: _register.bDate == null ? null : DateTime.parse(_register.bDate),
+          selectedDate:
+              _register.bDate == null ? null : DateTime.parse(_register.bDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.bDate = dateFormatter.format(date);
@@ -117,7 +120,8 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         // G_date
         DateInput(
           labelText: 'Gnan Date',
-          selectedDate: _register.gDate == null ? null : DateTime.parse(_register.gDate),
+          selectedDate:
+              _register.gDate == null ? null : DateTime.parse(_register.gDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.gDate = dateFormatter.format(date);
@@ -201,7 +205,14 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
               canTapOnHeader: true,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return ListTile(
-                  title: Text('Current Address'),
+                  title: Text(
+                    'Current Address',
+                    style: TextStyle(
+                      color: _register.sameAsPermanentAddress
+                          ? Colors.grey
+                          : Theme.of(context).textTheme.copyWith().title.color,
+                    ),
+                  ),
                 );
               },
               isExpanded: isExpandedAddress[1],
