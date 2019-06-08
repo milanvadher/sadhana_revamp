@@ -174,8 +174,8 @@ class LoginPageState extends BaseState<LoginPage> {
       _formKeyOtp.currentState.save();
       print('Verify');
       startLoading();
-      if (true) {
-        //if (otpController.text == otpData.otp.toString()) {
+      // if (true) {
+        if (otpController.text == otpData.otp.toString()) {
         setState(() {
           stepState = [
             StepState.complete,
@@ -215,9 +215,9 @@ class LoginPageState extends BaseState<LoginPage> {
 
   @override
   Widget pageToDisplay() {
-    mhtIdController.text = '78241';
-    mobileController.text = '9429520961';
-    otpController.text = '123456';
+    // mhtIdController.text = '78241';
+    // mobileController.text = '9429520961';
+    // otpController.text = '123456';
     Widget getTitleAndName({@required String title, @required String value}) {
       return Container(
         padding: EdgeInsets.all(5),
