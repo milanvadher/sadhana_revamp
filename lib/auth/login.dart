@@ -212,9 +212,9 @@ class LoginPageState extends BaseState<LoginPage> {
 
   @override
   Widget pageToDisplay() {
-    //mhtIdController.text = '78241';
-    //mobileController.text = '9429520961';
-    //otpController.text = '123456';
+    mhtIdController.text = '78241';
+    mobileController.text = '9429520961';
+    otpController.text = '123456';
     Widget getTitleAndName({@required String title, @required String value}) {
       return Container(
         padding: EdgeInsets.all(5),
