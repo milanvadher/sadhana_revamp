@@ -44,7 +44,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
               Text('Regular Seva Department:'),
               TextInputField(
                 labelText: 'Regular Seva Dept.',
-                valueText: _register.sevaProfile.,
+                valueText: 'Test',
                 onSaved: (value) => _register.personalNotes = value,
               ),
               ListTile(
