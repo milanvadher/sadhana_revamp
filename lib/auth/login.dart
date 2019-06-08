@@ -218,6 +218,7 @@ class LoginPageState extends BaseState<LoginPage> {
     // mhtIdController.text = '78241';
     // mobileController.text = '9429520961';
     // otpController.text = '123456';
+    double screenWidth = MediaQuery.of(context).size.width;
     Widget getTitleAndName({@required String title, @required String value}) {
       return Container(
         padding: EdgeInsets.all(5),
@@ -231,6 +232,7 @@ class LoginPageState extends BaseState<LoginPage> {
               ),
             ),
             Container(
+              width: screenWidth - 212,
               child: Text(
                 '$value',
                 style: TextStyle(fontWeight: FontWeight.normal),
@@ -608,6 +610,7 @@ class LoginPageState extends BaseState<LoginPage> {
             child: Text(
               'You are successfully verified\n',
               style: TextStyle(fontSize: 30),
+              textAlign: TextAlign.center,
             ),
           ),
           Card(
