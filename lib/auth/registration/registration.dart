@@ -242,7 +242,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           ),
           // T-shirt Size
           DropDownInput(
-            items: ['S', 'M', 'XL', 'XXL', 'XXXL'],
+            items: ['S', 'L', 'M', 'XL', 'XXL', 'XXXL'],
             labelText: 'T-shirt Size',
             valueText: _register.tshirtSize,
             onChange: (value) {
@@ -502,7 +502,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
             },
           ),
           // No of Holidays
-          Container(  
+          Container(
             child: ListTile(
               title: Text('Weekly off in your Job/Occupation/Business'),
               contentPadding: EdgeInsets.only(left: 5),
