@@ -19,6 +19,16 @@ abstract class BaseDAO<T extends Entity> {
     return entity;
   }
 
+  Future<void> batchInsertOrUpdate(List<T> entities) async {
+    final db = await dbProvider.database;
+    Batch batch = db.batch();
+    entities.forEach((entity) {
+        batch.insert(getTableName(), entity.toMap(),conflictAlgorithm: ConflictAlgorithm.replace,);
+    });
+    await batch.commit(continueOnError: true, noResult: true);
+  }
+
+
   Future<int> update(T entity, {String where, List<dynamic> values}) async {
     final db = await dbProvider.database;
     return await db.update(

@@ -37,8 +37,43 @@ class DropDownInput extends StatefulWidget {
 
 class DropDownInputState extends State<DropDownInput> {
 
+  dynamic selectedValue;
   @override
   Widget build(BuildContext context) {
+    selectedValue = widget.valuesByLabel.values.contains(widget.valueText) ? widget.valueText : null;
+    return FormField<dynamic>(
+      initialValue:  selectedValue,
+      validator: (value) {
+        if(widget.isRequiredValidation) {
+          if (selectedValue == null) {
+            return "Select ${widget.labelText}";
+          }
+        }
+      },
+      onSaved: (value) {
+        //widget.onChange(value);
+        // FocusScope.of(context).detach9();
+
+      },
+      builder: (
+          FormFieldState<dynamic> state,
+          ) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _buildDropDown(state),
+            state.hasError ? Text(
+            state.errorText,
+              style:
+              TextStyle(color: Colors.redAccent.shade700, fontSize: 12.0),
+            ) : Container(),
+          ],
+        );
+      },
+    );
+  }
+
+  _buildDropDown(FormFieldState state) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
@@ -57,10 +92,14 @@ class DropDownInputState extends State<DropDownInput> {
               isDense: true,
               items:  getDropDownMenuItem(widget.valuesByLabel),
               onChanged: (value) {
+                state.didChange(value);
+                /*setState(() {
+                  _town = newValue;
+                });*/
                 FocusScope.of(context).requestFocus(new FocusNode());
                 widget.onChange(value);
               },
-              value: widget.valuesByLabel.values.contains(widget.valueText) ? widget.valueText : null,
+              value: selectedValue,
             ),
           ),
         ),
@@ -70,9 +109,11 @@ class DropDownInputState extends State<DropDownInput> {
 
   List<DropdownMenuItem> getDropDownMenuItem(Map<String, dynamic> valuesByLabel) {
     List<DropdownMenuItem> items = [];
-    valuesByLabel.forEach((label, value) {
-      items.add(DropdownMenuItem<dynamic>(value: value, child: new Text(label)));
-    });
+    if(valuesByLabel != null) {
+      valuesByLabel.forEach((label, value) {
+        items.add(DropdownMenuItem<dynamic>(value: value, child: new Text(label)));
+      });
+    }
     return items;
   }
 }

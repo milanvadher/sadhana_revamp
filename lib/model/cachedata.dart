@@ -52,4 +52,8 @@ class CacheData {
       sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
     }
   }
+
+  static addActivities(List<Activity> activities) {
+    activities.forEach((activity) => addActivity(activity));
+  }
 }
