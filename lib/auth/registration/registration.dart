@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/auth/registration/customstepper.dart';
 import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
@@ -34,6 +33,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   bool _autoValidate = false;
   List<RegistrationStep> registrationSteps;
   final String personalStepID = "Personal Info";
+  ScrollController _scrollController = new ScrollController();
 
   @override
   initState() {
@@ -78,12 +78,23 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           title: Text('Registration'),
         ),
         body: SafeArea(
-          child: Stepper(
-            controlsBuilder: buildController,
-            currentStep: currentStep,
-            onStepContinue: onStepContinue,
-            onStepCancel: () => currentStep--,
-            steps: steps,
+          child: ListView(
+            controller: _scrollController,
+            children: <Widget>[
+              Stepper(
+                physics: ClampingScrollPhysics(),
+                controlsBuilder: buildController,
+                currentStep: currentStep,
+                onStepContinue: onStepContinue,
+                onStepCancel: () {
+                  currentStep--;
+                  setState(() {
+                    scrollToTop();
+                  });
+                },
+                steps: steps,
+              )
+            ],
           ),
         ),
       ),
@@ -105,7 +116,8 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     }).toList(growable: true);
   }
 
-  Widget buildController(BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+  Widget buildController(BuildContext context,
+      {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Row(
@@ -113,11 +125,14 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
         children: <Widget>[
           RaisedButton(
             onPressed: onStepContinue,
-            child: Text(currentStep != steps.length - 1 ? 'CONTINUE' : 'Register'),
+            child:
+                Text(currentStep != steps.length - 1 ? 'CONTINUE' : 'Register'),
           ),
-          SizedBox(width: 10,),
+          SizedBox(
+            width: 10,
+          ),
           currentStep != 0
-              ? RaisedButton(
+              ? FlatButton(
                   onPressed: onStepCancel,
                   child: const Text('BACK'),
                 )
@@ -135,7 +150,8 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       }
       formKey.currentState.save();
       if (registrationSteps[currentStep].id == personalStepID) {
-        if (_register.sameAsPermanentAddress) _register.currentAddress = _register.permanentAddress;
+        if (_register.sameAsPermanentAddress)
+          _register.currentAddress = _register.permanentAddress;
       }
       FocusScope.of(context).requestFocus(new FocusNode());
       if (currentStep < steps.length - 1) {
@@ -143,7 +159,16 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       } else {
         register();
       }
+      scrollToTop();
     });
+  }
+
+  void scrollToTop() {
+    _scrollController.animateTo(
+      0.0,
+      curve: Curves.easeOut,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
   void register() async {
@@ -152,14 +177,17 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       print(_register.toJson());
       //_register.registered = 1;
       Response res = await api.generateToken(_register.mhtId);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        if (appResponse.data != null && appResponse.data.toString().isNotEmpty) {
+        if (appResponse.data != null &&
+            appResponse.data.toString().isNotEmpty) {
           _register.token = appResponse.data;
           res = await api.register(_register);
           appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
-            await CommonFunction.registerUser(register: _register, context: context, generateToken: false);
+            await CommonFunction.registerUser(
+                register: _register, context: context, generateToken: false);
             Navigator.pushReplacementNamed(context, HomePage.routeName);
           }
         }

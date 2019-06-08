@@ -298,7 +298,7 @@ class LoginPageState extends BaseState<LoginPage> {
               child: TextFormField(
                 controller: mobileController,
                 validator: CommonValidation.mobileValidation,
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   icon: Icon(Icons.call),
                   border: OutlineInputBorder(),
@@ -319,7 +319,7 @@ class LoginPageState extends BaseState<LoginPage> {
               child: TextFormField(
                 controller: emailController,
                 validator: CommonValidation.emailValidation,
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   icon: Icon(Icons.email),
                   border: OutlineInputBorder(),
@@ -492,7 +492,7 @@ class LoginPageState extends BaseState<LoginPage> {
               child: TextFormField(
                 controller: otpController,
                 validator: CommonValidation.otpValidation,
-                keyboardType: TextInputType.text,
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   icon: Icon(Icons.phonelink_lock),
                   border: OutlineInputBorder(),
