@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/message_constant.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/notification/notifcation_setup.dart';
+import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/setup/options.dart';
+import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/wsmodel/appresponse.dart';
 
 class CommonFunction {
   static AppOptionsPage appOptionsPage;
@@ -24,14 +29,60 @@ class CommonFunction {
     }
   }
 
-  static Future<bool> registerUser({@required Register register, BuildContext context}) async {
-    AppSharedPrefUtil.saveToken(register.token);
-    Profile profile = Profile.fromRegisterModel(register);
-    loginUser(profile: profile);
-    AppSharedPrefUtil.saveRegisterProfile(register);
-    AppSharedPrefUtil.saveIsUserRegistered(true);
-    await NotificationSetup.setupNotification(userInfo: register, context: context);
-    return true;
+  static displayInernetNotAvailableDialog({@required BuildContext context}) {
+    if(context != null) {
+      alertDialog(
+        context: context,
+        msg: 'Internet is not available, Please connect to internet and retry',
+        type: 'error',
+        barrierDismissible: false,
+      );
+    }
+  }
+
+  // email Validation
+  static String emailValidation(String value) {
+    String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (value.isEmpty) {
+      return 'Email-Id is required';
+    } else if (!regex.hasMatch(value)) {
+      return 'Enter valid Email-Id';
+    }
+    return null;
+  }
+
+  static String mobileValidation(String value) {
+    if (value.isEmpty) {
+      return 'Mobile no. is required';
+    } else if (value.length != 10) {
+      return 'Enter valid Mobile no.';
+    }
+    return null;
+  }
+
+
+
+  static Future<bool> registerUser({@required Register register, @required BuildContext context, bool generateToken = true}) async {
+    if(generateToken) {
+      ApiService apiService = ApiService();
+      Response res = await apiService.generateToken(register.mhtId);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if(appResponse.status == WSConstant.SUCCESS_CODE) {
+        if (appResponse.data != null && appResponse.data.toString().isNotEmpty)
+          register.token = appResponse.data;
+      }
+    }
+    if(register.token != null) {
+      AppSharedPrefUtil.saveToken(register.token);
+      Profile profile = Profile.fromRegisterModel(register);
+      loginUser(profile: profile);
+      AppSharedPrefUtil.saveRegisterProfile(register);
+      AppSharedPrefUtil.saveIsUserRegistered(true);
+      await NotificationSetup.setupNotification(userInfo: register, context: context);
+      return true;
+    }
+    return false;
   }
 
   static Future<bool> loginUser({@required Profile profile}) async {

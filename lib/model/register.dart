@@ -58,7 +58,7 @@ class Register {
   List<String> holidays;
   Address permanentAddress;
   Address currentAddress;
-
+  bool sameAsPermanentAddress = false;
   Register(
       {this.mhtId,
       this.firstName,
@@ -133,6 +133,7 @@ class Register {
       holidays = tmpHolidays.map((v) => v.toString()).toList(growable: true);
     permanentAddress = json["permanent_address"] != null ? new Address.fromJson(json["permanent_address"]) : null;
     currentAddress = json["current_address"] != null ? new Address.fromJson(json["current_address"]) : null;
+    sameAsPermanentAddress = false;
   }
 
   Map<String, dynamic> toJson() {
@@ -163,13 +164,13 @@ class Register {
     data["job_start_date"] = this.jobStartDate;
     data["company_name"] = this.companyName;
     data["work_city"] = this.workCity;
-    data["skills"] = this.skills;
     data["health"] = this.health;
     data["personal_notes"] = this.personalNotes;
     data["blood_group"] = this.bloodGroup;
     data["tshirt_size"] = this.tshirtSize;
     data["registered"] = this.registered;
-    data["holidays"] = this.holidays;
+    data['skills'] = getFromList(this.skills);
+    data['holidays'] = getFromList(this.holidays);
     if (this.permanentAddress != null) {
       data["permanent_address"] = this.permanentAddress.toJson();
     }
@@ -179,6 +180,12 @@ class Register {
     return data;
   }
 
+  List<dynamic> getFromList(List<dynamic> input) {
+    if(input == null || input.isEmpty)
+      return [""];
+    else
+      return input;
+  }
   @override
   String toString() {
     return "Register{mhtId: $mhtId, firstName: $firstName, middleName: $middleName, lastName: $lastName, bDate: $bDate, gDate: $gDate, center: $center, mobileNo1: $mobileNo1, mobileNo2: $mobileNo2, email: $email, fatherName: $fatherName, fatherGnan: $fatherGnan, fatherGDate: $fatherGDate, fatherMbaApproval: $fatherMbaApproval, brotherCount: $brotherCount, motherName: $motherName, motherGnan: $motherGnan, motherGDate: $motherGDate, motherMbaApproval: $motherMbaApproval, sisterCount: $sisterCount, studyDetail: $studyDetail, occupation: $occupation, jobStartDate: $jobStartDate, companyName: $companyName, workCity: $workCity, skills: $skills, health: $health, personalNotes: $personalNotes, bloodGroup: $bloodGroup, tshirtSize: $tshirtSize, registered: $registered, permanentAddress: $permanentAddress, currentAddress: $currentAddress}";

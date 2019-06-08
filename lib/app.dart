@@ -48,7 +48,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
         });
       } else {
         setState(() {
-          pageToDisplay = FirstPage();
+          pageToDisplay = LoginPage();
         });
       }
     });

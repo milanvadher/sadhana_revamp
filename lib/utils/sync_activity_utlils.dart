@@ -32,6 +32,7 @@ class SyncActivityUtils {
         for (WSSadhanaActivity wsSadhana in wsSadhanaActivity) {
           Sadhana sadhana = sadhanaByServerSName[wsSadhana.name];
           if (sadhana != null) {
+            List<Activity> activityToInsert = [];
             for (WSActivity wsActivity in wsSadhana.data) {
               if (wsActivity.date != null) {
                 Activity activity = Activity(
@@ -41,9 +42,10 @@ class SyncActivityUtils {
                   isSynced: true,
                   remarks: wsActivity.remark,
                 );
-                await _activityDAO.insertOrUpdate(activity);
+                activityToInsert.add(activity);
               }
             }
+            await _activityDAO.batchActivityInsertForSync(sadhana, activityToInsert);
           }
         }
       }

@@ -374,7 +374,7 @@ class HomePageState extends BaseState<HomePage> {
         tooltip: 'MBA Schedule',
       ) : Container(),
       isUserRegistered ? IconButton(
-        icon: Icon(Icons.sync),
+        icon: Icon(Icons.backup),
         onPressed: _onSyncClicked,
         tooltip: 'Sync Data',
       ) : Container(),
