@@ -5,9 +5,11 @@ import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
 import 'package:sadhana/auth/registration/registration_step.dart';
+import 'package:sadhana/auth/registration/seav_info_widget.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
+import 'package:intl/intl.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -65,6 +67,15 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           stopLoading: stopLoading,
         ),
       ),
+      RegistrationStep(
+        title: "Seva Details",
+        builder: SevaInfoWidget(
+          register: _register,
+          startLoading: startLoading,
+          stopLoading: stopLoading,
+        ),
+      ),
+      
     ];
     steps = getSteps(registrationSteps);
   }
@@ -153,7 +164,6 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
         if (_register.sameAsPermanentAddress)
           _register.currentAddress = _register.permanentAddress;
       }
-      FocusScope.of(context).requestFocus(new FocusNode());
       if (currentStep < steps.length - 1) {
         currentStep++;
       } else {

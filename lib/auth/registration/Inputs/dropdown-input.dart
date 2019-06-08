@@ -52,7 +52,7 @@ class DropDownInputState extends State<DropDownInput> {
       },
       onSaved: (value) {
         //widget.onChange(value);
-        FocusScope.of(context).detach();
+        // FocusScope.of(context).detach9();
 
       },
       builder: (

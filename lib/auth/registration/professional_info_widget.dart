@@ -108,6 +108,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
                 Text(
                   Constant.weekName[index],
                   style: TextStyle(
+                    fontSize: 10,
                     color:
                         Theme.of(context).copyWith().textTheme.caption.color,
                   ),
