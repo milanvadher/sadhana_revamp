@@ -17,6 +17,17 @@ class AppUtils {
     return string1?.toLowerCase() == string2?.toLowerCase();
   }
 
+  static bool convertToIntToBool(int input, {bool defaultValue = false}) {
+    if(input == null) {
+      return defaultValue;
+    } else {
+      if(input > 0)
+        return true;
+      else
+        return false;
+    }
+  }
+
   static bool isNumeric(String s) {
     if (s == null) {
       return false;

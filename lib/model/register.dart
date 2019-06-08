@@ -1,3 +1,5 @@
+import 'package:sadhana/utils/apputils.dart';
+
 class OtpData {
   int otp;
   Register profile;
@@ -58,7 +60,8 @@ class Register {
   List<String> holidays;
   Address permanentAddress;
   Address currentAddress;
-  bool sameAsPermanentAddress = true;
+  bool sameAsPermanentAddress = false;
+  SevaProfile sevaProfile;
   Register(
       {this.mhtId,
       this.firstName,
@@ -93,7 +96,8 @@ class Register {
       this.registered,
       this.holidays,
       this.permanentAddress,
-      this.currentAddress});
+      this.currentAddress,
+        this.sevaProfile});
 
   Register.fromJson(Map<String, dynamic> json) {
     mhtId = json["mht_id"];
@@ -127,13 +131,16 @@ class Register {
     bloodGroup = json["blood_group"];
     tshirtSize = json["tshirt_size"];
     registered = json["registered"];
+    sameAsPermanentAddress = AppUtils.convertToIntToBool(json["current_address_same_permanent"]);
     holidays = [];
     List<dynamic> tmpHolidays = json["holidays"];
     if(tmpHolidays != null && tmpHolidays.isNotEmpty)
       holidays = tmpHolidays.map((v) => v.toString()).toList(growable: true);
     permanentAddress = json["permanent_address"] != null ? new Address.fromJson(json["permanent_address"]) : null;
     currentAddress = json["current_address"] != null ? new Address.fromJson(json["current_address"]) : null;
-    sameAsPermanentAddress = true;
+    sevaProfile = json['seva_profile'] != null
+        ? new SevaProfile.fromJson(json['seva_profile'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -169,13 +176,19 @@ class Register {
     data["blood_group"] = this.bloodGroup;
     data["tshirt_size"] = this.tshirtSize;
     data["registered"] = this.registered;
-    data['skills'] = getFromList(this.skills);
-    data['holidays'] = getFromList(this.holidays);
+    data['skills'] = this.skills;
+    data['holidays'] = this.holidays;
+    data['current_address_same_permanent'] = sameAsPermanentAddress ? 1 : 0;
     if (this.permanentAddress != null) {
+      this.permanentAddress.addressType = "Permanent";
       data["permanent_address"] = this.permanentAddress.toJson();
     }
     if (this.currentAddress != null) {
+      this.currentAddress.addressType = 'Current';
       data["current_address"] = this.currentAddress.toJson();
+    }
+    if (this.sevaProfile != null) {
+      data['seva_profile'] = this.sevaProfile.toJson();
     }
     return data;
   }
@@ -249,6 +262,37 @@ class Address {
   String toString() {
     return "Address{addressType: $addressType, addressLine1: $addressLine1, addressLine2: $addressLine2, city: $city, cityDisp: $cityDisp, state: $state, country: $country, pincode: $pincode, emailId: $emailId, phone: $phone}";
   }
+}
 
+class SevaProfile {
+  String regularSevaDept;
+  String eventSevaDept;
+  int timeAvailability;
+  String daysAvailablity;
+  Null remarks;
 
+  SevaProfile(
+      {this.regularSevaDept,
+        this.eventSevaDept,
+        this.timeAvailability,
+        this.daysAvailablity,
+        this.remarks});
+
+  SevaProfile.fromJson(Map<String, dynamic> json) {
+    regularSevaDept = json['regular_seva_dept'];
+    eventSevaDept = json['event_seva_dept'];
+    timeAvailability = json['time_availability'];
+    daysAvailablity = json['days_availablity'];
+    remarks = json['remarks'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['regular_seva_dept'] = this.regularSevaDept;
+    data['event_seva_dept'] = this.eventSevaDept;
+    data['time_availability'] = this.timeAvailability;
+    data['days_availablity'] = this.daysAvailablity;
+    data['remarks'] = this.remarks;
+    return data;
+  }
 }

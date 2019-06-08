@@ -36,14 +36,18 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
   ApiService api = new ApiService();
   List<String> skills = [];
 
+  @override
+  void initState() {
+    super.initState();
+    loadSkills();
+  }
+
   loadSkills() async {
     try {
       Response res = await api.getSkills();
-      AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        Skills.fromJsonList(appResponse.data)
-            .forEach((item) => skills.add(item.name));
+        Skills.fromJsonList(appResponse.data).forEach((item) => skills.add(item.name));
       }
     } catch (error, s) {
       print(error);
@@ -85,9 +89,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         ),
         DateInput(
           labelText: 'Job/Business Start Date',
-          selectedDate: _register.jobStartDate == null
-              ? null
-              : DateTime.parse(_register.jobStartDate),
+          selectedDate: _register.jobStartDate == null ? null : DateTime.parse(_register.jobStartDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.jobStartDate = dateFormatter.format(date);
@@ -109,8 +111,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
                   Constant.weekName[index],
                   style: TextStyle(
                     fontSize: 10,
-                    color:
-                        Theme.of(context).copyWith().textTheme.caption.color,
+                    color: Theme.of(context).copyWith().textTheme.caption.color,
                   ),
                 ),
                 Checkbox(

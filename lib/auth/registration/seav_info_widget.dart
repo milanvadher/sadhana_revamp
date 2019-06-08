@@ -26,6 +26,13 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
   Register _register = new Register();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(_register.sevaProfile == null)
+      _register.sevaProfile = SevaProfile();
+  }
+  @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Column(
@@ -37,7 +44,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
               Text('Regular Seva Department:'),
               TextInputField(
                 labelText: 'Regular Seva Dept.',
-                valueText: _register.personalNotes,
+                valueText: _register.sevaProfile.,
                 onSaved: (value) => _register.personalNotes = value,
               ),
               ListTile(
