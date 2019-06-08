@@ -12,7 +12,7 @@ import 'app.dart';
 import 'constant/constant.dart';
 
 void main() {
-  // schedulePeriodicSync();
+  schedulePeriodicSync();
   initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
 }
 final int periodicID = 0;
