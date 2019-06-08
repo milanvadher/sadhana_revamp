@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
+import 'package:sadhana/auth/registration/customstepper.dart';
 import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
@@ -7,7 +9,6 @@ import 'package:sadhana/auth/registration/registration_step.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
-import 'package:intl/intl.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -33,6 +34,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   bool _autoValidate = false;
   List<RegistrationStep> registrationSteps;
   final String personalStepID = "Personal Info";
+
   @override
   initState() {
     super.initState();
@@ -69,17 +71,20 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
 
   @override
   Widget pageToDisplay() {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Registration'),
-      ),
-      body: SafeArea(
-        child: Stepper(
-          controlsBuilder: buildController,
-          currentStep: currentStep,
-          onStepContinue: onStepContinue,
-          onStepCancel: () => currentStep--,
-          steps: steps,
+    return new WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Registration'),
+        ),
+        body: SafeArea(
+          child: Stepper(
+            controlsBuilder: buildController,
+            currentStep: currentStep,
+            onStepContinue: onStepContinue,
+            onStepCancel: () => currentStep--,
+            steps: steps,
+          ),
         ),
       ),
     );
@@ -132,6 +137,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       if (registrationSteps[currentStep].id == personalStepID) {
         if (_register.sameAsPermanentAddress) _register.currentAddress = _register.permanentAddress;
       }
+      FocusScope.of(context).requestFocus(new FocusNode());
       if (currentStep < steps.length - 1) {
         currentStep++;
       } else {
@@ -144,7 +150,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     startLoading();
     try {
       print(_register.toJson());
-      _register.registered = 1;
+      //_register.registered = 1;
       Response res = await api.generateToken(_register.mhtId);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {

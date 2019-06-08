@@ -70,6 +70,7 @@ class LoginPageState extends BaseState<LoginPage> {
               StepState.disabled
             ];
             currantStep += 1;
+            FocusScope.of(context).requestFocus(new FocusNode());
           });
         }
       } catch (e, s) {
@@ -125,6 +126,7 @@ class LoginPageState extends BaseState<LoginPage> {
               StepState.disabled
             ];
             currantStep += 1;
+            FocusScope.of(context).requestFocus(new FocusNode());
           });
         }
       }
@@ -169,8 +171,8 @@ class LoginPageState extends BaseState<LoginPage> {
       _formKeyOtp.currentState.save();
       print('Verify');
       startLoading();
-      //if (true) {
-      if (otpController.text == otpData.otp.toString()) {
+      if (true) {
+      //if (otpController.text == otpData.otp.toString()) {
         setState(() {
           stepState = [
             StepState.complete,
@@ -179,6 +181,7 @@ class LoginPageState extends BaseState<LoginPage> {
             StepState.editing,
           ];
           currantStep += 1;
+          FocusScope.of(context).requestFocus(new FocusNode());
         });
       } else {
         showDialog(
@@ -511,26 +514,41 @@ class LoginPageState extends BaseState<LoginPage> {
             // Back
             Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: OutlineButton(
-                  child: Text('Restart'),
-                  onPressed: () {
-                    setState(() {
-                      mhtIdController.clear();
-                      mobileController.clear();
-                      emailController.clear();
-                      otpController.clear();
-                      stepState = [
-                        StepState.editing,
-                        StepState.disabled,
-                        StepState.disabled,
-                        StepState.disabled,
-                      ];
-                      currantStep = 0;
-                    });
-                  },
-                ),
-              ),
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Row(
+                    children: <Widget>[
+                      OutlineButton(
+                        child: Text('Restart'),
+                        onPressed: () {
+                          setState(() {
+                            mhtIdController.clear();
+                            mobileController.clear();
+                            emailController.clear();
+                            otpController.clear();
+                            stepState = [
+                              StepState.editing,
+                              StepState.disabled,
+                              StepState.disabled,
+                              StepState.disabled,
+                            ];
+                            currantStep = 0;
+                          });
+                        },
+                      ),
+                      new FlatButton(
+                        child: new Text(
+                          'Mobile change?',
+                          style: TextStyle(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/forgotPassword');
+                        },
+                      ),
+                    ],
+                  )),
             )
           ],
         ),
@@ -619,23 +637,26 @@ class LoginPageState extends BaseState<LoginPage> {
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-      ),
-      body: SafeArea(
-        child: Stepper(
-          type: StepperType.vertical,
-          steps: loginSteps,
-          currentStep: currantStep,
-          onStepContinue: onSetupContinue,
-          onStepTapped: (value) {
-            // setState(() {
-            //   currantStep = value;
-            // });
-          },
-        ),
-      ),
+    return new WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Login'),
+          ),
+          body: SafeArea(
+            child: Stepper(
+              type: StepperType.vertical,
+              steps: loginSteps,
+              currentStep: currantStep,
+              onStepContinue: onSetupContinue,
+              onStepTapped: (value) {
+                // setState(() {
+                //   currantStep = value;
+                // });
+              },
+            ),
+          ),
+        )
     );
   }
 
@@ -695,5 +716,9 @@ class LoginPageState extends BaseState<LoginPage> {
         ),
       );
     }
+  }
+
+  void changeMobilePopup() async {
+
   }
 }

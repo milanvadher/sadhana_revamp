@@ -78,7 +78,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
     showDialog<String>(
         context: context,
         builder: (_) {
-          return ReamarkPickerDialog(
+          return RemarkPickerDialog(
             title: Text(title),
             remark: activity.remarks,
           );
