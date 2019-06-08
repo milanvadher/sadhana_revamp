@@ -56,13 +56,19 @@ class LoginPageState extends BaseState<LoginPage> {
       startLoading();
       try {
         Response res = await api.getUserProfile(mhtIdController.text);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse =
+            AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** Login Data ::: ');
           print(appResponse.data);
           setState(() {
             profileData = Profile.fromJson(appResponse.data);
-            stepState = [StepState.complete, StepState.editing, StepState.disabled, StepState.disabled];
+            stepState = [
+              StepState.complete,
+              StepState.editing,
+              StepState.disabled,
+              StepState.disabled
+            ];
             currantStep += 1;
           });
         }
@@ -83,12 +89,44 @@ class LoginPageState extends BaseState<LoginPage> {
   _sendOtp(BuildContext context) async {
     if (registerMethod == 0 && _formKeyMobile.currentState.validate() ||
         registerMethod == 1 && _formKeyEmail.currentState.validate()) {
-      registerMethod == 0 ? _formKeyMobile.currentState.save() : _formKeyEmail.currentState.validate();
-      if (await _sendOTPAPICall()) {
-        setState(() {
-          stepState = [StepState.complete, StepState.complete, StepState.editing, StepState.disabled];
-          currantStep += 1;
-        });
+      registerMethod == 0
+          ? _formKeyMobile.currentState.save()
+          : _formKeyEmail.currentState.validate();
+      print('Send OTP');
+
+      if ((registerMethod == 0 &&
+              mobileController.text != profileData.mobileNo1) ||
+          (registerMethod == 1 && emailController.text != profileData.email)) {
+        showDialog(
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text('Details did not match'),
+              content: Text(
+                  'Entered Mobile No / Email Id does not match with I-Card Mobile No / Email Id !!! '),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Retry'),
+                )
+              ],
+            );
+          },
+        );
+      } else {
+        if (await _sendOTPAPICall()) {
+          setState(() {
+            stepState = [
+              StepState.complete,
+              StepState.complete,
+              StepState.editing,
+              StepState.disabled
+            ];
+            currantStep += 1;
+          });
+        }
       }
     } else {
       setState(() {
@@ -105,8 +143,10 @@ class LoginPageState extends BaseState<LoginPage> {
     print('Send OTP');
     startLoading();
     try {
-      Response res = await api.sendOTP(mhtIdController.text, emailController.text, mobileController.text);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      Response res = await api.sendOTP(
+          mhtIdController.text, emailController.text, mobileController.text);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         print('***** OTP Data ::: ');
         print(appResponse.data);
@@ -317,7 +357,11 @@ class LoginPageState extends BaseState<LoginPage> {
                   ),
                   getTitleAndName(
                     title: 'Email',
-                    value: profileData != null ? profileData.email.trim().isNotEmpty ? getEmailId() : "" : "",
+                    value: profileData != null
+                        ? profileData.email.trim().isNotEmpty
+                            ? getEmailId()
+                            : ""
+                        : "",
                   ),
                 ],
               ),
@@ -527,11 +571,14 @@ class LoginPageState extends BaseState<LoginPage> {
                   ),
                   getTitleAndName(
                     title: 'Full name',
-                    value: profileData != null ? '${profileData.firstName} ${profileData.lastName}' : "",
+                    value: profileData != null
+                        ? '${profileData.firstName} ${profileData.lastName}'
+                        : "",
                   ),
                   getTitleAndName(
                     title: 'Mobile',
-                    value: profileData != null ? '${profileData.mobileNo1}' : "",
+                    value:
+                        profileData != null ? '${profileData.mobileNo1}' : "",
                   ),
                   getTitleAndName(
                     title: 'Email',
@@ -616,20 +663,22 @@ class LoginPageState extends BaseState<LoginPage> {
       case 3:
         if (otpData.profile.registered == 0) {
           Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RegistrationPage(
-                      registrationData: otpData.profile,
-                    ),
-              ));
+            context,
+            MaterialPageRoute(
+              builder: (context) => RegistrationPage(
+                    registrationData: otpData.profile,
+                  ),
+            ),
+          );
         } else {
           if (otpData.isLoggedIn == 1) {
             CommonFunction.alertDialog(
-                context: context,
-                msg:
-                    "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
-                doneButtonText: 'Yes',
-                doneButtonFn: goToHomePage);
+              context: context,
+              msg:
+                  "You are already logged in other device. You will be logout from that device, Do you want to still process in this device?",
+              doneButtonText: 'Yes',
+              doneButtonFn: goToHomePage,
+            );
           }
         }
         break;
@@ -638,7 +687,8 @@ class LoginPageState extends BaseState<LoginPage> {
 
   goToHomePage() async {
     Navigator.pop(context);
-    if (await CommonFunction.registerUser(register: otpData.profile, context: context)) {
+    if (await CommonFunction.registerUser(
+        register: otpData.profile, context: context)) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => HomePage(),
