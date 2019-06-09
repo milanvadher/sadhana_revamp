@@ -88,6 +88,7 @@ class DropDownInputState extends State<DropDownInput> {
             child: new DropdownButton<dynamic>(
               isExpanded: true,
               isDense: true,
+              hint: Text('Select ${widget.labelText}'),
               items:  getDropDownMenuItem(widget.valuesByLabel),
               onChanged: (value) {
                 state.didChange(value);
