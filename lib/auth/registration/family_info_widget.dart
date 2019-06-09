@@ -35,6 +35,19 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           valueText: _register.fatherName,
         ),
         RadioInput(
+          lableText: 'Father MBA Approval',
+          radioValue: _register.fatherMbaApproval,
+          radioData: [
+            {'lable': 'Yes', 'value': 1},
+            {'lable': 'No', 'value': 0},
+          ],
+          handleRadioValueChange: (value) {
+            setState(() {
+              _register.fatherMbaApproval = value;
+            });
+          },
+        ),
+        RadioInput(
           lableText: 'Is your Father taken gnan ? ',
           radioValue: _register.fatherGnan,
           radioData: [
@@ -58,23 +71,23 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
             });
           },
         ),
+        TextInputField(
+          enabled: true,
+          labelText: 'Mother Name',
+          valueText: _register.motherName,
+        ),
         RadioInput(
-          lableText: 'Father MBA Approval',
-          radioValue: _register.fatherMbaApproval,
+          lableText: 'Mother MBA Approval',
+          radioValue: _register.motherMbaApproval,
           radioData: [
             {'lable': 'Yes', 'value': 1},
             {'lable': 'No', 'value': 0},
           ],
           handleRadioValueChange: (value) {
             setState(() {
-              _register.fatherMbaApproval = value;
+              _register.motherMbaApproval = value;
             });
           },
-        ),
-        TextInputField(
-          enabled: true,
-          labelText: 'Mother Name',
-          valueText: _register.motherName,
         ),
         RadioInput(
           lableText: 'Is your Mother taken gnan ? ',
@@ -100,21 +113,6 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
             });
           },
         ),
-        // Mother MBA approval
-        RadioInput(
-          lableText: 'Mother MBA Approval',
-          radioValue: _register.motherMbaApproval,
-          radioData: [
-            {'lable': 'Yes', 'value': 1},
-            {'lable': 'No', 'value': 0},
-          ],
-          handleRadioValueChange: (value) {
-            setState(() {
-              _register.motherMbaApproval = value;
-            });
-          },
-        ),
-        // Brother Count
         DropDownInput(
           items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           labelText: 'No. of Brother(s)',

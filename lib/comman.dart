@@ -30,6 +30,29 @@ class CommonFunction {
     }
   }
 
+  static Widget getTitleAndName({@required String title, @required String value}) {
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: 80,
+            child: Text(
+              '$title : ',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Container(
+            child: Text(
+              '$value',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   static displayInernetNotAvailableDialog({@required BuildContext context}) {
     if (context != null) {
       alertDialog(

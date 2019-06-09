@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class RegistrationStep {
+class AppStep {
   final String id;
   final String title;
   final String subTitle;
   GlobalKey<FormState> formKey;
   final Widget builder;
-  RegistrationStep({
+  AppStep({
     this.id,
     @required this.title,
     formKey,

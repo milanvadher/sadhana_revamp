@@ -268,22 +268,25 @@ class SevaProfile {
   String regularSevaDept;
   String eventSevaDept;
   int timeAvailability;
-  String daysAvailablity;
-  Null remarks;
-
+  List<dynamic> daysAvailability;
+  String remarks;
+  String interest;
   SevaProfile(
       {this.regularSevaDept,
         this.eventSevaDept,
-        this.timeAvailability,
-        this.daysAvailablity,
-        this.remarks});
+        this.timeAvailability = 0,
+        daysAvailability,
+        this.remarks,
+        this.interest
+      }) : this.daysAvailability = daysAvailability ?? List() ;
 
   SevaProfile.fromJson(Map<String, dynamic> json) {
     regularSevaDept = json['regular_seva_dept'];
     eventSevaDept = json['event_seva_dept'];
-    timeAvailability = json['time_availability'];
-    daysAvailablity = json['days_availablity'];
+    timeAvailability = json['time_availability'] ?? 0;
+    daysAvailability = json['days_availability']?? [];
     remarks = json['remarks'];
+    interest = json['interest'];
   }
 
   Map<String, dynamic> toJson() {
@@ -291,8 +294,9 @@ class SevaProfile {
     data['regular_seva_dept'] = this.regularSevaDept;
     data['event_seva_dept'] = this.eventSevaDept;
     data['time_availability'] = this.timeAvailability;
-    data['days_availablity'] = this.daysAvailablity;
+    data['days_availability'] = this.daysAvailability;
     data['remarks'] = this.remarks;
+    data['interest'] = this.interest;
     return data;
   }
 }

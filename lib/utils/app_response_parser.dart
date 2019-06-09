@@ -34,9 +34,11 @@ class AppResponseParser {
         if (context != null) {
           CommonFunction.alertDialog(
             context: context,
-            title: 'Error - ' + appResponse.status.toString(),
+            //title: 'Error - ' + appResponse.status.toString(),
+            title: 'Error',
             msg: appResponse.msg != null ? appResponse.msg : MessageConstant.COMMON_ERROR_MSG,
-            doneButtonText: 'Okay',
+            type: 'error',
+            doneButtonText: 'OK',
           );
         }
       }

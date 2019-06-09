@@ -53,7 +53,7 @@ class Sadhana extends Entity {
     id,
     this.sadhanaName,
     this.index,
-    this.description,
+    this.description = 'Have you done Sadhana?',
     this.type,
     this.targetValue = 1,
     this.isPreloaded = false,

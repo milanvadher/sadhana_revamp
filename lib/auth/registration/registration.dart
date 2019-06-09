@@ -9,7 +9,6 @@ import 'package:sadhana/auth/registration/seav_info_widget.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
-import 'package:intl/intl.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -33,7 +32,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   var dateFormatter = new DateFormat(WSConstant.DATE_FORMAT);
   List<Step> steps = [];
   bool _autoValidate = false;
-  List<RegistrationStep> registrationSteps;
+  List<AppStep> registrationSteps;
   final String personalStepID = "Personal Info";
   ScrollController _scrollController = new ScrollController();
 
@@ -42,7 +41,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     super.initState();
     _register = widget.registrationData;
     registrationSteps = [
-      RegistrationStep(
+      AppStep(
         title: "Personal Information",
         id: personalStepID,
         builder: PersonalInfoWidget(
@@ -51,7 +50,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           stopLoading: stopLoading,
         ),
       ),
-      RegistrationStep(
+      AppStep(
         title: "Family Information",
         builder: FamilyInfoWidget(
           register: _register,
@@ -59,7 +58,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           stopLoading: stopLoading,
         ),
       ),
-      RegistrationStep(
+      AppStep(
         title: "Professional Information",
         builder: ProfessionalInfoWidget(
           register: _register,
@@ -67,8 +66,8 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           stopLoading: stopLoading,
         ),
       ),
-      RegistrationStep(
-        title: "Seva Details",
+      AppStep(
+        title: "Seva Information",
         builder: SevaInfoWidget(
           register: _register,
           startLoading: startLoading,
@@ -112,7 +111,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     );
   }
 
-  List<Step> getSteps(List<RegistrationStep> registrationSteps) {
+  List<Step> getSteps(List<AppStep> registrationSteps) {
     return registrationSteps.map((regStep) {
       return Step(
         title: Text(regStep.title),
@@ -160,6 +159,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
         return;
       }
       formKey.currentState.save();
+      FocusScope.of(context).requestFocus(new FocusNode());
       if (registrationSteps[currentStep].id == personalStepID) {
         if (_register.sameAsPermanentAddress)
           _register.currentAddress = _register.permanentAddress;

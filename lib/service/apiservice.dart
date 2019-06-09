@@ -155,6 +155,13 @@ class ApiService {
     );
   }
 
+  Future<Response> getEducations() async {
+    return await _postApi(
+      url: '/mba.master.education_list',
+      data: {},
+    );
+  }
+
   Future<Response> syncActivity(List<WSSadhanaActivity> wsSadhanaActivity) async {
     Map<String, dynamic> data = {'activity': wsSadhanaActivity.map((v) => v.toJson()).toList() };
     Response res = await _postApi(url: '/mba.sadhana.sync', data: data);

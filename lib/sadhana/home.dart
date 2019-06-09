@@ -253,7 +253,7 @@ class HomePageState extends BaseState<HomePage> {
               ],
             ),
             SizedBox(
-              height: 20,
+              height: 50,
             )
           ],
         ),
@@ -268,7 +268,7 @@ class HomePageState extends BaseState<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  child: Text('Last Sadhana Synced: ' + CacheData.lastSyncTime),
+                  child: Text('Last Sadhana Synced on: ' + CacheData.lastSyncTime),
                 )
               ],
             )
@@ -502,7 +502,7 @@ class HomePageState extends BaseState<HomePage> {
         }
       } else {
         CommonFunction.alertDialog(
-            context: context, msg: "Please connect to internet to sync");
+            context: context, msg: "Please connect to internet to sync", type: 'error');
       }
     } catch (error, s) {
       print(error);
