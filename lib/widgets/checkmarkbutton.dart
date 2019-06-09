@@ -34,9 +34,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-    color = widget.isDisabled
-        ? Colors.grey
-        : theme == Brightness.light
+    color = theme == Brightness.light
             ? widget.sadhana.lColor
             : widget.sadhana.dColor;
     return Container(

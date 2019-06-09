@@ -33,9 +33,7 @@ class _NumberButtonState extends State<NumberButton> {
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-    color = widget.isDisabled
-        ? Colors.grey
-        : theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
+    color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Container(
       color: widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
       child: Container(
