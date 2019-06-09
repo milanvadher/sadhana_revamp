@@ -3,11 +3,13 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/auth/registration/Inputs/combobox-input.dart';
 import 'package:sadhana/auth/registration/Inputs/date-input.dart';
+import 'package:sadhana/auth/registration/Inputs/dropdown-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/education.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/skill.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -35,11 +37,12 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
   var dateFormatter = new DateFormat(WSConstant.DATE_FORMAT);
   ApiService api = new ApiService();
   List<String> skills = [];
-
+  List<String> educations = [];
   @override
   void initState() {
     super.initState();
     loadSkills();
+    loadEducation();
   }
 
   loadSkills() async {
@@ -47,7 +50,26 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
       Response res = await api.getSkills();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        Skills.fromJsonList(appResponse.data).forEach((item) => skills.add(item.name));
+        setState(() {
+          Skills.fromJsonList(appResponse.data).forEach((item) => skills.add(item.name));
+        });
+
+      }
+    } catch (error, s) {
+      print(error);
+      print(s);
+      CommonFunction.displayErrorDialog(context: context);
+    }
+  }
+
+  loadEducation() async {
+    try {
+      Response res = await api.getEducations();
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        setState(() {
+          Education.fromJsonList(appResponse.data).forEach((item) => educations.add(item.education));
+        });
       }
     } catch (error, s) {
       print(error);
@@ -62,16 +84,16 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
     return Column(
       children: <Widget>[
         // Education Qualification
-        /*DropDownInput(
-            items: ["Bachelor"],
+        DropDownInput(
+            items: educations,
             labelText: 'Education Qualification',
-            valueText: _register.studyDetail,
+            valueText: _register.studyDetail ?? null,
             onChange: (value) {
               setState(() {
                 _register.studyDetail = value;
               });
             },
-          ),*/
+          ),
         RadioInput(
           lableText: 'Occupation',
           radioValue: _register.occupation,
@@ -95,6 +117,12 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
               _register.jobStartDate = dateFormatter.format(date);
             });
           },
+        ),
+        TextInputField(
+          labelText: 'Work City',
+          valueText: _register.workCity,
+          onSaved: (value) => _register.workCity = value,
+          isRequiredValidation: true,
         ),
         Container(
           child: ListTile(

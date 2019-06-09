@@ -1,13 +1,13 @@
+import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/auth/registration/seav_info_widget.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
+
 import 'app.dart';
 import 'constant/constant.dart';
 

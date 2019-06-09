@@ -86,7 +86,7 @@ class _AddressInputState extends State<AddressInput> {
               });
               getStateByCountry(country: value, resetState: true);
             },
-            valueText: address.country ?? "",
+            valueText: address.country,
             isRequiredValidation: true,
           ),
           // State

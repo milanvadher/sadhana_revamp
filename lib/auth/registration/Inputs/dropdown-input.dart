@@ -52,8 +52,6 @@ class DropDownInputState extends State<DropDownInput> {
       },
       onSaved: (value) {
         //widget.onChange(value);
-        // FocusScope.of(context).detach9();
-
       },
       builder: (
           FormFieldState<dynamic> state,
@@ -93,9 +91,6 @@ class DropDownInputState extends State<DropDownInput> {
               items:  getDropDownMenuItem(widget.valuesByLabel),
               onChanged: (value) {
                 state.didChange(value);
-                /*setState(() {
-                  _town = newValue;
-                });*/
                 FocusScope.of(context).requestFocus(new FocusNode());
                 widget.onChange(value);
               },

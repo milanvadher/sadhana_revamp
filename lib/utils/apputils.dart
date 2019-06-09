@@ -17,6 +17,10 @@ class AppUtils {
     return string1?.toLowerCase() == string2?.toLowerCase();
   }
 
+  static bool isNullOrEmpty(String str) {
+    return str == null || str.trim().isEmpty;
+  }
+
   static bool convertToIntToBool(int input, {bool defaultValue = false}) {
     if(input == null) {
       return defaultValue;
