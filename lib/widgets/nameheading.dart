@@ -27,7 +27,7 @@ class NameHeading extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(10),
           child: MaterialButton(
-              minWidth: headerWidth,
+              // minWidth: headerWidth,
               padding: EdgeInsets.all(0),
               onPressed: () {
                 _onSadhanaHeadingClick();
@@ -39,7 +39,7 @@ class NameHeading extends StatelessWidget {
                     child: Icon(Icons.data_usage, color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor),
                   ),
                   Container(
-                    width: headerWidth - 54,
+                    // width: headerWidth - 54,
                     child: Tooltip(
                       message: '$title',
                       child: Text(

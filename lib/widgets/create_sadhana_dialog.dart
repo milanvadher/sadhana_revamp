@@ -173,8 +173,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                       )
                     : TimeOfDay(hour: 7, minute: 0),
                 decoration: InputDecoration(
-                  labelText: _getReminderText(),
-                  hasFloatingPlaceholder: false,
+                  labelText: 'Reminder',
+                  hasFloatingPlaceholder: true,
                   hintText: "Reminder",
                 ),
                 onChanged: (dt) => setState(
