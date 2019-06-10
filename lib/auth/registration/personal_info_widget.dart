@@ -98,7 +98,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           valueText: _register.mobileNo2,
           textInputType: TextInputType.phone,
           onSaved: (value) => _register.mobileNo2 = value,
-          validation: (value) => CommonFunction.mobileValidation(value,isRequired: false),
+          validation: (value) => CommonFunction.mobileRegexValidator(value, isRequired: false),
         ),
         // Email
         TextInputField(

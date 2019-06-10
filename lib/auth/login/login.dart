@@ -48,9 +48,6 @@ class LoginPageState extends BaseState<LoginPage> {
   initState() {
     super.initState();
     loginState = LoginState();
-    loginState.mhtId = '61758';
-    loginState.mobileNo = '9429520961';
-    loginState.otp = '123456';
   }
 
   List<Step> getSteps() {
@@ -214,10 +211,10 @@ class LoginPageState extends BaseState<LoginPage> {
 
   void onSubmit() {
     if (loginState.mobileChangeRequestStart) {
-      restart();
+      return restart();
     }
-    if (true) {
-    //if (otpData.profile.registered == 0) {
+    //if (true) {
+    if (otpData.profile.registered == 0) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -343,8 +340,8 @@ class LoginPageState extends BaseState<LoginPage> {
   }
 
   bool _verify(BuildContext context) {
-    if (true) {
-    //if (loginState.otp == otpData.otp.toString()) {
+    //if (true) {
+    if (loginState.otp == otpData.otp.toString()) {
       return true;
     } else {
       showDialog(

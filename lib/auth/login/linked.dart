@@ -41,9 +41,9 @@ class LinkedWidget extends StatelessWidget {
                     children: <Widget>[
                       CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mht Id', value: '${profileData.mhtId}'),
                       CommonFunction.getTitleAndName(screenWidth: screenWidth,
-                          title: 'Full name', value: '${profileData.firstName} ${profileData.lastName}'),
-                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mobile', value: profileData.mobileNo1 == null ? '' : '${profileData.mobileNo1}'),
-                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Email', value: profileData.email == null ? '' : '${profileData.email}'),
+                          title: 'Full name', value: '${profileData.firstName} ${profileData.lastName?? ""}'),
+                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mobile', value: '${profileData.mobileNo1?? ""}'),
+                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Email', value: '${profileData.email?? ""}'),
                     ],
                   ),
                 ),

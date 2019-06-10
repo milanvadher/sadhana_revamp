@@ -88,6 +88,17 @@ class CommonFunction {
     }
     return null;
   }
+  static String mobileRegexValidator(String value, {bool isRequired = true}) {
+    if (isRequired && value.isEmpty) {
+      return 'Mobile no. is required';
+    }  else if (!AppUtils.isNullOrEmpty(value)) {
+      Pattern pattern = r'^(?:[+0]9)?[0-9]{10}$';
+      RegExp regex = new RegExp(pattern);
+      if (!regex.hasMatch(value))
+        return 'Enter Valid Mobile Number';
+    }
+    return null;
+  }
 
   static Future<bool> registerUser(
       {@required Register register,

@@ -499,8 +499,7 @@ class HomePageState extends BaseState<HomePage> {
               msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
-        CommonFunction.alertDialog(
-            context: context, msg: "Please connect to internet to sync", type: 'error');
+        CommonFunction.displayInernetNotAvailableDialog(context: context);
       }
     } catch (error, s) {
       print(error);
