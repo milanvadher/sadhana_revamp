@@ -131,7 +131,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     CommonFunction.alertDialog(
         context: context,
         title: 'Are you sure ?',
-        msg: "Do you want to delete Sadhana and all data?",
+        msg: "Do you want to delete ${sadhana.sadhanaName} and its data?",
         showCancelButton: true,
         doneButtonFn: deleteSadhana);
   }

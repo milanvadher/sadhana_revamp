@@ -9,6 +9,7 @@ class LinkedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return profileData != null
         ? Column(
             children: <Widget>[
@@ -38,10 +39,11 @@ class LinkedWidget extends StatelessWidget {
                   alignment: Alignment.bottomLeft,
                   child: Column(
                     children: <Widget>[
-                      CommonFunction.getTitleAndName(title: 'Mht Id', value: '${profileData.mhtId}'),
-                      CommonFunction.getTitleAndName(title: 'Full name', value: '${profileData.firstName} ${profileData.lastName}'),
-                      CommonFunction.getTitleAndName(title: 'Mobile', value: '${profileData.mobileNo1}'),
-                      CommonFunction.getTitleAndName(title: 'Email', value: '${profileData.email}'),
+                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mht Id', value: '${profileData.mhtId}'),
+                      CommonFunction.getTitleAndName(screenWidth: screenWidth,
+                          title: 'Full name', value: '${profileData.firstName} ${profileData.lastName?? ""}'),
+                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mobile', value: '${profileData.mobileNo1?? ""}'),
+                      CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Email', value: '${profileData.email?? ""}'),
                     ],
                   ),
                 ),

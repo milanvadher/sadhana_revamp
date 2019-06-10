@@ -12,6 +12,7 @@ import 'package:sadhana/model/country.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class PersonalInfoWidget extends StatefulWidget {
@@ -80,17 +81,24 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           enabled: false,
           labelText: 'Full Name',
           valueText:
-              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
+              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName?? ""}',
         ),
         // Mobile
-        NumberInput(
-          enabled: false,
+        TextInputField(
+          enabled: AppUtils.isNullOrEmpty(_register.mobileNo1) ? true : false,
           labelText: 'Mobile',
           valueText: _register.mobileNo1,
+          textInputType: TextInputType.phone,
+          onSaved: (value) => _register.mobileNo1 = value,
+          validation: (value) => CommonFunction.mobileValidation(value),
         ),
-        NumberInput(
+        TextInputField(
+          enabled: true,
           labelText: 'Alternate Mobile',
           valueText: _register.mobileNo2,
+          textInputType: TextInputType.phone,
+          onSaved: (value) => _register.mobileNo2 = value,
+          validation: (value) => CommonFunction.mobileRegexValidator(value, isRequired: false),
         ),
         // Email
         TextInputField(

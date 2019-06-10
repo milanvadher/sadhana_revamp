@@ -79,7 +79,7 @@ class AppSharedPrefUtil {
 
 
   static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
-    String sLastSyncTime = DateFormat(Constant.APP_DATE_TIME_FORMAT).format(lastSyncTime);
+    String sLastSyncTime = DateFormat(Constant.APP_DATE_FORMAT).format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
     return saveString(SharedPrefConstant.s_last_sync_time, sLastSyncTime);
   }
@@ -149,13 +149,12 @@ class AppSharedPrefUtil {
     if(serverSetting == null) {
       return AppSetting.getDefaulServerAppSetting();
     } else {
-      return json.decode(serverSetting);
+      return AppSetting.fromJson(json.decode(serverSetting));
     }
   }
 
-
   static Future<void> saveServerSetting(AppSetting appSetting) async {
-    await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting));
+    await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting.toJson()));
   }
 
   static Future<String> getMBAScheduleFilePath() async {
@@ -182,6 +181,12 @@ class AppSharedPrefUtil {
     await saveMBAScheduleFilePath(filePath);
     String strDate = DateFormat(Constant.APP_MONTH_FORMAT).format(date);
     await saveMBAScheduleMonth(strDate);
+  }
+
+  static Future<bool> clear() async {
+    await loadPref();
+    _pref.clear();
+    return true;
   }
 
 }

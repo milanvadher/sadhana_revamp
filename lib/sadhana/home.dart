@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
-import 'package:sadhana/auth/login.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -16,9 +15,7 @@ import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
-import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/sadhana.dart';
-import 'package:sadhana/notification/notifcation_setup.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
@@ -31,7 +28,6 @@ import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
-import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:share_extend/share_extend.dart';
 
@@ -175,14 +171,16 @@ class HomePageState extends BaseState<HomePage> {
     CommonFunction.alertDialog(
       closeable: false,
       context: context,
-      msg: "Do you want to load activity of sadhana from server?",
+      title: 'Load Data',
+      msg: "Do you want to load sadhana data from server?",
       doneButtonText: 'Yes',
       cancelButtonText: 'No',
       doneButtonFn: () {
         Navigator.pop(context);
         CommonFunction.alertDialog(
             context: context,
-            msg: "It's takes several minutes, Pls wait to compelete.",
+            title: '',
+            msg: "It may take several minutes, Pls wait till it completes.",
             closeable: false,
             doneButtonText: 'OK',
             type: 'info',
@@ -501,8 +499,7 @@ class HomePageState extends BaseState<HomePage> {
               msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
-        CommonFunction.alertDialog(
-            context: context, msg: "Please connect to internet to sync", type: 'error');
+        CommonFunction.displayInernetNotAvailableDialog(context: context);
       }
     } catch (error, s) {
       print(error);

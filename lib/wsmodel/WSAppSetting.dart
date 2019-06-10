@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:sadhana/utils/app_setting_util.dart';
 
 class AppSetting {
-  static const int DEFAULT_EditableDays = 15;
+  static const int DEFAULT_EditableDays = 4;
   static const int DEFAULT_periodicSyncIntervalInMin = 5;
   String appVersionAndroid;
   String appVersionIos;

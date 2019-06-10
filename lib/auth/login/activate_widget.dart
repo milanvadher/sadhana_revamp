@@ -7,8 +7,8 @@ import 'package:sadhana/utils/apputils.dart';
 
 class ActivateWidget extends StatefulWidget {
   final LoginState loginState;
-
-  const ActivateWidget({Key key, @required this.loginState}) : super(key: key);
+  final Function onMobileChangeClick;
+  const ActivateWidget({Key key, @required this.loginState, this.onMobileChangeClick}) : super(key: key);
 
   @override
   _ActivateWidgetState createState() => _ActivateWidgetState();
@@ -17,41 +17,64 @@ class ActivateWidget extends StatefulWidget {
 class _ActivateWidgetState extends State<ActivateWidget> {
   Profile profileData;
   LoginState loginState;
+  final mobileController = TextEditingController();
+  final emailController = TextEditingController();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loginState = widget.loginState;
+  }
 
   @override
   Widget build(BuildContext context) {
     loginState = widget.loginState;
-    profileData = loginState.profileData;
+    profileData = widget.loginState.profileData;
     return profileData != null
         ? Column(
             children: <Widget>[
               _buildMBAInfo(),
               _buildNote(),
-              _buildMobileEmailWidget(),
+              _buildRadioWidget(),
               _inputForm(),
+              AppUtils.isNullOrEmpty(profileData.mobileNo1) ? Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: new FlatButton(
+                    child: new Text(
+                      'Mobile change request ?',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    onPressed: widget.onMobileChangeClick,
+                  ),
+                ),
+              ): Container(),
             ],
           )
         : Container();
   }
 
   Widget _buildMBAInfo() {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Card(
       child: Container(
         padding: const EdgeInsets.all(10),
         alignment: Alignment.bottomLeft,
         child: Column(
           children: <Widget>[
-            CommonFunction.getTitleAndName(title: 'Mht Id', value: '${profileData.mhtId}'),
-            CommonFunction.getTitleAndName(title: 'Full name', value: getFullName()),
-            CommonFunction.getTitleAndName(title: 'Mobile', value: getMobileNumber()),
-            CommonFunction.getTitleAndName(title: 'Email', value: getEmailId()),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mht Id', value: '${profileData.mhtId}'),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Full name', value: getFullName()),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mobile', value: getMobileNumber()),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Email', value: getEmailId()),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMobileEmailWidget() {
+  Widget _buildRadioWidget() {
     return Card(
       child: Container(
         child: Column(
@@ -81,54 +104,60 @@ class _ActivateWidgetState extends State<ActivateWidget> {
         groupValue: loginState.registerMethod,
         onChanged: (value) {
           setState(() {
-            loginState.registerMethod = value;
-            FocusScope.of(context).requestFocus(new FocusNode());
+            onRadioValueChange(radioValue);
           });
         },
         value: radioValue,
       ),
       onTap: () {
-        setState(() {
-          loginState.registerMethod = radioValue;
-          FocusScope.of(context).requestFocus(new FocusNode());
-        });
+        onRadioValueChange(radioValue);
       },
     );
+  }
+
+  void onRadioValueChange(int selectedValue) {
+    setState(() {
+      loginState.registerMethod = selectedValue;
+      if(loginState.registerMethod == 0)
+        loginState.email = '';
+      else
+        loginState.mobileNo = '';
+    });
+    FocusScope.of(context).requestFocus(new FocusNode());
   }
 
   Widget _inputForm() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       alignment: Alignment.bottomLeft,
-      child: loginState.registerMethod == 0 ? mobileWidget() : emailWidget(),
-    );
-  }
-
-  Widget mobileWidget() {
-    return TextFormField(
-      initialValue: loginState.mobileNo.toString(),
-      validator: CommonValidation.mobileValidation,
-      keyboardType: TextInputType.phone,
-      decoration: const InputDecoration(
-        icon: Icon(Icons.call),
-        border: OutlineInputBorder(),
-        labelText: 'Mobile Number',
-      ),
-      maxLines: 1,
-    );
-  }
-
-  Widget emailWidget() {
-    return TextFormField(
-      initialValue: loginState.email,
-      validator: CommonValidation.emailValidation,
-      keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-        icon: Icon(Icons.email),
-        border: OutlineInputBorder(),
-        labelText: 'Email Id',
-      ),
-      maxLines: 1,
+      child: loginState.registerMethod == 0
+          ? TextFormField(
+              controller: mobileController,
+              //initialValue: loginState.mobileNo.toString(),
+              validator: CommonValidation.mobileValidation,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.call),
+                border: OutlineInputBorder(),
+                labelText: 'Mobile Number',
+              ),
+              maxLines: 1,
+              maxLength: 10,
+              onSaved: (value) => loginState.mobileNo = value,
+            )
+          : TextFormField(
+              controller: emailController,
+              //initialValue: loginState.email,
+              validator: CommonValidation.emailValidation,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.email),
+                border: OutlineInputBorder(),
+                labelText: 'Email Id',
+              ),
+              maxLines: 1,
+              onSaved: (value) => loginState.email = value,
+            ),
     );
   }
 

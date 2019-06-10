@@ -11,6 +11,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class CommonFunction {
@@ -30,7 +31,7 @@ class CommonFunction {
     }
   }
 
-  static Widget getTitleAndName({@required String title, @required String value}) {
+  static Widget getTitleAndName({@required double screenWidth, @required String title, @required String value}) {
     return Container(
       padding: EdgeInsets.all(5),
       child: Row(
@@ -43,6 +44,7 @@ class CommonFunction {
             ),
           ),
           Container(
+            width: screenWidth - 212,
             child: Text(
               '$value',
               style: TextStyle(fontWeight: FontWeight.normal),
@@ -58,7 +60,8 @@ class CommonFunction {
       alertDialog(
         context: context,
         msg: 'Internet is not available, Please connect to internet and retry',
-        type: 'error',
+        type: 'info',
+        title: 'Connect Internet',
         barrierDismissible: false,
       );
     }
@@ -77,11 +80,22 @@ class CommonFunction {
     return null;
   }
 
-  static String mobileValidation(String value) {
-    if (value.isEmpty) {
+  static String mobileValidation(String value, {bool isRequired = true}) {
+    if (isRequired && value.isEmpty) {
       return 'Mobile no. is required';
-    } else if (value.length != 10) {
+    } else if (value.isNotEmpty && value.length != 10) {
       return 'Enter valid Mobile no.';
+    }
+    return null;
+  }
+  static String mobileRegexValidator(String value, {bool isRequired = true}) {
+    if (isRequired && value.isEmpty) {
+      return 'Mobile no. is required';
+    }  else if (!AppUtils.isNullOrEmpty(value)) {
+      Pattern pattern = r'^(?:[+0]9)?[0-9]{10}$';
+      RegExp regex = new RegExp(pattern);
+      if (!regex.hasMatch(value))
+        return 'Enter Valid Mobile Number';
     }
     return null;
   }
@@ -124,7 +138,7 @@ class CommonFunction {
   static alertDialog(
       {@required BuildContext context,
       String type = 'info', // 'success' || 'error'
-      String title,
+      String title = '',
       @required String msg,
       bool showDoneButton = true,
       String doneButtonText = 'OK',
@@ -137,6 +151,7 @@ class CommonFunction {
       Widget widget,
       bool closeable = true}) {
     if (context != null) {
+      String newTitle = title != null ? title : type == 'error' ? 'Error' : type == 'info' ? title : 'Success';
       showDialog(
         context: context,
         barrierDismissible: barrierDismissible,
@@ -144,7 +159,7 @@ class CommonFunction {
           return WillPopScope(
               onWillPop: () async => closeable,
               child: AlertDialog(
-                title: Text(title != null ? title : type == 'error' ? 'Error' : 'Success'),
+                title: AppUtils.isNullOrEmpty(newTitle) ? null : Text(newTitle),
                 contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 15),
                 shape: new RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5.0),

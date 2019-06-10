@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sadhana/auth/login/validate_widget.dart';
 
 class DropDownInput extends StatefulWidget {
   DropDownInput({
@@ -41,43 +42,21 @@ class DropDownInputState extends State<DropDownInput> {
   @override
   Widget build(BuildContext context) {
     selectedValue = widget.valuesByLabel.values.contains(widget.valueText) ? widget.valueText : null;
-    return FormField<dynamic>(
-      initialValue:  selectedValue,
-      validator: (value) {
-        if(widget.isRequiredValidation) {
-          if (selectedValue == null) {
-            return "Select ${widget.labelText}";
-          }
-        }
-      },
-      onSaved: (value) {
-        //widget.onChange(value);
-      },
-      builder: (
-          FormFieldState<dynamic> state,
-          ) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _buildDropDown(state),
-            state.hasError ? Text(
-            state.errorText,
-              style:
-              TextStyle(color: Colors.redAccent.shade700, fontSize: 12.0),
-            ) : Container(),
-          ],
-        );
-      },
+    return ValidateInput(
+      labelText: widget.labelText,
+      isRequiredValidation: widget.isRequiredValidation,
+      inputWidget: _buildDropDown(),
+      selectedValue: selectedValue,
     );
   }
 
-  _buildDropDown(FormFieldState state) {
+  _buildDropDown() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: widget.labelText,
+          //labelText: widget.labelText,
           border: OutlineInputBorder(),
           enabled: widget.enabled,
         ),
@@ -91,7 +70,7 @@ class DropDownInputState extends State<DropDownInput> {
               hint: Text('Select ${widget.labelText}'),
               items:  getDropDownMenuItem(widget.valuesByLabel),
               onChanged: (value) {
-                state.didChange(value);
+                selectedValue = value;
                 FocusScope.of(context).requestFocus(new FocusNode());
                 widget.onChange(value);
               },

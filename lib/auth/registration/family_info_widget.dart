@@ -32,7 +32,9 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
         TextInputField(
           enabled: true,
           labelText: 'Father Name',
+          isRequiredValidation: true,
           valueText: _register.fatherName,
+          onSaved: (value) => _register.fatherName = value,
         ),
         RadioInput(
           lableText: 'Father MBA Approval',
@@ -74,7 +76,9 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
         TextInputField(
           enabled: true,
           labelText: 'Mother Name',
+          isRequiredValidation: true,
           valueText: _register.motherName,
+          onSaved: (value) => _register.motherName = value,
         ),
         RadioInput(
           lableText: 'Mother MBA Approval',

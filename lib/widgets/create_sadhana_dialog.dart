@@ -120,7 +120,6 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
               valueText: des,
               hintText: 'e.g. Have you done sadhana today?',
               enabled: isPreloaded ? false : true,
-              isRequiredValidation: true,
             ),
             widget.isEditMode
                 ? Container()

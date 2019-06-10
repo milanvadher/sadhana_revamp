@@ -13,7 +13,7 @@ class SevaInfoWidget extends StatefulWidget {
   final Function stopLoading;
 
   const SevaInfoWidget(
-      {Key key, this.register, this.startLoading, this.stopLoading})
+      {Key key, @required this.register, this.startLoading, this.stopLoading})
       : super(key: key);
   @override
   State<StatefulWidget> createState() {
@@ -23,18 +23,11 @@ class SevaInfoWidget extends StatefulWidget {
 }
 
 class SevaInfoWidgetState extends State<SevaInfoWidget> {
-  Register _register = new Register();
+  Register _register;
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    if(_register.sevaProfile == null)
-      _register.sevaProfile = SevaProfile();
-  }
-  @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    _register = widget.register;
     return Column(
       children: <Widget>[
         Container(
@@ -44,14 +37,14 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
               Text('Regular Seva Department:'),
               TextInputField(
                 labelText: 'Regular Seva Dept.',
-                valueText: 'Test',
-                onSaved: (value) => _register.personalNotes = value,
+                valueText: _register.sevaProfile.regularSevaDept,
+                onSaved: (value) => _register.sevaProfile.regularSevaDept = value,
               ),
               ListTile(
                 dense: true,
                 contentPadding: EdgeInsets.all(0),
                 subtitle: Text(
-                  'Note: Please Enter the Departments were you currently give seva or have given in past.',
+                  'Note: Please Enter the Departments where you are currently giving seva.',
                   style: TextStyle(
                     color: Colors.red,
                   ),
@@ -68,8 +61,8 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
               Text('Event Based Seva Department:'),
               TextInputField(
                 labelText: 'Event Seva Dept.',
-                valueText: _register.personalNotes,
-                onSaved: (value) => _register.personalNotes = value,
+                valueText: _register.sevaProfile.eventSevaDept,
+                onSaved: (value) => _register.sevaProfile.eventSevaDept = value,
               ),
               ListTile(
                 dense: true,
@@ -96,11 +89,11 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                     width: MediaQuery.of(context).size.width / 4,
                     child: DropDownInput(
                       labelText: 'Hours',
-                      valueText: 1,
-                      items: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                      valueText: _register.sevaProfile.timeAvailability,
+                      items: List.generate(24, (index) => index),
                       onChange: (value) {
                         setState(() {
-                          print(value);
+                          _register.sevaProfile.timeAvailability = value;
                         });
                       },
                     ),
@@ -122,15 +115,13 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                                 onChanged: (value) {
                                   setState(() {
                                     if (value) {
-                                      _register.holidays
-                                          .add(Constant.weekName[index]);
+                                      _register.sevaProfile.daysAvailability.add(Constant.weekName[index]);
                                     } else {
-                                      _register.holidays
-                                          .remove(Constant.weekName[index]);
+                                      _register.sevaProfile.daysAvailability.remove(Constant.weekName[index]);
                                     }
                                   });
                                 },
-                                value: false,
+                                value: _register.sevaProfile.daysAvailability.contains(Constant.weekName[index]),
                                 // value: _register.holidays
                                 //     .contains(Constant.weekName[index]),
                               )
@@ -145,8 +136,8 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
               Text('Remark'),
               TextInputField(
                 labelText: 'Remarks',
-                valueText: _register.personalNotes,
-                onSaved: (value) => _register.personalNotes = value,
+                valueText: _register.sevaProfile.remarks,
+                onSaved: (value) => _register.sevaProfile.remarks = value,
               ),
               ListTile(
                 dense: true,
@@ -169,31 +160,22 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 Text('Interest in Dept/Skill\'s'),
                 TextInputField(
                   labelText: 'Interest in Dept/Skill\'s',
-                  valueText: _register.personalNotes,
-                  onSaved: (value) => _register.personalNotes = value,
+                  valueText: _register.sevaProfile.interest,
+                  onSaved: (value) => _register.sevaProfile.interest = value,
                 ),
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.all(0),
+                  subtitle: Text(
+                    'Note: Please write name of department/skills where you want to give seva in future.',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                )
               ],
             ))
       ],
     );
   }
-
-  // sevaAvailTime() {
-  //   return
-  // }
-
-  // sevaRemarkField() {
-  //   return Container(
-  //     child: Column(
-  //       children: <Widget>[
-  //         Text('Remark'),
-  //         TextInputField(
-  //           labelText: 'Remarks',
-  //           valueText: _register.personalNotes,
-  //           onSaved: (value) => _register.personalNotes = value,
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 }

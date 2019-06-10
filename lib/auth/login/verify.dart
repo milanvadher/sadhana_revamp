@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:sadhana/commonvalidation.dart';
 import 'package:sadhana/model/logindatastate.dart';
 
-class VerifyWidget extends StatefulWidget {
+class VerifyWidget extends StatelessWidget {
   final LoginState loginState;
-
-  const VerifyWidget({Key key, this.loginState}) : super(key: key);
-
-  @override
-  _VerifyWidgetState createState() => _VerifyWidgetState();
-}
-
-class _VerifyWidgetState extends State<VerifyWidget> {
-  _resendOtp() {}
+  final Function resendOtp;
+  final Function onMobileChangeClick;
+  const VerifyWidget({Key key, @required this.loginState, @required this.resendOtp, @required this.onMobileChangeClick})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +22,7 @@ class _VerifyWidgetState extends State<VerifyWidget> {
           padding: const EdgeInsets.symmetric(vertical: 20.0),
           alignment: Alignment.bottomLeft,
           child: TextFormField(
-            initialValue: widget.loginState.otp,
+            initialValue: loginState.otp,
             validator: CommonValidation.otpValidation,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
@@ -36,6 +31,7 @@ class _VerifyWidgetState extends State<VerifyWidget> {
               labelText: 'Enter OTP',
             ),
             maxLines: 1,
+            onSaved: (value) => loginState.otp = value,
           ),
         ),
         Center(
@@ -43,7 +39,7 @@ class _VerifyWidgetState extends State<VerifyWidget> {
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: OutlineButton(
               child: Text('Resend Verification Code'),
-              onPressed: _resendOtp,
+              onPressed: resendOtp,
             ),
           ),
         ),
@@ -58,11 +54,7 @@ class _VerifyWidgetState extends State<VerifyWidget> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              onPressed: () {
-                setState(() {
-                  widget.loginState.mobileChangeRequestStart = true;
-                });
-              },
+              onPressed: onMobileChangeClick,
             ),
           ),
         ),
