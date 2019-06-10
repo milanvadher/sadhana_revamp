@@ -257,7 +257,7 @@ class HomePageState extends BaseState<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: Icon(Icons.add,color: Colors.white),
         onPressed: _onAddSadhanaClick,
         tooltip: 'Add new Sadhana',
       ),

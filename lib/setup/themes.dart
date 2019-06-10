@@ -47,6 +47,9 @@ ThemeData _buildDarkTheme() {
     inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(),
     ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: primaryColor
+    ),
     textTheme: _buildTextTheme(base.textTheme),
     primaryTextTheme: _buildTextTheme(base.primaryTextTheme),
     accentTextTheme: _buildTextTheme(base.accentTextTheme),
