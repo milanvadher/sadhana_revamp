@@ -118,6 +118,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         // B_date
         DateInput(
           labelText: 'Birth Date',
+          isRequiredValidation: true,
           selectedDate:
               _register.bDate == null ? null : DateTime.parse(_register.bDate),
           selectDate: (DateTime date) {
@@ -129,6 +130,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         // G_date
         DateInput(
           labelText: 'Gnan Date',
+          isRequiredValidation: true,
           selectedDate:
               _register.gDate == null ? null : DateTime.parse(_register.gDate),
           selectDate: (DateTime date) {

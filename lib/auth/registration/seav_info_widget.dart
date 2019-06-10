@@ -3,7 +3,6 @@ import 'package:sadhana/auth/registration/Inputs/combobox-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/register.dart';
-import 'package:sadhana/setup/numberpicker.dart';
 
 import 'Inputs/dropdown-input.dart';
 
@@ -17,7 +16,6 @@ class SevaInfoWidget extends StatefulWidget {
       : super(key: key);
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return SevaInfoWidgetState();
   }
 }
