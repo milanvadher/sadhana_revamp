@@ -37,6 +37,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 labelText: 'Regular Seva Dept.',
                 valueText: _register.sevaProfile.regularSevaDept,
                 onSaved: (value) => _register.sevaProfile.regularSevaDept = value,
+                isRequiredValidation: true,
               ),
               ListTile(
                 dense: true,
@@ -61,6 +62,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 labelText: 'Event Seva Dept.',
                 valueText: _register.sevaProfile.eventSevaDept,
                 onSaved: (value) => _register.sevaProfile.eventSevaDept = value,
+                isRequiredValidation: true,
               ),
               ListTile(
                 dense: true,
@@ -160,6 +162,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                   labelText: 'Interest in Dept/Skill\'s',
                   valueText: _register.sevaProfile.interest,
                   onSaved: (value) => _register.sevaProfile.interest = value,
+                  isRequiredValidation: true,
                 ),
                 ListTile(
                   dense: true,

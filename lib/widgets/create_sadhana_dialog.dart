@@ -172,8 +172,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                       )
                     : TimeOfDay(hour: 7, minute: 0),
                 decoration: InputDecoration(
-                  labelText: 'Reminder',
-                  hasFloatingPlaceholder: true,
+                  labelText: _getReminderText(),
+                  hasFloatingPlaceholder: false,
                   hintText: "Reminder",
                 ),
                 onChanged: (dt) => setState(
@@ -252,7 +252,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 RaisedButton(
                   onPressed: onOKClick,
                   color: color,
-                  child: Text('$operation',
+                  child: Text('Save',
                       style: TextStyle(
                           color: theme == Brightness.light
                               ? Colors.white

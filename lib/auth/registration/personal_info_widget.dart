@@ -143,6 +143,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         DropDownInput(
           items: ['A-', 'A+', 'B-', 'B+', 'AB-', 'AB+', 'O-', 'O+'],
           labelText: 'Blood Group',
+          isRequiredValidation: true,
           valueText: _register.bloodGroup,
           onChange: (value) {
             setState(() {
@@ -154,6 +155,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         DropDownInput(
           items: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
           labelText: 'T-shirt Size',
+          isRequiredValidation: true,
           valueText: _register.tshirtSize,
           onChange: (value) {
             setState(() {
