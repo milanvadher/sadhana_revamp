@@ -159,9 +159,10 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
           })),
         ),
         ComboboxInput(
-          lableText: 'Skills',
+          labelText: 'Skills',
           listData: skills,
           selectedData: _register.skills,
+          isRequiredValidation: true,
           handleValueSelect: (value) {
             print('onselect : $value');
             setState(() {

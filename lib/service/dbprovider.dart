@@ -55,5 +55,6 @@ class DBProvider {
     _database.close();
     File file = File(await _getDBPath());
     file.deleteSync();
+    _database = null;
   }
 }

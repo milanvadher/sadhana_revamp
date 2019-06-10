@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:sadhana/attendance/attendance_home.dart';
-import 'package:sadhana/auth/login.dart';
+import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/other/about.dart';
 import 'package:sadhana/sadhana/home.dart';

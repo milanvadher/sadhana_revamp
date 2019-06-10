@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/model/version.dart';
+import 'package:sadhana/service/apiservice.dart';
+import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:synchronized/synchronized.dart';
@@ -10,6 +14,7 @@ import 'package:synchronized/synchronized.dart';
 class AppUpdateCheck {
   static bool isAreladyChecking = false;
   static var lock = new Lock();
+  ApiService api = ApiService();
   static void startAppUpdateCheckThread(BuildContext context) {
     Future.delayed(Duration(seconds: 1), () => AppUpdateCheck().checkForNewAppUpdate(context));
   }
@@ -34,12 +39,20 @@ class AppUpdateCheck {
         Version playStoreVersion = Version(version: appSetting.version);
         if (playStoreVersion.compareTo(currentVersion) > 0) {
           showUpdateDialog(context: context);
-        }
+        } else
+          await checkTokenExpiration(context);
       }
     }
     isAreladyChecking = false;
 
     //}
+  }
+
+  checkTokenExpiration(BuildContext context) async {
+    if(await AppSharedPrefUtil.isUserRegistered()) {
+      Response res = await api.validateToken();
+      AppResponseParser.parseResponse(res, context: context);
+    }
   }
 
   void showUpdateDialog({

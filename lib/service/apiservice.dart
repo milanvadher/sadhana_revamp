@@ -82,7 +82,7 @@ class ApiService {
   Future<Response> changeMobile(String mht_id, String oldNo, String newNo) async {
     Map<String, dynamic> data = {'mht_id': mht_id, 'old_no': oldNo,
       'new_no': newNo};
-    Response res = await _postApi(url: '/mba.user.change_mobile_nos', data: data);
+    Response res = await _postApi(url: '/mba.user.change_mobile_no', data: data);
     return res;
   }
 
@@ -98,6 +98,13 @@ class ApiService {
     //Response res = Response("", 200);
     return res;
   }
+
+  Future<Response> validateToken() async {
+    Map<String, dynamic> data = {};
+    Response res = await _postApi(url: '/mba.user.validate_token', data: data);
+    return res;
+  }
+
 
   Future<Response> updateNotificationToken(
       {@required String mhtId,

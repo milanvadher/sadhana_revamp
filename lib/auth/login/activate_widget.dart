@@ -7,8 +7,8 @@ import 'package:sadhana/utils/apputils.dart';
 
 class ActivateWidget extends StatefulWidget {
   final LoginState loginState;
-
-  const ActivateWidget({Key key, @required this.loginState}) : super(key: key);
+  final Function onMobileChangeClick;
+  const ActivateWidget({Key key, @required this.loginState, this.onMobileChangeClick}) : super(key: key);
 
   @override
   _ActivateWidgetState createState() => _ActivateWidgetState();
@@ -17,7 +17,8 @@ class ActivateWidget extends StatefulWidget {
 class _ActivateWidgetState extends State<ActivateWidget> {
   Profile profileData;
   LoginState loginState;
-
+  final mobileController = TextEditingController();
+  final emailController = TextEditingController();
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -35,22 +36,38 @@ class _ActivateWidgetState extends State<ActivateWidget> {
               _buildNote(),
               _buildRadioWidget(),
               _inputForm(),
+              AppUtils.isNullOrEmpty(profileData.mobileNo1) ? Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: new FlatButton(
+                    child: new Text(
+                      'Mobile change request ?',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    onPressed: widget.onMobileChangeClick,
+                  ),
+                ),
+              ): Container(),
             ],
           )
         : Container();
   }
 
   Widget _buildMBAInfo() {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Card(
       child: Container(
         padding: const EdgeInsets.all(10),
         alignment: Alignment.bottomLeft,
         child: Column(
           children: <Widget>[
-            CommonFunction.getTitleAndName(title: 'Mht Id', value: '${profileData.mhtId}'),
-            CommonFunction.getTitleAndName(title: 'Full name', value: getFullName()),
-            CommonFunction.getTitleAndName(title: 'Mobile', value: getMobileNumber()),
-            CommonFunction.getTitleAndName(title: 'Email', value: getEmailId()),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mht Id', value: '${profileData.mhtId}'),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Full name', value: getFullName()),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Mobile', value: getMobileNumber()),
+            CommonFunction.getTitleAndName(screenWidth: screenWidth, title: 'Email', value: getEmailId()),
           ],
         ),
       ),
@@ -115,7 +132,8 @@ class _ActivateWidgetState extends State<ActivateWidget> {
       alignment: Alignment.bottomLeft,
       child: loginState.registerMethod == 0
           ? TextFormField(
-              initialValue: loginState.mobileNo.toString(),
+              controller: mobileController,
+              //initialValue: loginState.mobileNo.toString(),
               validator: CommonValidation.mobileValidation,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(
@@ -124,10 +142,12 @@ class _ActivateWidgetState extends State<ActivateWidget> {
                 labelText: 'Mobile Number',
               ),
               maxLines: 1,
+              maxLength: 10,
               onSaved: (value) => loginState.mobileNo = value,
             )
           : TextFormField(
-              initialValue: loginState.email,
+              controller: emailController,
+              //initialValue: loginState.email,
               validator: CommonValidation.emailValidation,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(

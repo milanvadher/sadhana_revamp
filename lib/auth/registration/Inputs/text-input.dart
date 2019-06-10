@@ -9,6 +9,7 @@ class TextInputField extends StatelessWidget {
     this.onSaved,
     this.hintText,
     this.validation,
+    this.textInputType = TextInputType.text,
     this.isRequiredValidation = false,
     this.autoFocus = false,
   }) : super(key: key);
@@ -19,6 +20,7 @@ class TextInputField extends StatelessWidget {
   final bool enabled;
   final bool autoFocus;
   final bool isRequiredValidation;
+  final TextInputType textInputType;
   final Function(String) onSaved;
   final Function(String) validation;
   @override
@@ -38,7 +40,7 @@ class TextInputField extends StatelessWidget {
         ),
         initialValue: valueText,
         enabled: enabled,
-        keyboardType: TextInputType.text,
+        keyboardType: textInputType,
         onSaved: (value) {
           if (onSaved != null) onSaved(value);
           return value;

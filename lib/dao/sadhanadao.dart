@@ -7,6 +7,7 @@ import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/apputils.dart';
 
 class SadhanaDAO extends BaseDAO<Sadhana> {
   static ActivityDAO _activityDAO = ActivityDAO();
@@ -27,6 +28,8 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
   }
 
   Future<Sadhana> insertOrUpdate(Sadhana entity) async {
+    if(AppUtils.isNullOrEmpty(entity.description))
+      entity.description = 'Have you done ${entity.sadhanaName} today?';
     Sadhana sadhana = await super.insertOrUpdate(entity);
     CacheData.addSadhanas([sadhana]);
     return sadhana;

@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:sadhana/auth/login/validate_widget.dart';
 
 class ComboboxInput extends StatelessWidget {
   ComboboxInput({
     this.handleValueSelect,
-    this.lableText,
+    this.labelText,
     this.listData,
     this.selectedData,
     this.onDelete,
+    this.isRequiredValidation,
   });
 
   // final String text;
   final Function handleValueSelect;
   final Function onDelete;
-  final String lableText;
+  final String labelText;
   final List<String> listData;
   final List<dynamic> selectedData;
-
+  final bool isRequiredValidation;
   @override
   Widget build(BuildContext context) {
+    return ValidateInput(
+      labelText: labelText,
+      isRequiredValidation: isRequiredValidation,
+      inputWidget: buildCombobox(),
+      selectedValue: selectedData,
+      validator: (value) {
+        if ((value as List).isEmpty) return 'Select $labelText';
+      },
+    );
+  }
+
+  Widget buildCombobox() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
@@ -28,7 +42,7 @@ class ComboboxInput extends StatelessWidget {
             SimpleAutoCompleteTextField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: lableText,
+                labelText: labelText,
               ),
               key: key,
               submitOnSuggestionTap: true,

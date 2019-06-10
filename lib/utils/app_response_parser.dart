@@ -3,11 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/message_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/service/dbprovider.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AppResponseParser {
@@ -18,13 +20,16 @@ class AppResponseParser {
       logout(context);
     } else {
       if (res.statusCode == 500 || res.statusCode == 502)
-        serverResponse = new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
+        serverResponse =
+            new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
       else {
         try {
           serverResponse = ServerResponse.fromJson(json.decode(res.body));
-        } catch (error,s) {
-          print(error);print(s);
-          serverResponse = new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
+        } catch (error, s) {
+          print(error);
+          print(s);
+          serverResponse =
+              new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
         }
       }
       AppResponse appResponse = serverResponse.appResponse;
@@ -63,14 +68,16 @@ class AppResponseParser {
 
   static _exportDB(BuildContext context) async {
     try {
-      DBProvider db = await DBProvider.db;
-
       void logout2() async {
         DBProvider db = await DBProvider.db;
-        await db.deleteDB();
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Navigator.pop(context);
+        db.deleteDB();
+        await AppSharedPrefUtil.clear();
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            ),
+            (_) => false);
       }
 
       File exportedFile = await DBProvider.db.exportDB();
@@ -82,9 +89,10 @@ class AppResponseParser {
           doneButtonFn: logout2,
         );
       }
-    } catch (error,s) {
+    } catch (error, s) {
       print('Error while exporting backup:');
-      print(error);print(s);
+      print(error);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
   }

@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:sadhana/auth/firstpage.dart';
-import 'package:sadhana/auth/login.dart';
+import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/sadhana/home.dart';

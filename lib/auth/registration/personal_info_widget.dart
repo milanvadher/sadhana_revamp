@@ -81,18 +81,24 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           enabled: false,
           labelText: 'Full Name',
           valueText:
-              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName}',
+              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName?? ""}',
         ),
         // Mobile
-        NumberInput(
-          enabled: false,
+        TextInputField(
+          enabled: AppUtils.isNullOrEmpty(_register.mobileNo1) ? true : false,
           labelText: 'Mobile',
           valueText: _register.mobileNo1,
+          textInputType: TextInputType.phone,
+          onSaved: (value) => _register.mobileNo1 = value,
+          validation: (value) => CommonFunction.mobileValidation(value),
         ),
-        NumberInput(
+        TextInputField(
+          enabled: true,
           labelText: 'Alternate Mobile',
           valueText: _register.mobileNo2,
-          onSaved: (value) => _register.mobileNo2 = value != null ? value.toString : '',
+          textInputType: TextInputType.phone,
+          onSaved: (value) => _register.mobileNo2 = value,
+          validation: (value) => CommonFunction.mobileValidation(value,isRequired: false),
         ),
         // Email
         TextInputField(
