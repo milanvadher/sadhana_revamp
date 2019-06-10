@@ -12,6 +12,7 @@ import 'package:sadhana/model/country.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class PersonalInfoWidget extends StatefulWidget {
@@ -91,6 +92,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
         NumberInput(
           labelText: 'Alternate Mobile',
           valueText: _register.mobileNo2,
+          onSaved: (value) => _register.mobileNo2 = value != null ? value.toString : '',
         ),
         // Email
         TextInputField(

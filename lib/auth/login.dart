@@ -9,6 +9,7 @@ import 'package:sadhana/model/register.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
@@ -59,8 +60,7 @@ class LoginPageState extends BaseState<LoginPage> {
       startLoading();
       try {
         Response res = await api.getUserProfile(mhtIdController.text);
-        AppResponse appResponse =
-            AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** Login Data ::: ');
           print(appResponse.data);
@@ -70,7 +70,7 @@ class LoginPageState extends BaseState<LoginPage> {
               StepState.complete,
               StepState.editing,
               StepState.disabled,
-              StepState.disabled
+              StepState.disabled,
             ];
             currantStep += 1;
             FocusScope.of(context).requestFocus(new FocusNode());
@@ -91,23 +91,18 @@ class LoginPageState extends BaseState<LoginPage> {
   }
 
   _sendOtp(BuildContext context) async {
-    if (registerMethod == 0 && _formKeyMobile.currentState.validate() ||
-        registerMethod == 1 && _formKeyEmail.currentState.validate()) {
-      registerMethod == 0
-          ? _formKeyMobile.currentState.save()
-          : _formKeyEmail.currentState.validate();
+    if (registerMethod == 0 && _formKeyMobile.currentState.validate() || registerMethod == 1 && _formKeyEmail.currentState.validate()) {
+      registerMethod == 0 ? _formKeyMobile.currentState.save() : _formKeyEmail.currentState.validate();
       print('Send OTP');
 
-      if ((registerMethod == 0 &&
-              mobileController.text != profileData.mobileNo1) ||
+      if ((registerMethod == 0 && mobileController.text != profileData.mobileNo1) ||
           (registerMethod == 1 && emailController.text != profileData.email)) {
         showDialog(
           context: context,
           builder: (_) {
             return AlertDialog(
               title: Text('Details did not match'),
-              content: Text(
-                  'Entered Mobile No / Email Id does not match with I-Card Mobile No / Email Id !!! '),
+              content: Text('Entered Mobile No / Email Id does not match with I-Card Mobile No / Email Id !!! '),
               actions: <Widget>[
                 FlatButton(
                   onPressed: () {
@@ -122,12 +117,7 @@ class LoginPageState extends BaseState<LoginPage> {
       } else {
         if (await _sendOTPAPICall()) {
           setState(() {
-            stepState = [
-              StepState.complete,
-              StepState.complete,
-              StepState.editing,
-              StepState.disabled
-            ];
+            stepState = [StepState.complete, StepState.complete, StepState.editing, StepState.disabled];
             currantStep += 1;
             FocusScope.of(context).requestFocus(new FocusNode());
           });
@@ -148,10 +138,8 @@ class LoginPageState extends BaseState<LoginPage> {
     print('Send OTP');
     startLoading();
     try {
-      Response res = await api.sendOTP(
-          mhtIdController.text, emailController.text, mobileController.text);
-      AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      Response res = await api.sendOTP(mhtIdController.text, emailController.text, mobileController.text);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         print('***** OTP Data ::: ');
         print(appResponse.data);
@@ -174,8 +162,8 @@ class LoginPageState extends BaseState<LoginPage> {
       _formKeyOtp.currentState.save();
       print('Verify');
       startLoading();
-      // if (true) {
-        if (otpController.text == otpData.otp.toString()) {
+      //if (true) {
+      if (otpController.text == otpData.otp.toString()) {
         setState(() {
           stepState = [
             StepState.complete,
@@ -307,7 +295,7 @@ class LoginPageState extends BaseState<LoginPage> {
                 decoration: const InputDecoration(
                   icon: Icon(Icons.call),
                   border: OutlineInputBorder(),
-                  labelText: 'Mobile Number',
+                  labelText: 'Enter 10 digit Mobile',
                 ),
                 maxLines: 1,
               ),
@@ -338,42 +326,58 @@ class LoginPageState extends BaseState<LoginPage> {
       }
     }
 
+    String getMobileNumber() {
+      if (!AppUtils.isNullOrEmpty(profileData.mobileNo1))
+        return '${profileData.mobileNo1.substring(0, 2)}******${profileData.mobileNo1.substring(profileData.mobileNo1.length - 2, profileData.mobileNo1.length)}';
+      return '';
+    }
+
+    String getFullName() {
+      String fullName = '';
+      if (profileData != null) {
+        if (!AppUtils.isNullOrEmpty(profileData.firstName)) {
+          fullName = '${profileData.firstName.substring(0, 2)}******';
+        }
+        if (!AppUtils.isNullOrEmpty(profileData.lastName)) {
+          fullName = fullName + '${profileData.lastName.substring(0, 2)}******';
+        }
+      }
+      return fullName;
+    }
+
+    String getEmailId() {
+      try {
+        if (!AppUtils.isNullOrEmpty(profileData.email))
+          return '${profileData.email.substring(0, 2)}******'
+              '@${profileData.email.substring(profileData.email.indexOf('@') + 1, profileData.email.indexOf('@') + 3)}******${profileData.email.substring(
+            profileData.email.lastIndexOf('.'),
+            profileData.email.length,
+          )}';
+      } catch (e, s) {
+        print(e);
+        print(s);
+      }
+      return "";
+    }
+
     Widget buildStep2() {
       return Column(
         children: <Widget>[
           Card(
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.bottomLeft,
-              child: Column(
-                children: <Widget>[
-                  getTitleAndName(
-                    title: 'Mht Id',
-                    value: profileData != null ? '${profileData.mhtId}' : "",
-                  ),
-                  getTitleAndName(
-                    title: 'Full name',
-                    value: profileData != null
-                        ? '${profileData.firstName.substring(0, 2)}****** ${profileData.lastName.substring(0, 2)}******'
-                        : "",
-                  ),
-                  getTitleAndName(
-                    title: 'Mobile',
-                    value: profileData != null
-                        ? '${profileData.mobileNo1.substring(0, 2)}******${profileData.mobileNo1.substring(profileData.mobileNo1.length - 2, profileData.mobileNo1.length)}'
-                        : "",
-                  ),
-                  getTitleAndName(
-                    title: 'Email',
-                    value: profileData != null
-                        ? profileData.email.trim().isNotEmpty
-                            ? getEmailId()
-                            : ""
-                        : "",
-                  ),
-                ],
-              ),
-            ),
+            child: profileData != null
+                ? Container(
+                    padding: const EdgeInsets.all(10),
+                    alignment: Alignment.bottomLeft,
+                    child: Column(
+                      children: <Widget>[
+                        getTitleAndName(title: 'Mht Id', value: '${profileData.mhtId}'),
+                        getTitleAndName(title: 'Full name', value: getFullName()),
+                        getTitleAndName(title: 'Mobile', value: getMobileNumber()),
+                        getTitleAndName(title: 'Email', value: getEmailId()),
+                      ],
+                    ),
+                  )
+                : Container(),
           ),
           Card(
             // color: Colors.purple.shade50,
@@ -476,6 +480,7 @@ class LoginPageState extends BaseState<LoginPage> {
       );
     }
 
+    Widget buildMobileChangeStep() {}
     Widget buildStep3() {
       return Form(
         key: _formKeyOtp,
@@ -486,9 +491,7 @@ class LoginPageState extends BaseState<LoginPage> {
             Container(
               padding: const EdgeInsets.all(15.0),
               child: Text(
-                _mobileChangeRequestStart
-                    ? 'Mobile Change Request'
-                    : 'Enter Verification Code',
+                _mobileChangeRequestStart ? 'Mobile Change Request' : 'Enter Verification Code',
                 style: TextStyle(fontSize: 25),
               ),
             ),
@@ -625,14 +628,11 @@ class LoginPageState extends BaseState<LoginPage> {
                   ),
                   getTitleAndName(
                     title: 'Full name',
-                    value: profileData != null
-                        ? '${profileData.firstName} ${profileData.lastName}'
-                        : "",
+                    value: profileData != null ? '${profileData.firstName} ${profileData.lastName}' : "",
                   ),
                   getTitleAndName(
                     title: 'Mobile',
-                    value:
-                        profileData != null ? '${profileData.mobileNo1}' : "",
+                    value: profileData != null ? '${profileData.mobileNo1}' : "",
                   ),
                   getTitleAndName(
                     title: 'Email',
@@ -724,9 +724,16 @@ class LoginPageState extends BaseState<LoginPage> {
                 //   currantStep = value;
                 // });
               },
+              onStepCancel: onStepCancel,
             ),
           ),
         ));
+  }
+
+  void onStepCancel() {
+    setState(() {
+      currantStep--;
+    });
   }
 
   void scrollToTop() {
@@ -737,8 +744,7 @@ class LoginPageState extends BaseState<LoginPage> {
     );
   }
 
-  Widget buildController(BuildContext context,
-      {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+  Widget buildController(BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Row(
@@ -746,19 +752,17 @@ class LoginPageState extends BaseState<LoginPage> {
         children: <Widget>[
           RaisedButton(
             onPressed: onStepContinue,
-            child: Text(currantStep != loginSteps.length - 1
-                ? 'CONTINUE'
-                : _mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
+            child: Text(currantStep != loginSteps.length - 1 ? 'CONTINUE' : _mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
           ),
           SizedBox(
             width: 10,
           ),
-          // currantStep != 0
-          //     ? FlatButton(
-          //         onPressed: onStepCancel,
-          //         child: const Text('BACK'),
-          //       )
-          //     : Container()
+          currantStep == 1
+              ? FlatButton(
+                  onPressed: onStepCancel,
+                  child: const Text('BACK'),
+                )
+              : Container()
         ],
       ),
     );
@@ -802,7 +806,8 @@ class LoginPageState extends BaseState<LoginPage> {
             currantStep = 0;
           });
         }
-        if (otpData.profile.registered == 0) {
+        if (true) {
+          //if (otpData.profile.registered == 0) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -828,8 +833,7 @@ class LoginPageState extends BaseState<LoginPage> {
 
   goToHomePage() async {
     Navigator.pop(context);
-    if (await CommonFunction.registerUser(
-        register: otpData.profile, context: context)) {
+    if (await CommonFunction.registerUser(register: otpData.profile, context: context)) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => HomePage(),

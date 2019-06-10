@@ -4,15 +4,14 @@ import 'package:sadhana/model/logindatastate.dart';
 
 class VerifyWidget extends StatefulWidget {
   final LoginState loginState;
-
-  const VerifyWidget({Key key, this.loginState}) : super(key: key);
+  final Function resnedOtp;
+  const VerifyWidget({Key key, this.loginState, this.resnedOtp}) : super(key: key);
 
   @override
   _VerifyWidgetState createState() => _VerifyWidgetState();
 }
 
 class _VerifyWidgetState extends State<VerifyWidget> {
-  _resendOtp() {}
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +35,7 @@ class _VerifyWidgetState extends State<VerifyWidget> {
               labelText: 'Enter OTP',
             ),
             maxLines: 1,
+            onSaved: (value) => widget.loginState.otp = value,
           ),
         ),
         Center(
@@ -43,7 +43,7 @@ class _VerifyWidgetState extends State<VerifyWidget> {
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: OutlineButton(
               child: Text('Resend Verification Code'),
-              onPressed: _resendOtp,
+              onPressed: widget.resnedOtp,
             ),
           ),
         ),

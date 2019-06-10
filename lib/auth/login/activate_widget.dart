@@ -19,15 +19,21 @@ class _ActivateWidgetState extends State<ActivateWidget> {
   LoginState loginState;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loginState = widget.loginState;
+  }
+
+  @override
   Widget build(BuildContext context) {
     loginState = widget.loginState;
-    profileData = loginState.profileData;
+    profileData = widget.loginState.profileData;
     return profileData != null
         ? Column(
             children: <Widget>[
               _buildMBAInfo(),
               _buildNote(),
-              _buildMobileEmailWidget(),
+              _buildRadioWidget(),
               _inputForm(),
             ],
           )
@@ -51,7 +57,7 @@ class _ActivateWidgetState extends State<ActivateWidget> {
     );
   }
 
-  Widget _buildMobileEmailWidget() {
+  Widget _buildRadioWidget() {
     return Card(
       child: Container(
         child: Column(
@@ -81,54 +87,57 @@ class _ActivateWidgetState extends State<ActivateWidget> {
         groupValue: loginState.registerMethod,
         onChanged: (value) {
           setState(() {
-            loginState.registerMethod = value;
-            FocusScope.of(context).requestFocus(new FocusNode());
+            onRadioValueChange(radioValue);
           });
         },
         value: radioValue,
       ),
       onTap: () {
-        setState(() {
-          loginState.registerMethod = radioValue;
-          FocusScope.of(context).requestFocus(new FocusNode());
-        });
+        onRadioValueChange(radioValue);
       },
     );
+  }
+
+  void onRadioValueChange(int selectedValue) {
+    setState(() {
+      loginState.registerMethod = selectedValue;
+      if(loginState.registerMethod == 0)
+        loginState.email = '';
+      else
+        loginState.mobileNo = '';
+    });
+    FocusScope.of(context).requestFocus(new FocusNode());
   }
 
   Widget _inputForm() {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       alignment: Alignment.bottomLeft,
-      child: loginState.registerMethod == 0 ? mobileWidget() : emailWidget(),
-    );
-  }
-
-  Widget mobileWidget() {
-    return TextFormField(
-      initialValue: loginState.mobileNo.toString(),
-      validator: CommonValidation.mobileValidation,
-      keyboardType: TextInputType.phone,
-      decoration: const InputDecoration(
-        icon: Icon(Icons.call),
-        border: OutlineInputBorder(),
-        labelText: 'Mobile Number',
-      ),
-      maxLines: 1,
-    );
-  }
-
-  Widget emailWidget() {
-    return TextFormField(
-      initialValue: loginState.email,
-      validator: CommonValidation.emailValidation,
-      keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-        icon: Icon(Icons.email),
-        border: OutlineInputBorder(),
-        labelText: 'Email Id',
-      ),
-      maxLines: 1,
+      child: loginState.registerMethod == 0
+          ? TextFormField(
+              initialValue: loginState.mobileNo.toString(),
+              validator: CommonValidation.mobileValidation,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.call),
+                border: OutlineInputBorder(),
+                labelText: 'Mobile Number',
+              ),
+              maxLines: 1,
+              onSaved: (value) => loginState.mobileNo = value,
+            )
+          : TextFormField(
+              initialValue: loginState.email,
+              validator: CommonValidation.emailValidation,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                icon: Icon(Icons.email),
+                border: OutlineInputBorder(),
+                labelText: 'Email Id',
+              ),
+              maxLines: 1,
+              onSaved: (value) => loginState.email = value,
+            ),
     );
   }
 

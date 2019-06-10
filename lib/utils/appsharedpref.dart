@@ -149,13 +149,12 @@ class AppSharedPrefUtil {
     if(serverSetting == null) {
       return AppSetting.getDefaulServerAppSetting();
     } else {
-      return json.decode(serverSetting);
+      return AppSetting.fromJson(json.decode(serverSetting));
     }
   }
 
-
   static Future<void> saveServerSetting(AppSetting appSetting) async {
-    await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting));
+    await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting.toJson()));
   }
 
   static Future<String> getMBAScheduleFilePath() async {

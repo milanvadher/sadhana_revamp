@@ -43,7 +43,7 @@ class WSActivity {
   WSActivity({this.value, this.remark, this.date});
 
   WSActivity.fromJson(Map<String, dynamic> json) {
-    value = (json['value'] != null) ? int.parse(json['value']) : 0;
+    value = (json['value'] != null) ? json['value'] : 0;
     remark = json['remark'];
     date = json['sadhana_date'] != null ? DateFormat(WSConstant.DATE_FORMAT).parse(json['sadhana_date']) : null;
     activityTime = json['activity_datetime'] != null

@@ -175,14 +175,16 @@ class HomePageState extends BaseState<HomePage> {
     CommonFunction.alertDialog(
       closeable: false,
       context: context,
-      msg: "Do you want to load activity of sadhana from server?",
+      title: 'Load Data',
+      msg: "Do you want to load sadhana data from server?",
       doneButtonText: 'Yes',
       cancelButtonText: 'No',
       doneButtonFn: () {
         Navigator.pop(context);
         CommonFunction.alertDialog(
             context: context,
-            msg: "It's takes several minutes, Pls wait to compelete.",
+            title: '',
+            msg: "It may take several minutes, Pls wait till it completes.",
             closeable: false,
             doneButtonText: 'OK',
             type: 'info',
