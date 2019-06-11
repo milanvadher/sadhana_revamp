@@ -31,6 +31,8 @@ class AppLocalNotification {
       importance: Importance.Max,
       priority: Priority.High,
       playSound: true,
+      color: Colors.redAccent,
+      largeIcon: "ic_notification",
       //ongoing: true,  // Sticky Notification
     );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
@@ -40,7 +42,6 @@ class AppLocalNotification {
       sadhana.sadhanaName,
       sadhana.description,
       time,
-
       platformChannelSpecifics,
     );
   }
