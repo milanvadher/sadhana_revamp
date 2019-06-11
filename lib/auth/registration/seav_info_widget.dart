@@ -80,7 +80,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('Seva Alailability'),
+              Text('Seva Availability'),
               Row(
                 children: <Widget>[
                   Container(
