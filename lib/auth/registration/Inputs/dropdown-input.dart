@@ -56,13 +56,13 @@ class DropDownInputState extends State<DropDownInput> {
       alignment: Alignment.bottomLeft,
       child: InputDecorator(
         decoration: InputDecoration(
-          //labelText: widget.labelText,
+          labelText: selectedValue != null ? widget.labelText : null,
           hasFloatingPlaceholder: true,
           border: OutlineInputBorder(),
           enabled: widget.enabled,
           hintText: widget.labelText
         ),
-        isEmpty: widget.valuesByLabel == null || widget.valuesByLabel.isEmpty,
+        //isEmpty: widget.valuesByLabel == null || widget.valuesByLabel.isEmpty,
         child: DropdownButtonHideUnderline(
           child: new IgnorePointer(
             ignoring: !widget.enabled,

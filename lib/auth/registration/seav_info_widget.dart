@@ -37,7 +37,6 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 labelText: 'Regular Seva Dept.',
                 valueText: _register.sevaProfile.regularSevaDept,
                 onSaved: (value) => _register.sevaProfile.regularSevaDept = value,
-                isRequiredValidation: true,
               ),
               ListTile(
                 dense: true,
@@ -62,7 +61,6 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 labelText: 'Event Seva Dept.',
                 valueText: _register.sevaProfile.eventSevaDept,
                 onSaved: (value) => _register.sevaProfile.eventSevaDept = value,
-                isRequiredValidation: true,
               ),
               ListTile(
                 dense: true,
@@ -82,7 +80,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text('Seva Alailability'),
+              Text('Seva Availability'),
               Row(
                 children: <Widget>[
                   Container(

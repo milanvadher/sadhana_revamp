@@ -65,7 +65,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
         ),
         DateInput(
           labelText: 'Father Gnan Date',
-          isRequiredValidation: true,
+          isRequiredValidation: _register.fatherGnan == 0 ? false : true,
           enable: _register.fatherGnan == 0 ? false : true,
           selectedDate: _register.fatherGDate == null ? null : DateTime.parse(_register.fatherGDate),
           selectDate: (DateTime date) {
@@ -110,7 +110,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
         ),
         DateInput(
           labelText: 'Mother Gnan Date',
-          isRequiredValidation: true,
+          isRequiredValidation: _register.motherGnan == 0 ? false : true,
           enable: _register.motherGnan == 0 ? false : true,
           selectedDate: _register.motherGDate == null ? null : DateTime.parse(_register.motherGDate),
           selectDate: (DateTime date) {

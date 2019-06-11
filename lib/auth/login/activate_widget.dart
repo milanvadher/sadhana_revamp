@@ -134,7 +134,7 @@ class _ActivateWidgetState extends State<ActivateWidget> {
           ? TextFormField(
               controller: mobileController,
               //initialValue: loginState.mobileNo.toString(),
-              validator: CommonValidation.mobileValidation,
+              validator: mobileValidation,
               keyboardType: TextInputType.phone,
               decoration: const InputDecoration(
                 icon: Icon(Icons.call),
@@ -148,7 +148,7 @@ class _ActivateWidgetState extends State<ActivateWidget> {
           : TextFormField(
               controller: emailController,
               //initialValue: loginState.email,
-              validator: CommonValidation.emailValidation,
+              validator: emailValidation,
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
                 icon: Icon(Icons.email),
@@ -161,6 +161,26 @@ class _ActivateWidgetState extends State<ActivateWidget> {
     );
   }
 
+  static String mobileValidation(String value) {
+    if (value.isEmpty) {
+      return 'Mobile no. is required';
+    } else if (value.length != 10) {
+      return 'Enter valid Mobile no./Email';
+    }
+    return null;
+  }
+
+  // email Validation
+  static String emailValidation(String value) {
+    String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (value.isEmpty) {
+      return 'Email is required';
+    } else if (!regex.hasMatch(value)) {
+      return 'Enter valid Email/Mobile';
+    }
+    return null;
+  }
   Widget _buildNote() {
     return Card(
       // color: Colors.purple.shade50,
