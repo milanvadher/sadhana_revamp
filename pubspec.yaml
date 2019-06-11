@@ -80,7 +80,7 @@ flutter:
   assets:
     - images/logo.png
     - images/logo_dada.png
-    - images/about_logo.png
+    - images/about_logo.jpg
     - assets/icon/calendar-icon.png
 
 

@@ -62,7 +62,7 @@ class AboutState extends BaseState<About> {
       ),
       body: ListView(
         children: <Widget>[
-          Image.asset('images/about_logo.png',),
+          Image.asset('images/about_logo.jpg',),
           SizedBox(
             height: 20,
           ),

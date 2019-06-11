@@ -64,7 +64,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void _getUserSelectedTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isDarkMode = prefs.getBool('isDarkMode') != null ? prefs.getBool('isDarkMode') : true;
+    bool isDarkMode = prefs.getBool('isDarkMode') != null ? prefs.getBool('isDarkMode') : false;
     setState(() {
       _options = AppOptions(theme: isDarkMode ? kDarkAppTheme : kLightAppTheme, platform: defaultTargetPlatform);
     });
