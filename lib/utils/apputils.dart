@@ -151,15 +151,11 @@ class AppUtils {
   static void launchPlaystoreApp() async {
     String appId = await AppSettingUtil.getAppID();
     launch(Constant.BASE_PLAYSTORE_URL + appId);
-    /*LaunchReview.launch(androidAppId: "org.dadabhagwan.AKonnect",
-        iOSAppId: "585027354");*/
   }
 
   static void launchAppstoreApp() async {
     String appId = await AppSettingUtil.getAppID();
     launch(Constant.BASE_APPSTORE_URL);
-    /*LaunchReview.launch(androidAppId: "org.dadabhagwan.AKonnect",
-        iOSAppId: "585027354");*/
   }
 
   static void showInSnackBar(BuildContext context, String value) {

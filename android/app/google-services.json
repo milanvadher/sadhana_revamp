@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "208680760148",
-    "firebase_url": "https://sadhana-1146a.firebaseio.com",
-    "project_id": "sadhana-1146a",
-    "storage_bucket": "sadhana-1146a.appspot.com"
+    "project_number": "423174894",
+    "firebase_url": "https://sadhana-sheelsadhak.firebaseio.com",
+    "project_id": "sadhana-sheelsadhak",
+    "storage_bucket": "sadhana-sheelsadhak.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:208680760148:android:4e9e9438aee15094",
+        "mobilesdk_app_id": "1:423174894:android:689fc36fa117d263",
         "android_client_info": {
-          "package_name": "org.dadabhagwan.sadhana"
+          "package_name": "org.sheelsadhak.sadhana"
         }
       },
       "oauth_client": [
         {
-          "client_id": "208680760148-mbuk0mvgvkmj5vnshbam8o1h7412efb8.apps.googleusercontent.com",
+          "client_id": "423174894-b3lqpcj55qnoq38ibuhu16ssn6cr7842.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCDLeWTL4p3PSJvxk7Z0jk2OQg6fr-BKtM"
+          "current_key": "AIzaSyAzI7dfnlJZc6lIM0mRhSwJaUaK0nO-Dy8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "208680760148-mbuk0mvgvkmj5vnshbam8o1h7412efb8.apps.googleusercontent.com",
+              "client_id": "423174894-b3lqpcj55qnoq38ibuhu16ssn6cr7842.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

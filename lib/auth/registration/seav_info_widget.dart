@@ -128,12 +128,24 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                         },
                       ),
                     ),
-                  )
+                  ),
+
                 ],
               ),
-              Text('Remark'),
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.all(0),
+                subtitle: Text(
+                  'How much time(days/hours) you can be available for seva?',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15,),
+              Text('Seva Availability more details'),
               TextInputField(
-                labelText: 'Remarks',
+                labelText: 'Seva Availability more details',
                 valueText: _register.sevaProfile.remarks,
                 onSaved: (value) => _register.sevaProfile.remarks = value,
               ),
@@ -141,7 +153,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 dense: true,
                 contentPadding: EdgeInsets.all(0),
                 subtitle: Text(
-                  'Note: Please give details in remarks. eg., 4Hrs on weekends',
+                  'Note: Please give seva availability more details. eg., Can give 1 hrs seva in weekdays and 4 hrs seva on weekends.',
                   style: TextStyle(
                     color: Colors.red,
                   ),

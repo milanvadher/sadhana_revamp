@@ -32,7 +32,7 @@ class AppLocalNotification {
       priority: Priority.High,
       playSound: true,
       color: Colors.redAccent,
-      largeIcon: "ic_notification",
+      largeIcon: "ic_launcher",
       //ongoing: true,  // Sticky Notification
     );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();

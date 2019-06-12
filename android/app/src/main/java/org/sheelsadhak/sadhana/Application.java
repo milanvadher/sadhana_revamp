@@ -1,4 +1,4 @@
-package org.dadabhagwan.sadhana;
+package org.sheelsadhak.sadhana;
 
 import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.PluginRegistry;
