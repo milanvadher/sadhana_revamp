@@ -156,6 +156,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     setState(() {
       GlobalKey<FormState> formKey = registrationSteps[currentStep].formKey;
       if (!formKey.currentState.validate()) {
+        CommonFunction.alertDialog(context: context, msg: "Please fill details for required fields", title: '', type: 'error',);
         return;
       }
       formKey.currentState.save();

@@ -50,7 +50,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           },
         ),
         RadioInput(
-          lableText: 'Is your Father taken gnan ? ',
+          lableText: 'Has your Father taken gnan ? ',
           radioValue: _register.fatherGnan,
           radioData: [
             {'lable': 'Yes', 'value': 1},
@@ -95,7 +95,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           },
         ),
         RadioInput(
-          lableText: 'Is your Mother taken gnan ? ',
+          lableText: 'Has your Mother taken gnan ? ',
           radioValue: _register.motherGnan,
           radioData: [
             {'lable': 'Yes', 'value': 1},

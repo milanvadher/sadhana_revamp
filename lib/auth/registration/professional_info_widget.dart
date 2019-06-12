@@ -178,15 +178,15 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
           },
         ),
         TextInputField(
-          labelText: 'Comapny Name',
+          labelText: 'Company Name',
           valueText: _register.companyName,
           onSaved: (value) => _register.companyName = value,
         ),
-        TextInputField(
+        /*TextInputField(
           labelText: 'Health',
           valueText: _register.health,
           onSaved: (value) => _register.health = value,
-        ),
+        ),*/
         TextInputField(
           labelText: 'Remarks',
           valueText: _register.personalNotes,

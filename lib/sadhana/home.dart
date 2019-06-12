@@ -399,7 +399,17 @@ class HomePageState extends BaseState<HomePage> {
               tooltip: 'Sync Data',
             )
           : Container(),
-      PopupMenuButton(
+      IconButton(
+        icon: Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => widget.optionsPage),
+          );
+        },
+        tooltip: 'Options',
+      ),
+      /*PopupMenuButton(
         onSelected: (value) {
           handleOptionClick(value);
         },
@@ -427,16 +437,16 @@ class HomePageState extends BaseState<HomePage> {
               ),
               value: 'options',
             ),
-            /*PopupMenuItem(
+            *//*PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.data_usage, color: Colors.orange),
                 title: Text('Attendance App'),
               ),
               value: 'attendance',
-            ),*/
+            ),*//*
           ];
         },
-      )
+      )*/
     ];
   }
 

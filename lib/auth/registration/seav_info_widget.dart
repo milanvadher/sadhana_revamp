@@ -153,7 +153,7 @@ class SevaInfoWidgetState extends State<SevaInfoWidget> {
                 dense: true,
                 contentPadding: EdgeInsets.all(0),
                 subtitle: Text(
-                  'Note: Please give seva availability more details. eg., Can give 1 hrs seva in weekdays and 4 hrs seva on weekends.',
+                  'Note: Please give more details on seva availability. eg., Can give 1 hrs seva in weekdays and 4 hrs seva on weekends.',
                   style: TextStyle(
                     color: Colors.red,
                   ),
