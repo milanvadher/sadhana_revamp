@@ -13,13 +13,15 @@ class AppSetting {
   String get version => Platform.isIOS ? appVersionIos : appVersionAndroid;
   bool allowSyncFromServer;
   bool forceSync;
+  bool showCSVOption = false;
   AppSetting(
       {this.appVersionAndroid,
       this.appVersionIos,
       this.editableDays =  DEFAULT_EditableDays,
       this.serverDate,
       this.periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin,
-      this.allowSyncFromServer = false});
+      this.allowSyncFromServer = false,
+      this.showCSVOption = false});
 
   static Future<AppSetting> getDefaulServerAppSetting() async {
     String appVersion = await AppSettingUtil.getAppVersion();
@@ -38,6 +40,8 @@ class AppSetting {
     forceSync = false;
     if(json['forceSync'] != null)
       forceSync = json['forceSync'] > 0 ? true : false;
+    if(json['showcsv_option'] != null)
+      showCSVOption = json['showcsv_option'] > 0 ? true : false;
   }
 
   Map<String, dynamic> toJson() {
@@ -48,6 +52,7 @@ class AppSetting {
     data['server_date'] = this.serverDate;
     data['allow_sync_from_server'] = this.allowSyncFromServer ? 1 : 0;
     data['forceSync'] = this.forceSync ? 1 : 0;
+    data['forceSync'] = this.showCSVOption ? 1 : 0;
     return data;
   }
 }

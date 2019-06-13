@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -43,13 +44,18 @@ class About extends StatefulWidget {
 
 class AboutState extends BaseState<About> {
   String appVersion = '';
-
+  String mhtid = '';
   AboutState() {
     isLoading = true;
     AppSettingUtil.getAppVersion().then((version) {
       setState(() {
         appVersion = version;
         isLoading = false;
+      });
+    });
+    CacheData.getUserProfile().then((profile) {
+      setState(() {
+        mhtid = profile.mhtId;
       });
     });
   }
@@ -95,6 +101,8 @@ class AboutState extends BaseState<About> {
                   text: "mbaapps@googlegroups.com",
                   url: "mailto:" + Constant.MBA_MAILID + "?subject=Bug Report of Sadhana",
                 ),
+                SizedBox(height: 30),
+                Text("MHT ID: $mhtid", style: TextStyle(fontSize: 14),),
               ],
             ),
           )

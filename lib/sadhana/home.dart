@@ -66,7 +66,7 @@ class HomePageState extends BaseState<HomePage> {
   int sadhanaIndex = 0;
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   bool isUserRegistered = false;
-
+  bool showCSVOption = false;
   @override
   void initState() {
     super.initState();
@@ -79,6 +79,11 @@ class HomePageState extends BaseState<HomePage> {
     AppSharedPrefUtil.isUserRegistered().then((isUserRegisterd) {
       setState(() {
         this.isUserRegistered = isUserRegisterd;
+      });
+    });
+    AppSettingUtil.getServerAppSetting().then((appSetting) {
+      setState(() {
+        showCSVOption = appSetting.showCSVOption;
       });
     });
     subscribeConnnectivityChange();
@@ -399,17 +404,8 @@ class HomePageState extends BaseState<HomePage> {
               tooltip: 'Sync Data',
             )
           : Container(),
-      IconButton(
-        icon: Icon(Icons.settings),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => widget.optionsPage),
-          );
-        },
-        tooltip: 'Options',
-      ),
-      /*PopupMenuButton(
+      showCSVOption ?
+      PopupMenuButton(
         onSelected: (value) {
           handleOptionClick(value);
         },
@@ -437,16 +433,18 @@ class HomePageState extends BaseState<HomePage> {
               ),
               value: 'options',
             ),
-            *//*PopupMenuItem(
-              child: ListTile(
-                trailing: Icon(Icons.data_usage, color: Colors.orange),
-                title: Text('Attendance App'),
-              ),
-              value: 'attendance',
-            ),*//*
           ];
         },
-      )*/
+      ) : IconButton(
+        icon: Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => widget.optionsPage),
+          );
+        },
+        tooltip: 'Options',
+      )
     ];
   }
 
