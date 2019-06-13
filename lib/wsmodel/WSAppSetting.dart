@@ -40,8 +40,8 @@ class AppSetting {
     forceSync = false;
     if(json['forceSync'] != null)
       forceSync = json['forceSync'] > 0 ? true : false;
-    if(json['showcsv_option'] != null)
-      showCSVOption = json['showcsv_option'] > 0 ? true : false;
+    if(json['show_csv_option'] != null)
+      showCSVOption = json['show_csv_option'] > 0 ? true : false;
   }
 
   Map<String, dynamic> toJson() {
@@ -52,7 +52,7 @@ class AppSetting {
     data['server_date'] = this.serverDate;
     data['allow_sync_from_server'] = this.allowSyncFromServer ? 1 : 0;
     data['forceSync'] = this.forceSync ? 1 : 0;
-    data['forceSync'] = this.showCSVOption ? 1 : 0;
+    data['show_csv_option'] = this.showCSVOption ? 1 : 0;
     return data;
   }
 }
