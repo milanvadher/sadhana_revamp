@@ -7,6 +7,8 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/cachedata.dart';
+import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_file_util.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -30,7 +32,11 @@ class MBAScheduleCheck {
       }
       if(await AppUtils.isInternetConnected()) {
         String date = DateFormat(WSConstant.DATE_FORMAT).format(DateTime.now());
-        Response res = await _apiService.getMBASchedule('Sim-City', date);
+        String center = 'Simandhar City';
+        Profile profile = await CacheData.getUserProfile();
+        if(profile != null && AppUtils.isNullOrEmpty(profile.center))
+          center = profile.center;
+        Response res = await _apiService.getMBASchedule(center, date);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if(appResponse.status == WSConstant.SUCCESS_CODE) {
           String fileUrl = appResponse.data;
