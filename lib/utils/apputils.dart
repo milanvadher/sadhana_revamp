@@ -80,34 +80,32 @@ class AppUtils {
   }
 
   static askForPermission() async {
-    if(await getAndroidOSVersion() >= 23) { //Marshmallow
-      List<PermissionName> permissions = [PermissionName.Storage];
-      if (Platform.isAndroid) {
+    List<PermissionName> permissions = [PermissionName.Storage];
+    if (Platform.isAndroid) {
+      if(await getAndroidOSVersion() >= 23) { //Marshmallow
         await Permission.requestPermissions(permissions);
-      } else {
-        for (PermissionName permissionName in permissions) await Permission.requestSinglePermission(permissionName);
       }
+    } else {
+      for (PermissionName permissionName in permissions) await Permission.requestSinglePermission(permissionName);
     }
   }
 
   static Future<bool> checkPermission() async {
     //await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
     //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
-    if(await getAndroidOSVersion() >= 23) { //Marshmallow
-      await askForPermission();
-      bool checkPermission;
-      if(Platform.isAndroid) {
+    await askForPermission();
+    bool checkPermission;
+    if(Platform.isAndroid) {
+      if(await getAndroidOSVersion() >= 23) {
         List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
-        if(permissions != null && permissions.isNotEmpty) {
-          checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
-        }
-      } else {
-        PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
-        checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
-      }
-      return checkPermission;
+        checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
+      } else
+        checkPermission = true;
+    } else {
+      PermissionStatus permissionStatus = await Permission.getSinglePermissionStatus(PermissionName.Storage);
+      checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
     }
-    return true;
+    return checkPermission;
   }
 
   static bool isLightBrightness(BuildContext context) {

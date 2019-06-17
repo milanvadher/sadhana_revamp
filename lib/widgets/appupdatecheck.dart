@@ -61,7 +61,7 @@ class AppUpdateCheck {
     CommonFunction.alertDialog(
       context: context,
       msg: "New App Version is avaliable.\n You need to update the app to continue ... !!",
-      title: "App Updatee",
+      title: "App Update",
       closeable: false,
       doneButtonText: "Update Now",
       type: 'success',
