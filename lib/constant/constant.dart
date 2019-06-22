@@ -13,7 +13,7 @@ class Constant {
   static final String MBA_MAILID = "mbaapps@googlegroups.com";
 
   static final String BASE_PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=";
-  static final String BASE_APPSTORE_URL = "https://itunes.apple.com/app/id1457589389";
+  static final String BASE_APPSTORE_URL = "https://itunes.apple.com/app/id1469199921";
   // Display activity data for no of days
   static int displayDays = 30;
 

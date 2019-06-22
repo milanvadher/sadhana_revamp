@@ -4,7 +4,6 @@ import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/remark_picker.dart';
-import 'package:vibration/vibration.dart';
 
 class CheckmarkButton extends StatefulWidget {
   Function onClick;

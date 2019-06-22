@@ -8,7 +8,7 @@ import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:vibration/vibration.dart';
+// import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info/device_info.dart';
 
@@ -124,14 +124,14 @@ class AppUtils {
   }
 
   static vibratePhone({int duration}) {
-    Vibration.hasVibrator().then((canVibrate) {
-      if (canVibrate) {
-        if (duration != null && duration > 0)
-          Vibration.vibrate(duration: duration);
-        else
-          Vibration.vibrate();
-      }
-    });
+    // Vibration.hasVibrator().then((canVibrate) {
+    //   if (canVibrate) {
+    //     if (duration != null && duration > 0)
+    //       Vibration.vibrate(duration: duration);
+    //     else
+    //       Vibration.vibrate();
+    //   }
+    // });
   }
 
   static Future<bool> isInternetConnected() async {

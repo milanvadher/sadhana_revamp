@@ -40,7 +40,7 @@ class DBProvider {
   }
 
   Future<File> exportDB() async {
-    if(await AppUtils.checkPermission()) {
+    if(Platform.isIOS || await AppUtils.checkPermission()) {
       Directory documentsDirectory = await getApplicationDocumentsDirectory();
       String path = join(documentsDirectory.path, "Sadhana.db");
       File dbFile = new File(path);

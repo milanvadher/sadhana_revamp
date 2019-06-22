@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:android_alarm_manager/android_alarm_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,7 +13,9 @@ import 'app.dart';
 import 'constant/constant.dart';
 
 void main() {
-  schedulePeriodicSync();
+  if (!Platform.isIOS) {
+    schedulePeriodicSync();
+  }
   initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
 }
 final int periodicID = 0;
