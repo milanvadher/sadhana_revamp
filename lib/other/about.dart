@@ -24,7 +24,7 @@ class _LinkText extends GestureDetector {
             ),
           ),
           onTap: () {
-            launch(url, forceSafariVC: false);
+            launch(url);
           },
         );
 }
@@ -91,7 +91,7 @@ class AboutState extends BaseState<About> {
                 _LinkText(
                   style: linkStyle,
                   text: Constant.MBA_MAILID,
-                  url: "mailto:" + Constant.MBA_MAILID +"?subject=Feedback of Sadhana",
+                  url: "mailto:" + Constant.MBA_MAILID +"?subject=Feedback%20of%20Sadhana",
                 ),
                 SizedBox(height: 40),
                 Text("Send Bug Report to us with screenshots @", style: TextStyle(fontSize: 14),),
@@ -99,7 +99,7 @@ class AboutState extends BaseState<About> {
                 _LinkText(
                   style: linkStyle,
                   text: "mbaapps@googlegroups.com",
-                  url: "mailto:" + Constant.MBA_MAILID + "?subject=Bug Report of Sadhana",
+                  url: "mailto:" + Constant.MBA_MAILID + "?subject=Bug%20Report%20of%20Sadhana",
                 ),
                 SizedBox(height: 30),
                 Text("MHT ID: $mhtid", style: TextStyle(fontSize: 14),),

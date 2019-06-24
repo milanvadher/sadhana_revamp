@@ -24,7 +24,12 @@ class AppFileUtil {
   }
 
   static Future<String> getBackupDir() async {
-    String dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
+    String dir = null;
+    if (Platform.isIOS) {
+      dir = (await getApplicationDocumentsDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
+    } else {
+      dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
+    }
     new Directory('$dir').createSync(recursive: true);
     return dir;
   }

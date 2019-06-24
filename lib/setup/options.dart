@@ -262,9 +262,9 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
       if (exportedFile != null) {
         CommonFunction.alertDialog(context: context, msg: 'Your Backup file is generated at ${exportedFile.path}');
       }
-    } catch (error) {
+    } catch (error, s) {
       print('Error while exporting backup:');
-      print(error);
+      print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
     setState(() {
