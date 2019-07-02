@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/colors.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/version.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -9,17 +11,19 @@ import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
+import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../main.dart';
+
 class AppUpdateCheck {
-  static bool isAreladyChecking = false;
-  static var lock = new Lock();
+  static bool isChecking = false;
   ApiService api = ApiService();
   static void startAppUpdateCheckThread(BuildContext context) {
     Future.delayed(Duration(seconds: 1), () => AppUpdateCheck().checkForNewAppUpdate(context));
   }
 
-  void checkForNewAppUpdate(BuildContext context, {forceSetting = false}) async {
+  void checkForNewAppUpdate(BuildContext context) async {
     /*bool check = true;
     int checkAfter = await AppSharedPrefUtil.getAppUpdateCheckAfter();
     if (checkAfter > 0) {
@@ -30,8 +34,8 @@ class AppUpdateCheck {
       }
     }
     if (checkapp_setting_util.dart) {*/
-    if (await AppUtils.isInternetConnected() && !isAreladyChecking) {
-      isAreladyChecking = true;
+    if (await AppUtils.isInternetConnected() && !isChecking) {
+      isChecking = true;
       AppSetting appSetting = await AppSettingUtil.getServerAppSetting();
       if (appSetting != null && appSetting.version != null) {
         String version = await AppSettingUtil.getAppVersion();
@@ -39,19 +43,34 @@ class AppUpdateCheck {
         Version playStoreVersion = Version(version: appSetting.version);
         if (playStoreVersion.compareTo(currentVersion) > 0) {
           showUpdateDialog(context: context);
-        } else
+        } else {
           await checkTokenExpiration(context);
+          await updateUserRole(context);
+        }
+
       }
     }
-    isAreladyChecking = false;
+    isChecking = false;
 
     //}
   }
 
   checkTokenExpiration(BuildContext context) async {
-    if(await AppSharedPrefUtil.isUserRegistered()) {
+    if (await AppSharedPrefUtil.isUserRegistered()) {
       Response res = await api.validateToken();
       AppResponseParser.parseResponse(res, context: context);
+    }
+  }
+
+  updateUserRole(BuildContext context) async {
+    Response res = await api.getUserRole();
+    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+    if (appResponse.status == WSConstant.SUCCESS_CODE) {
+      UserRole userRole = UserRole.fromJson(appResponse.data);
+      if (userRole != null) {
+        AppSharedPrefUtil.saveUserRole(userRole.role);
+        main();
+      }
     }
   }
 
@@ -66,7 +85,7 @@ class AppUpdateCheck {
       doneButtonText: "Update Now",
       type: 'success',
       doneButtonFn: () {
-        isAreladyChecking = false;
+        isChecking = false;
         onUpdateNow(context);
       },
     );

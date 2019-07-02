@@ -1,6 +1,5 @@
 import 'package:http/http.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path/path.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';

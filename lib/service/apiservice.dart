@@ -13,8 +13,8 @@ import 'package:sadhana/wsmodel/ws_sadhana_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  //static final _baseServerUrl = 'http://52.140.97.54'; //Test
-  static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
+  static final _baseServerUrl = 'http://52.140.97.54'; //Test
+  //static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
   static final _apiUrl = '$_baseServerUrl/api/method';
 
   Map<String, String> headers = {'content-type': 'application/json'};
@@ -103,6 +103,12 @@ class ApiService {
   Future<Response> validateToken() async {
     Map<String, dynamic> data = {};
     Response res = await _postApi(url: '/mba.user.validate_token', data: data);
+    return res;
+  }
+
+  Future<Response> getUserRole() async {
+    Map<String, dynamic> data = {};
+    Response res = await _postApi(url: '/mba.user.get_user_role', data: data);
     return res;
   }
 

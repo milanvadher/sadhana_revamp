@@ -1,7 +1,9 @@
+import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
+import 'package:sadhana/charts/totalstatisticstimebarchart.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
@@ -9,7 +11,6 @@ import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 DateTime now = new DateTime.now();
 
 Map<DateTime, List<bool>> _holidays = {

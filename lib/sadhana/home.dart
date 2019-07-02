@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
+import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -53,7 +54,6 @@ class HomePageState extends BaseState<HomePage> {
   DateTime today = new DateTime(now.year, now.month, now.day);
   DateTime previousMonth = DateTime(now.year, now.month - 1);
   static int durationInDays = Constant.displayDays;
-  List<Sadhana> tmpSadhanas = new List();
   List<Sadhana> sadhanas = new List();
   double headerWidth = 150.0;
   Brightness theme;
@@ -66,7 +66,8 @@ class HomePageState extends BaseState<HomePage> {
   int sadhanaIndex = 0;
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   bool isUserRegistered = false;
-  bool showCSVOption = false;
+  bool showOptionMenu = false;
+  bool isAttendanceCord = false;
   @override
   void initState() {
     super.initState();
@@ -76,20 +77,43 @@ class HomePageState extends BaseState<HomePage> {
       AppUpdateCheck.startAppUpdateCheckThread(context);
     });
     AppUtils.askForPermission();
-    AppSharedPrefUtil.isUserRegistered().then((isUserRegisterd) {
+    AppSharedPrefUtil.isUserRegistered().then((isUserRegistered) {
       setState(() {
-        this.isUserRegistered = isUserRegisterd;
+        this.isUserRegistered = isUserRegistered;
       });
     });
-    AppSettingUtil.getServerAppSetting().then((appSetting) {
+    updateUserRole();
+    /*AppSettingUtil.getServerAppSetting().then((appSetting) {
       setState(() {
         showCSVOption = appSetting.showCSVOption;
       });
-    });
-    subscribeConnnectivityChange();
+    });*/
+    subscribeConnectivityChange();
   }
 
-  void subscribeConnnectivityChange() {
+  updateUserRole() async {
+    if (await AppUtils.isInternetConnected()) {
+      Response res = await _api.getUserRole();
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        UserRole userRole = UserRole.fromJson(appResponse.data);
+        if (userRole != null) {
+          AppSharedPrefUtil.saveUserRole(userRole.role);
+        }
+      }
+    }
+    String role = await AppSharedPrefUtil.getUserRole();
+    if (!AppUtils.isNullOrEmpty(role)) {
+      if (AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role)) {
+        setState(() {
+          showOptionMenu = true;
+          isAttendanceCord = true;
+        });
+      }
+    }
+  }
+
+  void subscribeConnectivityChange() {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
   }
 
@@ -100,17 +124,16 @@ class HomePageState extends BaseState<HomePage> {
       if (!isFirst) {
         print('on Connectivity change');
         await AppSettingUtil.getServerAppSetting(forceFromServer: true);
-        SyncActivityUtils.syncAllUnSyncActivity(context: context);
+        AppUpdateCheck.startAppUpdateCheckThread(context);
         if (await AppSharedPrefUtil.isUserRegistered()) {
+          SyncActivityUtils.syncAllUnSyncActivity(context: context);
           MBAScheduleCheck.getMBASchedule();
-          AppUpdateCheck.startAppUpdateCheckThread(context);
         }
       }
       isFirst = false;
     } catch (error, s) {
-      print(error);
-      print(s);
       print("Error while sync all activity:" + error);
+      print(s);
     }
   }
 
@@ -404,15 +427,15 @@ class HomePageState extends BaseState<HomePage> {
               tooltip: 'Sync Data',
             )
           : Container(),
-      showCSVOption ?
-      PopupMenuButton(
-        onSelected: (value) {
-          handleOptionClick(value);
-        },
-        tooltip: 'Press to get more options',
-        itemBuilder: (BuildContext context) {
-          return [
-            PopupMenuItem(
+      showOptionMenu
+          ? PopupMenuButton(
+              onSelected: (value) {
+                handleOptionClick(value);
+              },
+              tooltip: 'Press to get more options',
+              itemBuilder: (BuildContext context) {
+                return [
+                  /*PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.save_alt, color: Colors.red),
                 title: Text('Save CSV'),
@@ -425,26 +448,36 @@ class HomePageState extends BaseState<HomePage> {
                 title: Text('Share CSV     '),
               ),
               value: 'share_excel',
-            ),
-            PopupMenuItem(
-              child: ListTile(
-                trailing: Icon(Icons.settings, color: Colors.blueGrey),
-                title: Text('Options    '),
-              ),
-              value: 'options',
-            ),
-          ];
-        },
-      ) : IconButton(
-        icon: Icon(Icons.settings),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => widget.optionsPage),
-          );
-        },
-        tooltip: 'Options',
-      )
+            ),*/
+                  PopupMenuItem(
+                    child: ListTile(
+                      trailing: Icon(Icons.settings, color: Colors.blueGrey),
+                      title: Text('Options    '),
+                    ),
+                    value: 'options',
+                  ),
+                  isAttendanceCord
+                      ? PopupMenuItem(
+                          child: ListTile(
+                            trailing: Icon(Icons.assignment_turned_in, color: Colors.blueGrey),
+                            title: Text('Attendance'),
+                          ),
+                          value: 'attendance',
+                        )
+                      : null,
+                ];
+              },
+            )
+          : IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => widget.optionsPage),
+                );
+              },
+              tooltip: 'Options',
+            )
     ];
   }
 
@@ -459,16 +492,29 @@ class HomePageState extends BaseState<HomePage> {
         onShareExcel();
         break;
       case 'options':
-        print('On press options');
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => widget.optionsPage),
         );
         break;
       case 'attendance':
-        Navigator.pushNamed(context, AttendanceHomePage.routeName);
+        onAttendanceClick();
         break;
     }
+  }
+
+  void onAttendanceClick() async {
+    startLoading();
+    if (await AppUtils.isInternetConnected()) {
+      await updateUserRole();
+      if (isAttendanceCord) {
+        stopLoading();
+        Navigator.pushNamed(context, AttendanceHomePage.routeName);
+      }
+    } else {
+      CommonFunction.displayInernetNotAvailableDialog(context: context);
+    }
+    stopLoading();
   }
 
   Future<File> getGeneratedCSVPath(date) async {
@@ -546,6 +592,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
 /*
+List<Sadhana> tmpSadhanas = new List();
   void addSadhana({
     @required int id,
     @required SadhanaType type,

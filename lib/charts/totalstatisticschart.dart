@@ -90,6 +90,7 @@ class TotalStatisticsChart extends StatelessWidget {
           titleStyleSpec: charts.TextStyleSpec(color: color),
         ),
         new charts.PanAndZoomBehavior(),
+        //charts.RangeAnnotation([new charts.LineAnnotationSegment<num>(1, RangeAnnotationAxisType.measure)]),
       ],
       dateTimeFactory: const charts.LocalDateTimeFactory(),
       defaultRenderer: new charts.LineRendererConfig(

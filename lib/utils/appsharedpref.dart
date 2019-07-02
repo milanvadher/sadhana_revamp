@@ -94,9 +94,21 @@ class AppSharedPrefUtil {
     await saveString('token', token);
   }
 
+  static Future<String> getToken() async {
+    return await getString('token');
+  }
+
   static Future<void> saveUserData(String token, String mhtId) async {
     await saveToken(token);
     await saveMhtId(mhtId);
+  }
+
+  static Future<void> saveUserRole(String role) async {
+    await saveString(SharedPrefConstant.s_user_role, role);
+  }
+
+  static Future<String> getUserRole() async {
+    return await getString(SharedPrefConstant.s_user_role);
   }
 
   static Future<bool> isForceSyncRemained() async {
@@ -107,9 +119,7 @@ class AppSharedPrefUtil {
     await saveBoolean(SharedPrefConstant.b_force_sync_remain, isForceSyncRemained);
   }
 
-  static Future<String> getToken() async {
-    return await getString('token');
-  }
+
 
   static Future<void> saveMhtId(String mhtId) async {
     await saveString('mht_id', mhtId);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sadhana/widgets/base_state.dart';
 
 class AttendanceHomePage extends StatefulWidget {
   static const String routeName = '/attendance_home';
@@ -7,7 +8,14 @@ class AttendanceHomePage extends StatefulWidget {
   AttendanceHomePageState createState() => AttendanceHomePageState();
 }
 
-class AttendanceHomePageState extends State<AttendanceHomePage> {
+class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+
   Widget home = Scaffold(
     appBar: AppBar(
       title: Text('AttendanceHome Page'),
@@ -20,7 +28,7 @@ class AttendanceHomePageState extends State<AttendanceHomePage> {
   );
 
   @override
-  Widget build(BuildContext context) {
+  Widget pageToDisplay() {
     return home;
   }
 }
