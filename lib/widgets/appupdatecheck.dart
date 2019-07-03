@@ -68,7 +68,7 @@ class AppUpdateCheck {
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       UserRole userRole = UserRole.fromJson(appResponse.data);
       if (userRole != null) {
-        AppSharedPrefUtil.saveUserRole(userRole.role);
+        AppSharedPrefUtil.saveUserRole(userRole);
         main();
       }
     }

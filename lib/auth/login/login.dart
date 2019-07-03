@@ -258,7 +258,7 @@ class LoginPageState extends BaseState<LoginPage> {
   Future<bool> _loadUserProfile(BuildContext context) async {
     print('Login');
     if (await AppUtils.isInternetConnected()) {
-      startLoading();
+      startOverlay();
       try {
         Response res = await api.getUserProfile(loginState.mhtId);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -269,7 +269,7 @@ class LoginPageState extends BaseState<LoginPage> {
             loginState.profileData = Profile.fromJson(appResponse.data);
             loginState = loginState;
           });
-          stopLoading();
+          stopOverlay();
           return true;
         }
       } catch (e, s) {
@@ -277,7 +277,7 @@ class LoginPageState extends BaseState<LoginPage> {
         print(s);
         CommonFunction.displayErrorDialog(context: context);
       }
-      stopLoading();
+      stopOverlay();
     } else {
       CommonFunction.displayInernetNotAvailableDialog(context: context);
     }
@@ -319,7 +319,7 @@ class LoginPageState extends BaseState<LoginPage> {
 
   Future<bool> _sendOTPAPICall() async {
     print('Send OTP');
-    startLoading();
+    startOverlay();
     try {
       Response res = await api.sendOTP(loginState.mhtId, loginState.email, loginState.mobileNo);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -327,7 +327,7 @@ class LoginPageState extends BaseState<LoginPage> {
         print('***** OTP Data ::: ');
         print(appResponse.data);
         otpData = OtpData.fromJson(appResponse.data);
-        stopLoading();
+        stopOverlay();
         return true;
       }
     } catch (e, s) {
@@ -335,7 +335,7 @@ class LoginPageState extends BaseState<LoginPage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
     return false;
   }
 
@@ -367,11 +367,11 @@ class LoginPageState extends BaseState<LoginPage> {
 
   Future<bool> sumbitMobileChangeReq() async {
     try {
-      startLoading();
+      startOverlay();
       Response res = await api.changeMobile(loginState.mhtId, loginState.profileData.mobileNo1, loginState.newMobile);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse != null && appResponse.status == WSConstant.SUCCESS_CODE) {
-        stopLoading();
+        stopOverlay();
         return true;
       }
     } catch (e, s) {
@@ -379,7 +379,7 @@ class LoginPageState extends BaseState<LoginPage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
     return false;
   }
 

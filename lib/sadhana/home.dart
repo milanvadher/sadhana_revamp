@@ -82,7 +82,8 @@ class HomePageState extends BaseState<HomePage> {
         this.isUserRegistered = isUserRegistered;
       });
     });
-    updateUserRole();
+    loadUserRole();
+    loadUserRoleFromServer();
     /*AppSettingUtil.getServerAppSetting().then((appSetting) {
       setState(() {
         showCSVOption = appSetting.showCSVOption;
@@ -91,24 +92,33 @@ class HomePageState extends BaseState<HomePage> {
     subscribeConnectivityChange();
   }
 
-  updateUserRole() async {
+  loadUserRole() async {
+    UserRole role = await AppSharedPrefUtil.getUserRole();
+    if (role != null) {
+      if (AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role.role)) {
+        setState(() {
+          showOptionMenu = true;
+          isAttendanceCord = true;
+        });
+      } else {
+        setState(() {
+          showOptionMenu = false;
+          isAttendanceCord = false;
+        });
+      }
+    }
+  }
+
+  loadUserRoleFromServer() async {
     if (await AppUtils.isInternetConnected()) {
       Response res = await _api.getUserRole();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         UserRole userRole = UserRole.fromJson(appResponse.data);
         if (userRole != null) {
-          AppSharedPrefUtil.saveUserRole(userRole.role);
+          await AppSharedPrefUtil.saveUserRole(userRole);
+          await loadUserRole();
         }
-      }
-    }
-    String role = await AppSharedPrefUtil.getUserRole();
-    if (!AppUtils.isNullOrEmpty(role)) {
-      if (AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role)) {
-        setState(() {
-          showOptionMenu = true;
-          isAttendanceCord = true;
-        });
       }
     }
   }
@@ -160,7 +170,7 @@ class HomePageState extends BaseState<HomePage> {
   Future<void> createPreloadedSadhana() async {
     try {
       if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
-        startLoading();
+        startOverlay();
         Response res = await _api.getSadhanas();
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -169,13 +179,13 @@ class HomePageState extends BaseState<HomePage> {
           for (Sadhana sadhana in sadhanaList) {
             await sadhanaDAO.insertOrUpdate(sadhana);
           }
-          stopLoading();
+          stopOverlay();
           AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
           if (await AppSharedPrefUtil.isUserRegistered()) {
             askForPreloadActivity(sadhanaList);
           }
         }
-        stopLoading();
+        stopOverlay();
       }
     } catch (error, s) {
       print(error);
@@ -221,7 +231,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void loadPreloadedActivity(List<Sadhana> sadhanas) async {
-    startLoading();
+    startOverlay();
     try {
       await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
     } catch (error, s) {
@@ -229,7 +239,7 @@ class HomePageState extends BaseState<HomePage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 
   @override
@@ -246,7 +256,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('Sadhana'),
+        title: Text('SadhanaQA'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -504,17 +514,17 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onAttendanceClick() async {
-    startLoading();
+    startOverlay();
     if (await AppUtils.isInternetConnected()) {
-      await updateUserRole();
+      await loadUserRoleFromServer();
       if (isAttendanceCord) {
-        stopLoading();
+        stopOverlay();
         Navigator.pushNamed(context, AttendanceHomePage.routeName);
       }
     } else {
       CommonFunction.displayInernetNotAvailableDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 
   Future<File> getGeneratedCSVPath(date) async {
@@ -527,9 +537,9 @@ class HomePageState extends BaseState<HomePage> {
     try {
       /*String filePath = '/storage/emulated/0/Sadhana/June.jpg';
       await openFile(File(filePath));*/
-      startLoading();
+      startOverlay();
       File file = await MBAScheduleCheck.getMBASchedule(context: context);
-      stopLoading();
+      stopOverlay();
       if (file != null) {
         OpenFile.open(file.path);
       }
@@ -544,7 +554,7 @@ class HomePageState extends BaseState<HomePage> {
     //Navigator.pushNamed(context, RegistrationPage.routeName);
     try {
       if (await AppUtils.isInternetConnected()) {
-        startLoading();
+        startOverlay();
         if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
           CommonFunction.alertDialog(context: context, msg: "Your sadhana is successfully uploaded to server.");
         }
@@ -556,7 +566,7 @@ class HomePageState extends BaseState<HomePage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 
   void onShareExcel() {
