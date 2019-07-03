@@ -46,32 +46,32 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
         id: personalStepID,
         builder: PersonalInfoWidget(
           register: _register,
-          startLoading: startLoading,
-          stopLoading: stopLoading,
+          startLoading: startOverlay,
+          stopLoading: stopOverlay,
         ),
       ),
       AppStep(
         title: "Family Information",
         builder: FamilyInfoWidget(
           register: _register,
-          startLoading: startLoading,
-          stopLoading: stopLoading,
+          startLoading: startOverlay,
+          stopLoading: stopOverlay,
         ),
       ),
       AppStep(
         title: "Professional Information",
         builder: ProfessionalInfoWidget(
           register: _register,
-          startLoading: startLoading,
-          stopLoading: stopLoading,
+          startLoading: startOverlay,
+          stopLoading: stopOverlay,
         ),
       ),
       AppStep(
         title: "Seva Information",
         builder: SevaInfoWidget(
           register: _register,
-          startLoading: startLoading,
-          stopLoading: stopLoading,
+          startLoading: startOverlay,
+          stopLoading: stopOverlay,
         ),
       ),
       
@@ -183,7 +183,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   }
 
   void register() async {
-    startLoading();
+    startOverlay();
     try {
       print(_register.toJson());
       _register.registered = 1;
@@ -208,6 +208,6 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 }

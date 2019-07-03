@@ -109,8 +109,24 @@ class ApiService {
   Future<Response> getUserRole() async {
     Map<String, dynamic> data = {};
     Response res = await _postApi(url: '/mba.user.get_user_role', data: data);
+    //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
     return res;
   }
+
+  Future<Response> getMBAAttendance(String date, String group) async {
+    Map<String, dynamic> data = {'date': date, 'group': group};
+    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    Response res = http.Response("{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}", 200);
+    return res;
+  }
+
+  Future<Response> getMBAOfGroup(String date, String group) async {
+    Map<String, dynamic> data = {'date': date, 'group': group};
+    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    Response res = http.Response("{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\"},{\"mht_id\":\"111111\",\"name\":\"Divyang Mistry\"},{\"mht_id\":\"222222\",\"name\":\"Milan Vadher\"},{\"mht_id\":\"333333\",\"name\":\"Gaurav Suri\"},{\"mht_id\":\"444444\",\"name\":\"Parth Gudkha\"},{\"mht_id\":\"555555\",\"name\":\"Laxit Patel\"},{\"mht_id\":\"666666\",\"name\":\"Vijay Yadav\"}]}}", 200);
+    return res;
+  }
+
 
 
   Future<Response> updateNotificationToken(

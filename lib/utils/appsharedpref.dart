@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
@@ -29,7 +30,6 @@ class AppSharedPrefUtil {
     await loadPref();
     _pref.setBool(prefStr, isDone);
   }
-
   static Future<bool> getBool(String prefStr, {bool defaultValue = false}) async {
     await loadPref();
     return _pref.getBool(prefStr) == null ? defaultValue : _pref.getBool(prefStr);
@@ -39,10 +39,20 @@ class AppSharedPrefUtil {
     await loadPref();
     return _pref.getString(prefStr) == null ? defaultValue : _pref.getString(prefStr);
   }
-
   static Future<void> saveString(String prefStr, String value) async {
     await loadPref();
     _pref.setString(prefStr, value);
+  }
+
+  static Future<dynamic> getObjectJson(String key) async {
+    String objectJson = await getString(key);
+    if(objectJson != null) {
+      return json.decode(objectJson);
+    }
+    return null;
+  }
+  static Future<void> saveObjectJson(String key, Object objectJson) async {
+    await saveString(key, json.encode(objectJson));
   }
 
   static Future<bool> isCreatedPreloadedSadhana() async {
@@ -103,12 +113,16 @@ class AppSharedPrefUtil {
     await saveMhtId(mhtId);
   }
 
-  static Future<void> saveUserRole(String role) async {
-    await saveString(SharedPrefConstant.s_user_role, role);
+  static Future<void> saveUserRole(UserRole userRole) async {
+    await saveObjectJson(SharedPrefConstant.obj_user_role, userRole.toJson());
   }
 
-  static Future<String> getUserRole() async {
-    return await getString(SharedPrefConstant.s_user_role);
+  static Future<UserRole> getUserRole() async {
+    dynamic objectJson = await getObjectJson(SharedPrefConstant.obj_user_role);
+    if(objectJson != null) {
+      return UserRole.fromJson(objectJson);
+    } else
+      return null;
   }
 
   static Future<bool> isForceSyncRemained() async {
