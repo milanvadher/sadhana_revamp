@@ -13,6 +13,7 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'attendance/attendance_summary.dart';
+import 'attendance/submit_attendance.dart';
 
 class SadhanaApp extends StatefulWidget {
   const SadhanaApp({Key key}) : super(key: key);
@@ -40,20 +41,19 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
-    // AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
-    // if (isLoggedIn) {
-    //   setState(() {
-    //     pageToDisplay = HomePage(
-    //       optionsPage: getAppOptionPage(),
-    //     );
-    //   });
-    // } else {
-    //   setState(() {
-    pageToDisplay = AttendanceSummaryPage();
-    //     // pageToDisplay = LoginPage();
-    //   });
-    // }
-    // });
+    AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
+      if (isLoggedIn) {
+        setState(() {
+          pageToDisplay = HomePage(
+            optionsPage: getAppOptionPage(),
+          );
+        });
+      } else {
+        setState(() {
+          pageToDisplay = LoginPage();
+        });
+      }
+    });
   }
 
   AppOptionsPage getAppOptionPage() {

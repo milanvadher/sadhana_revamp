@@ -329,6 +329,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 case PopUpMenu.attendanceSummary:
                   Navigator.pushNamed(context, '/attendance_summary');
                   break;
+                case PopUpMenu.submitAttendance:
+                  Navigator.pushNamed(context, '/submit_attendance');
+                  break;
                 default:
               }
             },

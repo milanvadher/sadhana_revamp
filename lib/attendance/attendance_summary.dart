@@ -32,6 +32,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   Widget _appBarTitle = new Text('Attendance Summary');
   final TextEditingController _filter = new TextEditingController();
   ApiService _api = ApiService();
+  
   List<AttendanceSummaryModel> data = [
     AttendanceSummaryModel('lol 01', 34, 50),
     AttendanceSummaryModel('lol 02', 14, 50),
@@ -193,5 +194,6 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
       ),
       body: list(),
     );
+  
   }
 }
