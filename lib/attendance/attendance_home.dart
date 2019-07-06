@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/attendance/model/session.dart';
@@ -40,28 +41,30 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   String _dvdType;
   String _dvdNumber;
   String _dvdRemarks;
+  Hero _dvdFormButton;
+  Hero _saveButton;
 
   @override
   void initState() {
     super.initState();
-    // loadData();
+    loadData();
   }
 
-  // loadData() async {
-  //   startLoading();
-  //   UserRole userRole = await AppSharedPrefUtil.getUserRole();
-  //   if (userRole != null) {
-  //     Response res = await _api.getMBAAttendance(
-  //         DateFormat(WSConstant.DATE_FORMAT).format(today), userRole.groupName);
-  //     AppResponse appResponse =
-  //         AppResponseParser.parseResponse(res, context: context);
-  //     if (appResponse.status == WSConstant.SUCCESS_CODE) {
-  //       session = Session.fromJson(appResponse.data);
-  //       print(session);
-  //     }
-  //   }
-  //   stopLoading();
-  // }
+  loadData() async {
+    // startLoading();
+    // UserRole userRole = await AppSharedPrefUtil.getUserRole();
+    // if (userRole != null) {
+    //   Response res = await _api.getMBAAttendance(
+    //       DateFormat(WSConstant.DATE_FORMAT).format(today), userRole.groupName);
+    //   AppResponse appResponse =
+    //       AppResponseParser.parseResponse(res, context: context);
+    //   if (appResponse.status == WSConstant.SUCCESS_CODE) {
+    //     session = Session.fromJson(appResponse.data);
+    //     print(session);
+    //   }
+    // }
+    // stopLoading();
+  }
 
   static List<DummyData> data = [
     DummyData("Divyang", false),
@@ -73,6 +76,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     DummyData("Vijay", false),
     DummyData("Devandra", false),
     DummyData("Darshan", false),
+    // DummyData("Gaurav", false),
+    // DummyData("Parth", false),
+    // DummyData("Laxit", false),
   ];
 
   @override
@@ -288,11 +294,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                     ),
                   ),
                   Checkbox(
-                    onChanged: (bool value) {
-                      _selectAll = value;
-                    },
-                    value: _selectAll,
-                  )
+                      value: _selectAll,
+                      onChanged: (bool value) {
+                        _selectAll = value;
+                        setState(() {
+                          data.forEach((res) {
+                            res.isPresent = _selectAll;
+                          });
+                        });
+                      }),
                 ],
               ),
             ),
@@ -337,21 +347,38 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
         height: 70,
-        width: 70,
-        decoration: BoxDecoration(shape: BoxShape.circle),
-        child: FloatingActionButton(
-          onPressed: () => _askedToLead(),
-          backgroundColor: Colors.red.shade800,
-          child: Container(
-            height: 70,
-            child: Icon(
-              Icons.disc_full,
-              size: 40,
-              color: Colors.white,
+        width: MediaQuery.of(context).size.width / 2,
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(80),
+          color: Colors.deepOrange,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FloatingActionButton(
+              heroTag: _dvdFormButton,
+              onPressed: () => _askedToLead(),
+              backgroundColor: Colors.white,
+              child: Image.asset(
+                'assets/icon/iconfinder_BT_dvd_905549.png',
+                color: Colors.blue,
+              ),
             ),
-          ),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16.0))),
+            SizedBox(
+              width: 20,
+            ),
+            FloatingActionButton.extended(
+              heroTag: _saveButton,
+              onPressed: () {},
+              backgroundColor: Colors.white,
+              icon: Icon(Icons.check, color: Colors.red.shade800),
+              label: Text(
+                'Save',
+                style: TextStyle(color: Colors.red.shade800),
+              ),
+            ),
+          ],
         ),
       ),
     );
