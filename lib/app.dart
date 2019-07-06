@@ -12,6 +12,8 @@ import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'attendance/attendance_summary.dart';
+
 class SadhanaApp extends StatefulWidget {
   const SadhanaApp({Key key}) : super(key: key);
 
@@ -38,19 +40,20 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
-    AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
-      if(isLoggedIn) {
-        setState(() {
-          pageToDisplay = HomePage(
-            optionsPage: getAppOptionPage(),
-          );
-        });
-      } else {
-        setState(() {
-          pageToDisplay = LoginPage();
-        });
-      }
-    });
+    // AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
+    // if (isLoggedIn) {
+    //   setState(() {
+    //     pageToDisplay = HomePage(
+    //       optionsPage: getAppOptionPage(),
+    //     );
+    //   });
+    // } else {
+    //   setState(() {
+    pageToDisplay = AttendanceSummaryPage();
+    //     // pageToDisplay = LoginPage();
+    //   });
+    // }
+    // });
   }
 
   AppOptionsPage getAppOptionPage() {
@@ -64,9 +67,13 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void _getUserSelectedTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isDarkMode = prefs.getBool('isDarkMode') != null ? prefs.getBool('isDarkMode') : false;
+    bool isDarkMode = prefs.getBool('isDarkMode') != null
+        ? prefs.getBool('isDarkMode')
+        : false;
     setState(() {
-      _options = AppOptions(theme: isDarkMode ? kDarkAppTheme : kLightAppTheme, platform: defaultTargetPlatform);
+      _options = AppOptions(
+          theme: isDarkMode ? kDarkAppTheme : kLightAppTheme,
+          platform: defaultTargetPlatform);
     });
   }
 
@@ -88,9 +95,11 @@ class _SadhanaAppState extends State<SadhanaApp> {
         _options = newOptions;
       });
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool('isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
-    } catch(e,s) {
-      print(e); print(s);
+      prefs.setBool(
+          'isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
+    } catch (e, s) {
+      print(e);
+      print(s);
     }
   }
 

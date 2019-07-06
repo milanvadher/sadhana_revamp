@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:sadhana/attendance/attendance_home.dart';
+import 'package:sadhana/attendance/attendance_summary.dart';
 import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/other/about.dart';
@@ -46,6 +47,11 @@ List<CreateRoute> _buildAppRoutes() {
       title: 'AttendanceHome Page',
       routeName: AttendanceHomePage.routeName,
       buildRoute: (BuildContext context) => AttendanceHomePage(),
+    ),
+    CreateRoute(
+      title: 'AttendanceSummary Page',
+      routeName: AttendanceSummaryPage.routeName,
+      buildRoute: (BuildContext context) => AttendanceSummaryPage(),
     ),
     CreateRoute(
       title: 'Registration Page',

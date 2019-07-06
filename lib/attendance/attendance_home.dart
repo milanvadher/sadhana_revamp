@@ -27,7 +27,11 @@ class AttendanceHomePage extends StatefulWidget {
   AttendanceHomePageState createState() => AttendanceHomePageState();
 }
 
-enum PopUpMenu { harder, smarter, selfStarter, tradingCharter }
+enum PopUpMenu {
+  changeDate,
+  attendanceSummary,
+  submitAttendance,
+}
 
 class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   bool _selectAll = false;
@@ -318,25 +322,29 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           PopupMenuButton<PopUpMenu>(
             onSelected: (PopUpMenu result) {
               setState(() {
+                print(result);
                 _popUpMenu = result;
               });
+              switch (result) {
+                case PopUpMenu.attendanceSummary:
+                  Navigator.pushNamed(context, '/attendance_summary');
+                  break;
+                default:
+              }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
               const PopupMenuItem<PopUpMenu>(
-                value: PopUpMenu.harder,
-                child: Text('Working a lot harder'),
+                value: PopUpMenu.changeDate,
+                child: Text('Change Date'),
               ),
               const PopupMenuItem<PopUpMenu>(
-                value: PopUpMenu.smarter,
-                child: Text('Being a lot smarter'),
+                value: PopUpMenu.attendanceSummary,
+                enabled: true,
+                child: Text('Attendance Summary'),
               ),
               const PopupMenuItem<PopUpMenu>(
-                value: PopUpMenu.selfStarter,
-                child: Text('Being a self-starter'),
-              ),
-              const PopupMenuItem<PopUpMenu>(
-                value: PopUpMenu.tradingCharter,
-                child: Text('Placed in charge of trading charter'),
+                value: PopUpMenu.submitAttendance,
+                child: Text('Submit Attendance'),
               ),
             ],
             icon: Icon(Icons.menu),

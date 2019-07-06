@@ -36,19 +36,21 @@ class ApiService {
     return res;
   }
 
-  Future<Response> _postApi({@required String url, @required Map<String, dynamic> data}) async {
+  Future<Response> _postApi(
+      {@required String url, @required Map<String, dynamic> data}) async {
     await checkLogin();
     String postUrl = _apiUrl + url;
     await appendCommonDataToBody(data);
     String body = json.encode(data);
     print('Post Url:' + postUrl + '\tReq:' + body);
     Response res = await http.post(_apiUrl + url, body: body, headers: headers);
-    print('Response: ${res.body} status code: ${res.statusCode} msg: ${res.reasonPhrase}');
+    print(
+        'Response: ${res.body} status code: ${res.statusCode} msg: ${res.reasonPhrase}');
     return res;
   }
 
   appendCommonDataToBody(Map<String, dynamic> data) async {
-    if(await AppSharedPrefUtil.isUserRegistered()) {
+    if (await AppSharedPrefUtil.isUserRegistered()) {
       data['token'] = await AppSharedPrefUtil.getToken();
       data['mht_id'] = await AppSharedPrefUtil.getMhtId();
     }
@@ -76,14 +78,19 @@ class ApiService {
       "email": email,
       "mobile_no_1": mobile
     };
-    Response res = await _postApi(url: '/mba.user.send_otp', data:data);
+    Response res = await _postApi(url: '/mba.user.send_otp', data: data);
     return res;
   }
 
-  Future<Response> changeMobile(String mht_id, String oldNo, String newNo) async {
-    Map<String, dynamic> data = {'mht_id': mht_id, 'old_no': oldNo,
-      'new_no': newNo};
-    Response res = await _postApi(url: '/mba.user.change_mobile_no', data: data);
+  Future<Response> changeMobile(
+      String mht_id, String oldNo, String newNo) async {
+    Map<String, dynamic> data = {
+      'mht_id': mht_id,
+      'old_no': oldNo,
+      'new_no': newNo
+    };
+    Response res =
+        await _postApi(url: '/mba.user.change_mobile_no', data: data);
     return res;
   }
 
@@ -95,7 +102,8 @@ class ApiService {
 
   Future<Response> register(Register register) async {
     Map<String, dynamic> data = register.toJson();
-    Response res = await _postApi(url: '/mba.user.update_mba_profile', data: data);
+    Response res =
+        await _postApi(url: '/mba.user.update_mba_profile', data: data);
     //Response res = Response("", 200);
     return res;
   }
@@ -116,30 +124,43 @@ class ApiService {
   Future<Response> getMBAAttendance(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group': group};
     //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
-    Response res = http.Response("{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}", 200);
+    Response res = http.Response(
+        "{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}",
+        200);
+    return res;
+  }
+
+  Future<Response> getMBAMonthlySummary(String month, String group) async {
+    Map<String, dynamic> data = {'month': month, 'group': group};
+    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    Response res = http.Response(
+        "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\",\"totalattendancedates\":9,\"presentdates\":2,\"lessattendancereason\":\"\"}]}}",
+        200);
     return res;
   }
 
   Future<Response> getMBAOfGroup(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group': group};
     //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
-    Response res = http.Response("{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\"},{\"mht_id\":\"111111\",\"name\":\"Divyang Mistry\"},{\"mht_id\":\"222222\",\"name\":\"Milan Vadher\"},{\"mht_id\":\"333333\",\"name\":\"Gaurav Suri\"},{\"mht_id\":\"444444\",\"name\":\"Parth Gudkha\"},{\"mht_id\":\"555555\",\"name\":\"Laxit Patel\"},{\"mht_id\":\"666666\",\"name\":\"Vijay Yadav\"}]}}", 200);
+    Response res = http.Response(
+        "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\"},{\"mht_id\":\"111111\",\"name\":\"Divyang Mistry\"},{\"mht_id\":\"222222\",\"name\":\"Milan Vadher\"},{\"mht_id\":\"333333\",\"name\":\"Gaurav Suri\"},{\"mht_id\":\"444444\",\"name\":\"Parth Gudkha\"},{\"mht_id\":\"555555\",\"name\":\"Laxit Patel\"},{\"mht_id\":\"666666\",\"name\":\"Vijay Yadav\"}]}}",
+        200);
     return res;
   }
 
-
-
   Future<Response> updateNotificationToken(
       {@required String mhtId,
-        @required String fbToken,
-        @required String oneSignalToken}) async {
+      @required String fbToken,
+      @required String oneSignalToken}) async {
     Map<String, dynamic> data = {
       'mht_id': mhtId,
       'one_signal_token': oneSignalToken
     };
-    Response res = await _postApi(url: '/mba.user.save_one_signal_token', data: data);
+    Response res =
+        await _postApi(url: '/mba.user.save_one_signal_token', data: data);
     return res;
   }
+
   // Logout
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -153,7 +174,8 @@ class ApiService {
 
   Future<Response> getActivity() async {
     Map<String, dynamic> data = {};
-    Response res = await _postApi(url: '/mba.sadhana.getsadhana_activity', data: data);
+    Response res =
+        await _postApi(url: '/mba.sadhana.getsadhana_activity', data: data);
     return res;
   }
 
@@ -165,10 +187,7 @@ class ApiService {
   }
 
   Future<Response> getCityByState(String state) async {
-    return await _postApi(
-        url: '/mba.master.city_list',
-        data: {'state': state}
-    );
+    return await _postApi(url: '/mba.master.city_list', data: {'state': state});
   }
 
   Future<Response> getStateByCountry(String country) async {
@@ -192,8 +211,11 @@ class ApiService {
     );
   }
 
-  Future<Response> syncActivity(List<WSSadhanaActivity> wsSadhanaActivity) async {
-    Map<String, dynamic> data = {'activity': wsSadhanaActivity.map((v) => v.toJson()).toList() };
+  Future<Response> syncActivity(
+      List<WSSadhanaActivity> wsSadhanaActivity) async {
+    Map<String, dynamic> data = {
+      'activity': wsSadhanaActivity.map((v) => v.toJson()).toList()
+    };
     Response res = await _postApi(url: '/mba.sadhana.sync', data: data);
     return res;
     /*Response res = new http.Response("{\r\n    \"message\": {\r\n        \"data\": [\r\n            {\r\n                \"name\": \"Samayik\",\r\n                \"data\": [\r\n                    {\r\n                        \"value\": \"1\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-25\"\r\n                    },\r\n                    {\r\n                        \"value\": \"1\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-24\"\r\n                    },\r\n                    {\r\n                        \"value\": \"1\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-23\"\r\n                    },\r\n                    {\r\n                        \"value\": \"0\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-22\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"name\": \"Vanchan\",\r\n                \"data\": [\r\n                    {\r\n                        \"value\": \"5\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-25\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"name\": \"Seva\",\r\n                \"data\": [\r\n                    {\r\n                        \"value\": \"5\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-25\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"name\": \"G. Satsang\",\r\n                \"data\": [\r\n                    {\r\n                        \"value\": \"1\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-25\"\r\n                    }\r\n                ]\r\n            },\r\n            {\r\n                \"name\": \"Vidhi\",\r\n                \"data\": [\r\n                    {\r\n                        \"value\": \"0\",\r\n                        \"remark\": null,\r\n                        \"date\": \"2019-05-25\"\r\n                    }\r\n                ]\r\n            }\r\n        ]\r\n    }\r\n}",
@@ -207,15 +229,15 @@ class ApiService {
   }
 
   Future<http.Response> getMBASchedule(String center, String date) async {
-    Map<String, dynamic> data = {'center': center, 'date' : date };
-    http.Response res = await _postApi(url: '/mba.schedule.get_schedule', data: data);
+    Map<String, dynamic> data = {'center': center, 'date': date};
+    http.Response res =
+        await _postApi(url: '/mba.schedule.get_schedule', data: data);
     return res;
   }
 
   String getMBAScheduleAbsoluteUrl(String relativeUrl) {
     return '$_baseServerUrl/$relativeUrl';
   }
-
 
   // Check Login Status
   Future<bool> checkLoginStatus() async {
@@ -230,6 +252,4 @@ class ApiService {
       return false;
     }
   }
-
-
 }
