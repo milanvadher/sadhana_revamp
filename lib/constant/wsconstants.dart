@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class WSConstant {
   static final int SUCCESS_CODE = 200;
   static final String MONTH_FORMAT = 'yyyy-MM';
@@ -6,4 +8,6 @@ class WSConstant {
   static final String DATE_TIME_FORMAT2 = 'yyyy-MM-dd HH:mm:ss';
 
   static final String ROLE_ATTENDANCECOORD = "AttendanceCoord";
+
+  static final DateFormat wsDateFormat = DateFormat(DATE_FORMAT);
 }

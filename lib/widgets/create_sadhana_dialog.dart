@@ -125,11 +125,11 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 ? Container()
                 : RadioInput(
                     handleRadioValueChange: _onChangeType,
-                    lableText: 'Type',
+                    labelText: 'Type',
                     radioValue: radioValue,
                     radioData: [
-                      {'lable': 'Yes / No', 'value': 0},
-                      {'lable': 'Number', 'value': 1},
+                      {'label': 'Yes / No', 'value': 0},
+                      {'label': 'Number', 'value': 1},
                     ],
                   ),
             radioValue == 1

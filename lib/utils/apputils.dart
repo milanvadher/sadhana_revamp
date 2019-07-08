@@ -159,4 +159,10 @@ class AppUtils {
   static void showInSnackBar(BuildContext context, String value) {
     Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(value)));
   }
+
+/*  static List<Attendance> fromJsonList(dynamic json, Class) {
+    return (json as List)?.map((e) =>
+    e == null ? null : Attendance.fromJson(e as Map<String, dynamic>))
+        ?.toList();
+  }*/
 }

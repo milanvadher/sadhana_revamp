@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
+import 'package:sadhana/attendance/attendance_home.dart';
 import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
@@ -11,9 +12,6 @@ import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'attendance/attendance_summary.dart';
-import 'attendance/submit_attendance.dart';
 
 class SadhanaApp extends StatefulWidget {
   const SadhanaApp({Key key}) : super(key: key);
@@ -41,8 +39,9 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
+    //pageToDisplay = AttendanceHomePage();
     AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
-      if (isLoggedIn) {
+      if(isLoggedIn) {
         setState(() {
           pageToDisplay = HomePage(
             optionsPage: getAppOptionPage(),
@@ -67,13 +66,9 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void _getUserSelectedTheme() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isDarkMode = prefs.getBool('isDarkMode') != null
-        ? prefs.getBool('isDarkMode')
-        : false;
+    bool isDarkMode = prefs.getBool('isDarkMode') != null ? prefs.getBool('isDarkMode') : false;
     setState(() {
-      _options = AppOptions(
-          theme: isDarkMode ? kDarkAppTheme : kLightAppTheme,
-          platform: defaultTargetPlatform);
+      _options = AppOptions(theme: isDarkMode ? kDarkAppTheme : kLightAppTheme, platform: defaultTargetPlatform);
     });
   }
 
@@ -95,11 +90,9 @@ class _SadhanaAppState extends State<SadhanaApp> {
         _options = newOptions;
       });
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setBool(
-          'isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
-    } catch (e, s) {
-      print(e);
-      print(s);
+      prefs.setBool('isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
+    } catch(e,s) {
+      print(e); print(s);
     }
   }
 

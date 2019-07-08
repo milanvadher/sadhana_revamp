@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 
 part "session.g.dart";
 
@@ -17,12 +18,19 @@ class Session {
   @JsonKey(name: 'remark')
   String remark;
 
+  DateTime get dateTime =>  date != null ? WSConstant.wsDateFormat.parse(date) : null;
+
   @JsonKey(name: 'attendance')
   List<Attendance> attendance;
 
   Session({this.date, this.group, this.dvdType, this.dvdNo, this.dvdPart, this.remark, this.attendance});
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
   Map<String, dynamic> toJson() => _$SessionToJson(this);
+
+  Session.fromAttendanceList(String date, List<Attendance> attendances) {
+    this.date = date;
+    this.attendance = attendances;
+  }
 
   @override
   String toString() {
@@ -42,12 +50,18 @@ class Attendance {
   @JsonKey(name: 'absentreason')
   String absentReason;
 
-  static bool _isPresentFromJson(int duration) => duration == null ? duration > 0 ? true : false : false;
+  static bool _isPresentFromJson(int isPresent) => isPresent != null ? isPresent > 0 ? true : false : false;
   static int _isPresentToJson(bool isPresent) => isPresent ? 1 : 0;
 
   Attendance({this.mhtId, this.isPresent, this.absentReason});
   factory Attendance.fromJson(Map<String, dynamic> json) => _$AttendanceFromJson(json);
   Map<String, dynamic> toJson() => _$AttendanceToJson(this);
+
+  static List<Attendance> fromJsonList(dynamic json) {
+    return (json as List)?.map((e) =>
+    e == null ? null : Attendance.fromJson(e as Map<String, dynamic>))
+        ?.toList();
+  }
 
   @override
   String toString() {

@@ -37,11 +37,11 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           onSaved: (value) => _register.fatherName = value,
         ),
         RadioInput(
-          lableText: 'Father MBA Approval',
+          labelText: 'Father MBA Approval',
           radioValue: _register.fatherMbaApproval,
           radioData: [
-            {'lable': 'Yes', 'value': 1},
-            {'lable': 'No', 'value': 0},
+            {'label': 'Yes', 'value': 1},
+            {'label': 'No', 'value': 0},
           ],
           handleRadioValueChange: (value) {
             setState(() {
@@ -50,11 +50,11 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           },
         ),
         RadioInput(
-          lableText: 'Has your Father taken gnan ? ',
+          labelText: 'Has your Father taken gnan ? ',
           radioValue: _register.fatherGnan,
           radioData: [
-            {'lable': 'Yes', 'value': 1},
-            {'lable': 'No', 'value': 0},
+            {'label': 'Yes', 'value': 1},
+            {'label': 'No', 'value': 0},
           ],
           handleRadioValueChange: (value) {
             setState(() {
@@ -82,11 +82,11 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           onSaved: (value) => _register.motherName = value,
         ),
         RadioInput(
-          lableText: 'Mother MBA Approval',
+          labelText: 'Mother MBA Approval',
           radioValue: _register.motherMbaApproval,
           radioData: [
-            {'lable': 'Yes', 'value': 1},
-            {'lable': 'No', 'value': 0},
+            {'label': 'Yes', 'value': 1},
+            {'label': 'No', 'value': 0},
           ],
           handleRadioValueChange: (value) {
             setState(() {
@@ -95,11 +95,11 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           },
         ),
         RadioInput(
-          lableText: 'Has your Mother taken gnan ? ',
+          labelText: 'Has your Mother taken gnan ? ',
           radioValue: _register.motherGnan,
           radioData: [
-            {'lable': 'Yes', 'value': 1},
-            {'lable': 'No', 'value': 0},
+            {'label': 'Yes', 'value': 1},
+            {'label': 'No', 'value': 0},
           ],
           handleRadioValueChange: (value) {
             setState(() {

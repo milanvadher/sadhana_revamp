@@ -5,6 +5,7 @@ part "mba.g.dart";
 class MBA {
   @JsonKey(name: 'mht_id')
   String mhtId;
+
   @JsonKey(name: 'name')
   String name;
 

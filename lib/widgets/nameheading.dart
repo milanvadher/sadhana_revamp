@@ -22,7 +22,7 @@ class NameHeading extends StatelessWidget {
       ),
       margin: EdgeInsets.fromLTRB(4, 4, 0, 4),
       child: Container(
-        height: 50,
+        height: 45,
         alignment: Alignment(-1, 0),
         child: Padding(
           padding: EdgeInsets.all(10),

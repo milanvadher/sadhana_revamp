@@ -95,13 +95,13 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
             },
           ),
         RadioInput(
-          lableText: 'Occupation',
+          labelText: 'Occupation',
           radioValue: _register.occupation,
           radioData: [
-            {'lable': 'Job', 'value': 'Job'},
-            {'lable': 'Business', 'value': 'Business'},
-            {'lable': 'Seva', 'value': 'Seva'},
-            {'lable': 'N/A', 'value': 'N/A'},
+            {'label': 'Job', 'value': 'Job'},
+            {'label': 'Business', 'value': 'Business'},
+            {'label': 'Seva', 'value': 'Seva'},
+            {'label': 'N/A', 'value': 'N/A'},
           ],
           handleRadioValueChange: (value) {
             setState(() {

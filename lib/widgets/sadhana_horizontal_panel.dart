@@ -44,7 +44,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
       ),
       margin: EdgeInsets.fromLTRB(0, 4, 4, 4),
       child: Container(
-        height: 50,
+        height: 45,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
@@ -55,9 +55,6 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
                 bool isDisabled = false;
                 if(sadhana.isPreloaded) {
-                  /*if(today.isBefore(DateTime(2019, 07,1)))
-                    isDisabled = true;
-                  else*/
                     isDisabled = index >= editableDays ? true : false;
                 }
                     

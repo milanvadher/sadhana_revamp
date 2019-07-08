@@ -102,13 +102,13 @@ class CommonFunction {
 
   static Future<bool> registerUser(
       {@required Register register,
-      @required BuildContext context,
-      bool generateToken = true}) async {
+        @required BuildContext context,
+        bool generateToken = true}) async {
     if (generateToken) {
       ApiService apiService = ApiService();
       Response res = await apiService.generateToken(register.mhtId);
       AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         if (appResponse.data != null && appResponse.data.toString().isNotEmpty)
           register.token = appResponse.data;
@@ -137,19 +137,19 @@ class CommonFunction {
   // common Alert dialog
   static alertDialog(
       {@required BuildContext context,
-      String type = 'info', // 'success' || 'error'
-      String title = '',
-      @required String msg,
-      bool showDoneButton = true,
-      String doneButtonText = 'OK',
-      String cancelButtonText = 'Cancel',
-      Function doneButtonFn,
-      bool barrierDismissible = true,
-      bool showCancelButton = false,
-      Function doneCancelFn,
-      AlertDialog Function() builder,
-      Widget widget,
-      bool closeable = true}) {
+        String type = 'info', // 'success' || 'error'
+        String title = '',
+        @required String msg,
+        bool showDoneButton = true,
+        String doneButtonText = 'OK',
+        String cancelButtonText = 'Cancel',
+        Function doneButtonFn,
+        bool barrierDismissible = true,
+        bool showCancelButton = false,
+        Function doneCancelFn,
+        AlertDialog Function() builder,
+        Widget widget,
+        bool closeable = true}) {
     if (context != null) {
       String newTitle = title != null ? title : type == 'error' ? 'Error' : type == 'info' ? title : 'Success';
       showDialog(
@@ -175,8 +175,8 @@ class CommonFunction {
                         msg != null
                             ? msg
                             : type == 'error'
-                                ? "Looks like your lack of \n Imagination ! "
-                                : "Looks like today is your luckyday ... !!",
+                            ? "Looks like your lack of \n Imagination ! "
+                            : "Looks like today is your luckyday ... !!",
                         style: TextStyle(color: Theme.of(context).textTheme.caption.color),
                       ),
                     ),
@@ -196,27 +196,27 @@ class CommonFunction {
                           onPressed: doneButtonFn != null
                               ? doneButtonFn
                               : () {
-                                  Navigator.pop(context);
-                                },
+                            Navigator.pop(context);
+                          },
                         ),
                         showCancelButton
                             ? SizedBox(width: 10)
                             : new Container(),
                         showCancelButton
                             ? FlatButton(
-                                color: kQuizErrorRed,
-                                child: Text(
-                                  cancelButtonText ?? 'Cancel',
-                                  style: TextStyle(
-                                    color: kQuizBackgroundWhite,
-                                  ),
-                                ),
-                                onPressed: doneCancelFn != null
-                                    ? doneCancelFn
-                                    : () {
-                                        Navigator.pop(context);
-                                      },
-                              )
+                          color: kQuizErrorRed,
+                          child: Text(
+                            cancelButtonText ?? 'Cancel',
+                            style: TextStyle(
+                              color: kQuizBackgroundWhite,
+                            ),
+                          ),
+                          onPressed: doneCancelFn != null
+                              ? doneCancelFn
+                              : () {
+                            Navigator.pop(context);
+                          },
+                        )
                             : new Container(),
                       ],
                     ),

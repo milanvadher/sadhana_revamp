@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:sadhana/auth/registration/Inputs/text-input.dart';
+import 'package:http/http.dart';
+import 'package:sadhana/attendance/model/attendance_summary.dart';
+import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/service/apiservice.dart';
+import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/wsmodel/appresponse.dart';
 
-class SubmitAttendanceModel {
-  String name;
-  String reason;
-  int totalDays;
-  int presentDays;
-  bool showRemarks;
 
-  SubmitAttendanceModel(this.name, this.presentDays, this.totalDays,
-      this.reason, this.showRemarks);
-}
 
 class SubmitAttendancePage extends StatefulWidget {
   static const String routeName = '/submit_attendance';
@@ -19,34 +18,39 @@ class SubmitAttendancePage extends StatefulWidget {
   _SubmitAttendancePageState createState() => _SubmitAttendancePageState();
 }
 
-class _SubmitAttendancePageState extends State<SubmitAttendancePage> {
-  bool showRemarks = false;
-  List<SubmitAttendanceModel> data = [
-    SubmitAttendanceModel('lol 01', 34, 50, 'This is Reason 01', false),
-    SubmitAttendanceModel('lol 02', 10, 50, 'This is Reason 02', false),
-    SubmitAttendanceModel('lol 03', 12, 50, 'This is Reason 03', false),
-    SubmitAttendanceModel('lol 04', 40, 50, 'This is Reason 04', false),
-    SubmitAttendanceModel('lol 05', 8, 50, 'This is Reason 05', false),
-    SubmitAttendanceModel('lol 06', 22, 50, 'This is Reason 06', false),
-    SubmitAttendanceModel('lol 07', 31, 50, 'This is Reason 07', false),
-    SubmitAttendanceModel('lol 08', 47, 50, 'This is Reason 08', false),
-    SubmitAttendanceModel('lol 09', 10, 50, 'This is Reason 08', false),
-    SubmitAttendanceModel('lol 10', 39, 50, 'This is Reason 09', false),
-  ];
+class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
+  ApiService _api = ApiService();
+  List<AttendanceSummary> summary = new List();
 
   @override
-  Widget build(BuildContext context) {
-    final Color textColor = Theme.of(context).brightness == Brightness.dark
-        ? Colors.grey
-        : Colors.white;
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() async {
+    startLoading();
+    UserRole userRole = await AppSharedPrefUtil.getUserRole();
+    if (userRole != null) {
+      Response res = await _api.getAttendanceSummary(userRole.groupName);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        summary = AttendanceSummary.fromJsonList(appResponse.data);
+        print(summary);
+      }
+    }
+    stopLoading();
+  }
+
+  @override
+  Widget pageToDisplay() {
+    final Color textColor = Theme.of(context).brightness == Brightness.dark ? Colors.grey : Colors.white;
     // TODO: implement build
-    cardView(SubmitAttendanceModel data) {
+    cardView(AttendanceSummary data) {
       return Container(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
         child: Card(
-          color: ((data.presentDays / data.totalDays) * 100) < 50
-              ? Colors.lightBlue.shade300
-              : Colors.lightGreen.shade300,
+          color: ((data.presentDates / data.totalAttendanceDates) * 100) < 50 ? Colors.lightBlue.shade300 : Colors.lightGreen.shade300,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -58,9 +62,7 @@ class _SubmitAttendancePageState extends State<SubmitAttendancePage> {
                 children: <Widget>[
                   Container(
                     padding: EdgeInsets.only(left: 20),
-                    child: Text(
-                      data.name,
-                    ),
+                    child: Text(data.name),
                   ),
                   Container(
                     child: Row(
@@ -68,25 +70,17 @@ class _SubmitAttendancePageState extends State<SubmitAttendancePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         IconButton(
-                          icon: Icon(
-                            Icons.message,
-                          ),
-                          onPressed: () => setState(
-                              () => data.showRemarks = !data.showRemarks),
+                          icon: Icon(Icons.message),
+                          onPressed: () => setState(() => data.showRemarks = !data.showRemarks),
                         ),
-                        Text(
-                          '${((data.presentDays / data.totalDays) * 100).toInt().toString()} %',
-                        ),
-                        SizedBox(
-                          width: 10,
-                        )
+                        Text('${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %'),
+                        SizedBox(width: 10)
                       ],
                     ),
                   ),
                 ],
               ),
-              (((data.presentDays / data.totalDays) * 100) < 50) ||
-                      data.showRemarks
+              (((data.presentDates / data.totalAttendanceDates) * 100) < 50) || data.showRemarks
                   ? Container(
                       child: Column(
                         children: <Widget>[
@@ -118,9 +112,9 @@ class _SubmitAttendancePageState extends State<SubmitAttendancePage> {
       return Container(
         padding: EdgeInsets.only(top: 15),
         child: ListView.builder(
-          itemCount: data.length,
+          itemCount: summary.length,
           itemBuilder: (BuildContext context, int index) {
-            return cardView(data[index]);
+            return cardView(summary[index]);
           },
         ),
       );
