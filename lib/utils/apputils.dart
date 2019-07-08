@@ -22,10 +22,10 @@ class AppUtils {
   }
 
   static bool convertToIntToBool(int input, {bool defaultValue = false}) {
-    if(input == null) {
+    if (input == null) {
       return defaultValue;
     } else {
-      if(input > 0)
+      if (input > 0)
         return true;
       else
         return false;
@@ -51,23 +51,23 @@ class AppUtils {
     for (String format in formats) {
       try {
         return DateFormat(format).parse(dateString);
-      } catch (error,s) {
+      } catch (error, s) {
         throwError = error;
         print('Cannot parse $dateString using $format');
       }
     }
-    if(throwErrorIfNotParse)
-      throw throwError;
+    if (throwErrorIfNotParse) throw throwError;
   }
 
   static tryToExecute(int numOfTry, Function function) async {
     int tried = 0;
-    while(tried < numOfTry) {
+    while (tried < numOfTry) {
       try {
         return await function();
-      } catch(error,s) {
+      } catch (error, s) {
         print('error on trying');
-        print(error);print(s);
+        print(error);
+        print(s);
       }
       tried++;
     }
@@ -82,7 +82,8 @@ class AppUtils {
   static askForPermission() async {
     List<PermissionName> permissions = [PermissionName.Storage];
     if (Platform.isAndroid) {
-      if(await getAndroidOSVersion() >= 23) { //Marshmallow
+      if (await getAndroidOSVersion() >= 23) {
+        //Marshmallow
         await Permission.requestPermissions(permissions);
       }
     } else {
@@ -95,8 +96,8 @@ class AppUtils {
     //bool checkPermission = await SimplePermissions.checkPermission(Permission.WriteExternalStorage);
     await askForPermission();
     bool checkPermission;
-    if(Platform.isAndroid) {
-      if(await getAndroidOSVersion() >= 23) {
+    if (Platform.isAndroid) {
+      if (await getAndroidOSVersion() >= 23) {
         List<Permissions> permissions = await Permission.getPermissionsStatus([PermissionName.Storage]);
         checkPermission = permissions.single.permissionStatus == PermissionStatus.allow ? true : false;
       } else
@@ -160,9 +161,7 @@ class AppUtils {
     Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(value)));
   }
 
-/*  static List<Attendance> fromJsonList(dynamic json, Class) {
-    return (json as List)?.map((e) =>
-    e == null ? null : Attendance.fromJson(e as Map<String, dynamic>))
-        ?.toList();
-  }*/
+  static List<T> fromJsonList<T>(dynamic json, Function(Map<String, dynamic>) fromJson) {
+    return (json as List)?.map<T>((e) => e == null ? null : fromJson(e as Map<String, dynamic>))?.toList();
+  }
 }

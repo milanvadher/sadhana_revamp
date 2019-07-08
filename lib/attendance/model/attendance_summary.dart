@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/utils/apputils.dart';
 part 'attendance_summary.g.dart';
 
 @JsonSerializable()
@@ -25,13 +26,11 @@ class AttendanceSummary {
   }
 
   factory AttendanceSummary.fromJson(Map<String, dynamic> json) => _$AttendanceSummaryFromJson(json);
-      
+
   Map<String, dynamic> toJson() => _$AttendanceSummaryToJson(this);
+
+  static fromJsonFun(Map<String, dynamic> json) => AttendanceSummary.fromJson(json);
   static List<AttendanceSummary> fromJsonList(dynamic jsonList) {
-    return (jsonList as List)
-        ?.map((e) => e == null
-            ? null
-            : AttendanceSummary.fromJson(e as Map<String, dynamic>))
-        ?.toList();
+    return AppUtils.fromJsonList<AttendanceSummary>(jsonList, fromJsonFun);
   }
 }

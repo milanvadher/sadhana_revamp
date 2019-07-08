@@ -56,6 +56,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         CommonFunction.alertDialog(context: context, msg: "You don't have right for Attendance");
       }
     } catch (e, s) {
+      print(e);
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
@@ -77,7 +78,6 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<Attendance> attendances = Attendance.fromJsonList(appResponse.data);
         session = Session.fromAttendanceList(strDate, attendances);
-        print(session);
       }
     }
   }

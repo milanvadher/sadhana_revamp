@@ -93,6 +93,19 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
           children: <Widget>[sadhanaCreateEditForm()],
         ),
       ),
+      bottomNavigationBar: buildBottomBar(),
+    );
+  }
+
+  Widget buildBottomBar() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(child: Text("This sadhana will not be synced to server.")),
+        Container(child: Text("You can take back up & import.")),
+        SizedBox(height: 7,),
+      ],
     );
   }
 

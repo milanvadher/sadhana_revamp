@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/utils/apputils.dart';
 
 part "session.g.dart";
 
@@ -57,10 +58,9 @@ class Attendance {
   factory Attendance.fromJson(Map<String, dynamic> json) => _$AttendanceFromJson(json);
   Map<String, dynamic> toJson() => _$AttendanceToJson(this);
 
+  static Attendance fromJsonFun(Map<String, dynamic> json) => Attendance.fromJson(json);
   static List<Attendance> fromJsonList(dynamic json) {
-    return (json as List)?.map((e) =>
-    e == null ? null : Attendance.fromJson(e as Map<String, dynamic>))
-        ?.toList();
+    return AppUtils.fromJsonList<Attendance>(json, Attendance.fromJsonFun);
   }
 
   @override
