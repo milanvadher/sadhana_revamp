@@ -7,6 +7,7 @@ import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/attendance/submit_attendance.dart';
 import 'package:sadhana/attendance/widgets/dvd_form.dart';
+import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -38,7 +39,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Hero _saveButton;
   UserRole _userRole;
   List<DateTime> _sessionDates = List();
-
+  bool isSimcityGroup = true;
+  final GlobalKey<FormState> _attendanceForm = GlobalKey<FormState>();
   @override
   void initState() {
     super.initState();
@@ -50,6 +52,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     try {
       _userRole = await AppSharedPrefUtil.getUserRole();
       if (_userRole != null && AppUtils.equalsIgnoreCase(_userRole.role, WSConstant.ROLE_ATTENDANCECOORD)) {
+        //isSimcityGroup = _userRole.isSimCityGroup;
         await loadSessionDates();
         await loadSession(DateTime.now());
       } else {
@@ -133,7 +136,11 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         ),
         actions: _buildAction(),
       ),
-      body: SafeArea(child: _buildListView()),
+      body: SafeArea(
+          child: Form(
+        key: _attendanceForm,
+        child: _buildListView(),
+      )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _buildFloatingActionButton(),
     );
@@ -143,20 +150,41 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     return Container(
       padding: EdgeInsets.only(left: 10, right: 10),
       child: Card(
-        elevation: 5,
-        child: ListTile(
-          title: Text(attendance.name),
-          onTap: () {
-            onCheck(attendance);
-          },
-          trailing: Checkbox(
-            onChanged: (val) {
-              onCheck(attendance);
-            },
-            value: attendance.isPresent,
-          ),
-        ),
-      ),
+          elevation: 5,
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                title: Text(attendance.name),
+                onTap: () {
+                  onCheck(attendance);
+                },
+                trailing: Checkbox(
+                  onChanged: (val) {
+                    onCheck(attendance);
+                  },
+                  value: attendance.isPresent,
+                ),
+              ),
+              !attendance.isPresent && isSimcityGroup
+                  ? Container(
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+                            child: TextInputField(
+                              isRequiredValidation: true,
+                              labelText: "Reason for Absent",
+                              onSaved: (val) => attendance.absentReason = val,
+                              padding: EdgeInsets.all(0),
+                              contentPadding: EdgeInsets.all(13),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container()
+            ],
+          )),
     );
   }
 
@@ -197,13 +225,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          FloatingActionButton(
-            heroTag: _dvdFormButton,
-            onPressed: () => _onDVDClick(),
-            backgroundColor: Colors.white,
-            child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Colors.blue),
-          ),
-          SizedBox(width: 20),
+          !isSimcityGroup
+              ? FloatingActionButton(
+                  heroTag: _dvdFormButton,
+                  onPressed: () => _onDVDClick(),
+                  backgroundColor: Colors.white,
+                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Colors.blue),
+                )
+              : Container(),
+          !isSimcityGroup ? SizedBox(width: 20) : Container(),
           FloatingActionButton.extended(
             heroTag: _saveButton,
             onPressed: _onSubmit,
@@ -277,20 +307,25 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
-    if (_validateDVD() && _validateAttendance()) {
-      print(session);
-      Response res = await _api.submitAttendanceSession(session);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        CommonFunction.alertDialog(context: context, msg: "Attendance submitted successfully.");
+    if(_attendanceForm.currentState.validate()) {
+      _attendanceForm.currentState.save();
+      if (_validateDVD() && _validateAttendance()) {
+        print(session);
+        Response res = await _api.submitAttendanceSession(session);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          CommonFunction.alertDialog(context: context, msg: "Attendance submitted successfully.");
+        }
       }
     }
   }
 
   bool _validateDVD() {
-    if (session.dvdNo == null && session.dvdPart == null && session.remark == null) {
-      CommonFunction.alertDialog(context: context, msg: "Please fill DVD Details", type: 'error');
-      return false;
+    if (!isSimcityGroup) {
+      if (session.dvdNo == null && session.dvdPart == null && session.remark == null) {
+        CommonFunction.alertDialog(context: context, msg: "Please fill DVD Details", type: 'error');
+        return false;
+      }
     }
     return true;
   }

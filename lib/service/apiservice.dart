@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
+import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
@@ -238,7 +239,7 @@ class ApiService {
 
   Future<Response> getMBAOfGroup(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group': group};
-    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    //Response res = await _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
     Response res = http.Response(
         "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\"},{\"mht_id\":\"111111\",\"name\":\"Divyang Mistry\"},{\"mht_id\":\"222222\",\"name\":\"Milan Vadher\"},{\"mht_id\":\"333333\",\"name\":\"Gaurav Suri\"},{\"mht_id\":\"444444\",\"name\":\"Parth Gudkha\"},{\"mht_id\":\"555555\",\"name\":\"Laxit Patel\"},{\"mht_id\":\"666666\",\"name\":\"Vijay Yadav\"}]}}",
         200);
@@ -279,5 +280,11 @@ class ApiService {
     return res;
   }
 
+  Future<Response> submitMontlyReport(String group, List<AttendanceSummary> summary) async {
+    Map<String, dynamic> data = {'group': group, 'lessAttendanceReasons' : AttendanceSummary.toJsonList(summary)};
+    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
+    return res;
+  }
 
 }

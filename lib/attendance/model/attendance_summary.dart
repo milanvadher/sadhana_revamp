@@ -18,11 +18,13 @@ class AttendanceSummary {
   @JsonKey(ignore: true)
   bool showRemarks = false;
 
+  int get percentage => ((presentDates / totalAttendanceDates) * 100).toInt();
+
   AttendanceSummary({this.mhtId, this.name, this.totalAttendanceDates, this.presentDates, this.lessAttendanceReason});
 
   @override
   String toString() {
-    return 'MonthlySummary{mhtId: $mhtId, name: $name, totalattendancedates: $totalAttendanceDates, presentdates: $presentDates, lessattendancereason: $lessAttendanceReason}';
+    return 'AttendanceSummary{mhtId: $mhtId, name: $name, totalattendancedates: $totalAttendanceDates, presentdates: $presentDates, lessattendancereason: $lessAttendanceReason}';
   }
 
   factory AttendanceSummary.fromJson(Map<String, dynamic> json) => _$AttendanceSummaryFromJson(json);
@@ -33,4 +35,8 @@ class AttendanceSummary {
   static List<AttendanceSummary> fromJsonList(dynamic jsonList) {
     return AppUtils.fromJsonList<AttendanceSummary>(jsonList, fromJsonFun);
   }
+  static toJsonList(List<AttendanceSummary> summary) {
+    return summary?.map((e) => e?.toJson())?.toList();
+  }
+
 }

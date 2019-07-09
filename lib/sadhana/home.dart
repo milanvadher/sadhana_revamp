@@ -522,7 +522,7 @@ class HomePageState extends BaseState<HomePage> {
         Navigator.pushNamed(context, AttendanceHomePage.routeName);
       }
     } else {
-      CommonFunction.displayInernetNotAvailableDialog(context: context);
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
     stopOverlay();
   }
@@ -559,7 +559,7 @@ class HomePageState extends BaseState<HomePage> {
           CommonFunction.alertDialog(context: context, msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
-        CommonFunction.displayInernetNotAvailableDialog(context: context);
+        CommonFunction.displayInternetNotAvailableDialog(context: context);
       }
     } catch (error, s) {
       print(error);

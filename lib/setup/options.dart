@@ -248,7 +248,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         isOverlay = false;
       });
     } else {
-      CommonFunction.displayInernetNotAvailableDialog(context: context);
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
 
   }

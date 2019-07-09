@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/constant/constant.dart';
-import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/setup/numberpicker.dart';
 import 'package:sadhana/utils/apputils.dart';
+import 'package:sadhana/widgets/remark_picker.dart';
 
 class NumberButton extends StatefulWidget {
   Function onClick;
@@ -53,7 +53,7 @@ class _NumberButtonState extends State<NumberButton> {
           child: Center(
             child: FlatButton(
               padding: EdgeInsets.all(0),
-              onPressed: widget.isDisabled ? null : onPressed,
+              onPressed: onPressed,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -84,27 +84,40 @@ class _NumberButtonState extends State<NumberButton> {
   }
 
   onPressed() {
-    showDialog<List>(
-        context: context,
-        builder: (_) {
-          return new NumberPickerDialog.integer(
-            title: Text(title),
-            color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
-            initialIntegerValue: activity.sadhanaValue,
-            minValue: 0,
-            isForSevaSadhana: AppUtils.equalsIgnoreCase(
-                sadhana.sadhanaName, Constant.SEVANAME),
-            maxValue: AppUtils.equalsIgnoreCase(
-                    sadhana.sadhanaName, Constant.SEVANAME)
-                ? 24
-                : 100,
-            remark: activity.remarks,
-          );
-        }).then(
-      (List onValue) {
-        onValueSelected(onValue);
-      },
-    );
+    if(widget.isDisabled && !AppUtils.isNullOrEmpty(activity.remarks)) {
+      showDialog<String>(
+          context: context,
+          builder: (_) {
+            return RemarkPickerDialog(
+              title: Text(title),
+              isEnabled: false,
+              remark: activity.remarks,
+            );
+          });
+    } else if(!widget.isDisabled) {
+      showDialog<List>(
+          context: context,
+          builder: (_) {
+            return new NumberPickerDialog.integer(
+              title: Text(title),
+              color: theme == Brightness.light ? sadhana.lColor : sadhana.dColor,
+              initialIntegerValue: activity.sadhanaValue,
+              minValue: 0,
+              isForSevaSadhana: AppUtils.equalsIgnoreCase(
+                  sadhana.sadhanaName, Constant.SEVANAME),
+              maxValue: AppUtils.equalsIgnoreCase(
+                  sadhana.sadhanaName, Constant.SEVANAME)
+                  ? 24
+                  : 100,
+              remark: activity.remarks,
+
+            );
+          }).then(
+            (List onValue) {
+          onValueSelected(onValue);
+        },
+      );
+    }
   }
 
   onValueSelected(List onValue) {

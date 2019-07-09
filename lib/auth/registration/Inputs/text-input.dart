@@ -12,6 +12,8 @@ class TextInputField extends StatelessWidget {
     this.textInputType = TextInputType.text,
     this.isRequiredValidation = false,
     this.autoFocus = false,
+    this.padding,
+    this.contentPadding,
   }) : super(key: key);
 
   final String labelText;
@@ -23,10 +25,12 @@ class TextInputField extends StatelessWidget {
   final TextInputType textInputType;
   final Function(String) onSaved;
   final Function(String) validation;
+  final EdgeInsetsGeometry contentPadding;
+  final EdgeInsetsGeometry padding;
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: padding?? const EdgeInsets.symmetric(vertical: 10.0),
       alignment: Alignment.bottomLeft,
       child: TextFormField(
         style: TextStyle(
@@ -34,9 +38,10 @@ class TextInputField extends StatelessWidget {
         ),
         autofocus: autoFocus,
         decoration: InputDecoration(
-          labelText: labelText,
+          labelText: isRequiredValidation ? "$labelText *" : labelText,
           border: OutlineInputBorder(),
           hintText: hintText ?? 'Enter a $labelText',
+          contentPadding: contentPadding,
         ),
         initialValue: valueText,
         enabled: enabled,

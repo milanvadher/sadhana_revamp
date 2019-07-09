@@ -27,7 +27,7 @@ Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'dvdno': instance.dvdNo,
       'dvdpart': instance.dvdPart,
       'remark': instance.remark,
-      'attendance': instance.attendance
+      'attendance': instance.attendance?.map((e) => e?.toJson())?.toList()
     };
 
 Attendance _$AttendanceFromJson(Map<String, dynamic> json) {

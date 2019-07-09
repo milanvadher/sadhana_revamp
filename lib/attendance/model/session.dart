@@ -50,7 +50,7 @@ class Attendance {
   bool isPresent;
   @JsonKey(name: 'absentreason')
   String absentReason;
-
+  @JsonKey(ignore: true)
   static bool _isPresentFromJson(int isPresent) => isPresent != null ? isPresent > 0 ? true : false : false;
   static int _isPresentToJson(bool isPresent) => isPresent ? 1 : 0;
 

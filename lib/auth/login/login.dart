@@ -279,7 +279,7 @@ class LoginPageState extends BaseState<LoginPage> {
       }
       stopOverlay();
     } else {
-      CommonFunction.displayInernetNotAvailableDialog(context: context);
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
     return false;
   }
