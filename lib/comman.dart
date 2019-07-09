@@ -55,7 +55,7 @@ class CommonFunction {
     );
   }
 
-  static displayInernetNotAvailableDialog({@required BuildContext context}) {
+  static displayInternetNotAvailableDialog({@required BuildContext context}) {
     if (context != null) {
       alertDialog(
         context: context,
@@ -65,6 +65,13 @@ class CommonFunction {
         barrierDismissible: false,
       );
     }
+  }
+
+  static String isRequiredValidation(String label, dynamic val) {
+    if (val == null || (val is String && val.trim().isEmpty)) {
+        return '$label is required';
+    }
+    return null;
   }
 
   // email Validation
