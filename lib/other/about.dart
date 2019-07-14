@@ -91,6 +91,7 @@ class AboutState extends BaseState<About> {
                 _LinkText(
                   style: linkStyle,
                   text: Constant.MBA_MAILID,
+                  // %20 used instead of space because link with space not opening in iOS
                   url: "mailto:" + Constant.MBA_MAILID +"?subject=Feedback%20of%20Sadhana",
                 ),
                 SizedBox(height: 40),
@@ -99,6 +100,7 @@ class AboutState extends BaseState<About> {
                 _LinkText(
                   style: linkStyle,
                   text: "mbaapps@googlegroups.com",
+                  // %20 used instead of space because link with space not opening in iOS
                   url: "mailto:" + Constant.MBA_MAILID + "?subject=Bug%20Report%20of%20Sadhana",
                 ),
                 SizedBox(height: 30),
