@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/attendance/mba_attendance_history.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -51,10 +52,10 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
     startLoading();
     UserRole userRole = await AppSharedPrefUtil.getUserRole();
     if (userRole != null) {
-      Response res = await _api.getAttendanceSummary("Group 1");
+      Response res = await _api.getAttendanceSummary(userRole.groupName);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        allSummary = AttendanceSummary.fromJsonList(appResponse.data);
+        allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
         filteredSummary = allSummary;
         print(filteredSummary);
       }
@@ -65,8 +66,9 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   void _filteredSummary() async {
     if (_searchText.isNotEmpty) {
       setState(() {
-        filteredSummary =
-            filteredSummary.where((summary) => summary.name.toLowerCase().contains(_searchText.toLowerCase())).toList(growable: true);
+        filteredSummary = filteredSummary
+            .where((summary) => summary.name.toLowerCase().contains(_searchText.toLowerCase()))
+            .toList(growable: true);
       });
     }
   }
@@ -100,6 +102,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   Widget pageToDisplay() {
     _filteredSummary();
     return Scaffold(
+      backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         centerTitle: true,
         title: _appBarTitle,
@@ -110,7 +113,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
           ),
         ],
       ),
-      body: _buildListView(),
+      body: SafeArea(child: _buildListView()),
     );
   }
 
@@ -128,44 +131,45 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
 
   _buildCardView(AttendanceSummary data) {
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: EdgeInsets.only(left: 10, right: 10),
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
         elevation: 5,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 20),
-              child: Text(data.name),
+        child: ListTile(
+          onTap: () {
+            onListTileClick(data);
+          },
+          contentPadding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+          dense: true,
+          title: Text(data.name),
+          trailing: Container(
+            decoration: BoxDecoration(
+              color: Colors.red.shade500,
             ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
-                color: Colors.blueGrey,
-              ),
-              width: 50,
-              height: 60,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Text(
-                    '${data.presentDates}/${data.totalAttendanceDates}',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
+            width: 60,
+            height: 60,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  '${data.presentDates}/${data.totalAttendanceDates}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  onListTileClick(AttendanceSummary summary) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => MBAAttendanceHistory(mhtID: "61758", name: "Kamlesh Kanazariya",),
+    ),);
   }
 }

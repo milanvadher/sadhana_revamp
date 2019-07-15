@@ -15,9 +15,11 @@ Session _$SessionFromJson(Map<String, dynamic> json) {
       dvdPart: json['dvd_part'] as int,
       remark: json['remark'] as String,
       attendance: (json['attendance'] as List)
-          ?.map((e) =>
-              e == null ? null : Attendance.fromJson(e as Map<String, dynamic>))
-          ?.toList())
+              ?.map((e) => e == null
+                  ? null
+                  : Attendance.fromJson(e as Map<String, dynamic>))
+              ?.toList() ??
+          [])
     ..sessionType = json['session_type'] as String;
 }
 

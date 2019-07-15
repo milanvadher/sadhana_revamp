@@ -24,6 +24,7 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
   final GlobalKey<FormState> _submitForm = GlobalKey<FormState>();
   UserRole _userRole;
   Color textColor;
+  String wsMonth;
   @override
   void initState() {
     super.initState();
@@ -32,14 +33,20 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
 
   void loadData() async {
     startLoading();
-    _userRole = await AppSharedPrefUtil.getUserRole();
-    if (_userRole != null) {
-      Response res = await _api.getAttendanceSummary(_userRole.groupName);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        summary = AttendanceSummary.fromJsonList(appResponse.data);
-        print(summary);
+    try {
+      _userRole = await AppSharedPrefUtil.getUserRole();
+      if (_userRole != null) {
+        wsMonth = WSConstant.wsDateFormat.format(DateTime.now());
+        Response res = await _api.getMonthlySummary(wsMonth, _userRole.groupName);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          summary = AttendanceSummary.fromJsonList(appResponse.data['details']);
+          print(summary);
+        }
       }
+    } catch(e,s) {
+      print(s);
+      CommonFunction.displayErrorDialog(context: context);
     }
     stopLoading();
   }
@@ -194,7 +201,7 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
   void _onSubmit() async {
     if (_submitForm.currentState.validate()) {
       _submitForm.currentState.save();
-      Response res = await _api.submitMontlyReport(_userRole.groupName, summary);
+      Response res = await _api.submitMontlyReport(wsMonth, _userRole.groupName, summary);
       print(summary);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {

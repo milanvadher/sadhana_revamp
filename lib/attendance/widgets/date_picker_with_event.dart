@@ -12,6 +12,8 @@ class AppCalendarCarousel extends StatefulWidget {
 }
 
 class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
+  DateTime selectedDate;
+
   static Color color = Colors.red;
   static Widget _eventIcon = Padding(
     padding: EdgeInsets.only(top: 23),
@@ -29,6 +31,12 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
   EventList _markedDateMap;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedDate = widget.selectedDate;
+  }
+
+  @override
   Widget build(BuildContext context) {
     _markedDateMap = new EventList(
       events: Map.fromIterable(widget.events != null ? widget.events : [], key: (v) => v, value: (v) => ["E"]),
@@ -41,18 +49,18 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
   }
 
   void _handleOk() {
-    Navigator.pop(context, widget.selectedDate);
+    Navigator.pop(context, selectedDate);
   }
 
   buildCalendar() {
     return CalendarCarousel(
       onDayPressed: (DateTime date, List events) {
-        this.setState(() => widget.selectedDate = date);
+        this.setState(() => selectedDate = date);
       },
       thisMonthDayBorderColor: Colors.grey,
       weekFormat: false,
       height: 350.0,
-      selectedDateTime: widget.selectedDate,
+      selectedDateTime: selectedDate,
       daysHaveCircularBorder: true,
       maxSelectedDate: DateTime.now(),
       todayButtonColor: Colors.transparent,

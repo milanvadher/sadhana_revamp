@@ -416,7 +416,7 @@ class HomePageState extends BaseState<HomePage> {
   void checkSimcityMBA() async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       Profile profile = await CacheData.getUserProfile();
-      if (profile != null && AppUtils.equalsIgnoreCase('Simandhar City', profile.center)) {
+      if (profile != null && AppUtils.equalsIgnoreCase(WSConstant.center_Simcity, profile.center)) {
         setState(() {
           isSimcityMBA = true;
         });

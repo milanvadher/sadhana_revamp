@@ -32,7 +32,7 @@ class MBAScheduleCheck {
       }
       if(await AppUtils.isInternetConnected()) {
         String date = DateFormat(WSConstant.DATE_FORMAT).format(DateTime.now());
-        String center = 'Simandhar City';
+        String center = WSConstant.center_Simcity;
         Profile profile = await CacheData.getUserProfile();
         if(profile != null && AppUtils.isNullOrEmpty(profile.center))
           center = profile.center;

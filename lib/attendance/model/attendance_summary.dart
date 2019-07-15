@@ -16,11 +16,13 @@ class AttendanceSummary {
   @JsonKey(ignore: true)
   String get name => '$firstName $lastName';
 
-  @JsonKey(name: 'totalattendancedates')
+  @JsonKey(name: 'total_session_for_mht')
   int totalAttendanceDates;
-  @JsonKey(name: 'presentdates')
+
+  @JsonKey(name: 'present_dates')
   int presentDates;
-  @JsonKey(name: 'lessattendancereason')
+
+  @JsonKey(name: 'less_attendance_reason')
   String lessAttendanceReason;
 
   @JsonKey(ignore: true)

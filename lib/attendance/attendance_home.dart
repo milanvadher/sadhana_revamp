@@ -20,6 +20,8 @@ import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel;
 
+import 'mba_attendance_history.dart';
+
 class AttendanceHomePage extends StatefulWidget {
   static const String routeName = '/attendance_home';
 
@@ -57,7 +59,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     try {
       _userRole = await AppSharedPrefUtil.getUserRole();
       if (_userRole != null && AppUtils.equalsIgnoreCase(_userRole.role, WSConstant.ROLE_ATTENDANCECOORD)) {
-        //isSimcityGroup = _userRole.isSimCityGroup;
+        isSimcityGroup = _userRole.isSimCityGroup;
         await loadSessionDates();
         await loadSession(selectedDate);
       } else {
@@ -123,7 +125,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         title: InkWell(
-          onTap: () => _selectDate(context),
+          onTap: () => _selectDate(),
           child: Container(
             width: MediaQuery.of(context).size.width / 2,
             child: Center(
@@ -229,7 +231,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
               const PopupMenuItem<PopUpMenu>(value: PopUpMenu.changeDate, child: Text('Change Date')),
               const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
-              const PopupMenuItem<PopUpMenu>(value: PopUpMenu.submitAttendance, child: Text('Submit Attendance')),
+              !isSimcityGroup
+                  ? const PopupMenuItem<PopUpMenu>(value: PopUpMenu.submitAttendance, child: Text('Submit Attendance'))
+                  : null,
             ],
         icon: Icon(Icons.menu),
       ),
@@ -270,15 +274,14 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate() async {
     final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
-    if(picked != null) {
+    if (picked != null) {
       setState(() {
         selectedDate = picked;
         loadSession(selectedDate);
       });
     }
-
   }
 
   Future<void> _selectDate1(BuildContext context) async {
@@ -288,7 +291,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       firstDate: DateTime(1950, 1),
       lastDate: DateTime.now(),
     );
-    if(picked != null) {
+    if (picked != null) {
       setState(() {
         selectedDate = picked;
         loadSession(selectedDate);
@@ -298,6 +301,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   void _onPopupSelected(PopUpMenu result) {
     switch (result) {
+      case PopUpMenu.changeDate:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MBAAttendanceHistory(),
+          ),
+        );
+        //_selectDate();
+        break;
       case PopUpMenu.attendanceSummary:
         Navigator.pushNamed(context, AttendanceSummaryPage.routeName);
         break;
