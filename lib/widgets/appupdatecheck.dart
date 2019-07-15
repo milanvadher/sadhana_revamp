@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
@@ -12,18 +14,31 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
-import 'package:synchronized/synchronized.dart';
 
 import '../main.dart';
 
 class AppUpdateCheck {
   static bool isChecking = false;
+  final BuildContext context;
+
   ApiService api = ApiService();
+
+  AppUpdateCheck(this.context);
+
   static void startAppUpdateCheckThread(BuildContext context) {
-    Future.delayed(Duration(seconds: 1), () => AppUpdateCheck().checkForNewAppUpdate(context));
+    Future.delayed(Duration(seconds: 1), () => AppUpdateCheck(context).startThread());
   }
 
-  void checkForNewAppUpdate(BuildContext context) async {
+  startThread() async {
+    await updateUserRole();
+    if(!await checkForNewAppUpdate()) {
+      await checkTokenExpiration();
+      await checkServerDate();
+    }
+  }
+
+  Future<bool> checkForNewAppUpdate() async {
+    bool isUpdated = false;
     /*bool check = true;
     int checkAfter = await AppSharedPrefUtil.getAppUpdateCheckAfter();
     if (checkAfter > 0) {
@@ -43,26 +58,40 @@ class AppUpdateCheck {
         Version playStoreVersion = Version(version: appSetting.version);
         if (playStoreVersion.compareTo(currentVersion) > 0) {
           showUpdateDialog(context: context);
-        } else {
-          await checkTokenExpiration(context);
-          await updateUserRole(context);
+          isUpdated = true;
         }
-
       }
     }
     isChecking = false;
-
+    return isUpdated;
     //}
   }
 
-  checkTokenExpiration(BuildContext context) async {
+  checkServerDate() async {
+    DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
+    if (internetDate != null) {
+      DateTime currentTime = DateTime.now();
+      if (currentTime.isAfter(internetDate) && currentTime.difference(internetDate).inDays > 2) {
+        CommonFunction.alertDialog(
+          closeable: false,
+          context: context,
+          msg: "You mobile date is not proper, Please change it and reopen App.",
+          doneButtonFn: () {
+            exit(0);
+          },
+        );
+      }
+    }
+  }
+
+  checkTokenExpiration() async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       Response res = await api.validateToken();
       AppResponseParser.parseResponse(res, context: context);
     }
   }
 
-  updateUserRole(BuildContext context) async {
+  updateUserRole() async {
     Response res = await api.getUserRole();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {

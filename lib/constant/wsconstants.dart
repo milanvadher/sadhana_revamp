@@ -10,4 +10,8 @@ class WSConstant {
   static final String ROLE_ATTENDANCECOORD = "AttendanceCoord";
 
   static final DateFormat wsDateFormat = DateFormat(DATE_FORMAT);
+  static final DateFormat wsTimeFormat = DateFormat(DATE_TIME_FORMAT);
+
+  static final String sessionType_GD = "GD";
+  static final String sessionType_General = "General";
 }

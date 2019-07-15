@@ -56,6 +56,7 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
             child: Column(
               children: <Widget>[
                 ListTile(
+                  dense: true,
                   title: Text(data.name),
                   trailing: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -172,27 +173,22 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
     return Scaffold(
       backgroundColor: Colors.blueGrey,
       appBar: AppBar(centerTitle: true, title: Text('Submit Attendance')),
-      body: Form(
+      body: SafeArea(child: Form(
         key: _submitForm,
         child: _buildListView(),
-      ),
+      ),),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _buildFloatingActionButton(),
     );
   }
 
   Widget _buildFloatingActionButton() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        FloatingActionButton.extended(
+    return FloatingActionButton.extended(
           onPressed: _onSubmit,
           //backgroundColor: Colors.white,
           icon: Icon(Icons.check, color: Colors.white),
           label: Text('Save', style: TextStyle(color: Colors.white)),
-        ),
-      ],
-    );
+        );
   }
 
   void _onSubmit() async {

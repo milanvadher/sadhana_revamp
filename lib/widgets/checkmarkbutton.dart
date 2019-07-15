@@ -10,11 +10,8 @@ class CheckmarkButton extends StatefulWidget {
   Sadhana sadhana;
   Activity activity;
   bool isDisabled;
-  CheckmarkButton(
-      {@required this.sadhana,
-      @required this.activity,
-      this.onClick,
-      this.isDisabled = false});
+
+  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick, this.isDisabled = false});
 
   @override
   _CheckmarkButtonState createState() => _CheckmarkButtonState();
@@ -27,55 +24,53 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Brightness theme;
   ActivityDAO activityDAO = ActivityDAO();
   Color color;
+
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-    color = theme == Brightness.light
-            ? widget.sadhana.lColor
-            : widget.sadhana.dColor;
+    color = theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor;
     return Container(
-      color: widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
+      color:
+          widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
       height: 50,
       child: InkWell(
         onTap: widget.isDisabled ? null : onClicked,
         onLongPress: widget.isDisabled ? null : onLongPress,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8,horizontal: 4),
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Container(
-          width: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: (color).withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
-            border: Border.all(
-              color: color,
-              width: 2,
-              style: widget.activity.sadhanaValue > 0
-                  ? BorderStyle.solid
-                  : BorderStyle.none,
+            width: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: (color).withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
+              border: Border.all(
+                color: color,
+                width: 2,
+                style: widget.activity.sadhanaValue > 0 ? BorderStyle.solid : BorderStyle.none,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: AnimatedContainer(
+                duration: Duration(seconds: 5),
+                width: 40,
+                child: widget.activity.sadhanaValue > 0
+                    ? Icon(
+                        Icons.done,
+                        size: 20.0,
+                        color: color,
+                      )
+                    : Icon(
+                        Icons.close,
+                        size: 20.0,
+                        color: Colors.grey,
+                      ),
+              ),
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: AnimatedContainer(
-              duration: Duration(seconds: 5),
-              width: 40,
-              child: widget.activity.sadhanaValue > 0
-                  ? Icon(
-                      Icons.done,
-                      size: 20.0,
-                      color: color,
-                    )
-                  : Icon(
-                      Icons.close,
-                      size: 20.0,
-                      color: Colors.grey,
-                    ),
-            ),
-          ),
-        ),
         ),
       ),
     );

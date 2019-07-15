@@ -6,6 +6,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
 
@@ -29,7 +30,12 @@ void schedulePeriodicSync() async {
   }
 }
 
-void syncPeriodic() {
-  print('Starting periodic sync on' + DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now()));
-  SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
+void syncPeriodic() async {
+  if(await AppUtils.isInternetConnected()) {
+    print('Starting periodic sync on' + DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now()));
+    SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
+    AppUtils.updateInternetDate();
+  } else {
+
+  }
 }

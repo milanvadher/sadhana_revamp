@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ntp/ntp.dart';
 import 'package:permission/permission.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
@@ -48,6 +51,8 @@ class AppUtils {
 
   static DateTime tryParse(String dateString, List<String> formats, {bool throwErrorIfNotParse = false}) {
     dynamic throwError;
+    if(formats == null)
+      formats = [WSConstant.DATE_TIME_FORMAT, WSConstant.DATE_TIME_FORMAT2, WSConstant.DATE_FORMAT];
     for (String format in formats) {
       try {
         return DateFormat(format).parse(dateString);
@@ -163,5 +168,12 @@ class AppUtils {
 
   static List<T> fromJsonList<T>(dynamic json, Function(Map<String, dynamic>) fromJson) {
     return (json as List)?.map<T>((e) => e == null ? null : fromJson(e as Map<String, dynamic>))?.toList();
+  }
+
+  static Future<void> updateInternetDate() async {
+    DateTime internetDate = await NTP.now();
+    if(internetDate != null) {
+      AppSharedPrefUtil.saveInternetDate(internetDate);
+    }
   }
 }

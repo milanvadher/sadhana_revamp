@@ -6,8 +6,16 @@ part 'attendance_summary.g.dart';
 class AttendanceSummary {
   @JsonKey(name: 'mht_id')
   String mhtId;
-  @JsonKey(name: 'name')
-  String name;
+
+  @JsonKey(name: 'first_name')
+  String firstName;
+
+  @JsonKey(name: 'last_name')
+  String lastName;
+
+  @JsonKey(ignore: true)
+  String get name => '$firstName $lastName';
+
   @JsonKey(name: 'totalattendancedates')
   int totalAttendanceDates;
   @JsonKey(name: 'presentdates')
@@ -20,7 +28,7 @@ class AttendanceSummary {
 
   int get percentage => ((presentDates / totalAttendanceDates) * 100).toInt();
 
-  AttendanceSummary({this.mhtId, this.name, this.totalAttendanceDates, this.presentDates, this.lessAttendanceReason});
+  AttendanceSummary();
 
   @override
   String toString() {

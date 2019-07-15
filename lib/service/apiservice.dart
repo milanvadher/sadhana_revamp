@@ -232,33 +232,33 @@ class ApiService {
 
   Future<Response> getSessionDates(String group) async {
     Map<String, dynamic> data = {'group': group};
-    //Response res = await _postApi(url: '/mba.attendance.get_session_dates', data: data);
-    Response res = http.Response("{\"message\":{\"data\":[\"2019-07-05\",\"2019-07-04\"]}}", 200);
+    Response res = await _postApi(url: '/mba.attendance.get_session_dates', data: data);
+    //Response res = http.Response("{\"message\":{\"data\":[\"2019-07-05\",\"2019-07-04\"]}}", 200);
     return res;
   }
 
   Future<Response> getMBAOfGroup(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group': group};
-    //Response res = await _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
-    Response res = http.Response(
-        "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\"},{\"mht_id\":\"111111\",\"name\":\"Divyang Mistry\"},{\"mht_id\":\"222222\",\"name\":\"Milan Vadher\"},{\"mht_id\":\"333333\",\"name\":\"Gaurav Suri\"},{\"mht_id\":\"444444\",\"name\":\"Parth Gudkha\"},{\"mht_id\":\"555555\",\"name\":\"Laxit Patel\"},{\"mht_id\":\"666666\",\"name\":\"Vijay Yadav\"}]}}",
-        200);
+    Response res = await _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
+    //Response res = http.Response(
+    //    "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"Kanazariya\"},{\"mht_id\":\"111111\",\"first_name\":\"Divyang\",\"last_name\":\"Mistry\"},{\"mht_id\":\"222222\",\"first_name\":\"Milan\",\"last_name\":\"Vadher\"},{\"mht_id\":\"333333\",\"first_name\":\"Gaurav\",\"last_name\":\"Suri\"},{\"mht_id\":\"444444\",\"first_name\":\"Parth\",\"last_name\":\"Gudkha\"},{\"mht_id\":\"555555\",\"first_name\":\"Laxit\",\"last_name\":\"Patel\"},{\"mht_id\":\"666666\",\"first_name\":\"Vijay\",\"last_name\":\"Yadav\"}]}}",
+    //    200);
     return res;
   }
 
   Future<Response> getAttendanceSession(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group': group};
-    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
-    Response res = http.Response(
-        "{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}",
-        200);
+    Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    //Response res = http.Response(
+    //    "{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}",
+    //    200);
     return res;
   }
 
   Future<Response> submitAttendanceSession(Session session) async {
     Map<String, dynamic> data = session.toJson();
-    //Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
-    Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
+    Response res = await _postApi(url: '/mba.attendance.save_attendance', data: data);
+    //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 

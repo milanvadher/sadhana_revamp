@@ -7,18 +7,20 @@ part of 'attendance_summary.dart';
 // **************************************************************************
 
 AttendanceSummary _$AttendanceSummaryFromJson(Map<String, dynamic> json) {
-  return AttendanceSummary(
-      mhtId: json['mht_id'] as String,
-      name: json['name'] as String,
-      totalAttendanceDates: json['totalattendancedates'] as int,
-      presentDates: json['presentdates'] as int,
-      lessAttendanceReason: json['lessattendancereason'] as String);
+  return AttendanceSummary()
+    ..mhtId = json['mht_id'] as String
+    ..firstName = json['first_name'] as String
+    ..lastName = json['last_name'] as String
+    ..totalAttendanceDates = json['totalattendancedates'] as int
+    ..presentDates = json['presentdates'] as int
+    ..lessAttendanceReason = json['lessattendancereason'] as String;
 }
 
 Map<String, dynamic> _$AttendanceSummaryToJson(AttendanceSummary instance) =>
     <String, dynamic>{
       'mht_id': instance.mhtId,
-      'name': instance.name,
+      'first_name': instance.firstName,
+      'last_name': instance.lastName,
       'totalattendancedates': instance.totalAttendanceDates,
       'presentdates': instance.presentDates,
       'lessattendancereason': instance.lessAttendanceReason

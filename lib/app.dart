@@ -3,14 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:sadhana/attendance/attendance_home.dart';
-import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
-import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
-import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SadhanaApp extends StatefulWidget {
@@ -39,8 +36,8 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
-    //pageToDisplay = AttendanceHomePage();
-    AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
+    pageToDisplay = AttendanceHomePage();
+    /*AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
       if(isLoggedIn) {
         setState(() {
           pageToDisplay = HomePage(
@@ -52,7 +49,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
           pageToDisplay = LoginPage();
         });
       }
-    });
+    });*/
   }
 
   AppOptionsPage getAppOptionPage() {

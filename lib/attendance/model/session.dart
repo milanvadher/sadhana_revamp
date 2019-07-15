@@ -12,24 +12,28 @@ class Session {
   String group;
   @JsonKey(name: 'dvdtype')
   String dvdType;
-  @JsonKey(name: 'dvdno')
+  @JsonKey(name: 'dvd_no')
   int dvdNo;
-  @JsonKey(name: 'dvdpart')
+  @JsonKey(name: 'dvd_part')
   int dvdPart;
   @JsonKey(name: 'remark')
   String remark;
+  @JsonKey(name: 'session_type')
+  String sessionType;
 
   DateTime get dateTime =>  date != null ? WSConstant.wsDateFormat.parse(date) : null;
 
-  @JsonKey(name: 'attendance')
+  @JsonKey(name: 'attendance' , defaultValue: [])
   List<Attendance> attendance;
 
   Session({this.date, this.group, this.dvdType, this.dvdNo, this.dvdPart, this.remark, this.attendance});
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
   Map<String, dynamic> toJson() => _$SessionToJson(this);
 
-  Session.fromAttendanceList(String date, List<Attendance> attendances) {
+  Session.fromAttendanceList(String group, String date, String sessionType, List<Attendance> attendances) {
     this.date = date;
+    this.group = group;
+    this.sessionType = sessionType;
     this.attendance = attendances;
   }
 
@@ -44,17 +48,25 @@ class Session {
 class Attendance {
   @JsonKey(name: 'mht_id')
   String mhtId;
-  @JsonKey(name: 'name')
-  String name;
-  @JsonKey(name: 'isPresent', fromJson: _isPresentFromJson, toJson: _isPresentToJson)
-  bool isPresent;
-  @JsonKey(name: 'absentreason')
-  String absentReason;
+
+  @JsonKey(name: 'first_name')
+  String firstName;
+
+  @JsonKey(name: 'last_name')
+  String lastName;
+
   @JsonKey(ignore: true)
+  String get name => '$firstName $lastName';
+
+  @JsonKey(name: 'is_present', fromJson: _isPresentFromJson, toJson: _isPresentToJson)
+  bool isPresent;
+  @JsonKey(name: 'absent_reason')
+  String absentReason;
+
+  Attendance();
   static bool _isPresentFromJson(int isPresent) => isPresent != null ? isPresent > 0 ? true : false : false;
   static int _isPresentToJson(bool isPresent) => isPresent ? 1 : 0;
 
-  Attendance({this.mhtId, this.isPresent, this.absentReason});
   factory Attendance.fromJson(Map<String, dynamic> json) => _$AttendanceFromJson(json);
   Map<String, dynamic> toJson() => _$AttendanceToJson(this);
 

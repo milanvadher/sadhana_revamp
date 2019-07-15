@@ -133,11 +133,14 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if (!isFirst) {
         print('on Connectivity change');
-        await AppSettingUtil.getServerAppSetting(forceFromServer: true);
-        AppUpdateCheck.startAppUpdateCheckThread(context);
-        if (await AppSharedPrefUtil.isUserRegistered()) {
-          SyncActivityUtils.syncAllUnSyncActivity(context: context);
-          MBAScheduleCheck.getMBASchedule();
+        if(await AppUtils.isInternetConnected()) {
+          await AppSettingUtil.getServerAppSetting(forceFromServer: true);
+          AppUpdateCheck.startAppUpdateCheckThread(context);
+          AppUtils.updateInternetDate();
+          if (await AppSharedPrefUtil.isUserRegistered()) {
+            SyncActivityUtils.syncAllUnSyncActivity(context: context);
+            MBAScheduleCheck.getMBASchedule();
+          }
         }
       }
       isFirst = false;

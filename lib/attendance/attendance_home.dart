@@ -6,9 +6,11 @@ import 'package:sadhana/attendance/model/dvd_info.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/attendance/submit_attendance.dart';
+import 'package:sadhana/attendance/widgets/date_picker_with_event.dart';
 import 'package:sadhana/attendance/widgets/dvd_form.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -16,6 +18,7 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel;
 
 class AttendanceHomePage extends StatefulWidget {
   static const String routeName = '/attendance_home';
@@ -32,15 +35,17 @@ enum PopUpMenu {
 
 class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   bool _selectAll = false;
-  static DateTime today = DateTime.now();
   ApiService _api = ApiService();
   Session session;
   Hero _dvdFormButton;
   Hero _saveButton;
   UserRole _userRole;
   List<DateTime> _sessionDates = List();
-  bool isSimcityGroup = true;
+  DateTime selectedDate = Constant.today;
+  bool isSimcityGroup = false;
   final GlobalKey<FormState> _attendanceForm = GlobalKey<FormState>();
+  bool isReadOnly = false;
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +59,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       if (_userRole != null && AppUtils.equalsIgnoreCase(_userRole.role, WSConstant.ROLE_ATTENDANCECOORD)) {
         //isSimcityGroup = _userRole.isSimCityGroup;
         await loadSessionDates();
-        await loadSession(DateTime.now());
+        await loadSession(selectedDate);
       } else {
         CommonFunction.alertDialog(context: context, msg: "You don't have right for Attendance");
       }
@@ -67,22 +72,33 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   loadSession(DateTime date) async {
-    String strDate = WSConstant.wsDateFormat.format(date);
-    if (_sessionDates.contains(date)) {
-      Response res = await _api.getAttendanceSession(strDate, _userRole.groupName);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        session = Session.fromJson(appResponse.data);
-        print(session);
+    startOverlay();
+    try {
+      String strDate = WSConstant.wsDateFormat.format(date);
+      if (_sessionDates.contains(date)) {
+        Response res = await _api.getAttendanceSession(strDate, _userRole.groupName);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          setState(() {
+            session = Session.fromJson(appResponse.data);
+          });
+          print(session);
+        }
+      } else {
+        Response res = await _api.getMBAOfGroup(strDate, _userRole.groupName);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          List<Attendance> attendances = Attendance.fromJsonList(appResponse.data);
+          String sessionType = isSimcityGroup ? WSConstant.sessionType_GD : WSConstant.sessionType_General;
+          setState(() {
+            session = Session.fromAttendanceList(_userRole.groupName, strDate, sessionType, attendances);
+          });
+        }
       }
-    } else {
-      Response res = await _api.getMBAOfGroup(strDate, _userRole.groupName);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        List<Attendance> attendances = Attendance.fromJsonList(appResponse.data);
-        session = Session.fromAttendanceList(strDate, attendances);
-      }
+    } catch (e, s) {
+      print(s);
     }
+    stopOverlay();
   }
 
   loadSessionDates() async {
@@ -90,7 +106,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       List<String> strDates = (appResponse.data as List)?.map((e) => e.toString())?.toList();
-      if (strDates != null) strDates.forEach((str) => _sessionDates.add(DateFormat(WSConstant.DATE_FORMAT).parse(str)));
+      if (strDates != null)
+        strDates.forEach((str) => _sessionDates.add(AppUtils.tryParse(str, [WSConstant.DATE_FORMAT], throwErrorIfNotParse: true)));
     }
   }
 
@@ -110,7 +127,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           child: Container(
             width: MediaQuery.of(context).size.width / 2,
             child: Center(
-              child: Text(new DateFormat('MMM dd yyy').format(today)),
+              child: Text(new DateFormat('MMM dd yyy').format(selectedDate)),
             ),
           ),
         ),
@@ -128,7 +145,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                     margin: EdgeInsets.only(top: 6, left: 20, bottom: 6),
                     child: Text('Select All'),
                   ),
-                  Checkbox(value: _selectAll, onChanged: _onSelectAll),
+                  Checkbox(value: _selectAll, onChanged: isReadOnly ? null : _onSelectAll),
                 ],
               ),
             ),
@@ -154,14 +171,19 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           child: Column(
             children: <Widget>[
               ListTile(
+                dense: true,
                 title: Text(attendance.name),
-                onTap: () {
-                  onCheck(attendance);
-                },
+                onTap: isReadOnly
+                    ? null
+                    : () {
+                        onCheck(attendance);
+                      },
                 trailing: Checkbox(
-                  onChanged: (val) {
-                    onCheck(attendance);
-                  },
+                  onChanged: isReadOnly
+                      ? null
+                      : (val) {
+                          onCheck(attendance);
+                        },
                   value: attendance.isPresent,
                 ),
               ),
@@ -234,26 +256,44 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 )
               : Container(),
           !isSimcityGroup ? SizedBox(width: 20) : Container(),
-          FloatingActionButton.extended(
-            heroTag: _saveButton,
-            onPressed: _onSubmit,
-            //backgroundColor: Colors.white,
-            icon: Icon(Icons.check, color: Colors.white),
-            label: Text('Save', style: TextStyle(color: Colors.white)),
-          ),
+          !isReadOnly
+              ? FloatingActionButton.extended(
+                  heroTag: _saveButton,
+                  onPressed: _onSubmit,
+                  //backgroundColor: Colors.white,
+                  icon: Icon(Icons.check, color: Colors.white),
+                  label: Text('Save', style: TextStyle(color: Colors.white)),
+                )
+              : Container(),
         ],
       ),
     );
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
+    if(picked != null) {
+      setState(() {
+        selectedDate = picked;
+        loadSession(selectedDate);
+      });
+    }
+
+  }
+
+  Future<void> _selectDate1(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedDate,
       firstDate: DateTime(1950, 1),
       lastDate: DateTime.now(),
     );
-    print(picked);
+    if(picked != null) {
+      setState(() {
+        selectedDate = picked;
+        loadSession(selectedDate);
+      });
+    }
   }
 
   void _onPopupSelected(PopUpMenu result) {
@@ -295,6 +335,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 builder: (BuildContext context) => DVDForm(
                       session: session,
                       onDVDSubmit: _onDVDEntered,
+                      isReadOnly: isReadOnly,
                     ),
               )
             ],
@@ -307,17 +348,25 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
-    if(_attendanceForm.currentState.validate()) {
-      _attendanceForm.currentState.save();
-      if (_validateDVD() && _validateAttendance()) {
-        print(session);
-        Response res = await _api.submitAttendanceSession(session);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-        if (appResponse.status == WSConstant.SUCCESS_CODE) {
-          CommonFunction.alertDialog(context: context, msg: "Attendance submitted successfully.");
+    startOverlay();
+    try {
+      if (_attendanceForm.currentState.validate()) {
+        _attendanceForm.currentState.save();
+        if (_validateDVD() && _validateAttendance()) {
+          print(session);
+          Response res = await _api.submitAttendanceSession(session);
+          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+          if (appResponse.status == WSConstant.SUCCESS_CODE) {
+            CommonFunction.alertDialog(context: context, msg: "Attendance submitted successfully.");
+            _sessionDates.add(session.dateTime);
+          }
         }
       }
+    } catch (e, s) {
+      print(s);
+      CommonFunction.displayErrorDialog(context: context);
     }
+    stopOverlay();
   }
 
   bool _validateDVD() {

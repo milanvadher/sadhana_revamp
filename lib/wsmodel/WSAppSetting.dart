@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/apputils.dart';
 
 class AppSetting {
   static const int DEFAULT_EditableDays = 4;
@@ -14,6 +16,14 @@ class AppSetting {
   bool allowSyncFromServer;
   bool forceSync;
   bool showCSVOption = false;
+
+  DateTime getServerDateTime() {
+    if(serverDate != null) {
+      return AppUtils.tryParse(serverDate, [WSConstant.DATE_TIME_FORMAT, WSConstant.DATE_TIME_FORMAT2]);
+    }
+    return null;
+  }
+
   AppSetting(
       {this.appVersionAndroid,
       this.appVersionIos,

@@ -213,4 +213,17 @@ class AppSharedPrefUtil {
     return true;
   }
 
+  static Future<DateTime> getInternetDate() async {
+    String strInternetDate = await getString(SharedPrefConstant.s_internet_date);
+    if(strInternetDate == null) {
+      return null;
+    } else {
+      return DateFormat('dd-MM-yy').parse(strInternetDate);
+    }
+  }
+
+  static Future<void> saveInternetDate(DateTime date) async {
+    if(date != null)
+      await saveString(SharedPrefConstant.s_internet_date, DateFormat('dd-MM-yy').format(date));
+  }
 }
