@@ -230,6 +230,13 @@ class ApiService {
     return res;
   }
 
+  Future<Response> getMonthPendingForAttendance(String group) async {
+    Map<String, dynamic> data = {'group': group};
+    Response res = await _postApi(url: '/mba.attendance.get_month_pending_for_attendance', data: data);
+    //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
+    return res;
+  }
+
   Future<Response> getSessionDates(String group) async {
     Map<String, dynamic> data = {'group': group};
     Response res = await _postApi(url: '/mba.attendance.get_session_dates', data: data);
@@ -275,14 +282,14 @@ class ApiService {
     Map<String, dynamic> data = {'group': group};
     //Response res = await _postApi(url: '/mba.attendance.get_attendance_summary', data: data);
     Response res = http.Response(
-        "{\"message\":{\"data\":{\"session_start_date\":\"2019-03-01\",\"total_attendance_dates\":3,\"details\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"\",\"present_dates\":2,\"total_session_for_mht\":3},{\"mht_id\":\"55354\",\"first_name\":\"Parth\",\"last_name\":\"Gudhka\",\"present_dates\":3,\"total_session_for_mht\":3}]}}}",
+        "{\"message\":{\"data\":{\"session_start_date\":\"2019-03-01\",\"total_attendance_dates\":3,\"details\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"\",\"present_dates\":2,\"total_attendance_dates\":3},{\"mht_id\":\"55354\",\"first_name\":\"Parth\",\"last_name\":\"Gudhka\",\"present_dates\":3,\"total_attendance_dates\":3}]}}}",
         200);
     return res;
   }
 
   Future<Response> submitMontlyReport(String month, String group, List<AttendanceSummary> summary) async {
     Map<String, dynamic> data = {'month' : month, 'group': group, 'less_attendance_reasons' : AttendanceSummary.toJsonList(summary)};
-    Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    Response res = await _postApi(url: '/mba.group_api.submit_monthly_report', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }

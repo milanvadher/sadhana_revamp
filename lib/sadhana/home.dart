@@ -5,9 +5,11 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/attendance/submit_attendance.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -68,6 +70,7 @@ class HomePageState extends BaseState<HomePage> {
   bool isUserRegistered = false;
   bool showOptionMenu = false;
   bool isAttendanceCord = false;
+  UserRole role;
   @override
   void initState() {
     super.initState();
@@ -93,7 +96,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadUserRole() async {
-    UserRole role = await AppSharedPrefUtil.getUserRole();
+    role = await AppSharedPrefUtil.getUserRole();
     if (role != null) {
       if (AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role.role)) {
         setState(() {
@@ -133,7 +136,7 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if (!isFirst) {
         print('on Connectivity change');
-        if(await AppUtils.isInternetConnected()) {
+        if (await AppUtils.isInternetConnected()) {
           await AppSettingUtil.getServerAppSetting(forceFromServer: true);
           AppUpdateCheck.startAppUpdateCheckThread(context);
           AppUtils.updateInternetDate();
@@ -521,8 +524,36 @@ class HomePageState extends BaseState<HomePage> {
     if (await AppUtils.isInternetConnected()) {
       await loadUserRoleFromServer();
       if (isAttendanceCord) {
+        if (!role.isSimCityGroup) {
+          Response res = await _api.getMonthPendingForAttendance(role.groupName);
+          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+          if (appResponse.status == WSConstant.SUCCESS_CODE) {
+            if (!AppUtils.isNullOrEmpty(appResponse.data)) {
+              DateTime date = WSConstant.wsDateFormat.parse(appResponse.data);
+              if (today.month != date.month) {
+                String strMonth = DateFormat.yMMM().format(date);
+                CommonFunction.alertDialog(
+                  context: context,
+                  msg: "$strMonth month's attendance submission is pending, Please submit Attendance",
+                  doneButtonFn: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SubmitAttendancePage(date),
+                      ),
+                    );
+                  }
+                );
+              }
+            } else {
+              Navigator.pushNamed(context, AttendanceHomePage.routeName);
+            }
+          }
+        } else {
+          Navigator.pushNamed(context, AttendanceHomePage.routeName);
+        }
         stopOverlay();
-        Navigator.pushNamed(context, AttendanceHomePage.routeName);
       }
     } else {
       CommonFunction.displayInternetNotAvailableDialog(context: context);

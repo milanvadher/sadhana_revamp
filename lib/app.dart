@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:sadhana/attendance/attendance_home.dart';
-import 'package:sadhana/attendance/mba_attendance_history.dart';
 import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
@@ -35,13 +33,13 @@ class _SadhanaAppState extends State<SadhanaApp> {
       AppLocalNotification.initAppLocalNotification(context);
     });
     _getUserSelectedTheme();
-    //checkForUserLoggedIn();
+    checkForUserLoggedIn();
   }
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
-    pageToDisplay = AttendanceHomePage();
-    /*AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
+    //pageToDisplay = AttendanceHomePage();
+    AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
       if(isLoggedIn) {
         setState(() {
           pageToDisplay = HomePage(
@@ -53,7 +51,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
           pageToDisplay = LoginPage();
         });
       }
-    });*/
+    });
   }
 
   AppOptionsPage getAppOptionPage() {
@@ -75,7 +73,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   @override
   Widget build(BuildContext context) {
-    checkForUserLoggedIn();
+    //checkForUserLoggedIn();
     return MaterialApp(
       theme: _options.theme.data.copyWith(platform: _options.platform),
       title: 'Sadhana',

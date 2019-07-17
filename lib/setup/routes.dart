@@ -53,11 +53,6 @@ List<CreateRoute> _buildAppRoutes() {
       buildRoute: (BuildContext context) => AttendanceSummaryPage(),
     ),
     CreateRoute(
-      title: 'SubmitAttendance Page',
-      routeName: SubmitAttendancePage.routeName,
-      buildRoute: (BuildContext context) => SubmitAttendancePage(),
-    ),
-    CreateRoute(
       title: 'Registration Page',
       routeName: RegistrationPage.routeName,
       buildRoute: (BuildContext context) => RegistrationPage(

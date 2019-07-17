@@ -302,19 +302,18 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   void _onPopupSelected(PopUpMenu result) {
     switch (result) {
       case PopUpMenu.changeDate:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MBAAttendanceHistory(),
-          ),
-        );
-        //_selectDate();
+        _selectDate();
         break;
       case PopUpMenu.attendanceSummary:
         Navigator.pushNamed(context, AttendanceSummaryPage.routeName);
         break;
       case PopUpMenu.submitAttendance:
-        Navigator.pushNamed(context, SubmitAttendancePage.routeName);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubmitAttendancePage(DateTime.now()),
+          ),
+        );
         break;
       default:
     }
