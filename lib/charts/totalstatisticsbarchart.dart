@@ -68,7 +68,7 @@ class TotalStatisticsBarChart extends StatelessWidget {
         tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
         renderSpec: new SmallTickRendererSpec(
           labelStyle: new TextStyleSpec(
-            fontSize: 12, // size in Pts.
+            fontSize: 12,
             color: color,
           ),
           lineStyle: new LineStyleSpec(
@@ -80,7 +80,7 @@ class TotalStatisticsBarChart extends StatelessWidget {
       primaryMeasureAxis: new NumericAxisSpec(
           renderSpec: new GridlineRendererSpec(
               labelStyle: new TextStyleSpec(
-                fontSize: 12, // size in Pts.
+                fontSize: 12,
                 color: color,
               ),
               lineStyle: new LineStyleSpec(

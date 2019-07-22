@@ -52,13 +52,13 @@ class _Heading extends StatelessWidget {
 }
 
 class AppOptionsPage extends StatefulWidget {
-  const AppOptionsPage({
+  AppOptionsPage({
     Key key,
     this.options,
     this.onOptionsChanged,
   }) : super(key: key);
 
-  final AppOptions options;
+  AppOptions options;
   final ValueChanged<AppOptions> onOptionsChanged;
 
   @override
@@ -119,6 +119,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
 
   void onThemeChanged(AppOptions newOptions) {
     setState(() {
+      widget.options = newOptions;
       widget.onOptionsChanged(newOptions);
     });
     /*widget.onOptionsChanged(newOptions);

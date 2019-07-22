@@ -1,12 +1,12 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sadhana/charts/number_history_barchart.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
-import 'package:sadhana/charts/totalstatisticslinechart.dart';
-import 'package:sadhana/charts/totalstatisticstimebarchart.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
@@ -113,6 +113,12 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                   height: 250.0,
                   child: TotalStatisticsChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
                 )),
+            sadhana.type == SadhanaType.NUMBER ? Padding(
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                child: new SizedBox(
+                  height: 250.0,
+                  child: NumberHistoryBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate),
+                )) : Container(),
           ],
         ),
       ),
