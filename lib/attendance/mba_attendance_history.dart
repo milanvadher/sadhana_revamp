@@ -13,6 +13,7 @@ import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class MBAAttendanceHistory extends StatefulWidget {
+  static const String routeName = '/mba_attendance_history';
   final String mhtID;
   final String name;
   const MBAAttendanceHistory({Key key, this.mhtID, this.name}) : super(key: key);
@@ -20,7 +21,7 @@ class MBAAttendanceHistory extends StatefulWidget {
   _MBAAttendanceHistoryState createState() => new _MBAAttendanceHistoryState();
 }
 
-class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
+class _MBAAttendanceHistoryState extends State<MBAAttendanceHistory> {
   static List<MBAAttendance> attendances;
   /*= [
     MBAAttendance.name("2019-07-10", true),
@@ -29,14 +30,26 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
   ];*/
   UserRole _userRole;
   ApiService _api = ApiService();
+  EventList<MBAAttendance> _markedDateMap;
+  var len = 9;
+  double cHeight;
+
   @override
   void initState() {
     super.initState();
     loadData();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _markedDateMap = EventList(
+      events: Map.fromIterable(attendances != null ? attendances : [],
+          key: (v) => (v as MBAAttendance).attendanceDate, value: (v) => [v]),
+    );
+  }
   loadData() async {
-    startLoading();
+    //startLoading();
     try {
       _userRole = await AppSharedPrefUtil.getUserRole();
       if (_userRole != null) {
@@ -54,7 +67,7 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    //stopLoading();
   }
 
   static Widget buildIcon(MBAAttendance mbaAttendance) {
@@ -76,21 +89,30 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
     );
   }
 
-  EventList<MBAAttendance> _markedDateMap;
-
-  CalendarCarousel _calendarCarouselNoHeader;
-
-  var len = 9;
-  double cHeight;
 
   @override
-  Widget pageToDisplay() {
-    _markedDateMap = EventList(
-      events: Map.fromIterable(attendances != null ? attendances : [],
-          key: (v) => (v as MBAAttendance).attendanceDate, value: (v) => [v]),
-    );
+  Widget build(BuildContext context) {
+  //Widget pageToDisplay() {
     cHeight = MediaQuery.of(context).size.height;
-    _calendarCarouselNoHeader = CalendarCarousel<MBAAttendance>(
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text(widget.name),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            buildCalendar(),
+            markerRepresent(Colors.red, "Absent"),
+            markerRepresent(Colors.green, "Present"),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildCalendar() {
+    return CalendarCarousel<MBAAttendance>(
       dayPadding: 0,
       weekDayMargin: EdgeInsets.only(bottom: 2),
       height: cHeight * 0.63,
@@ -106,22 +128,6 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
       markedDateIconBuilder: (event) {
         return buildIcon(event);
       },
-    );
-
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.name),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            _calendarCarouselNoHeader,
-            markerRepresent(Colors.red, "Absent"),
-            markerRepresent(Colors.green, "Present"),
-          ],
-        ),
-      ),
     );
   }
 

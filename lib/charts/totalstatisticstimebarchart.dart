@@ -59,15 +59,15 @@ class TotalStatisticsTimeBarChart extends StatelessWidget {
           viewport: new charts.DateTimeExtents(start: DateTime(today.year, today.month - 6), end: today)),*/
       primaryMeasureAxis: new charts.NumericAxisSpec(
           tickProviderSpec: new charts.StaticNumericTickProviderSpec(
-        <charts.TickSpec<num>>[
-          charts.TickSpec<num>(0),
-          charts.TickSpec<num>(7),
-          charts.TickSpec<num>(13),
-          charts.TickSpec<num>(19),
-          charts.TickSpec<num>(25),
-          charts.TickSpec<num>(31),
-        ],
-      )),
+            <charts.TickSpec<num>>[
+              charts.TickSpec<num>(0),
+              charts.TickSpec<num>(7),
+              charts.TickSpec<num>(13),
+              charts.TickSpec<num>(19),
+              charts.TickSpec<num>(25),
+              charts.TickSpec<num>(31),
+            ],
+          )),
       behaviors: [new charts.PanAndZoomBehavior()],
       dateTimeFactory: const charts.LocalDateTimeFactory(),
       defaultRenderer: new charts.BarRendererConfig<DateTime>(barRendererDecorator:charts.BarLabelDecorator<String>() ),

@@ -10,6 +10,7 @@ class TotalStatisticsChart extends StatelessWidget {
   final List<charts.Series> seriesList;
   final bool animate;
   final Color color;
+
   TotalStatisticsChart(this.seriesList, this.color, {this.animate});
 
   factory TotalStatisticsChart.withActivity(Color color, List<Activity> activities) {
@@ -45,7 +46,9 @@ class TotalStatisticsChart extends StatelessWidget {
       animate: false,
     );
   }
+
   DateTime today = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return new charts.TimeSeriesChart(
@@ -90,12 +93,29 @@ class TotalStatisticsChart extends StatelessWidget {
           titleStyleSpec: charts.TextStyleSpec(color: color),
         ),
         new charts.PanAndZoomBehavior(),
+        /*new charts.LinePointHighlighter(
+            showHorizontalFollowLine: charts.LinePointHighlighterFollowLineType.none,
+            showVerticalFollowLine: charts.LinePointHighlighterFollowLineType.nearest,
+            symbolRenderer: charts.RectSymbolRenderer(isSolid: true),
+        ),
+        new charts.SelectNearest(eventTrigger: charts.SelectionTrigger.tapAndDrag),
+        new charts.RangeAnnotation([
+          new charts.LineAnnotationSegment(
+            new DateTime(2019, 7, 21),
+            charts.RangeAnnotationAxisType.domain,
+            startLabel: 'Oct 4',
+            labelPosition: AnnotationLabelPosition.margin,
+          ),
+        ]),*/
+
         //charts.RangeAnnotation([new charts.LineAnnotationSegment<num>(1, RangeAnnotationAxisType.measure)]),
       ],
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      defaultRenderer: new charts.LineRendererConfig(
+      defaultRenderer: LineRendererConfig(includePoints: true, symbolRenderer: charts.CircleSymbolRenderer(isSolid: true)),
+      /*new charts.LineRendererConfig(
         includePoints: true,
-      ),
+        symbolRenderer: charts.CircleSymbolRenderer(isSolid: true, )
+      ),*/
       selectionModels: [
         SelectionModelConfig(changedListener: (SelectionModel model) {
           if (model.hasDatumSelection) print(model.selectedSeries[0].measureFn(model.selectedDatum[0].index));

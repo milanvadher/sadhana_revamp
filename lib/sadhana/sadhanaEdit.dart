@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
+import 'package:sadhana/charts/totalstatisticslinechart.dart';
 import 'package:sadhana/charts/totalstatisticstimebarchart.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -104,9 +105,13 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
                 child: new SizedBox(
                   height: 250.0,
+                  child: TotalStatisticsBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
+                )),
+            Padding(
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                child: new SizedBox(
+                  height: 250.0,
                   child: TotalStatisticsChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
-                  //TotalStatisticsBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
-                  //TotalStatisticsBarChart.withActivity(sadhana.activitiesByDate.values.toList()),
                 )),
           ],
         ),

@@ -168,7 +168,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   onListTileClick(AttendanceSummary summary) {
-    Navigator.push(context, MaterialPageRoute(
+    Navigator.pushReplacement(context, MaterialPageRoute(
       builder: (context) => MBAAttendanceHistory(mhtID: "61758", name: "Kamlesh Kanazariya",),
     ),);
   }

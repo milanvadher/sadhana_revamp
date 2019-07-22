@@ -90,7 +90,7 @@ class CommonFunction {
   static String mobileValidation(String value, {bool isRequired = true}) {
     if (isRequired && value.isEmpty) {
       return 'Mobile no. is required';
-    } else if (value.isNotEmpty && value.length != 15) {
+    } else if (value.isNotEmpty && value.length != 10) {
       return 'Enter valid Mobile no.';
     }
     return null;
@@ -99,7 +99,7 @@ class CommonFunction {
     if (isRequired && value.isEmpty) {
       return 'Mobile no. is required';
     }  else if (!AppUtils.isNullOrEmpty(value)) {
-      Pattern pattern = r'^(?:[+0]9)?[0-9]{15}$';
+      Pattern pattern = r'^(?:[+0]9)?[0-9]{10}$';
       RegExp regex = new RegExp(pattern);
       if (!regex.hasMatch(value))
         return 'Enter Valid Mobile Number';

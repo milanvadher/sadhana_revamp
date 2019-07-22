@@ -18,9 +18,6 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
-import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel;
-
-import 'mba_attendance_history.dart';
 
 class AttendanceHomePage extends StatefulWidget {
   static const String routeName = '/attendance_home';

@@ -11,11 +11,12 @@ class NumberButton extends StatefulWidget {
   Sadhana sadhana;
   Activity activity;
   bool isDisabled;
+  final double width;
   NumberButton(
       {this.onClick,
       @required this.sadhana,
       @required this.activity,
-      this.isDisabled = false});
+      this.isDisabled = false, this.width = 40});
 
   @override
   _NumberButtonState createState() => _NumberButtonState();
@@ -36,8 +37,8 @@ class _NumberButtonState extends State<NumberButton> {
     color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Container(
       color: widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
+      width: widget.width,
       child: Container(
-        width: 34,
         margin: EdgeInsets.all(7),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -49,7 +50,7 @@ class _NumberButtonState extends State<NumberButton> {
           ),
         ),
         child: Container(
-          width: 48,
+          //width: 30,
           child: Center(
             child: FlatButton(
               padding: EdgeInsets.all(0),

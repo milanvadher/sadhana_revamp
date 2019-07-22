@@ -46,7 +46,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
     try {
       Response res = await api.getAllCountries();
       AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         countryList = [];
         if (mounted) {
@@ -81,7 +81,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           enabled: false,
           labelText: 'Full Name',
           valueText:
-              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName?? ""}',
+          '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName?? ""}',
         ),
         // Mobile
         TextInputField(
@@ -120,7 +120,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           labelText: 'Birth Date',
           isRequiredValidation: true,
           selectedDate:
-              _register.bDate == null ? null : DateTime.parse(_register.bDate),
+          _register.bDate == null ? null : DateTime.parse(_register.bDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.bDate = dateFormatter.format(date);
@@ -132,7 +132,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           labelText: 'Gnan Date',
           isRequiredValidation: true,
           selectedDate:
-              _register.gDate == null ? null : DateTime.parse(_register.gDate),
+          _register.gDate == null ? null : DateTime.parse(_register.gDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.gDate = dateFormatter.format(date);
@@ -232,11 +232,11 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
               isExpanded: isExpandedAddress[1],
               body: isExpandedAddress[1]
                   ? AddressInput(
-                      address: _register.currentAddress,
-                      countryList: countryList,
-                      startLoading: widget.startLoading,
-                      stopLoading: widget.stopLoading,
-                    )
+                address: _register.currentAddress,
+                countryList: countryList,
+                startLoading: widget.startLoading,
+                stopLoading: widget.stopLoading,
+              )
                   : Container(),
             ),
           ],

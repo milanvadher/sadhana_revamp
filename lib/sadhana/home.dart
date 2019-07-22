@@ -57,7 +57,8 @@ class HomePageState extends BaseState<HomePage> {
   DateTime previousMonth = DateTime(now.year, now.month - 1);
   static int durationInDays = Constant.displayDays;
   List<Sadhana> sadhanas = new List();
-  double headerWidth = 150.0;
+  double headerWidth = 130.0;
+  double buttonWidth = 45;
   Brightness theme;
   BuildContext context;
   bool isSimcityMBA = false;
@@ -71,6 +72,7 @@ class HomePageState extends BaseState<HomePage> {
   bool showOptionMenu = false;
   bool isAttendanceCord = false;
   UserRole role;
+
   @override
   void initState() {
     super.initState();
@@ -372,7 +374,11 @@ class HomePageState extends BaseState<HomePage> {
     List<Widget> rightWidgets = new List();
     rightWidgets.add(_headerList(daysToDisplay));
     List<Widget> activityWidgets = sadhanas.map((sadhana) {
-      return SadhanaHorizontalPanel(sadhana: sadhana, daysToDisplay: daysToDisplay);
+      return SadhanaHorizontalPanel(
+        sadhana: sadhana,
+        daysToDisplay: daysToDisplay,
+        buttonWidth: buttonWidth,
+      );
     }).toList();
     rightWidgets.addAll(activityWidgets);
     return rightWidgets;
@@ -387,7 +393,7 @@ class HomePageState extends BaseState<HomePage> {
   Widget _headerListData(String weekDay, int date) {
     return Container(
       height: 60,
-      width: 48,
+      width: buttonWidth,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -533,18 +539,17 @@ class HomePageState extends BaseState<HomePage> {
               if (today.month != date.month) {
                 String strMonth = DateFormat.yMMM().format(date);
                 CommonFunction.alertDialog(
-                  context: context,
-                  msg: "$strMonth month's attendance submission is pending, Please submit Attendance",
-                  doneButtonFn: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SubmitAttendancePage(date),
-                      ),
-                    );
-                  }
-                );
+                    context: context,
+                    msg: "$strMonth month's attendance submission is pending, Please submit Attendance",
+                    doneButtonFn: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SubmitAttendancePage(date),
+                        ),
+                      );
+                    });
               }
             } else {
               Navigator.pushNamed(context, AttendanceHomePage.routeName);

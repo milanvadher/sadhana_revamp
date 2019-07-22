@@ -1,21 +1,22 @@
 //import 'dart:math';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:charts_flutter/flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:sadhana/charts/custom_bar_label_decorator.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:charts_flutter/flutter.dart';
+import 'package:charts_flutter/src/text_element.dart';
+import 'package:charts_flutter/src/text_style.dart' as style;
 
-class TotalStatisticsBarChart extends StatelessWidget {
+class TotalStatisticsLineChart extends StatelessWidget {
   final List<Series> seriesList;
   final bool animate;
   final Color color;
   final OrdinalViewport viewport;
 
-  TotalStatisticsBarChart(this.seriesList, this.color, {this.animate, this.viewport});
+  TotalStatisticsLineChart(this.seriesList, this.color, {this.animate, this.viewport});
 
-  factory TotalStatisticsBarChart.withActivity(Color color, List<Activity> activities) {
+  factory TotalStatisticsLineChart.withActivity(Color color, List<Activity> activities) {
     Map<DateTime, int> countByMonth = new Map();
     activities.forEach((activity) {
       if (activity.sadhanaValue > 0) {
@@ -33,16 +34,15 @@ class TotalStatisticsBarChart extends StatelessWidget {
     });
     timeSeries.sort((a, b) => a.time.compareTo(b.time));
     List<OrdinalSales> barChartData = timeSeries.map((timeSeries) {
-      String xaxis = Constant.monthName[timeSeries.time.month - 1];
-      if (xaxis == 'Dec') {
-        int year = int.parse(DateFormat("yy").format(timeSeries.time));
-        xaxis = 'Dec $year';
-      }
-      return OrdinalSales(xaxis, timeSeries.values);
+      //String xaxis = Constant.monthName[timeSeries.time.month - 1];
+      /*if (xaxis == 'Dec') {
+        xaxis = 'Dec ${timeSeries.time.year}';
+      }*/
+      return OrdinalSales(timeSeries.time.millisecondsSinceEpoch, timeSeries.values);
     }).toList();
-    OrdinalViewport viewport = OrdinalViewport(barChartData.last.year, 8);
-    List<Series<dynamic, String>> chart_series = [
-      new Series<OrdinalSales, String>(
+    OrdinalViewport viewport = OrdinalViewport(barChartData.last.year.toString(), barChartData.last.sales);
+    List<Series<dynamic, int>> chart_series = [
+      new Series<OrdinalSales, int>(
         id: 'Sadhana',
         colorFn: (_, __) => Color.fromHex(code: color.hexString),
         domainFn: (OrdinalSales sales, _) => sales.year,
@@ -51,7 +51,7 @@ class TotalStatisticsBarChart extends StatelessWidget {
         data: barChartData,
       )
     ];
-    return new TotalStatisticsBarChart(
+    return new TotalStatisticsLineChart(
       chart_series,
       color,
       animate: false,
@@ -61,22 +61,13 @@ class TotalStatisticsBarChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new BarChart(
+    return new LineChart(
       seriesList,
       animate: animate,
-      domainAxis: new OrdinalAxisSpec(
-        tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
-        renderSpec: new SmallTickRendererSpec(
-          labelStyle: new TextStyleSpec(
-            fontSize: 12, // size in Pts.
-            color: color,
-          ),
-          lineStyle: new LineStyleSpec(
-            color: MaterialPalette.gray.shade500,
-          ),
-        ),
-        viewport: viewport,
+      /*domainAxis: new charts.NumericAxisSpec(
+        viewport: new charts.NumericExtents(3.0, 7.0),
       ),
+*/
       primaryMeasureAxis: new NumericAxisSpec(
           renderSpec: new GridlineRendererSpec(
               labelStyle: new TextStyleSpec(
@@ -107,12 +98,12 @@ class TotalStatisticsBarChart extends StatelessWidget {
         ),
         new PanAndZoomBehavior(),
       ],
-      //defaultRenderer: LineRendererConfig(includePoints: true),
+      defaultRenderer: LineRendererConfig(includePoints: true),
       //defaultRenderer: BarLaneRendererConfig(),
-      defaultRenderer: new BarRendererConfig<String>(
+      /*defaultRenderer: new BarRendererConfig<String>(
         strokeWidthPx: 0.3,
-        barRendererDecorator: CustomBarLabelDecorator<String>(labelAnchor: CustomBarLabelAnchor.end),
-      ),
+        barRendererDecorator: CustomBarLabelDecorator<String>(),
+      ),*/
     );
   }
 }
@@ -126,7 +117,7 @@ class TimeSeries {
 }
 
 class OrdinalSales {
-  final String year;
+  final int year;
   final int sales;
 
   OrdinalSales(this.year, this.sales);

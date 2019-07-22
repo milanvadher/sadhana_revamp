@@ -33,7 +33,7 @@ class AppUpdateCheck {
     await updateUserRole();
     if(!await checkForNewAppUpdate()) {
       await checkTokenExpiration();
-      await checkServerDate();
+      //await checkServerDate();
     }
   }
 
@@ -75,7 +75,7 @@ class AppUpdateCheck {
         CommonFunction.alertDialog(
           closeable: false,
           context: context,
-          msg: "You mobile date is not proper, Please change it and reopen App.",
+          msg: "Your mobile date is not proper, Please change it and reopen App.",
           doneButtonFn: () {
             exit(0);
           },

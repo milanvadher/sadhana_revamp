@@ -10,8 +10,8 @@ class CheckmarkButton extends StatefulWidget {
   Sadhana sadhana;
   Activity activity;
   bool isDisabled;
-
-  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick, this.isDisabled = false});
+  final double width;
+  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick, this.isDisabled = false, this.width = 40});
 
   @override
   _CheckmarkButtonState createState() => _CheckmarkButtonState();
@@ -24,7 +24,6 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Brightness theme;
   ActivityDAO activityDAO = ActivityDAO();
   Color color;
-
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
@@ -36,13 +35,14 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
       color:
           widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
       height: 50,
+      width: widget.width,
       child: InkWell(
         onTap: widget.isDisabled ? null : onClicked,
         onLongPress: widget.isDisabled ? null : onLongPress,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: Container(
-            width: 40,
+            //width: 28,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: (color).withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
@@ -56,7 +56,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
               padding: const EdgeInsets.all(0.0),
               child: AnimatedContainer(
                 duration: Duration(seconds: 5),
-                width: 40,
+                //width: 40,
                 child: widget.activity.sadhanaValue > 0
                     ? Icon(
                         Icons.done,
