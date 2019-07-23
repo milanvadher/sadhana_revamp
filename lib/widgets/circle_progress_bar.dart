@@ -23,7 +23,7 @@ class CircleProgressBar extends StatelessWidget {
       child: CustomPaint(
         child: Container(),
         foregroundPainter: CircleProgressBarPainter(
-          strokeWidth: 4,
+          strokeWidth: 5,
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
           percentage: this.value,

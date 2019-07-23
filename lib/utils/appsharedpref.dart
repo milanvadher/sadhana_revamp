@@ -89,7 +89,7 @@ class AppSharedPrefUtil {
 
 
   static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
-    String sLastSyncTime = DateFormat(Constant.APP_DATE_FORMAT).format(lastSyncTime);
+    String sLastSyncTime = Constant.APP_DATE_FORMAT.format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
     return saveString(SharedPrefConstant.s_last_sync_time, sLastSyncTime);
   }

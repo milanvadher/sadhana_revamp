@@ -2,6 +2,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/charts/number_history_barchart.dart';
+import 'package:sadhana/charts/streak_chart.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
 import 'package:sadhana/comman.dart';
@@ -119,6 +120,11 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                   height: 250.0,
                   child: NumberHistoryBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate),
                 )) : Container(),
+            Padding(
+                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                child: new SizedBox(
+                  child: StreakChart.withActivity(color, sadhana.activitiesByDate.values.toList()),
+                )),
           ],
         ),
       ),
