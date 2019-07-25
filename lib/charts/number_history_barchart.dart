@@ -84,14 +84,13 @@ class NumberHistoryBarChart extends StatelessWidget {
       ),
       behaviors: [
         SlidingViewport(),
-        /*new ChartTitle(
-          'Total',
+        new ChartTitle(
+          'History',
           behaviorPosition: BehaviorPosition.top,
           titleOutsideJustification: OutsideJustification.start,
           innerPadding: 18,
           titleStyleSpec: TextStyleSpec(color: color),
-        ),*/
-
+        ),
         new PanAndZoomBehavior(),
       ],
       defaultRenderer: new BarRendererConfig<String>(

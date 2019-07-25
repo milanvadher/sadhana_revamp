@@ -369,7 +369,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
       }
       sadhana.reminderTime = reminderTime;
-      if (sadhana.type == SadhanaType.NUMBER)
+      if (sadhana.isNumeric)
         sadhana.targetValue = target;
       else
         sadhana.targetValue = 1;

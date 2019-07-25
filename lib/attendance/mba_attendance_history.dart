@@ -21,7 +21,7 @@ class MBAAttendanceHistory extends StatefulWidget {
   _MBAAttendanceHistoryState createState() => new _MBAAttendanceHistoryState();
 }
 
-class _MBAAttendanceHistoryState extends State<MBAAttendanceHistory> {
+class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
   static List<MBAAttendance> attendances;
   /*= [
     MBAAttendance.name("2019-07-10", true),
@@ -40,16 +40,8 @@ class _MBAAttendanceHistoryState extends State<MBAAttendanceHistory> {
     loadData();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _markedDateMap = EventList(
-      events: Map.fromIterable(attendances != null ? attendances : [],
-          key: (v) => (v as MBAAttendance).attendanceDate, value: (v) => [v]),
-    );
-  }
   loadData() async {
-    //startLoading();
+    startLoading();
     try {
       _userRole = await AppSharedPrefUtil.getUserRole();
       if (_userRole != null) {
@@ -58,6 +50,10 @@ class _MBAAttendanceHistoryState extends State<MBAAttendanceHistory> {
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {
             attendances = MBAAttendance.fromJsonList(appResponse.data);
+            _markedDateMap = EventList(
+              events: Map.fromIterable(attendances != null ? attendances : [],
+                  key: (v) => (v as MBAAttendance).attendanceDate, value: (v) => [v]),
+            );
           });
           print(attendances);
         }
@@ -67,7 +63,7 @@ class _MBAAttendanceHistoryState extends State<MBAAttendanceHistory> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    //stopLoading();
+    stopLoading();
   }
 
   static Widget buildIcon(MBAAttendance mbaAttendance) {
@@ -91,8 +87,7 @@ class _MBAAttendanceHistoryState extends State<MBAAttendanceHistory> {
 
 
   @override
-  Widget build(BuildContext context) {
-  //Widget pageToDisplay() {
+  Widget pageToDisplay() {
     cHeight = MediaQuery.of(context).size.height;
     return new Scaffold(
       appBar: new AppBar(

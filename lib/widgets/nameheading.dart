@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/sadhana/sadhanaEdit.dart';
+import 'package:sadhana/utils/chart_utils.dart';
 import 'package:sadhana/widgets/circle_progress_bar.dart';
 
 class NameHeading extends StatefulWidget {
@@ -84,15 +85,8 @@ class _NameHeadingState extends State<NameHeading> {
   }
 
   getPercentage() {
-    int counter = 0;
-    DateTime time = DateTime.now().add(Duration(days: -31));
-    widget.sadhana.activitiesByDate.values.forEach((activity) {
-      if(activity.sadhanaDate.isAfter(time)) {
-        if(activity.sadhanaValue > 0)
-          counter++;
-      }
-    });
-    return (counter/31);
+    double value = ChartUtils.getScore(widget.sadhana.activitiesByDate.values.toList());
+    return value / 100;
   }
 
   _onSadhanaHeadingClick() {

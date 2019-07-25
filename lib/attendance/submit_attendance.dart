@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
@@ -46,15 +49,31 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
     try {
       _userRole = await AppSharedPrefUtil.getUserRole();
       if (_userRole != null) {
-        wsMonth = WSConstant.wsDateFormat.format(widget.month);
-        strMonth = DateFormat.yMMM().format(widget.month);
-        Response res = await _api.getMonthlySummary(wsMonth, _userRole.groupName);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-        if (appResponse.status == WSConstant.SUCCESS_CODE) {
-          summary = AttendanceSummary.fromJsonList(appResponse.data['details']);
-          int totalSessionDates = appResponse.data['total_attendance_dates'];
-          summary.forEach((s) => s.totalAttendanceDates = totalSessionDates);
-          print(summary);
+        setState(() {
+          wsMonth = WSConstant.wsDateFormat.format(widget.month);
+          strMonth = DateFormat.yMMM().format(widget.month);
+        });
+        if (!CacheData.isSubmittedCurrentMonthAttendance) {
+          Response res = await _api.getMonthlySummary(wsMonth, _userRole.groupName);
+          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+          if (appResponse.status == WSConstant.SUCCESS_CODE) {
+            setState(() {
+              summary = AttendanceSummary.fromJsonList(appResponse.data['details']);
+              int totalSessionDates = appResponse.data['total_attendance_dates'];
+              summary.forEach((s) => s.totalAttendanceDates = totalSessionDates);
+              print(summary);
+            });
+          }
+        } else {
+          stopLoading();
+          CommonFunction.alertDialog(
+              closeable: false,
+              context: context,
+              msg: "You have already sumbitted current month attendance",
+              doneButtonFn: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
         }
       }
     } catch (e, s) {
@@ -133,13 +152,13 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
         centerTitle: true,
         title: AppTitleWithSubTitle(
           title: 'Submit Attendance',
-          subTitle: '${_userRole.groupName} , $strMonth',
+          subTitle: '${_userRole.groupTitle} , $strMonth',
         ),
       ),
       body: SafeArea(
         child: Form(
           key: _submitForm,
-          child: _buildListView(),
+          child: summary != null ? _buildListView() : Container(),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -160,13 +179,35 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
     if (_submitForm.currentState.validate()) {
       _submitForm.currentState.save();
       summary = summary.where((s) => !AppUtils.isNullOrEmpty(s.lessAttendanceReason)).toList();
+      CommonFunction.alertDialog(
+          context: context,
+          msg: "Are you sure you want to submit attendance?",
+          doneButtonFn: () async {
+            Navigator.pop(context);
+            await submitAttendance();
+          });
+    }
+  }
+
+  Future<void> submitAttendance() async {
+    try {
+      startLoading();
       Response res = await _api.submitMontlyReport(wsMonth, _userRole.groupName, summary);
-      print(summary);
+      stopLoading();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        CommonFunction.alertDialog(context: context, msg: "Attendance submitted successfully.");
-        Navigator.pop(context);
+        if (widget.month.month == Constant.today.month) CacheData.isSubmittedCurrentMonthAttendance = true;
+        CommonFunction.alertDialog(
+            context: context,
+            msg: "Attendance submitted successfully.",
+            doneButtonFn: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
       }
+    } catch (e, s) {
+      print(s);
+      stopLoading();
     }
   }
 }

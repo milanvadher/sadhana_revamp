@@ -12,11 +12,13 @@ import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AttendanceHomePage extends StatefulWidget {
@@ -59,6 +61,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         isSimcityGroup = _userRole.isSimCityGroup;
         await loadSessionDates();
         await loadSession(selectedDate);
+        checkForReadOnly();
       } else {
         CommonFunction.alertDialog(context: context, msg: "You don't have right for Attendance");
       }
@@ -106,7 +109,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       List<String> strDates = (appResponse.data as List)?.map((e) => e.toString())?.toList();
       if (strDates != null)
-        strDates.forEach((str) => _sessionDates.add(AppUtils.tryParse(str, [WSConstant.DATE_FORMAT], throwErrorIfNotParse: true)));
+        strDates
+            .forEach((str) => _sessionDates.add(AppUtils.tryParse(str, [WSConstant.DATE_FORMAT], throwErrorIfNotParse: true)));
     }
   }
 
@@ -123,11 +127,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       appBar: AppBar(
         title: InkWell(
           onTap: () => _selectDate(),
-          child: Container(
-            width: MediaQuery.of(context).size.width / 2,
-            child: Center(
-              child: Text(new DateFormat('MMM dd yyy').format(selectedDate)),
-            ),
+          child: AppTitleWithSubTitle(
+            title: new DateFormat('MMM dd yyy').format(selectedDate),
+            subTitle: _userRole.groupTitle,
           ),
         ),
         bottom: PreferredSize(
@@ -276,24 +278,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     if (picked != null) {
       setState(() {
         selectedDate = picked;
+        checkForReadOnly();
         loadSession(selectedDate);
       });
     }
   }
 
-  Future<void> _selectDate1(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(1950, 1),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-        loadSession(selectedDate);
-      });
-    }
+  void checkForReadOnly() {
+    if(selectedDate.month != Constant.today.month || CacheData.isSubmittedCurrentMonthAttendance)
+      isReadOnly = true;
   }
 
   void _onPopupSelected(PopUpMenu result) {

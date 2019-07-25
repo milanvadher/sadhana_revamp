@@ -7,12 +7,15 @@ import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
-import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/model/sadhana_statistics.dart';
+import 'package:sadhana/utils/chart_utils.dart';
+import 'package:sadhana/widgets/circle_progress_bar.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:table_calendar/table_calendar.dart';
+
 DateTime now = new DateTime.now();
 
 Map<DateTime, List<bool>> _holidays = {
@@ -33,6 +36,7 @@ class SadhanaEditPage extends StatefulWidget {
 
 class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderStateMixin {
   Sadhana sadhana;
+  SadhanaStatistics statistics;
   Brightness theme;
   Color color;
   SadhanaDAO sadhanaDAO = SadhanaDAO();
@@ -47,10 +51,9 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   void didChangeDependencies() {
     super.didChangeDependencies();
     sadhana = widget.sadhana;
-    List<DateTime> events = new List();
-    sadhana.activitiesByDate.forEach((timeInt, activity) {
-      if (activity.sadhanaValue > 0) events.add(DateTime.fromMillisecondsSinceEpoch(timeInt));
-    });
+    ChartUtils.generateStatistics(sadhana);
+    statistics = sadhana.statistics;
+    List<DateTime> events = statistics.events;
     _holidays = new Map.fromIterable(events, key: (v) => v, value: (v) => [true]);
   }
 
@@ -60,8 +63,10 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     return Scaffold(
       appBar: AppBar(
-        actionsIconTheme: Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
-        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        actionsIconTheme:
+            Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme:
+            Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         title: Text(sadhana.sadhanaName, style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
         backgroundColor: color,
         actions: <Widget>[
@@ -72,62 +77,128 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       body: SafeArea(
         child: ListView(
           children: <Widget>[
-            Card(
-              margin: EdgeInsets.only(bottom: 10),
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 15),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    maxRadius: 0,
-                  ),
-                  title: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      sadhana.description,
-                      style: TextStyle(color: color),
-                    ),
-                  ),
-                  subtitle: Row(
-                    children: <Widget>[
-                      Icon(Icons.loop, size: 15),
-                      Padding(padding: EdgeInsets.only(right: 5)),
-                      Text('Everyday'),
-                      Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
-                      Icon(Icons.alarm, size: 15),
-                      Padding(padding: EdgeInsets.only(right: 5)),
-                      Text(_getReminderText()),
-                    ],
-                  ),
-                ),
-              ),
+            _buildTopHeader(),
+            buildBoxLayout(_buildOverView()),
+            buildBoxLayout(
+              StreakChart.withStreakList(color, statistics.streakList),
+              isFirst: true,
             ),
-            _buildTableCalendar(),
-            Padding(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: new SizedBox(
-                  height: 250.0,
-                  child: TotalStatisticsBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
-                )),
-            Padding(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: new SizedBox(
-                  height: 250.0,
-                  child: TotalStatisticsChart.withActivity(getChartColor(color),sadhana.activitiesByDate.values.toList()),
-                )),
-            sadhana.type == SadhanaType.NUMBER ? Padding(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: new SizedBox(
-                  height: 250.0,
-                  child: NumberHistoryBarChart.withActivity(getChartColor(color),sadhana.activitiesByDate),
-                )) : Container(),
-            Padding(
-                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                child: new SizedBox(
-                  child: StreakChart.withActivity(color, sadhana.activitiesByDate.values.toList()),
-                )),
+            buildBoxLayout(Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+              child: _buildTableCalendar(),
+            )),
+            buildBoxLayout(SizedBox(
+              height: 250.0,
+              child: TotalStatisticsBarChart.forMonth(getChartColor(color), statistics.countByMonth),
+            )),
+            buildBoxLayout(SizedBox(
+              height: 250.0,
+              child: TotalStatisticsChart.forMonth(getChartColor(color), statistics.countByMonth),
+            )),
+            sadhana.isNumeric
+                ? buildBoxLayout(SizedBox(
+                    height: 250.0,
+                    child: NumberHistoryBarChart.withActivity(getChartColor(color), sadhana.activitiesByDate),
+                  ))
+                : Container(),
           ],
         ),
       ),
+    );
+  }
+
+  _buildTopHeader() {
+    return Card(
+      elevation: 10,
+      child: ListTile(
+        leading: CircleAvatar(maxRadius: 0),
+        title: Padding(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          child: Text(
+            sadhana.description,
+            style: TextStyle(color: color),
+          ),
+        ),
+        subtitle: Row(
+          children: <Widget>[
+            Icon(Icons.loop, size: 15),
+            Padding(padding: EdgeInsets.only(right: 5)),
+            Text('Everyday'),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
+            Icon(Icons.alarm, size: 15),
+            Padding(padding: EdgeInsets.only(right: 5)),
+            Text(_getReminderText()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  buildBoxLayout(Widget child, {bool isFirst = false}) {
+    return new Container(
+        padding: const EdgeInsets.fromLTRB(10, 10, 5, 10),
+        decoration: new BoxDecoration(
+          border: new Border(
+            top: BorderSide(color: Colors.grey, width: 2),
+            right: BorderSide(color: Colors.grey, width: 2),
+            left: BorderSide(color: Colors.grey, width: 2),
+          ),
+        ),
+        child: child);
+  }
+
+  _buildOverView() {
+    return Column(
+      children: <Widget>[
+        _buildTitle("Overview"),
+        Padding(
+          padding: EdgeInsets.only(left: 20, top: 5),
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                height: 30,
+                child: CircleProgressBar(
+                  backgroundColor: Colors.grey,
+                  foregroundColor: color,
+                  value: statistics.score / 100,
+                ),
+              ),
+              SizedBox(width: 15),
+              _buildTitleValue("Score", '${statistics.score} %'),
+              SizedBox(width: 15),
+              _buildTitleValue("Total", statistics.total.toString()),
+              SizedBox(width: 15),
+              _buildTitleValue("This Month", statistics.monthTotal.toString()),
+              SizedBox(width: 15),
+              sadhana.isNumeric ? _buildTitleValue("Total Value", statistics.totalValue.toString()) : Container(),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  _buildTitleValue(String title, String value) {
+    return Column(
+      children: <Widget>[
+        Text(
+          value,
+          style: TextStyle(color: color),
+        ),
+        Text(title),
+      ],
+    );
+  }
+
+  _buildTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.only(left: 10),
+      child: Row(children: <Widget>[
+        Text(
+          title,
+          style: TextStyle(color: color, fontSize: 18),
+        )
+      ]),
     );
   }
 
@@ -163,11 +234,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   }
 
   charts.Color getChartColor(Color color) {
-    return charts.Color(
-        r: color.red,
-        g: color.green,
-        b: color.blue,
-        a: color.alpha);
+    return charts.Color(r: color.red, g: color.green, b: color.blue, a: color.alpha);
   }
 
   _onSadhanaEdited(Sadhana sadhana) {
@@ -200,7 +267,9 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             child: CircleAvatar(
               child: Text(
                 '${date.day}',
-                style: TextStyle().copyWith(color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                style: TextStyle().copyWith(
+                    color:
+                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: _holidays.containsKey(date) ? color : Colors.transparent,
             ),
@@ -212,7 +281,9 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             child: CircleAvatar(
               child: Text(
                 '${date.day}',
-                style: TextStyle(color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                style: TextStyle(
+                    color:
+                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: color,
             ),

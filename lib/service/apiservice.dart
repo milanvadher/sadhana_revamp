@@ -280,10 +280,10 @@ class ApiService {
 
   Future<Response> getAttendanceSummary(String group) async {
     Map<String, dynamic> data = {'group': group};
-    //Response res = await _postApi(url: '/mba.attendance.get_attendance_summary', data: data);
-    Response res = http.Response(
+    Response res = await _postApi(url: '/mba.attendance.get_attendance_summary', data: data);
+    /*Response res = http.Response(
         "{\"message\":{\"data\":{\"session_start_date\":\"2019-03-01\",\"total_attendance_dates\":3,\"details\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"\",\"present_dates\":2,\"total_attendance_dates\":3},{\"mht_id\":\"55354\",\"first_name\":\"Parth\",\"last_name\":\"Gudhka\",\"present_dates\":3,\"total_attendance_dates\":3}]}}}",
-        200);
+        200);*/
     return res;
   }
 
@@ -295,7 +295,7 @@ class ApiService {
   }
 
   Future<Response> getMBAAttendance(String mhtId) async {
-    Map<String, dynamic> data = {'mht_id': mhtId};
+    Map<String, dynamic> data = {'mba_mht_id': mhtId};
     Response res = await _postApi(url: '/mba.attendance.get_mba_attendance', data: data);
     /*Response res = http.Response(
         "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\",\"totalattendancedates\":9,\"presentdates\":2,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Divyang Mistry\",\"totalattendancedates\":9,\"presentdates\":7,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Milan Vadher\",\"totalattendancedates\":9,\"presentdates\":6,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Gaurav Suri\",\"totalattendancedates\":9,\"presentdates\":9,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Parth Gudkha\",\"totalattendancedates\":9,\"presentdates\":8,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Laxit Patel\",\"totalattendancedates\":9,\"presentdates\":4,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Vijay Yadav\",\"totalattendancedates\":9,\"presentdates\":3,\"lessattendancereason\":\"\"}]}}",

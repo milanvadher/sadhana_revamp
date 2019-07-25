@@ -10,6 +10,7 @@ class CacheData {
   static Map<int, Sadhana> _sadhanasById = new Map();
   static String lastSyncTime;
   static Profile _userProfile;
+  static bool isSubmittedCurrentMonthAttendance = false;
 
   static void setUserProfile(Profile userProfile) {
     _userProfile = userProfile;

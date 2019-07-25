@@ -8,6 +8,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AttendanceSummaryPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   final TextEditingController _filter = new TextEditingController();
   ApiService _api = ApiService();
   int month = new DateTime.now().month;
-
+  UserRole _userRole;
   @override
   void initState() {
     super.initState();
@@ -50,13 +51,14 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
 
   void loadData() async {
     startLoading();
-    UserRole userRole = await AppSharedPrefUtil.getUserRole();
-    if (userRole != null) {
-      Response res = await _api.getAttendanceSummary(userRole.groupName);
+    _userRole = await AppSharedPrefUtil.getUserRole();
+    if (_userRole != null) {
+      Response res = await _api.getAttendanceSummary(_userRole.groupName);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
         filteredSummary = allSummary;
+        setTitle();
         print(filteredSummary);
       }
     }
@@ -91,11 +93,15 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
         );
       } else {
         this._searchIcon = new Icon(Icons.search);
-        this._appBarTitle = new Text('Attendance Summary');
+        setTitle();
         filteredSummary = allSummary;
         _filter.clear();
       }
     });
+  }
+
+  setTitle() {
+    _appBarTitle = AppTitleWithSubTitle(title: 'Attendance Summary', subTitle: _userRole.groupTitle,);
   }
 
   @override
@@ -168,8 +174,8 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   onListTileClick(AttendanceSummary summary) {
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) => MBAAttendanceHistory(mhtID: "61758", name: "Kamlesh Kanazariya",),
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => MBAAttendanceHistory(mhtID: summary.mhtId, name: summary.name,),
     ),);
   }
 }

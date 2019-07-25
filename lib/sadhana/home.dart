@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
+import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/attendance/submit_attendance.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
@@ -79,7 +80,7 @@ class HomePageState extends BaseState<HomePage> {
     loadSadhana();
     checkSimcityMBA();
     new Future.delayed(Duration.zero, () {
-      AppUpdateCheck.startAppUpdateCheckThread(context);
+      OnAppOpenBackgroundThread.startBackgroundThread(context);
     });
     AppUtils.askForPermission();
     AppSharedPrefUtil.isUserRegistered().then((isUserRegistered) {
@@ -140,7 +141,7 @@ class HomePageState extends BaseState<HomePage> {
         print('on Connectivity change');
         if (await AppUtils.isInternetConnected()) {
           await AppSettingUtil.getServerAppSetting(forceFromServer: true);
-          AppUpdateCheck.startAppUpdateCheckThread(context);
+          OnAppOpenBackgroundThread.startBackgroundThread(context);
           AppUtils.updateInternetDate();
           if (await AppSharedPrefUtil.isUserRegistered()) {
             SyncActivityUtils.syncAllUnSyncActivity(context: context);
@@ -264,7 +265,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('SadhanaQA'),
+        title: Text('JIOQA'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -535,8 +536,11 @@ class HomePageState extends BaseState<HomePage> {
           AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
             if (!AppUtils.isNullOrEmpty(appResponse.data)) {
+              CacheData.isSubmittedCurrentMonthAttendance = false;
               DateTime date = WSConstant.wsDateFormat.parse(appResponse.data);
-              if (today.month != date.month) {
+              if (today.month == date.month) {
+                Navigator.pushNamed(context, AttendanceHomePage.routeName);
+              } else {
                 String strMonth = DateFormat.yMMM().format(date);
                 CommonFunction.alertDialog(
                     context: context,
@@ -552,6 +556,7 @@ class HomePageState extends BaseState<HomePage> {
                     });
               }
             } else {
+              //CacheData.isSubmittedCurrentMonthAttendance = true;
               Navigator.pushNamed(context, AttendanceHomePage.routeName);
             }
           }

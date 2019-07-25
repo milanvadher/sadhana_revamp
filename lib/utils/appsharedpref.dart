@@ -218,12 +218,12 @@ class AppSharedPrefUtil {
     if(strInternetDate == null) {
       return null;
     } else {
-      return DateFormat('dd-MM-yy').parse(strInternetDate);
+      return DateFormat('dd-MM-yyyy').parse(strInternetDate);
     }
   }
 
   static Future<void> saveInternetDate(DateTime date) async {
     if(date != null)
-      await saveString(SharedPrefConstant.s_internet_date, DateFormat('dd-MM-yy').format(date));
+      await saveString(SharedPrefConstant.s_internet_date, DateFormat('dd-MM-yyyy').format(date));
   }
 }

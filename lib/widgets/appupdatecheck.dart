@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -12,29 +13,37 @@ import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
+import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/wsmodel/WSAppSetting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 import '../main.dart';
 
-class AppUpdateCheck {
+class OnAppOpenBackgroundThread {
   static bool isChecking = false;
   final BuildContext context;
 
   ApiService api = ApiService();
 
-  AppUpdateCheck(this.context);
+  OnAppOpenBackgroundThread(this.context);
 
-  static void startAppUpdateCheckThread(BuildContext context) {
-    Future.delayed(Duration(seconds: 1), () => AppUpdateCheck(context).startThread());
+  static void startBackgroundThread(BuildContext context) {
+    Future.delayed(Duration(seconds: 1), () => OnAppOpenBackgroundThread(context).startThread());
   }
 
   startThread() async {
-    await updateUserRole();
-    if(!await checkForNewAppUpdate()) {
-      await checkTokenExpiration();
-      //await checkServerDate();
+    if(await AppUtils.isInternetConnected()) {
+      await AppUtils.updateInternetDate();
+      if (await AppSharedPrefUtil.isUserRegistered()) {
+        updateUserRole();
+        SyncActivityUtils.syncAllUnSyncActivity(context: context);
+        MBAScheduleCheck.getMBASchedule();
+      }
+      if(!await checkForNewAppUpdate()) {
+        await checkTokenExpiration();
+      }
     }
+    await checkServerDate();
   }
 
   Future<bool> checkForNewAppUpdate() async {
@@ -71,7 +80,7 @@ class AppUpdateCheck {
     DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
     if (internetDate != null) {
       DateTime currentTime = DateTime.now();
-      if (currentTime.isAfter(internetDate) && currentTime.difference(internetDate).inDays > 2) {
+      if (currentTime.isBefore(internetDate) && internetDate.difference(currentTime).inDays > 2) {
         CommonFunction.alertDialog(
           closeable: false,
           context: context,

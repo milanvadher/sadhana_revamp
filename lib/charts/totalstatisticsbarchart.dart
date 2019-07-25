@@ -15,18 +15,7 @@ class TotalStatisticsBarChart extends StatelessWidget {
 
   TotalStatisticsBarChart(this.seriesList, this.color, {this.animate, this.viewport});
 
-  factory TotalStatisticsBarChart.withActivity(Color color, List<Activity> activities) {
-    Map<DateTime, int> countByMonth = new Map();
-    activities.forEach((activity) {
-      if (activity.sadhanaValue > 0) {
-        DateTime activityMonth = DateTime(activity.sadhanaDate.year, activity.sadhanaDate.month);
-        if (countByMonth[activityMonth] == null) {
-          countByMonth[activityMonth] = 1;
-        } else {
-          countByMonth[activityMonth] = countByMonth[activityMonth] + 1;
-        }
-      }
-    });
+  factory TotalStatisticsBarChart.forMonth(Color color, Map<DateTime, int> countByMonth) {
     List<TimeSeries> timeSeries = List();
     countByMonth.forEach((month, value) {
       timeSeries.add(TimeSeries(month, value));

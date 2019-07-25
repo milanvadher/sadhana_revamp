@@ -5,6 +5,8 @@ part "user_role.g.dart";
 
 @JsonSerializable()
 class UserRole {
+  @JsonKey(name: 'group_title')
+  String groupTitle;
   @JsonKey(name: 'group_name')
   String groupName;
   @JsonKey(name: 'role')
