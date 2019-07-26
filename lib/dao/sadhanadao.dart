@@ -28,8 +28,7 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
   }
 
   Future<Sadhana> insertOrUpdate(Sadhana entity) async {
-    if(AppUtils.isNullOrEmpty(entity.description))
-      entity.description = 'Have you done ${entity.sadhanaName} today?';
+    if (AppUtils.isNullOrEmpty(entity.description)) entity.description = 'Have you done ${entity.sadhanaName} today?';
     Sadhana sadhana = await super.insertOrUpdate(entity);
     CacheData.addSadhanas([sadhana]);
     return sadhana;
@@ -39,20 +38,31 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
   Future<List<Sadhana>> getAll() async {
     List<Sadhana> sadhanas = await super.getAll();
     for (Sadhana sadhana in sadhanas) {
-      List<Activity> activities = await _activityDAO.getActivityBySadhanaId(sadhana.id);
-      if (activities != null && activities.isNotEmpty) {
-        sadhana.activitiesByDate = new Map.fromIterable(
-          activities,
-          key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch,
-          value: (v) => v,
-        );
-      } else {
-        sadhana.activitiesByDate = new Map();
-      }
+      List<Activity> activities = await _activityDAO.getHomeVisibleActivityBySadhanaId(sadhana.id);
+      loadActivityToSadhana(sadhana, activities);
+      loadAllActivity(sadhana);
     }
     sadhanas.sort((a, b) => a.index.compareTo(b.index));
     CacheData.addSadhanas(sadhanas);
     return sadhanas;
+  }
+
+  loadAllActivity(Sadhana sadhana) async {
+    List<Activity> activities = await _activityDAO.getAllActivityBySadhanaId(sadhana.id);
+    loadActivityToSadhana(sadhana, activities);
+    sadhana.isLoadedAllActivity = true;
+  }
+
+  loadActivityToSadhana(Sadhana sadhana, List<Activity> activities) {
+    if (activities != null && activities.isNotEmpty) {
+      sadhana.activitiesByDate = new Map.fromIterable(
+        activities,
+        key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch,
+        value: (v) => v,
+      );
+    } else {
+      sadhana.activitiesByDate = new Map();
+    }
   }
 
   Future<int> delete(int id) async {

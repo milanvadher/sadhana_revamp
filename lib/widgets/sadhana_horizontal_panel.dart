@@ -5,13 +5,13 @@ import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/widgets/checkmarkbutton.dart';
+import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/numberbutton.dart';
 
 class SadhanaHorizontalPanel extends StatefulWidget {
   final List<DateTime> daysToDisplay;
   final Sadhana sadhana;
   final double buttonWidth;
-
   SadhanaHorizontalPanel({this.daysToDisplay, this.sadhana, this.buttonWidth = 40});
 
   @override
@@ -99,6 +99,9 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
         sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;
       });
     });
+    var namingState = listOfNamingState[sadhana.sadhanaName];
+    if(namingState != null)
+      namingState.setState(() {});
     /*setState(() {
       widget.sadhana.sadhanaData[activity.sadhanaDate] = activity;
     });*/

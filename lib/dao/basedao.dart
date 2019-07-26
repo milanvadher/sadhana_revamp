@@ -23,11 +23,14 @@ abstract class BaseDAO<T extends Entity> {
     final db = await dbProvider.database;
     Batch batch = db.batch();
     entities.forEach((entity) {
-        batch.insert(getTableName(), entity.toMap(),conflictAlgorithm: ConflictAlgorithm.replace,);
+      batch.insert(
+        getTableName(),
+        entity.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     });
     await batch.commit(continueOnError: true, noResult: true);
   }
-
 
   Future<int> update(T entity, {String where, List<dynamic> values}) async {
     final db = await dbProvider.database;
@@ -55,6 +58,30 @@ abstract class BaseDAO<T extends Entity> {
     return fromList(listOfDBData);
   }
 
+  Future<List<T>> query(
+      {bool distinct,
+      List<String> columns,
+      String where,
+      List<dynamic> whereArgs,
+      String groupBy,
+      String having,
+      String orderBy,
+      int limit,
+      int offset}) async {
+    final db = await dbProvider.database;
+    List<Map> listOfDBData = await db.query(getTableName(),
+        where: where,
+        columns: columns,
+        distinct: distinct,
+        groupBy: groupBy,
+        having: having,
+        limit: limit,
+        offset: offset,
+        orderBy: orderBy,
+        whereArgs: whereArgs);
+    return fromList(listOfDBData);
+  }
+
   Future<List<T>> rawQuery(String sql) async {
     final db = await dbProvider.database;
     List<Map> listOfDBData = await db.rawQuery(sql);
@@ -68,7 +95,6 @@ abstract class BaseDAO<T extends Entity> {
     }
     return entities;
   }
-
 
 /*  Future<int> updateWithWhere(T entity, {String where, List<dynamic> values}) async {
     final db = await dbProvider.database;

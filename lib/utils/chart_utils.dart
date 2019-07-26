@@ -1,13 +1,11 @@
-import 'package:sadhana/charts/streak.dart';
+import 'package:sadhana/charts/model/streak.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
 
 class ChartUtils {
-
   static final int bestStreak = 5;
-
 
   static getScore(List<Activity> activities) {
     int counter = 0;
@@ -24,10 +22,12 @@ class ChartUtils {
     SadhanaStatistics statistics = sadhana.statistics;
     List<Activity> activities = sadhana.activitiesByDate.values.toList();
     int counter = 0;
-    DateTime time = DateTime.now().add(Duration(days: -31));
+    DateTime scoreStartDate = DateTime.now().add(Duration(days: -31));
     Map<DateTime, int> countByMonth = new Map();
     Map<DateTime, int> countByYear = new Map();
     Map<DateTime, int> countByWeek = new Map();
+    Map<DateTime, int> countByQuarter = new Map();
+    Map<DateTime, int> countByDay = new Map();
     List<DateTime> events = new List();
     List<Streak> streakList = List();
     int total = 0;
@@ -35,59 +35,39 @@ class ChartUtils {
     int totalValue = 0;
 
     activities.sort((a, b) => a.sadhanaDate.compareTo(b.sadhanaDate));
-
+    statistics.firstSadhanaDate = activities[0].sadhanaDate;
     DateTime start = activities[0].sadhanaDate;
     for (int i = 0; i < activities.length; i++) {
       Activity activity = activities[i];
-
+      final DateTime sadhanaDate = activity.sadhanaDate;
+      final int sadhanaValue = activity.sadhanaValue;
       //Event & Total & TotalValue
-      if (activity.sadhanaValue > 0) {
-        bool isDone = true;
-        if(sadhana.isNumeric && activity.sadhanaValue < sadhana.targetValue)
-          isDone = false;
-        if(isDone) {
-          events.add(activity.sadhanaDate);
+      if (sadhanaValue > 0) {
+        if (sadhana.isActivityDone(activity)) {
+          events.add(sadhanaDate);
           total++;
         }
-        totalValue += activity.sadhanaValue;
+        totalValue += sadhanaValue;
       }
 
       //This Month Total
-      if(Constant.today.month == activity.sadhanaDate.month)
-        monthTotal++;
+      if (Constant.today.month == sadhanaDate.month) monthTotal++;
 
       //Score Calculation
-      if (activity.sadhanaDate.isAfter(time)) {
-        if (activity.sadhanaValue > 0) counter++;
+      if (sadhanaDate.isAfter(scoreStartDate)) {
+        if (sadhana.isActivityDone(activity)) counter++;
       }
 
-      //Count By Month Calculation
-      if (activity.sadhanaValue > 0) {
-        DateTime activityMonth = DateTime(activity.sadhanaDate.year, activity.sadhanaDate.month);
-        if (countByMonth[activityMonth] == null) {
-          countByMonth[activityMonth] = 1;
-        } else {
-          countByMonth[activityMonth] = countByMonth[activityMonth] + 1;
-        }
+      //Count Calculation
+      if (sadhana.isActivityDone(activity)) {
+        groupBy<DateTime>(countByMonth, DateTime(sadhanaDate.year, sadhanaDate.month));
+        groupBy<DateTime>(countByYear, DateTime(sadhanaDate.year));
+        groupBy<DateTime>(countByWeek, getStartWeekDay(sadhanaDate)); // Start with Mon
+        groupBy<DateTime>(countByQuarter, getStartQuarterDay(sadhanaDate));
       }
-
-      //Count By Year Calculation
-      if (activity.sadhanaValue > 0) {
-        DateTime activityYear = DateTime(activity.sadhanaDate.year);
-        if (countByYear[activityYear] == null) {
-          countByYear[activityYear] = 1;
-        } else {
-          countByYear[activityYear] = countByYear[activityYear] + 1;
-        }
-      }
-
-      //Count By Week Calculation
-      if (activity.sadhanaValue > 0) {
-        DateTime activityWeek = activity.sadhanaDate.subtract(new Duration(days: activity.sadhanaDate.weekday));
-        if (countByWeek[activityWeek] == null) {
-          countByWeek[activityWeek] = 1;
-        } else {
-          countByWeek[activityWeek] = countByWeek[activityWeek] + 1;
+      if (sadhanaValue > 0) {
+        if (sadhana.isNumeric) {
+          countByDay[sadhanaDate] = sadhanaValue;
         }
       }
 
@@ -120,6 +100,7 @@ class ChartUtils {
 
     statistics.events = events;
     statistics.countByMonth = countByMonth;
+    statistics.countByMMonthWithoutMissing = Map.from(countByMonth);
     statistics.score = ((counter / 31) * 100).toInt();
     statistics.streakList = streakList;
     statistics.total = total;
@@ -127,5 +108,70 @@ class ChartUtils {
     statistics.monthTotal = monthTotal;
     statistics.countByWeek = countByWeek;
     statistics.countByYear = countByYear;
+    statistics.countByQuarter = countByQuarter;
+    statistics.countByDay = countByDay;
+    addMissingValues(sadhana.isNumeric, statistics);
+  }
+
+  static addMissingValues(bool isNumeric, SadhanaStatistics statistics) {
+    DateTime tmp = statistics.firstSadhanaDate;
+    DateTime first = DateTime(tmp.year, tmp.month, tmp.day);
+    
+    DateTime today = Constant.today;
+    addMissingGeneric(
+      counts: statistics.countByMonth,
+      firstMonth: DateTime(first.year, first.month),
+      currentMonth: DateTime(today.year, today.month),
+      getNext: (current) => DateTime(current.year, current.month + 1),
+    );
+    addMissingGeneric(
+      counts: statistics.countByYear,
+      firstMonth: DateTime(first.year),
+      currentMonth: DateTime(today.year),
+      getNext: (current) => DateTime(current.year + 1),
+    );
+    addMissingGeneric(
+      counts: statistics.countByWeek,
+      firstMonth: getStartWeekDay(first),
+      currentMonth: getStartWeekDay(today),
+      getNext: (current) => DateTime(current.year, current.month, current.day + 7),
+    );
+    addMissingGeneric(
+      counts: statistics.countByWeek,
+      firstMonth: getStartQuarterDay(first),
+      currentMonth: getStartQuarterDay(today),
+      getNext: (current) => DateTime(current.year, current.month + 3,),
+    );
+    if(isNumeric) {
+      addMissingGeneric(
+        counts: statistics.countByDay,
+        firstMonth: today.add(Duration(days: -30)),
+        currentMonth: today,
+        getNext: (current) => current.add(Duration(days: 1)),
+      );
+    }
+  }
+
+  static DateTime getStartWeekDay(DateTime current) {
+    return current.subtract(new Duration(days: current.weekday - 1));
+  }
+
+  static DateTime getStartQuarterDay(DateTime current) {
+    return DateTime(current.year, (((current.month - 1) / 3).truncate() * 3) + 1);
+  }
+
+  static addMissingGeneric({Map<DateTime, int> counts, DateTime firstMonth, DateTime currentMonth, Function(DateTime) getNext}) {
+    while (firstMonth != currentMonth) {
+      if (counts[firstMonth] == null) counts[firstMonth] = 0;
+      firstMonth = getNext(firstMonth);
+    }
+  }
+
+  static void groupBy<D>(Map<D, int> counts, D key) {
+    if (counts[key] == null) {
+      counts[key] = 1;
+    } else {
+      counts[key] = counts[key] + 1;
+    }
   }
 }

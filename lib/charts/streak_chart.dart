@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/charts/streak.dart';
+import 'package:sadhana/charts/model/streak.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/utils/chart_utils.dart';
 

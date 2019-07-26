@@ -49,7 +49,19 @@ class Sadhana extends Entity {
   DateTime reminderTime;
   String reminderDays;
   Map<int, Activity> activitiesByDate = new Map();
+  bool isLoadedAllActivity = false;
   bool get isNumeric => type == SadhanaType.NUMBER;
+
+  bool isActivityDone(Activity activity) {
+    if (activity.sadhanaValue > 0) {
+      bool isDone = true;
+      if (isNumeric && activity.sadhanaValue < targetValue)
+        isDone = false;
+      return isDone;
+    }
+    return false;
+  }
+
   SadhanaStatistics statistics = SadhanaStatistics();
   Sadhana({
     id,

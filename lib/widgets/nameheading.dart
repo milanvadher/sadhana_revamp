@@ -4,6 +4,10 @@ import 'package:sadhana/sadhana/sadhanaEdit.dart';
 import 'package:sadhana/utils/chart_utils.dart';
 import 'package:sadhana/widgets/circle_progress_bar.dart';
 
+
+Map<String,_NameHeadingState> listOfNamingState = Map();
+
+_NameHeadingState nameHeadingState;
 class NameHeading extends StatefulWidget {
   final double headerWidth;
   final Sadhana sadhana;
@@ -12,7 +16,11 @@ class NameHeading extends StatefulWidget {
   NameHeading({this.headerWidth = 130.0, @required this.sadhana, this.onClick});
 
   @override
-  _NameHeadingState createState() => _NameHeadingState();
+  _NameHeadingState createState() {
+    nameHeadingState = _NameHeadingState();
+    listOfNamingState[sadhana.sadhanaName] = nameHeadingState;
+    return nameHeadingState;
+  }
 }
 
 class _NameHeadingState extends State<NameHeading> {
