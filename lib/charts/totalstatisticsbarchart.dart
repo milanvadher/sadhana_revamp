@@ -5,60 +5,122 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/charts/custom_bar_label_decorator.dart';
 import 'package:sadhana/constant/constant.dart';
-import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/sadhana_statistics.dart';
 
-class TotalStatisticsBarChart extends StatelessWidget {
-  final List<Series> seriesList;
-  final bool animate;
+enum InputType { Month, Week, Year }
+
+class TotalStatisticsBarChart extends StatefulWidget {
   final Color color;
-  final OrdinalViewport viewport;
+  final SadhanaStatistics statistics;
 
-  TotalStatisticsBarChart(this.seriesList, this.color, {this.animate, this.viewport});
+  TotalStatisticsBarChart(
+    this.statistics,
+    this.color,
+  );
 
-  factory TotalStatisticsBarChart.forMonth(Color color, Map<DateTime, int> countByMonth) {
-    List<TimeSeries> timeSeries = List();
-    countByMonth.forEach((month, value) {
-      timeSeries.add(TimeSeries(month, value));
+  @override
+  _TotalStatisticsBarChartState createState() => _TotalStatisticsBarChartState();
+}
+
+class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
+  List<Series<dynamic,String>> seriesList;
+  OrdinalViewport viewport;
+  InputType inputType = InputType.Month;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  generateSeriesList() {
+    List<TimeSeries> listOfTimeSeries = List();
+    widget.statistics.countByMonth.forEach((month, value) {
+      listOfTimeSeries.add(TimeSeries(month, value));
     });
-    timeSeries.sort((a, b) => a.time.compareTo(b.time));
-    List<OrdinalSales> barChartData = timeSeries.map((timeSeries) {
+    listOfTimeSeries.sort((a, b) => b.time.compareTo(a.time));
+    List<String> listOfXaxis = [];
+    List<BarData> barChartData = [];
+    for(int i = 0; i < listOfTimeSeries.length; i++) {
+      TimeSeries timeSeries = listOfTimeSeries[i];
       String xaxis = Constant.monthName[timeSeries.time.month - 1];
-      if (xaxis == 'Dec') {
-        int year = int.parse(DateFormat("yy").format(timeSeries.time));
-        xaxis = 'Dec $year';
+      if(i != 0) {
+        if(listOfXaxis.contains(xaxis)) {
+          xaxis = "$xaxis ";
+        }
+        TimeSeries perviousTimeSeries = listOfTimeSeries[i - 1];
+        if (perviousTimeSeries.time.year != timeSeries.time.year) {
+          int year = int.parse(DateFormat("yy").format(timeSeries.time));
+          xaxis = '$xaxis $year';
+        }
       }
-      return OrdinalSales(xaxis, timeSeries.values);
-    }).toList();
-    OrdinalViewport viewport = OrdinalViewport(barChartData.last.year, 8);
-    List<Series<dynamic, String>> chart_series = [
-      new Series<OrdinalSales, String>(
+      listOfXaxis.add(xaxis);
+      barChartData.add(BarData(xaxis, timeSeries.values, timeSeries.time));
+    }
+    List<BarData> finalBarChartData = barChartData.reversed.toList();
+    viewport = OrdinalViewport(barChartData.last.xAxis, 8);
+    seriesList = [
+      new Series<BarData, String>(
         id: 'Sadhana',
-        colorFn: (_, __) => Color.fromHex(code: color.hexString),
-        domainFn: (OrdinalSales sales, _) => sales.year,
-        measureFn: (OrdinalSales sales, _) => sales.sales,
-        labelAccessorFn: (OrdinalSales sales, _) => sales.sales.toString(),
-        data: barChartData,
+        keyFn: (value,_) => value.time.toString(),
+        colorFn: (_, __) => Color.fromHex(code: widget.color.hexString),
+        domainFn: (BarData sales, _) => sales.xAxis,
+        measureFn: (BarData sales, _) => sales.yAxis,
+        labelAccessorFn: (BarData sales, _) => sales.yAxis.toString(),
+        data: finalBarChartData,
       )
     ];
-    return new TotalStatisticsBarChart(
-      chart_series,
-      color,
-      animate: false,
-      viewport: viewport,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return new BarChart(
+    generateSeriesList();
+    return buildBarChart();
+  }
+
+  buildTitle() {
+    return ListTile(
+      title: Text('Total', style: TextStyle(color: Colors.grey, fontSize: 18)),
+      leading: buildTotalTypeDropDown(),
+    );
+  }
+
+  buildTotalTypeDropDown() {
+    Map<String, dynamic> valuesByLabel =
+        new Map.fromIterable(InputType.values, key: (v) => (v as InputType).toString(), value: (v) => v);
+    return DropdownButton<dynamic>(
+      isExpanded: true,
+      isDense: true,
+      hint: Text('Select Type'),
+      items: getDropDownMenuItem(valuesByLabel),
+      onChanged: (value) {
+        setState(() {
+          inputType = value;
+        });
+      },
+      value: inputType,
+    );
+  }
+
+  List<DropdownMenuItem> getDropDownMenuItem(Map<String, dynamic> valuesByLabel) {
+    List<DropdownMenuItem> items = [];
+    if (valuesByLabel != null) {
+      valuesByLabel.forEach((label, value) {
+        items.add(DropdownMenuItem<dynamic>(value: value, child: new Text(label)));
+      });
+    }
+    return items;
+  }
+
+  buildBarChart() {
+    return BarChart(
       seriesList,
-      animate: animate,
+      animate: false,
       domainAxis: new OrdinalAxisSpec(
         tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
         renderSpec: new SmallTickRendererSpec(
           labelStyle: new TextStyleSpec(
             fontSize: 12,
-            color: color,
+            color: widget.color,
           ),
           lineStyle: new LineStyleSpec(
             color: MaterialPalette.gray.shade500,
@@ -70,7 +132,7 @@ class TotalStatisticsBarChart extends StatelessWidget {
           renderSpec: new GridlineRendererSpec(
               labelStyle: new TextStyleSpec(
                 fontSize: 12,
-                color: color,
+                color: widget.color,
               ),
               lineStyle: new LineStyleSpec(
                 color: MaterialPalette.gray.shade500,
@@ -87,13 +149,13 @@ class TotalStatisticsBarChart extends StatelessWidget {
           )),
       behaviors: [
         SlidingViewport(),
-        new ChartTitle(
+        /*new ChartTitle(
           'Total',
           behaviorPosition: BehaviorPosition.top,
           titleOutsideJustification: OutsideJustification.start,
           innerPadding: 18,
-          titleStyleSpec: TextStyleSpec(color: color),
-        ),
+          titleStyleSpec: TextStyleSpec(color: widget.color),
+        ),*/
         new PanAndZoomBehavior(),
       ],
       //defaultRenderer: LineRendererConfig(includePoints: true),
@@ -114,9 +176,9 @@ class TimeSeries {
   TimeSeries(this.time, this.values);
 }
 
-class OrdinalSales {
-  final String year;
-  final int sales;
-
-  OrdinalSales(this.year, this.sales);
+class BarData {
+  final DateTime time;
+  final String xAxis;
+  final int yAxis;
+  BarData(this.xAxis, this.yAxis, this.time);
 }

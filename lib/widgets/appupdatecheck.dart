@@ -77,20 +77,21 @@ class OnAppOpenBackgroundThread {
   }
 
   checkServerDate() async {
-    DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
+/*    DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
     if (internetDate != null) {
       DateTime currentTime = DateTime.now();
       if (currentTime.isBefore(internetDate) && internetDate.difference(currentTime).inDays > 2) {
         CommonFunction.alertDialog(
           closeable: false,
           context: context,
+          type: 'error',
           msg: "Your mobile date is not proper, Please change it and reopen App.",
           doneButtonFn: () {
             exit(0);
           },
         );
       }
-    }
+    }*/
   }
 
   checkTokenExpiration() async {

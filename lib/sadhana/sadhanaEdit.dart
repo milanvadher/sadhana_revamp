@@ -84,12 +84,12 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               isFirst: true,
             ),
             buildBoxLayout(Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+              padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
               child: _buildTableCalendar(),
             )),
             buildBoxLayout(SizedBox(
               height: 250.0,
-              child: TotalStatisticsBarChart.forMonth(getChartColor(color), statistics.countByMonth),
+              child: TotalStatisticsBarChart(statistics, getChartColor(color)),
             )),
             buildBoxLayout(SizedBox(
               height: 250.0,
@@ -109,7 +109,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   _buildTopHeader() {
     return Card(
-      elevation: 10,
+      elevation: 5,
       child: ListTile(
         leading: CircleAvatar(maxRadius: 0),
         title: Padding(
@@ -136,7 +136,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   buildBoxLayout(Widget child, {bool isFirst = false}) {
     return new Container(
-        padding: const EdgeInsets.fromLTRB(10, 10, 5, 10),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
         decoration: new BoxDecoration(
           border: new Border(
             top: BorderSide(color: Colors.grey, width: 2),

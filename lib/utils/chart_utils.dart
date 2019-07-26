@@ -42,8 +42,13 @@ class ChartUtils {
 
       //Event & Total & TotalValue
       if (activity.sadhanaValue > 0) {
-        events.add(activity.sadhanaDate);
-        total++;
+        bool isDone = true;
+        if(sadhana.isNumeric && activity.sadhanaValue < sadhana.targetValue)
+          isDone = false;
+        if(isDone) {
+          events.add(activity.sadhanaDate);
+          total++;
+        }
         totalValue += activity.sadhanaValue;
       }
 
