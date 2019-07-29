@@ -1,7 +1,6 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/charts/number_history_barchart.dart';
 import 'package:sadhana/charts/streak_chart.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
@@ -29,7 +28,9 @@ class SadhanaEditPage extends StatefulWidget {
   static const String routeName = '/sadhanaEdit';
   final Sadhana sadhana;
   final Function(int) onDelete;
+
   SadhanaEditPage({@required this.sadhana, this.onDelete});
+
   @override
   SadhanaEditPageState createState() => SadhanaEditPageState();
 }
@@ -42,6 +43,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   SadhanaDAO sadhanaDAO = SadhanaDAO();
   static DateTime now = new DateTime.now();
   DateTime today = new DateTime(now.year, now.month, now.day);
+
   @override
   void initState() {
     super.initState();
@@ -65,8 +67,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       appBar: AppBar(
         actionsIconTheme:
             Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
-        iconTheme:
-            Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         title: Text(sadhana.sadhanaName, style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
         backgroundColor: color,
         actions: <Widget>[
@@ -80,7 +81,12 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             _buildTopHeader(),
             buildBoxLayout(_buildOverView()),
             buildBoxLayout(
-              StreakChart.withStreakList(color, statistics.streakList),
+              Column(
+                children: <Widget>[
+                  _buildTitle('Best Streak'),
+                  StreakChart.withStreakList(color, statistics.streakList),
+                ],
+              ),
               isFirst: true,
             ),
             buildBoxLayout(Padding(
@@ -89,16 +95,29 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
             )),
             buildBoxLayout(SizedBox(
               height: 290.0,
-              child: TotalStatisticsBarChart(statistics, getChartColor(color), isNumeric: sadhana.isNumeric,),
+              child: TotalStatisticsBarChart(
+                statistics,
+                getChartColor(color),
+                isNumeric: sadhana.isNumeric,
+              ),
             )),
-            buildBoxLayout(SizedBox(
-              height: 250.0,
-              child: TotalStatisticsChart.forMonth(getChartColor(color), statistics.countByMMonthWithoutMissing),
+            buildBoxLayout(Column(
+              children: <Widget>[
+                _buildTitle("Total"),
+                SizedBox(
+                  height: 250.0,
+                  child: TotalStatisticsChart.forMonth(getChartColor(color), statistics.countByMonthWithoutMissing),
+                )
+              ],
             )),
             sadhana.isNumeric
                 ? buildBoxLayout(SizedBox(
                     height: 290.0,
-                    child: TotalStatisticsBarChart(statistics, getChartColor(color), forHistory: true,),
+                    child: TotalStatisticsBarChart(
+                      statistics,
+                      getChartColor(color),
+                      forHistory: true,
+                    ),
                   ))
                 : Container(),
           ],
@@ -152,7 +171,9 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       children: <Widget>[
         _buildTitle("Overview"),
         Padding(
-          padding: EdgeInsets.only(left: 20, top: 5),
+          padding: EdgeInsets.only(
+            left: 20,
+          ),
           child: Row(
             children: <Widget>[
               SizedBox(
@@ -192,11 +213,11 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   _buildTitle(String title) {
     return Padding(
-      padding: EdgeInsets.only(left: 10),
+      padding: EdgeInsets.only(left: 10, bottom: 10),
       child: Row(children: <Widget>[
         Text(
           title,
-          style: TextStyle(color: color, fontSize: 18),
+          style: TextStyle(color: color, fontSize: ChartUtils.chartTitleSize),
         )
       ]),
     );
@@ -268,8 +289,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               child: Text(
                 '${date.day}',
                 style: TextStyle().copyWith(
-                    color:
-                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                    color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: _holidays.containsKey(date) ? color : Colors.transparent,
             ),
@@ -282,8 +302,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               child: Text(
                 '${date.day}',
                 style: TextStyle(
-                    color:
-                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                    color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: color,
             ),

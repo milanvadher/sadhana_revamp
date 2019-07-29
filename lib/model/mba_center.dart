@@ -1,20 +1,20 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sadhana/utils/apputils.dart';
 
-part "center.g.dart";
+part "mba_center.g.dart";
 @JsonSerializable()
-class Center {
+class MBACenter {
 
   @JsonKey(name: 'name')
   String name;
   @JsonKey(name: 'center_name')
   String title;
-  Center();
-  factory Center.fromJson(Map<String, dynamic> json) => _$CenterFromJson(json);
-  Map<String, dynamic> toJson() => _$CenterToJson(this);
+  MBACenter();
+  factory MBACenter.fromJson(Map<String, dynamic> json) => _$MBACenterFromJson(json);
+  Map<String, dynamic> toJson() => _$MBACenterToJson(this);
 
-  static Center fromJsonFun(Map<String, dynamic> json) => Center.fromJson(json);
-  static List<Center> fromJsonList(dynamic json) {
-    return AppUtils.fromJsonList<Center>(json, Center.fromJsonFun);
+  static MBACenter fromJsonFun(Map<String, dynamic> json) => MBACenter.fromJson(json);
+  static List<MBACenter> fromJsonList(dynamic json) {
+    return AppUtils.fromJsonList<MBACenter>(json, MBACenter.fromJsonFun);
   }
 }

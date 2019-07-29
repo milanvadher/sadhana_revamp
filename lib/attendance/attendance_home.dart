@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:sadhana/attendance/attendance_constant.dart';
 import 'package:sadhana/attendance/attendance_summary.dart';
 import 'package:sadhana/attendance/model/dvd_info.dart';
 import 'package:sadhana/attendance/model/session.dart';
@@ -10,12 +11,10 @@ import 'package:sadhana/attendance/widgets/date_picker_with_event.dart';
 import 'package:sadhana/attendance/widgets/dvd_form.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/comman.dart';
-import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
-import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/title_with_subtitle.dart';
@@ -23,6 +22,9 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AttendanceHomePage extends StatefulWidget {
   static const String routeName = '/attendance_home';
+  final DateTime date;
+
+  AttendanceHomePage({this.date});
 
   @override
   AttendanceHomePageState createState() => AttendanceHomePageState();
@@ -42,7 +44,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Hero _saveButton;
   UserRole _userRole;
   List<DateTime> _sessionDates = List();
-  DateTime selectedDate = Constant.today;
+  DateTime selectedDate = CacheData.today;
   bool isSimcityGroup = false;
   final GlobalKey<FormState> _attendanceForm = GlobalKey<FormState>();
   bool isReadOnly = false;
@@ -50,18 +52,21 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   @override
   void initState() {
     super.initState();
+    if (widget.date != null) selectedDate = widget.date;
     loadData();
   }
 
   loadData() async {
-    startLoading();
+    startOverlay();
     try {
-      _userRole = await AppSharedPrefUtil.getUserRole();
-      if (_userRole != null && AppUtils.equalsIgnoreCase(_userRole.role, WSConstant.ROLE_ATTENDANCECOORD)) {
+      _userRole = CacheData.userRole;
+      if (_userRole != null && _userRole.isAttendanceCord) {
         isSimcityGroup = _userRole.isSimCityGroup;
         await loadSessionDates();
         await loadSession(selectedDate);
-        checkForReadOnly();
+        setState(() {
+          checkForReadOnly();
+        });
       } else {
         CommonFunction.alertDialog(context: context, msg: "You don't have right for Attendance");
       }
@@ -70,7 +75,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 
   loadSession(DateTime date) async {
@@ -94,6 +99,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           String sessionType = isSimcityGroup ? WSConstant.sessionType_GD : WSConstant.sessionType_General;
           setState(() {
             session = Session.fromAttendanceList(_userRole.groupName, strDate, sessionType, attendances);
+            print('blank session' + session.toString());
           });
         }
       }
@@ -109,8 +115,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       List<String> strDates = (appResponse.data as List)?.map((e) => e.toString())?.toList();
       if (strDates != null)
-        strDates
-            .forEach((str) => _sessionDates.add(AppUtils.tryParse(str, [WSConstant.DATE_FORMAT], throwErrorIfNotParse: true)));
+        strDates.forEach((str) => _sessionDates.add(AppUtils.tryParse(str, [WSConstant.DATE_FORMAT], throwErrorIfNotParse: true)));
     }
   }
 
@@ -127,9 +132,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       appBar: AppBar(
         title: InkWell(
           onTap: () => _selectDate(),
-          child: AppTitleWithSubTitle(
-            title: new DateFormat('MMM dd yyy').format(selectedDate),
-            subTitle: _userRole.groupTitle,
+          child: Row(
+            children: <Widget>[
+              AppTitleWithSubTitle(
+                title: new DateFormat('dd MMM yyyy').format(selectedDate),
+                subTitle: _userRole.groupTitle,
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Icon(Icons.date_range),
+            ],
           ),
         ),
         bottom: PreferredSize(
@@ -157,7 +170,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       body: SafeArea(
           child: Form(
         key: _attendanceForm,
-        child: _buildListView(),
+        child: session != null ? _buildListView() : Container(),
       )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: _buildFloatingActionButton(),
@@ -165,6 +178,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   Widget _buildCardView(Attendance attendance) {
+    print('${attendance.firstName} ${attendance.reason}');
     return Container(
       padding: EdgeInsets.only(left: 10, right: 10),
       child: Card(
@@ -190,19 +204,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
               ),
               !attendance.isPresent && isSimcityGroup
                   ? Container(
-                      child: Column(
-                        children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
-                            child: TextInputField(
-                              isRequiredValidation: true,
-                              labelText: "Reason for Absent",
-                              onSaved: (val) => attendance.absentReason = val,
-                              padding: EdgeInsets.all(0),
-                              contentPadding: EdgeInsets.all(13),
-                            ),
-                          ),
-                        ],
+                      padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+                      child: TextInputField(
+                        valueText: attendance.reason,
+                        enabled: !isReadOnly,
+                        isRequiredValidation: true,
+                        labelText: "Reason for Absent",
+                        onSaved: (val) => attendance.reason = val,
+                        padding: EdgeInsets.all(0),
+                        contentPadding: EdgeInsets.all(13),
                       ),
                     )
                   : Container()
@@ -212,14 +222,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   Widget _buildListView() {
+    //List<Widget> cartList = session.attendance.map((attendance) => _buildCardView(attendance)).toList();
+    //cartList.add(SizedBox(height: 70));
     return Container(
       padding: EdgeInsets.only(top: 10),
-      child: ListView.builder(
-        itemCount: session.attendance.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _buildCardView(session.attendance[index]);
-        },
-      ),
+      child: ListView(children: [
+        Container(
+          child: Column(
+            children: session.attendance.map((attendance) => _buildCardView(attendance)).toList(),
+          ),
+        )
+      ]),
     );
   }
 
@@ -228,13 +241,13 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       PopupMenuButton<PopUpMenu>(
         onSelected: _onPopupSelected,
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
-              const PopupMenuItem<PopUpMenu>(value: PopUpMenu.changeDate, child: Text('Change Date')),
-              const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
+              //const PopupMenuItem<PopUpMenu>(value: PopUpMenu.changeDate, child: Text('Change Date')),
               !isSimcityGroup
                   ? const PopupMenuItem<PopUpMenu>(value: PopUpMenu.submitAttendance, child: Text('Submit Attendance'))
                   : null,
+              const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
             ],
-        icon: Icon(Icons.menu),
+        //icon: Icon(Icons.menu),
       ),
     ];
   }
@@ -255,7 +268,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                   heroTag: _dvdFormButton,
                   onPressed: () => _onDVDClick(),
                   backgroundColor: Colors.white,
-                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Colors.blue),
+                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Colors.red),
                 )
               : Container(),
           !isSimcityGroup ? SizedBox(width: 20) : Container(),
@@ -276,17 +289,53 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Future<void> _selectDate() async {
     final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
     if (picked != null) {
-      setState(() {
-        selectedDate = picked;
+      selectedDate = picked;
+      if (isSimcityGroup) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AttendanceHomePage(date: selectedDate),
+          ),
+        );
+      } else {
         checkForReadOnly();
         loadSession(selectedDate);
-      });
+      }
     }
   }
 
   void checkForReadOnly() {
-    if(selectedDate.month != Constant.today.month || CacheData.isSubmittedCurrentMonthAttendance)
-      isReadOnly = true;
+    if (_userRole.isSimCityGroup) {
+      if (selectedDate.isBefore(CacheData.today.add(Duration(days: -AttendanceConstant.SIMCITY_MAX_ALLOWED))))
+        isReadOnly = true;
+      else
+        isReadOnly = false;
+    } else {
+      if (selectedDate.month == CacheData.today.month) {
+        if (isCurrentMonthAttendanceSubmitted())
+          isReadOnly = true;
+        else
+          isReadOnly = false;
+      } else {
+        if (CacheData.pendingMonth != null && selectedDate.month == CacheData.pendingMonth.month)
+          isReadOnly = false;
+        else
+          isReadOnly = true;
+      }
+    }
+    //Temp
+    //if (_sessionDates.contains(selectedDate)) isReadOnly = true;
+  }
+
+  bool isCurrentMonthAttendanceSubmitted() {
+    return CacheData.pendingMonth == null && isContainCurrentMonthDates();
+  }
+
+  bool isContainCurrentMonthDates() {
+    for (DateTime sessionDate in _sessionDates) {
+      if (sessionDate.month == CacheData.today.month) return true;
+    }
+    return false;
   }
 
   void _onPopupSelected(PopUpMenu result) {
@@ -298,15 +347,32 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         Navigator.pushNamed(context, AttendanceSummaryPage.routeName);
         break;
       case PopUpMenu.submitAttendance:
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SubmitAttendancePage(DateTime.now()),
-          ),
-        );
+        onSubmitAttendanceClick();
         break;
       default:
     }
+  }
+
+  void onSubmitAttendanceClick() async {
+    startOverlay();
+    try {
+      await CacheData.loadPendingMonthForAttendance(_userRole.groupName, context);
+      if (CacheData.pendingMonth == null) {
+        CommonFunction.alertDialog(context: context, msg: "You have already submmited Attendance");
+      } else {
+        goToAttendanceSubmitPage();
+      }
+    } catch (e, s) {
+      print(s);
+      CommonFunction.displayErrorDialog(context: context);
+    }
+    stopOverlay();
+  }
+
+  void onAttendanceSubmitted(bool isSubmitted) {
+    setState(() {
+      checkForReadOnly();
+    });
   }
 
   void _onSelectAll(bool value) {
@@ -349,6 +415,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
+    if (CacheData.isAttendanceSubmissionPending()) {
+      String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
+      CommonFunction.alertDialog(
+          context: context,
+          msg: "$strMonth month's attendance submission is pending, Please submit Attendance to continue.",
+          doneButtonFn: () {
+            Navigator.pop(context);
+            goToAttendanceSubmitPage();
+          });
+      return;
+    }
     startOverlay();
     try {
       if (_attendanceForm.currentState.validate()) {
@@ -358,8 +435,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           Response res = await _api.submitAttendanceSession(session);
           AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
-            CommonFunction.alertDialog(context: context, msg: "Attendance submitted successfully.");
             _sessionDates.add(session.dateTime);
+            CommonFunction.alertDialog(
+                closeable: false,
+                context: context,
+                msg: "Attendance submitted successfully.",
+                doneButtonFn: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                });
           }
         }
       }
@@ -368,6 +452,20 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       CommonFunction.displayErrorDialog(context: context);
     }
     stopOverlay();
+  }
+
+  void goToAttendanceSubmitPage() {
+    if (CacheData.pendingMonth != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SubmitAttendancePage(
+                CacheData.pendingMonth,
+                onAttendanceSubmit: onAttendanceSubmitted,
+              ),
+        ),
+      );
+    }
   }
 
   bool _validateDVD() {

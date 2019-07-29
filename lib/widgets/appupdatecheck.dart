@@ -33,15 +33,14 @@ class OnAppOpenBackgroundThread {
 
   startThread() async {
     if(await AppUtils.isInternetConnected()) {
-      await AppUtils.updateInternetDate();
       if (await AppSharedPrefUtil.isUserRegistered()) {
         updateUserRole();
         SyncActivityUtils.syncAllUnSyncActivity(context: context);
         MBAScheduleCheck.getMBASchedule();
-      }
-      if(!await checkForNewAppUpdate()) {
         await checkTokenExpiration();
       }
+      await AppUtils.updateInternetDate();
+      await checkForNewAppUpdate();
     }
     await checkServerDate();
   }

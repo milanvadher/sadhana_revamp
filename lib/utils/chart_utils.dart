@@ -1,11 +1,14 @@
 import 'package:sadhana/charts/model/streak.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
 
 class ChartUtils {
+  static final double chartTitleSize = 16;
   static final int bestStreak = 5;
+  static final int maxNumberValueHistoryDays = 90;
 
   static getScore(List<Activity> activities) {
     int counter = 0;
@@ -22,6 +25,7 @@ class ChartUtils {
     SadhanaStatistics statistics = sadhana.statistics;
     List<Activity> activities = sadhana.activitiesByDate.values.toList();
     int counter = 0;
+    DateTime maxNumberHistory = CacheData.today.add(Duration(days: -maxNumberValueHistoryDays));
     DateTime scoreStartDate = DateTime.now().add(Duration(days: -31));
     Map<DateTime, int> countByMonth = new Map();
     Map<DateTime, int> countByYear = new Map();
@@ -51,7 +55,7 @@ class ChartUtils {
       }
 
       //This Month Total
-      if (Constant.today.month == sadhanaDate.month) monthTotal++;
+      if (CacheData.today.month == sadhanaDate.month) monthTotal++;
 
       //Score Calculation
       if (sadhanaDate.isAfter(scoreStartDate)) {
@@ -65,8 +69,8 @@ class ChartUtils {
         groupBy<DateTime>(countByWeek, getStartWeekDay(sadhanaDate)); // Start with Mon
         groupBy<DateTime>(countByQuarter, getStartQuarterDay(sadhanaDate));
       }
-      if (sadhanaValue > 0) {
-        if (sadhana.isNumeric) {
+      if (sadhanaValue > 0 && sadhana.isNumeric) {
+        if (sadhanaDate.isAfter(maxNumberHistory)) {
           countByDay[sadhanaDate] = sadhanaValue;
         }
       }
@@ -100,7 +104,7 @@ class ChartUtils {
 
     statistics.events = events;
     statistics.countByMonth = countByMonth;
-    statistics.countByMMonthWithoutMissing = Map.from(countByMonth);
+    statistics.countByMonthWithoutMissing = Map.from(countByMonth);
     statistics.score = ((counter / 31) * 100).toInt();
     statistics.streakList = streakList;
     statistics.total = total;
@@ -117,36 +121,36 @@ class ChartUtils {
     DateTime tmp = statistics.firstSadhanaDate;
     DateTime first = DateTime(tmp.year, tmp.month, tmp.day);
     
-    DateTime today = Constant.today;
+    DateTime today = CacheData.today;
     addMissingGeneric(
-      counts: statistics.countByMonth,
-      firstMonth: DateTime(first.year, first.month),
-      currentMonth: DateTime(today.year, today.month),
+      countMap: statistics.countByMonth,
+      start: DateTime(first.year, first.month),
+      end: DateTime(today.year, today.month),
       getNext: (current) => DateTime(current.year, current.month + 1),
     );
     addMissingGeneric(
-      counts: statistics.countByYear,
-      firstMonth: DateTime(first.year),
-      currentMonth: DateTime(today.year),
+      countMap: statistics.countByYear,
+      start: DateTime(first.year),
+      end: DateTime(today.year),
       getNext: (current) => DateTime(current.year + 1),
     );
     addMissingGeneric(
-      counts: statistics.countByWeek,
-      firstMonth: getStartWeekDay(first),
-      currentMonth: getStartWeekDay(today),
+      countMap: statistics.countByWeek,
+      start: getStartWeekDay(first),
+      end: getStartWeekDay(today),
       getNext: (current) => DateTime(current.year, current.month, current.day + 7),
     );
     addMissingGeneric(
-      counts: statistics.countByWeek,
-      firstMonth: getStartQuarterDay(first),
-      currentMonth: getStartQuarterDay(today),
+      countMap: statistics.countByWeek,
+      start: getStartQuarterDay(first),
+      end: getStartQuarterDay(today),
       getNext: (current) => DateTime(current.year, current.month + 3,),
     );
     if(isNumeric) {
       addMissingGeneric(
-        counts: statistics.countByDay,
-        firstMonth: today.add(Duration(days: -30)),
-        currentMonth: today,
+        countMap: statistics.countByDay,
+        start: today.add(Duration(days: -maxNumberValueHistoryDays)),
+        end: today,
         getNext: (current) => current.add(Duration(days: 1)),
       );
     }
@@ -160,10 +164,10 @@ class ChartUtils {
     return DateTime(current.year, (((current.month - 1) / 3).truncate() * 3) + 1);
   }
 
-  static addMissingGeneric({Map<DateTime, int> counts, DateTime firstMonth, DateTime currentMonth, Function(DateTime) getNext}) {
-    while (firstMonth != currentMonth) {
-      if (counts[firstMonth] == null) counts[firstMonth] = 0;
-      firstMonth = getNext(firstMonth);
+  static addMissingGeneric({Map<DateTime, int> countMap, DateTime start, DateTime end, Function(DateTime) getNext}) {
+    while (start != end) {
+      if (countMap[start] == null) countMap[start] = 0;
+      start = getNext(start);
     }
   }
 

@@ -10,6 +10,7 @@ class StreakChart extends StatelessWidget {
   double baseWidth = 0;
   final Color color;
   DateFormat dateFormat = DateFormat('dd MMM yy');
+
   StreakChart(this.streakList, this.color) {
     for (Streak streak in streakList) {
       if (maxDiff < streak.diff) {
@@ -22,32 +23,16 @@ class StreakChart extends StatelessWidget {
     streakList.sort((a, b) => b.diff.compareTo(a.diff));
     int maxStreak = ChartUtils.bestStreak;
     if (streakList.length - 1 < maxStreak) maxStreak = streakList.length - 1;
-    List<Streak> finalList = streakList.sublist(0, maxStreak -1);
+    List<Streak> finalList = streakList.sublist(0, maxStreak - 1);
     finalList.sort((a, b) => b.start.compareTo(a.start));
     return StreakChart(finalList, color);
   }
 
   @override
   Widget build(BuildContext context) {
-    baseWidth = MediaQuery.of(context).size.width - 155;
+    baseWidth = MediaQuery.of(context).size.width - 170;
     return Column(
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(left: 10),
-          child: Row(children: <Widget>[
-            Text(
-              "Best Streaks",
-              style: TextStyle(color: color, fontSize: 18),
-            )
-          ]),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        Column(
-          children: List.generate(streakList.length, (index) => buildRow(streakList[index])),
-        ),
-      ],
+      children: List.generate(streakList.length, (index) => buildRow(streakList[index])),
     );
   }
 
@@ -57,10 +42,7 @@ class StreakChart extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              dateFormat.format(streak.start),
-              style: TextStyle(fontSize: 15),
-            ),
+            Text(dateFormat.format(streak.start)),
             SizedBox(width: 5),
             Container(
               height: 20,
@@ -78,4 +60,3 @@ class StreakChart extends StatelessWidget {
     );
   }
 }
-

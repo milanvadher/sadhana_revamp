@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
@@ -20,7 +19,10 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 class SubmitAttendancePage extends StatefulWidget {
   static const String routeName = '/submit_attendance';
   final DateTime month;
-  SubmitAttendancePage(this.month);
+  final Function(bool) onAttendanceSubmit;
+
+  SubmitAttendancePage(this.month, {this.onAttendanceSubmit});
+
   @override
   _SubmitAttendancePageState createState() => _SubmitAttendancePageState();
 }
@@ -33,6 +35,7 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
   Color textColor;
   String wsMonth;
   String strMonth;
+
   @override
   void initState() {
     super.initState();
@@ -53,27 +56,16 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
           wsMonth = WSConstant.wsDateFormat.format(widget.month);
           strMonth = DateFormat.yMMM().format(widget.month);
         });
-        if (!CacheData.isSubmittedCurrentMonthAttendance) {
-          Response res = await _api.getMonthlySummary(wsMonth, _userRole.groupName);
-          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-          if (appResponse.status == WSConstant.SUCCESS_CODE) {
-            setState(() {
-              summary = AttendanceSummary.fromJsonList(appResponse.data['details']);
-              int totalSessionDates = appResponse.data['total_attendance_dates'];
-              summary.forEach((s) => s.totalAttendanceDates = totalSessionDates);
-              print(summary);
-            });
-          }
-        } else {
-          stopLoading();
-          CommonFunction.alertDialog(
-              closeable: false,
-              context: context,
-              msg: "You have already sumbitted current month attendance",
-              doneButtonFn: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              });
+
+        Response res = await _api.getMonthlySummary(wsMonth, _userRole.groupName);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          setState(() {
+            summary = AttendanceSummary.fromJsonList(appResponse.data['details']);
+            int totalSessionDates = appResponse.data['total_attendance_dates'];
+            summary.forEach((s) => s.totalAttendanceDates = totalSessionDates);
+            print(summary);
+          });
         }
       }
     } catch (e, s) {
@@ -138,9 +130,12 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
       return Container(
         padding: EdgeInsets.only(top: 15),
         child: ListView.builder(
-          itemCount: summary.length,
+          itemCount: summary.length + 1,
           itemBuilder: (BuildContext context, int index) {
-            return _buildCardView(summary[index]);
+            if (index == summary.length)
+              return SizedBox(height: 70);
+            else
+              return _buildCardView(summary[index]);
           },
         ),
       );
@@ -171,15 +166,15 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
       onPressed: _onSubmit,
       //backgroundColor: Colors.white,
       icon: Icon(Icons.check, color: Colors.white),
-      label: Text('Save', style: TextStyle(color: Colors.white)),
+      label: Text('Submit', style: TextStyle(color: Colors.white)),
     );
   }
 
   void _onSubmit() async {
     if (_submitForm.currentState.validate()) {
       _submitForm.currentState.save();
-      summary = summary.where((s) => !AppUtils.isNullOrEmpty(s.lessAttendanceReason)).toList();
       CommonFunction.alertDialog(
+          showCancelButton: true,
           context: context,
           msg: "Are you sure you want to submit attendance?",
           doneButtonFn: () async {
@@ -191,23 +186,26 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
 
   Future<void> submitAttendance() async {
     try {
-      startLoading();
-      Response res = await _api.submitMontlyReport(wsMonth, _userRole.groupName, summary);
-      stopLoading();
+      startOverlay();
+      List<AttendanceSummary> lessAttendanceReason = summary.where((s) => !AppUtils.isNullOrEmpty(s.lessAttendanceReason)).toList();
+      Response res = await _api.submitMontlyReport(wsMonth, _userRole.groupName, lessAttendanceReason);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        if (widget.month.month == Constant.today.month) CacheData.isSubmittedCurrentMonthAttendance = true;
+        await CacheData.loadPendingMonthForAttendance(_userRole.groupName, context);
         CommonFunction.alertDialog(
+            closeable: false,
             context: context,
             msg: "Attendance submitted successfully.",
             doneButtonFn: () {
+              widget.onAttendanceSubmit(true);
               Navigator.pop(context);
               Navigator.pop(context);
             });
       }
     } catch (e, s) {
       print(s);
-      stopLoading();
+      stopOverlay();
     }
+    stopOverlay();
   }
 }

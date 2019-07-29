@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:sadhana/auth/profile/profile_page.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/cachedata.dart';
@@ -67,6 +68,7 @@ class AppOptionsPage extends StatefulWidget {
 
 class _AppOptionsPageState extends BaseState<AppOptionsPage> {
   bool isAllowSyncFromServer = false;
+
   @override
   void initState() {
     super.initState();
@@ -90,11 +92,12 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
       body: SafeArea(
         child: ListView(
           children: <Widget>[
+            ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', onProfile, 'View/Edit your profile'),
+            Divider(height: 0),
             _Heading('Settings'),
             Column(
               children: <Widget>[
                 Divider(height: 0),
-                //_ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
                 ThemeItem(widget.options, onThemeChanged),
                 isAllowSyncFromServer
                     ? ActionItem(Icons.cloud_download, Constant.colors[3], 'Load Data From Server', loadPreloadedActivity,
@@ -132,6 +135,14 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
 
   void openAboutPage() {
     Navigator.pushNamed(context, About.routeName);
+  }
+
+  void onProfile() {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(),
+        ));
   }
 
   void askForSyncActivity() {

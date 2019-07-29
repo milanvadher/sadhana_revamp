@@ -31,7 +31,7 @@ class CommonFunction {
     }
   }
 
-  static Widget getTitleAndName({@required double screenWidth, @required String title, @required String value}) {
+  static Widget getTitleAndName({@required double screenWidth, @required String title, @required String value, bool forProfilePage}) {
     return Container(
       padding: EdgeInsets.all(5),
       child: Row(
@@ -39,12 +39,38 @@ class CommonFunction {
           Container(
             width: 80,
             child: Text(
-              '$title : ',
+              '$title',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
           Container(
             width: screenWidth - 212,
+            child: Text(
+              '$value',
+              style: TextStyle(fontWeight: FontWeight.normal),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget getTitleAndNameForProfilePage({@required double screenWidth, @required String title, @required String value, double titleWidth}) {
+    titleWidth = titleWidth == null ? 80 : titleWidth;
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: Row(
+        children: <Widget>[
+          Container(
+            width: titleWidth,
+            child: Text(
+              '$title',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Text(":"),SizedBox(width: 10),
+          Container(
+            width: screenWidth -  160 - (titleWidth - 80),
             child: Text(
               '$value',
               style: TextStyle(fontWeight: FontWeight.normal),

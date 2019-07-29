@@ -6,9 +6,9 @@ part "session.g.dart";
 
 @JsonSerializable()
 class Session {
-  @JsonKey(name: 'date')
+  @JsonKey(name: 'session_date')
   String date;
-  @JsonKey(name: 'group')
+  @JsonKey(name: 'group_name')
   String group;
   @JsonKey(name: 'dvdtype')
   String dvdType;
@@ -22,11 +22,10 @@ class Session {
   String sessionType;
 
   DateTime get dateTime =>  date != null ? WSConstant.wsDateFormat.parse(date) : null;
-
+  Session();
   @JsonKey(name: 'attendance' , defaultValue: [])
   List<Attendance> attendance;
 
-  Session({this.date, this.group, this.dvdType, this.dvdNo, this.dvdPart, this.remark, this.attendance});
   factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
   Map<String, dynamic> toJson() => _$SessionToJson(this);
 
@@ -60,8 +59,9 @@ class Attendance {
 
   @JsonKey(name: 'is_present', fromJson: _isPresentFromJson, toJson: _isPresentToJson)
   bool isPresent;
+
   @JsonKey(name: 'absent_reason')
-  String absentReason;
+  String reason;
 
   Attendance();
   static bool _isPresentFromJson(int isPresent) => isPresent != null ? isPresent > 0 ? true : false : false;
@@ -77,7 +77,7 @@ class Attendance {
 
   @override
   String toString() {
-    return 'Attendance{mhtId: $mhtId, name: $name, isPresent: $isPresent, absentReason: $absentReason}';
+    return 'Attendance{mhtId: $mhtId, name: $name, isPresent: $isPresent, absentReason: $reason}';
   }
 
 }

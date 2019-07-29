@@ -6,6 +6,7 @@ import 'package:sadhana/auth/login/mobile_request_success.dart';
 import 'package:sadhana/auth/login/start.dart';
 import 'package:sadhana/auth/login/verify.dart';
 import 'package:sadhana/auth/registration/registration.dart';
+import 'package:sadhana/auth/registration/registration_request.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/logindatastate.dart';
@@ -44,6 +45,7 @@ class LoginPageState extends BaseState<LoginPage> {
   ScrollController _scrollController = new ScrollController();
   LoginState loginState;
   List<GlobalKey<FormState>> formKeys = List.generate(4, (index) => GlobalKey());
+
   @override
   initState() {
     super.initState();
@@ -141,8 +143,8 @@ class LoginPageState extends BaseState<LoginPage> {
         children: <Widget>[
           RaisedButton(
             onPressed: onStepContinue,
-            child: Text(
-                currentStep != loginSteps.length - 1 ? 'CONTINUE' : loginState.mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
+            child:
+                Text(currentStep != loginSteps.length - 1 ? 'CONTINUE' : loginState.mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
           ),
           SizedBox(
             width: 10,
@@ -238,6 +240,8 @@ class LoginPageState extends BaseState<LoginPage> {
           },
           doneButtonFn: goToHomePage,
         );
+      } else {
+        goToHomePage();
       }
     }
   }
@@ -261,7 +265,8 @@ class LoginPageState extends BaseState<LoginPage> {
       startOverlay();
       try {
         Response res = await api.getUserProfile(loginState.mhtId);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
+        print(appResponse.status);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** Login Data ::: ');
           print(appResponse.data);
@@ -271,6 +276,19 @@ class LoginPageState extends BaseState<LoginPage> {
           });
           stopOverlay();
           return true;
+        } else if (appResponse.status == WSConstant.CODE_ENTITY_NOT_FOUND) {
+          print('inside data');
+          CommonFunction.alertDialog(
+              context: context,
+              msg:
+                  "Your Mht Id is not registered with us, Pls Check again, "
+                      "If it is correct and you are Dada's MBA then Kindly click Register button to enter registration details.",
+              showCancelButton: true,
+              doneButtonText: "Register",
+              doneButtonFn: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage()));
+              });
         }
       } catch (e, s) {
         print(e);

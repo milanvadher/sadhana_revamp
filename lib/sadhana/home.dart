@@ -76,6 +76,10 @@ class HomePageState extends BaseState<HomePage> {
   @override
   void initState() {
     super.initState();
+    loadData();
+  }
+
+  loadData() async {
     loadSadhana();
     checkSimcityMBA();
     new Future.delayed(Duration.zero, () {
@@ -88,7 +92,6 @@ class HomePageState extends BaseState<HomePage> {
       });
     });
     loadUserRole();
-    loadUserRoleFromServer();
     /*AppSettingUtil.getServerAppSetting().then((appSetting) {
       setState(() {
         showCSVOption = appSetting.showCSVOption;
@@ -98,9 +101,13 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadUserRole() async {
+    await loadUserRoleFromServer();
+    await loadUserRoleFromSharedPref();
+  }
+  loadUserRoleFromSharedPref() async {
     role = await AppSharedPrefUtil.getUserRole();
     if (role != null) {
-      if (AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role.role)) {
+      if (role.isAttendanceCord) {
         setState(() {
           showOptionMenu = true;
           isAttendanceCord = true;
@@ -116,15 +123,7 @@ class HomePageState extends BaseState<HomePage> {
 
   loadUserRoleFromServer() async {
     if (await AppUtils.isInternetConnected()) {
-      Response res = await _api.getUserRole();
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        UserRole userRole = UserRole.fromJson(appResponse.data);
-        if (userRole != null) {
-          await AppSharedPrefUtil.saveUserRole(userRole);
-          await loadUserRole();
-        }
-      }
+      await CacheData.loadUserRole(context);
     }
   }
 
@@ -264,7 +263,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('JIOQA'),
+        title: Text('SadhanaQA'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -340,7 +339,7 @@ class HomePageState extends BaseState<HomePage> {
 
   List<Widget> _buildLeftPanel() {
     List<Widget> widgets = new List();
-    widgets.add(_mainHeaderTitle('<<' + Constant.monthName[today.month - 1] + '>>'));
+    widgets.add(_mainHeaderTitle(DateFormat.MMMM().format(today)));
     List<Widget> sadhanaHeadings = sadhanas.map((sadhana) {
       return NameHeading(headerWidth: headerWidth, sadhana: sadhana);
     }).toList();
@@ -362,7 +361,7 @@ class HomePageState extends BaseState<HomePage> {
           child: Text(
             title,
             overflow: TextOverflow.fade,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
       ),
@@ -528,42 +527,26 @@ class HomePageState extends BaseState<HomePage> {
   void onAttendanceClick() async {
     startOverlay();
     if (await AppUtils.isInternetConnected()) {
-      await loadUserRoleFromServer();
-      if (isAttendanceCord) {
-        if (!role.isSimCityGroup) {
-          Response res = await _api.getMonthPendingForAttendance(role.groupName);
-          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-          if (appResponse.status == WSConstant.SUCCESS_CODE) {
-            if (!AppUtils.isNullOrEmpty(appResponse.data)) {
-              CacheData.isSubmittedCurrentMonthAttendance = false;
-              DateTime date = WSConstant.wsDateFormat.parse(appResponse.data);
-              if (today.month == date.month) {
-                Navigator.pushNamed(context, AttendanceHomePage.routeName);
-              } else {
-                String strMonth = DateFormat.yMMM().format(date);
-                CommonFunction.alertDialog(
-                    context: context,
-                    msg: "$strMonth month's attendance submission is pending, Please submit Attendance",
-                    doneButtonFn: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubmitAttendancePage(date),
-                        ),
-                      );
-                    });
-              }
-            } else {
-              //CacheData.isSubmittedCurrentMonthAttendance = true;
-              Navigator.pushNamed(context, AttendanceHomePage.routeName);
-            }
+      await CacheData.loadAttendanceData(context);
+      if(CacheData.userRole != null) {
+        loadUserRoleFromSharedPref();
+        if (isAttendanceCord) {
+          if (CacheData.isAttendanceSubmissionPending()) {
+            String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
+            CommonFunction.alertDialog(
+                context: context,
+                msg: "$strMonth month's attendance submission is pending, Please submit Attendance.",
+                doneButtonFn: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, AttendanceHomePage.routeName);
+                });
+          } else {
+            Navigator.pushNamed(context, AttendanceHomePage.routeName);
           }
-        } else {
-          Navigator.pushNamed(context, AttendanceHomePage.routeName);
+          stopOverlay();
         }
-        stopOverlay();
-      }
+      } else
+        print("User role is null");
     } else {
       CommonFunction.displayInternetNotAvailableDialog(context: context);
     }

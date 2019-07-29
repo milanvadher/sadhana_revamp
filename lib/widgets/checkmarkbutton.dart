@@ -11,6 +11,7 @@ class CheckmarkButton extends StatefulWidget {
   Activity activity;
   bool isDisabled;
   final double width;
+
   CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick, this.isDisabled = false, this.width = 40});
 
   @override
@@ -24,6 +25,7 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Brightness theme;
   ActivityDAO activityDAO = ActivityDAO();
   Color color;
+
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
@@ -33,14 +35,14 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
     color = theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor;
     return Container(
       color:
-          widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
+          widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade100 : Colors.grey.shade800) : Theme.of(context).cardColor,
       height: 50,
       width: widget.width,
       child: InkWell(
         onTap: widget.isDisabled ? null : onClicked,
         onLongPress: widget.isDisabled ? null : onLongPress,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          padding: EdgeInsets.symmetric(vertical: 7, horizontal: 4),
           child: Container(
             //width: 28,
             decoration: BoxDecoration(
@@ -52,11 +54,9 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
                 style: widget.activity.sadhanaValue > 0 ? BorderStyle.solid : BorderStyle.none,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: AnimatedContainer(
+            child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              AnimatedContainer(
                 duration: Duration(seconds: 5),
-                //width: 40,
                 child: widget.activity.sadhanaValue > 0
                     ? Icon(
                         Icons.done,
@@ -69,7 +69,11 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
                         color: Colors.grey,
                       ),
               ),
-            ),
+              CircleAvatar(
+                maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
+                backgroundColor: color,
+              ),
+            ]),
           ),
         ),
       ),

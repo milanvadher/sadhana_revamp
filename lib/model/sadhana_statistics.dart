@@ -9,7 +9,7 @@ class SadhanaStatistics {
   DateTime firstSadhanaDate;
   Map<DateTime, int> countByDay = Map();
   Map<DateTime, int> countByMonth = Map();
-  Map<DateTime, int> countByMMonthWithoutMissing = Map();
+  Map<DateTime, int> countByMonthWithoutMissing = Map();
   Map<DateTime, int> countByYear = Map();
   Map<DateTime, int> countByWeek = Map();
   Map<DateTime, int> countByQuarter = Map();

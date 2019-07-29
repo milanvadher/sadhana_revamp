@@ -14,4 +14,6 @@ class SharedPrefConstant {
   static final String b_force_sync_remain = "b_force_sync_remain";
   static final String obj_user_role = "s_user_roles";
   static final String s_internet_date = "s_internet_date";
+
+  static final String s_chart_filter = "s_chart_filter";
 }

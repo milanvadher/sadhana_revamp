@@ -74,13 +74,13 @@ class TotalStatisticsChart extends StatelessWidget {
             ],
           )),
       behaviors: [
-        new charts.ChartTitle(
+        /*new charts.ChartTitle(
           'Total',
           behaviorPosition: charts.BehaviorPosition.top,
           titleOutsideJustification: charts.OutsideJustification.start,
           innerPadding: 18,
           titleStyleSpec: charts.TextStyleSpec(color: color),
-        ),
+        ),*/
         new charts.PanAndZoomBehavior(),
         /*new charts.LinePointHighlighter(
             showHorizontalFollowLine: charts.LinePointHighlighterFollowLineType.none,

@@ -7,6 +7,8 @@ import 'package:sadhana/charts/custom_bar_label_decorator.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
 import 'package:flutter/painting.dart' as FlutterColor;
+import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/chart_utils.dart';
 
 import 'model/filter_type.dart';
 
@@ -15,6 +17,7 @@ class TotalStatisticsBarChart extends StatefulWidget {
   final bool isNumeric;
   final SadhanaStatistics statistics;
   final bool forHistory;
+
   TotalStatisticsBarChart(this.statistics, this.color, {this.forHistory = false, this.isNumeric = false});
 
   @override
@@ -24,20 +27,31 @@ class TotalStatisticsBarChart extends StatefulWidget {
 class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   List<Series<dynamic, String>> seriesList;
   OrdinalViewport viewport;
-  FilterType inputType = FilterType.Month;
+  FilterType filterType = FilterType.Month;
   int maxValue = 0;
   Brightness theme;
   Color outSideLabelColor;
+
   @override
   void initState() {
     super.initState();
-    if (widget.forHistory) inputType = FilterType.Day;
-    generateSeriesList();
+    loadData();
+  }
+
+  loadData() {
+    if(widget.forHistory) {
+      filterType = FilterType.Day;
+    }
+    /*if(!widget.forHistory) {
+        filterType = await AppSharedPrefUtil.getChartFilter();
+    } else
+      filterType = FilterType.Day;*/
+    setState(() {generateSeriesList();});
   }
 
   generateSeriesList() {
     List<TimeSeries> listOfTimeSeries = List();
-    Map<DateTime, int> counts = widget.statistics.getCounts(inputType);
+    Map<DateTime, int> counts = widget.statistics.getCounts(filterType);
     counts.forEach((month, value) {
       listOfTimeSeries.add(TimeSeries(month, value));
     });
@@ -49,10 +63,10 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       DateTime date = timeSeries.time;
       String xaxis = getXAxis(date);
       if (i != 0) {
-        if (listOfXaxis.contains(xaxis)) {
+        xaxis = getAppendedXAxis(xaxis, date, listOfTimeSeries[i - 1].time);
+        while (listOfXaxis.contains(xaxis)) {
           xaxis = "$xaxis ";
         }
-        xaxis = getAppendedXAxis(xaxis, date, listOfTimeSeries[i - 1].time);
       }
       listOfXaxis.add(xaxis);
       if (maxValue < timeSeries.value) maxValue = timeSeries.value;
@@ -74,7 +88,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   }
 
   getXAxis(DateTime date) {
-    switch (inputType) {
+    switch (filterType) {
       case FilterType.Month:
         return Constant.monthName[date.month - 1];
       case FilterType.Year:
@@ -91,19 +105,18 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   }
 
   String getAppendedXAxis(String xaxis, DateTime date, DateTime previousDate) {
-    if (inputType != FilterType.Year) {
+    if (filterType != FilterType.Year) {
       if (previousDate.year != date.year) {
         int year = int.parse(DateFormat("yy").format(date));
         xaxis = '$xaxis $year';
       }
     }
-    if (inputType == FilterType.Week || inputType == FilterType.Day) {
+    if (filterType == FilterType.Week || filterType == FilterType.Day) {
       if (previousDate.month != date.month) {
         String month = Constant.monthName[date.month - 1];
         xaxis = '$xaxis $month';
       }
     }
-
     return xaxis;
   }
 
@@ -116,7 +129,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
         buildTitle(),
         SizedBox(
           height: 240,
-          child: buildBarChart(),
+          child: seriesList != null ? buildBarChart() : Container(),
         )
       ],
     );
@@ -125,7 +138,8 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   buildTitle() {
     return ListTile(
       dense: true,
-      title: Text(widget.forHistory ? 'History' : 'Total', style: TextStyle(color: getFlutterColor(widget.color), fontSize: 18)),
+      title: Text(widget.forHistory ? 'History' : 'Total',
+          style: TextStyle(color: getFlutterColor(widget.color), fontSize: ChartUtils.chartTitleSize)),
       trailing: !widget.forHistory
           ? SizedBox(
               width: 80,
@@ -141,7 +155,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
 
   buildTotalTypeDropDown() {
     Map<String, dynamic> valuesByLabel = new Map.fromIterable(FilterType.values, key: (v) => FilterTypeLabel[v], value: (v) => v);
-    if(!widget.isNumeric) valuesByLabel.remove("Day");
+    if (!widget.isNumeric) valuesByLabel.remove("Day");
     return DropdownButton<dynamic>(
       isExpanded: true,
       isDense: true,
@@ -149,11 +163,13 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       items: getDropDownMenuItem(valuesByLabel),
       onChanged: (value) {
         setState(() {
-          inputType = value;
+          filterType = value;
           generateSeriesList();
+          if(filterType != FilterType.Day)
+            AppSharedPrefUtil.saveChartFilter(filterType.toString());
         });
       },
-      value: inputType,
+      value: filterType,
     );
   }
 
@@ -193,7 +209,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
             lineStyle: new LineStyleSpec(
               color: MaterialPalette.gray.shade500,
             )),
-        tickProviderSpec: inputType == FilterType.Day ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[inputType],
+        tickProviderSpec: filterType == FilterType.Day ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
       ),
       behaviors: [
         SlidingViewport(),
@@ -210,7 +226,8 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       //defaultRenderer: BarLaneRendererConfig(),
       defaultRenderer: new BarRendererConfig<String>(
         strokeWidthPx: 0.3,
-        barRendererDecorator: CustomBarLabelDecorator<String>(labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
+        barRendererDecorator: CustomBarLabelDecorator<String>(
+            labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
       ),
     );
   }
@@ -228,5 +245,6 @@ class BarData {
   final DateTime time;
   final String xAxis;
   final int yAxis;
+
   BarData(this.xAxis, this.yAxis, this.time);
 }

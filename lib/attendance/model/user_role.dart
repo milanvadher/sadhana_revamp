@@ -15,7 +15,7 @@ class UserRole {
   String center;
   @JsonKey(ignore: true)
   bool get isSimCityGroup => AppUtils.equalsIgnoreCase(center, WSConstant.center_Simcity);
-
+  bool get isAttendanceCord => AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role);
   UserRole();
 
   factory UserRole.fromJson(Map<String, dynamic> json) => _$UserRoleFromJson(json);

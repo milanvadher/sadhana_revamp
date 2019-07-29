@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Constant {
-  static DateTime _now = new DateTime.now();
-  static DateTime today = new DateTime(_now.year, _now.month, _now.day);
   static final String APP_TIME_FORMAT = "hh:mm a";
   static final DateFormat APP_DATE_FORMAT = DateFormat('dd-MM-yy');
   static final String APP_MONTH_FORMAT = 'MMM';
@@ -26,8 +24,8 @@ class Constant {
     'Mar',
     'Apr',
     'May',
-    'June',
-    'July',
+    'Jun',
+    'Jul',
     'Aug',
     'Sep',
     'Oct',

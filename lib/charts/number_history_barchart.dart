@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/charts/custom_bar_label_decorator.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/activity.dart';
+import 'package:sadhana/model/cachedata.dart';
 
 class NumberHistoryBarChart extends StatelessWidget {
   final List<Series> seriesList;
@@ -17,9 +18,9 @@ class NumberHistoryBarChart extends StatelessWidget {
 
   factory NumberHistoryBarChart.withActivity(Color color, Map<int, Activity> activitiesByDate) {
     int maxValue = 0;
-    DateTime startDate = Constant.today.add(Duration(days: -90));
+    DateTime startDate = CacheData.today.add(Duration(days: -90));
     List<OrdinalSales> barChartData = List();
-    while (startDate.millisecondsSinceEpoch <= Constant.today.millisecondsSinceEpoch) {
+    while (startDate.millisecondsSinceEpoch <= CacheData.today.millisecondsSinceEpoch) {
       String xAxis = startDate.day.toString();
       //if (startDate.day == 1) {
       xAxis = DateFormat("d MMM").format(startDate);

@@ -52,6 +52,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   DateTime reminderTime;
   AppLocalNotification appLocalNotification = new AppLocalNotification();
   String operation;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -70,30 +71,28 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;
-    if (sadhana != null)
-      color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
+    if (sadhana != null) color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     operation = widget.isEditMode ? 'Edit' : 'Create';
     //AppLocalNotification.initAppLocalNotification(context);
     return Scaffold(
       appBar: AppBar(
-        actionsIconTheme: Theme.of(context).copyWith().accentIconTheme.copyWith(
-            color: theme == Brightness.light ? Colors.white : Colors.black),
-        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(
-            color: theme == Brightness.light ? Colors.white : Colors.black),
+        actionsIconTheme:
+            Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         backgroundColor: color,
         // centerTitle: true,
-        title: Text('$operation Sadhana',
-            style: TextStyle(
-                color:
-                    theme == Brightness.light ? Colors.white : Colors.black)),
+        title: Text('$operation Sadhana', style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
       ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-          children: <Widget>[sadhanaCreateEditForm()],
+          children: <Widget>[
+            sadhana == null || !sadhana.isPreloaded ? buildBottomBar() : Container(),
+            sadhanaCreateEditForm(),
+          ],
         ),
       ),
-      bottomNavigationBar: buildBottomBar(),
+      //bottomNavigationBar: sadhana == null || !sadhana.isPreloaded ? buildBottomBar() : null,
     );
   }
 
@@ -102,9 +101,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Container(child: Text("This sadhana will not be synced to server.")),
-        Container(child: Text("You can take back up & import.")),
-        SizedBox(height: 7,),
+        Container(child: Text("Note : This sadhana will not be synced to server.")),
+        SizedBox(height: 6,)
       ],
     );
   }
@@ -165,9 +163,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 child: ListTile(
                   title: const Text('Change Color'),
                   trailing: CircleAvatar(
-                    backgroundColor: theme == Brightness.light
-                        ? _mainColor[0]
-                        : _mainColor[1],
+                    backgroundColor: theme == Brightness.light ? _mainColor[0] : _mainColor[1],
                   ),
                 ),
               ),
@@ -265,11 +261,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 RaisedButton(
                   onPressed: onOKClick,
                   color: color,
-                  child: Text('Save',
-                      style: TextStyle(
-                          color: theme == Brightness.light
-                              ? Colors.white
-                              : Colors.black)),
+                  child: Text('Save', style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
                 ),
                 OutlineButton(
                   highlightedBorderColor: color,
@@ -290,9 +282,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     bool isCheckSadhanaExist = false;
     if (!widget.isEditMode)
       isCheckSadhanaExist = true;
-    else if (sadhana != null &&
-        !AppUtils.equalsIgnoreCase(sadhana.sadhanaName, value))
-      isCheckSadhanaExist = true;
+    else if (sadhana != null && !AppUtils.equalsIgnoreCase(sadhana.sadhanaName, value)) isCheckSadhanaExist = true;
     if (isCheckSadhanaExist && AppUtils.isSadhanaExist(value)) {
       return 'Sadhana with $name name is already exists.';
     }
@@ -305,9 +295,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   }
 
   String _getReminderText() {
-    return reminderTime != null
-        ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime)
-        : "Reminder";
+    return reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime) : "Reminder";
   }
 
   void _onChangeType(dynamic value) {
@@ -321,8 +309,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     showDialog(
       context: context,
       builder: (_) {
-        return ColorPickerDialog.getColorPickerDialog(
-            context, _mainColor, _onColorSelected);
+        return ColorPickerDialog.getColorPickerDialog(context, _mainColor, _onColorSelected);
       },
     );
   }
@@ -365,8 +352,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
         sadhana.description = des;
         sadhana.lColor = _mainColor[0];
         sadhana.dColor = _mainColor[1];
-        sadhana.type =
-            radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
+        sadhana.type = radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
       }
       sadhana.reminderTime = reminderTime;
       if (sadhana.isNumeric)
@@ -386,8 +372,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
 
   void scheduleLocalNotification() {
     if (sadhana.reminderTime != null) {
-      Time time =
-          Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
+      Time time = Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
       appLocalNotification.scheduleSadhanaDailyAtTime(sadhana, time);
     }
   }
