@@ -33,7 +33,7 @@ class CacheData {
   }
 
   static Future<String> getLastSyncTime() async {
-    await AppSharedPrefUtil.getLastSyncTime();
+    await AppSharedPrefUtil.getStrLastSyncTime();
   }
 
   static SadhanaDAO sadhanaDAO = SadhanaDAO();

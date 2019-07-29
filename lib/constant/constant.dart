@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 
 class Constant {
   static final String APP_TIME_FORMAT = "hh:mm a";
-  static final DateFormat APP_DATE_FORMAT = DateFormat('dd-MM-yy');
+  static final DateFormat APP_DATE_FORMAT = DateFormat('dd-MMM-yyyy');
+  static final DateFormat SYNC_DATE_FORMAT = DateFormat('dd-MM-yy');
   static final String APP_MONTH_FORMAT = 'MMM';
   static final String APP_DATE_TIME_FORMAT = "dd-MM-yy hh:mm a";
   static final String APP_DATE_TIME_FILE_FORMAT = "dd-MM-yy hh-mm-a";
@@ -17,21 +18,17 @@ class Constant {
   // Display activity data for no of days
   static int displayDays = 30;
 
-  // Month names
-  static List<String> monthName = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
+  static final List<DateTime> syncReminder = [
+    DateTime(2019, 1, 1, 18),
+    DateTime(2019, 1, 2, 18),
+    DateTime(2019, 1, 3, 18),
+    DateTime(2019, 1, 4, 18),
+    DateTime(2019, 1, 5, 18),
   ];
+  static final String syncReminderTitle = "Sync Reminder";
+  static final String syncReminderBody = "Please sync your sadhana by click on sync button.";
+  // Month names
+  static List<String> monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   //  Week days names
   static List<String> weekName = ['MON', 'TUE', 'WED', 'THR', 'FRI', 'SAT', 'SUN'];
@@ -59,5 +56,4 @@ class Constant {
     [Colors.grey[600], Colors.grey[300]],
     [Colors.grey[500], Colors.grey[500]],
   ];
-
 }

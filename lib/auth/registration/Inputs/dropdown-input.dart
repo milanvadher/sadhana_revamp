@@ -70,7 +70,7 @@ class DropDownInputState extends State<DropDownInput> {
     return CommonFunction.getTitleAndNameForProfilePage(
       screenWidth: screenWidth,
       title: widget.labelText,
-      value: selectedValue.toString(),
+      value: widget.valueText.toString(),
       titleWidth: widget.viewModeTitleWidth,
     );
   }

@@ -20,12 +20,14 @@ class PersonalInfoWidget extends StatefulWidget {
   final Function startLoading;
   final Function stopLoading;
   final bool viewMode;
+  final bool profileEdit;
   const PersonalInfoWidget({
     Key key,
     @required this.register,
     @required this.startLoading,
     @required this.stopLoading,
     this.viewMode = false,
+    this.profileEdit = false,
   }) : super(key: key);
 
   @override
@@ -126,7 +128,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           viewMode: viewMode,
         ),
         // B_date
-        DateInput(
+        widget.profileEdit ? Container() : DateInput(
           labelText: 'Birth Date',
           viewMode: viewMode,
           isRequiredValidation: true,
@@ -139,7 +141,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           },
         ),
         // G_date
-        DateInput(
+        widget.profileEdit ? Container() : DateInput(
           labelText: 'Gnan Date',
           viewMode: viewMode,
           isRequiredValidation: true,
@@ -261,10 +263,9 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   }
 
   Widget addressForView(String title, Address address) {
-    //return Container();
     double screenWidth = MediaQuery.of(context).size.width;
     String city = address.city.replaceAll("-", ", ");
-    String valueText = '${address.addressLine1} ${address.addressLine2} $city';
+    String valueText = '${address.addressLine1} ${address.addressLine2} ${address.pincode} $city';
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5),
       alignment: Alignment.bottomLeft,

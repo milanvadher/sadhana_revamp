@@ -12,12 +12,14 @@ class FamilyInfoWidget extends StatefulWidget {
   final Function startLoading;
   final Function stopLoading;
   final bool viewMode;
+  final bool profileEdit;
   const FamilyInfoWidget({
     Key key,
     @required this.register,
     @required this.startLoading,
     @required this.stopLoading,
     this.viewMode = false,
+    this.profileEdit = false,
   }) : super(key: key);
   @override
   _FamilyInfoWidgetState createState() => _FamilyInfoWidgetState();
@@ -34,7 +36,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
     viewMode = widget.viewMode;
     return Column(
       children: <Widget>[
-        TextInputField(
+        widget.profileEdit ? Container() : TextInputField(
           enabled: true,
           labelText: 'Father Name',
           isRequiredValidation: true,
@@ -87,7 +89,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
             });
           },
         ),
-        TextInputField(
+        widget.profileEdit ? Container() : TextInputField(
           enabled: true,
           labelText: 'Mother Name',
           viewMode: viewMode,
@@ -140,7 +142,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
             });
           },
         ),
-        DropDownInput(
+        widget.profileEdit ? Container() : DropDownInput(
           items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           labelText: 'No. of Brother(s)',
           valueText: _register.brotherCount,
@@ -153,7 +155,7 @@ class _FamilyInfoWidgetState extends State<FamilyInfoWidget> {
           },
         ),
         // Sister Count
-        DropDownInput(
+        widget.profileEdit ? Container() : DropDownInput(
           items: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
           labelText: 'No. of Sister(s)',
           valueText: _register.sisterCount,

@@ -30,7 +30,16 @@ class RadioInput extends StatelessWidget {
 
   Widget viewModeWidget() {
     double screenWidth = MediaQuery.of(context).size.width;
-    return CommonFunction.getTitleAndNameForProfilePage(screenWidth: screenWidth, title: labelText, value: radioValue.toString(), titleWidth: viewModeTitleWidth);
+    String value = radioValue.toString();
+    if(radioData != null) {
+      for(Map<String,dynamic> labelValue in radioData) {
+        if(labelValue['value'] == radioValue) {
+          value = labelValue['label'];
+          break;
+        }
+      }
+    }
+    return CommonFunction.getTitleAndNameForProfilePage(screenWidth: screenWidth, title: labelText, value: value, titleWidth: viewModeTitleWidth);
   }
 
   Widget editModeWidget() {

@@ -14,9 +14,9 @@ import 'app.dart';
 import 'constant/constant.dart';
 
 void main() {
-  // if (!Platform.isIOS) {
-  //   schedulePeriodicSync();
-  // }
+   if (!Platform.isIOS) {
+     schedulePeriodicSync();
+   }
   initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
 }
 final int periodicID = 0;
@@ -33,9 +33,8 @@ void schedulePeriodicSync() async {
 void syncPeriodic() async {
   if(await AppUtils.isInternetConnected()) {
     print('Starting periodic sync on' + DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now()));
-    SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
     AppUtils.updateInternetDate();
-  } else {
-
+    await SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
   }
+  await SyncActivityUtils.checkForSyncReminder();
 }

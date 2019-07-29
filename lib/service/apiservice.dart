@@ -115,7 +115,7 @@ class ApiService {
     return res;
   }
 
-  Future<Response> register(Register register) async {
+  Future<Response> updateMBAProfile(Register register) async {
     Map<String, dynamic> data = register.toJson();
     Response res =
         await _postApi(url: '/mba.user.update_mba_profile', data: data);

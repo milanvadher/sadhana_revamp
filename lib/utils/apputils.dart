@@ -35,6 +35,13 @@ class AppUtils {
     }
   }
 
+  static String listToString(List<dynamic> data) {
+    String values = '';
+    if(data != null)
+      data.forEach((s) => AppUtils.isNullOrEmpty(s.toString()) ? '' : values = '$values, ${s.toString()}');
+    return values = values.substring(1, values.length);
+  }
+
   static bool isNumeric(String s) {
     if (s == null) {
       return false;

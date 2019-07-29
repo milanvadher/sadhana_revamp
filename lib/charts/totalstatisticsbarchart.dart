@@ -38,14 +38,14 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
     loadData();
   }
 
-  loadData() {
+  loadData() async {
     if(widget.forHistory) {
       filterType = FilterType.Day;
     }
-    /*if(!widget.forHistory) {
+    if(!widget.forHistory) {
         filterType = await AppSharedPrefUtil.getChartFilter();
     } else
-      filterType = FilterType.Day;*/
+      filterType = FilterType.Day;
     setState(() {generateSeriesList();});
   }
 
@@ -165,8 +165,8 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
         setState(() {
           filterType = value;
           generateSeriesList();
-          if(filterType != FilterType.Day)
-            AppSharedPrefUtil.saveChartFilter(filterType.toString());
+          if(!(filterType == FilterType.Day || filterType == FilterType.Quarter))
+              AppSharedPrefUtil.saveChartFilter(filterType.toString());
         });
       },
       value: filterType,

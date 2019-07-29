@@ -12,14 +12,16 @@ import 'package:sadhana/model/register.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationPage extends StatefulWidget {
   static const String routeName = '/registration';
   final Register registrationData;
-
-  RegistrationPage({@required this.registrationData});
+  final bool profileEdit;
+  final Function onProfileEdit;
+  RegistrationPage({@required this.registrationData, this.profileEdit = false, this.onProfileEdit});
 
   @override
   RegistrationPageState createState() => RegistrationPageState();
@@ -48,6 +50,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           register: _register,
           startLoading: startOverlay,
           stopLoading: stopOverlay,
+          profileEdit: widget.profileEdit,
         ),
       ),
       AppStep(
@@ -56,6 +59,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           register: _register,
           startLoading: startOverlay,
           stopLoading: stopOverlay,
+          profileEdit: widget.profileEdit,
         ),
       ),
       AppStep(
@@ -74,7 +78,6 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
           stopLoading: stopOverlay,
         ),
       ),
-      
     ];
     steps = getSteps(registrationSteps);
   }
@@ -82,10 +85,10 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
   @override
   Widget pageToDisplay() {
     return new WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => widget.profileEdit,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Registration'),
+          title: Text(widget.profileEdit ? 'Profile': 'Registration'),
         ),
         body: SafeArea(
           child: ListView(
@@ -126,8 +129,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     }).toList(growable: true);
   }
 
-  Widget buildController(BuildContext context,
-      {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
+  Widget buildController(BuildContext context, {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Row(
@@ -135,8 +137,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
         children: <Widget>[
           RaisedButton(
             onPressed: onStepContinue,
-            child:
-                Text(currentStep != steps.length - 1 ? 'CONTINUE' : 'Register'),
+            child: Text(currentStep != steps.length - 1 ? 'CONTINUE' : widget.profileEdit ? 'Update' : 'Register'),
           ),
           SizedBox(
             width: 10,
@@ -156,19 +157,23 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
     setState(() {
       GlobalKey<FormState> formKey = registrationSteps[currentStep].formKey;
       if (!formKey.currentState.validate()) {
-        CommonFunction.alertDialog(context: context, msg: "Please fill details for required fields", title: '', type: 'error',);
+        CommonFunction.alertDialog(
+          context: context,
+          msg: "Please fill details for required fields",
+          title: '',
+          type: 'error',
+        );
         return;
       }
       formKey.currentState.save();
       FocusScope.of(context).requestFocus(new FocusNode());
       if (registrationSteps[currentStep].id == personalStepID) {
-        if (_register.sameAsPermanentAddress)
-          _register.currentAddress = _register.permanentAddress;
+        if (_register.sameAsPermanentAddress) _register.currentAddress = _register.permanentAddress;
       }
       if (currentStep < steps.length - 1) {
         currentStep++;
       } else {
-        register();
+        widget.profileEdit ? updateMBAProfile() : register();
       }
       scrollToTop();
     });
@@ -188,20 +193,44 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       print(_register.toJson());
       _register.registered = 1;
       Response res = await api.generateToken(_register.mhtId);
-      AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        if (appResponse.data != null &&
-            appResponse.data.toString().isNotEmpty) {
+        if (appResponse.data != null && appResponse.data.toString().isNotEmpty) {
           _register.token = appResponse.data;
-          res = await api.register(_register);
+          res = await api.updateMBAProfile(_register);
           appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
             await CommonFunction.registerUser(
-                register: _register, context: context, generateToken: false);
+              register: _register,
+              context: context,
+              generateToken: false,
+            );
             Navigator.pushReplacementNamed(context, HomePage.routeName);
           }
         }
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
+      CommonFunction.displayErrorDialog(context: context);
+    }
+    stopOverlay();
+  }
+
+  Future<void> updateMBAProfile() async {
+    startOverlay();
+    try {
+      print(_register.toJson());
+      Response res = await api.updateMBAProfile(_register);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if(appResponse.status == WSConstant.SUCCESS_CODE) {
+        await AppSharedPrefUtil.saveMBAProfile(_register);
+        CommonFunction.alertDialog(context: context, msg: "Your Profile Updated successfully.", type: 'success', doneButtonFn: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          if(widget.onProfileEdit != null)
+            widget.onProfileEdit();
+        });
       }
     } catch (e, s) {
       print(e);

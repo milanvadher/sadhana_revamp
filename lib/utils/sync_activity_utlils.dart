@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
@@ -17,7 +20,8 @@ class SyncActivityUtils {
   static ActivityDAO _activityDAO = ActivityDAO();
   static ApiService apiService = ApiService();
   static bool isSyncing = false;
-
+  static final String MODULE = "[BackgroundSync]";
+  static AppLocalNotification appLocalNotification = new AppLocalNotification();
   static loadActivityFromServer(List<Sadhana> sadhanas, {BuildContext context}) async {
     if(await AppSharedPrefUtil.isUserRegistered()) {
       Response res = await apiService.getActivity();
@@ -68,7 +72,7 @@ class SyncActivityUtils {
 
   static Future<void> _checkNUpdateForLastSyncTime() async {
     if (await AppSharedPrefUtil.isUserRegistered() && (await _getUnSyncActivity()).length == 0) {
-      await AppSharedPrefUtil.saveLasySyncTime(DateTime.now());
+      await AppSharedPrefUtil.saveLastSyncTime(DateTime.now());
       print(CacheData.lastSyncTime);
       main();
     }
@@ -137,4 +141,32 @@ class SyncActivityUtils {
     }
     return true;
   }
+
+  static Future<void> checkForSyncReminder() async {
+    print('$MODULE Checking Sync Reminder');
+    DateTime now = DateTime.now();
+    //appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
+    for(DateTime reminderDate in Constant.syncReminder) {
+      if(reminderDate.day == now.day && reminderDate.hour == now.hour) {
+        print('$MODULE Date and Hour match ${reminderDate.day} ${reminderDate.hour}');
+        if(!await _isRemindedToday(now)) {
+          DateTime lastSynced = await AppSharedPrefUtil.getLastSyncTime();
+          print('$MODULE lastSynced: $lastSynced');
+          if(lastSynced == null || (lastSynced != null && lastSynced.month != now.month)) {
+            print('$MODULE Displaying notification');
+            appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody);
+            AppSharedPrefUtil.saveSyncRemindedDate(now);
+          }
+        } else {
+          print('$MODULE $now is already reminded');
+        }
+      }
+    }
+  }
+
+  static Future<bool> _isRemindedToday(DateTime now) async {
+    DateTime remindedDate = await AppSharedPrefUtil.getSyncRemindedDate();
+    return (remindedDate != null && now.difference(remindedDate).inDays == 0);
+  }
+
 }

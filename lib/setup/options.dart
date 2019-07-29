@@ -16,7 +16,6 @@ import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/widgets/action_item.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/them_item.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AppOptions {
   AppOptions({this.theme, this.platform});

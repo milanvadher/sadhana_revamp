@@ -161,7 +161,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void loadSadhana() async {
-    await AppSharedPrefUtil.getLastSyncTime();
+    await AppSharedPrefUtil.getStrLastSyncTime();
     await createPreloadedSadhana();
     await sadhanaDAO.getAll();
     setState(() {

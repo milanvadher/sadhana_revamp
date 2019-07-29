@@ -31,7 +31,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
   initState() {
     super.initState();
     _options = AppOptions(
-      theme: kDarkAppTheme,
+      theme: kLightAppTheme,
       platform: defaultTargetPlatform,
     );
     new Future.delayed(Duration.zero, () {
@@ -43,8 +43,8 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
-    pageToDisplay = ProfilePage();
-    /*AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
+    //pageToDisplay = ProfilePage();
+    AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
       if(isLoggedIn) {
         setState(() {
           pageToDisplay = HomePage(
@@ -56,7 +56,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
           pageToDisplay = LoginPage();
         });
       }
-    });*/
+    });
   }
 
   AppOptionsPage getAppOptionPage() {
