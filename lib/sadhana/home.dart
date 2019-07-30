@@ -30,6 +30,7 @@ import 'package:sadhana/widgets/appupdatecheck.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
 import 'package:sadhana/widgets/nameheading.dart';
+import 'package:sadhana/widgets/reorderable_list_demo.dart';
 import 'package:sadhana/widgets/sadhana_horizontal_panel.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:share_extend/share_extend.dart';
@@ -104,6 +105,7 @@ class HomePageState extends BaseState<HomePage> {
     await loadUserRoleFromServer();
     await loadUserRoleFromSharedPref();
   }
+
   loadUserRoleFromSharedPref() async {
     role = await AppSharedPrefUtil.getUserRole();
     if (role != null) {
@@ -277,6 +279,7 @@ class HomePageState extends BaseState<HomePage> {
                     children: _buildLeftPanel(),
                   ),
                 ),
+
                 Container(
                   width: mobileWidth - headerWidth,
                   child: Container(
@@ -304,24 +307,37 @@ class HomePageState extends BaseState<HomePage> {
         tooltip: 'Add new Sadhana',
       ),
       bottomNavigationBar: CacheData.lastSyncTime != null && isUserRegistered
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Icon(Icons.sync, size: 14),
-                SizedBox(width: 5),
-                Container(
-                    child: new RichText(
-                  text: new TextSpan(
-                    style: new TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
-                    children: <TextSpan>[
-                      new TextSpan(text: 'Last Sadhana Synced on: '),
-                      new TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                )),
+                _buildSyncStatus(),
+                SizedBox(
+                  height: 5,
+                )
               ],
             )
           : null, // It should null if container then will cover whole page
+    );
+  }
+
+  Widget _buildSyncStatus() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(Icons.sync, size: 14),
+        SizedBox(width: 5),
+        Container(
+          child: new RichText(
+            text: new TextSpan(
+              style: new TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
+              children: <TextSpan>[
+                new TextSpan(text: 'Last Sadhana Synced on: '),
+                new TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -518,17 +534,48 @@ class HomePageState extends BaseState<HomePage> {
           MaterialPageRoute(builder: (context) => widget.optionsPage),
         );
         break;
+      case 'order_change':
+        showChangeOrderDialog();
+        break;
       case 'attendance':
         onAttendanceClick();
         break;
     }
   }
 
+  showChangeOrderDialog() async {
+    return await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(children: <Widget>[
+            Builder(
+              builder: (BuildContext context) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: 12,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Text("City"),
+                        onTap: () => {},
+                      );
+                    },
+                  ),
+                )
+              ]
+          ),
+            )
+          ]);
+        });
+  }
+
   void onAttendanceClick() async {
     startOverlay();
     if (await AppUtils.isInternetConnected()) {
       await CacheData.loadAttendanceData(context);
-      if(CacheData.userRole != null) {
+      if (CacheData.userRole != null) {
         loadUserRoleFromSharedPref();
         if (isAttendanceCord) {
           if (CacheData.isAttendanceSubmissionPending()) {

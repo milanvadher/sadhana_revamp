@@ -163,13 +163,13 @@ class _ProfilePageState extends BaseState<ProfilePage> {
             CommonFunction.alertDialog(context: context, msg: "Your Profile reloaded successfully.", type: 'success');
             loadData();
           }
-        } else {
-          CommonFunction.displayInternetNotAvailableDialog(context: context);
         }
       } catch (e, s) {
         print(s);
       }
       stopOverlay();
+    } else {
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
   }
 }

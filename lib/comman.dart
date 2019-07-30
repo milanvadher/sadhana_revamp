@@ -89,7 +89,7 @@ class CommonFunction {
       alertDialog(
         context: context,
         msg: 'Internet is not available, Please connect to internet and retry',
-        type: 'info',
+        type: 'error',
         title: 'Connect Internet',
         barrierDismissible: false,
       );

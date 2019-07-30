@@ -78,10 +78,10 @@ class ChartUtils {
         if (i < activities.length - 1) {
           Activity current = activities[i];
           Activity next = activities[i + 1];
-          if (current.sadhanaValue == 0) {
+          if (!sadhana.isActivityDone(current)) {
             start = next.sadhanaDate;
             continue;
-          } else if (next.sadhanaDate.difference(current.sadhanaDate).inDays > 1 || next.sadhanaValue <= 0) {
+          } else if (next.sadhanaDate.difference(current.sadhanaDate).inDays > 1) {
             streakList.add(Streak(start, current.sadhanaDate));
             start = next.sadhanaDate;
             continue;
@@ -93,8 +93,8 @@ class ChartUtils {
       Activity last = activities.last;
       Activity lastBefore;
       if (activities.length > 1) lastBefore = activities[activities.length - 2];
-      if (last.sadhanaValue > 0) {
-        if (lastBefore != null && lastBefore.sadhanaValue > 0 && last.sadhanaDate.difference(lastBefore.sadhanaDate).inDays == 1) {
+      if (sadhana.isActivityDone(last)) {
+        if (lastBefore != null &&  sadhana.isActivityDone(lastBefore) && last.sadhanaDate.difference(lastBefore.sadhanaDate).inDays == 1) {
           streakList.add(Streak(start, last.sadhanaDate));
         } else {
           streakList.add(Streak(last.sadhanaDate, last.sadhanaDate));

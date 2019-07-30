@@ -46,7 +46,7 @@ class MBAScheduleCheck {
           return file;
         }
       } else {
-        CommonFunction.alertDialog(context: context, msg: "Please connect to internet to show MBA Schedule");
+        CommonFunction.displayInternetNotAvailableDialog(context: context);
       }
     }
     return null;

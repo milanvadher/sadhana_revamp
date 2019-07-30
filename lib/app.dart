@@ -14,6 +14,7 @@ import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/widgets/reorderable_list_demo.dart';
 import 'package:sadhana/widgets/scrollable_tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -43,7 +44,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
-    //pageToDisplay = ProfilePage();
+    //pageToDisplay = ReorderableListDemo();
     AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
       if(isLoggedIn) {
         setState(() {

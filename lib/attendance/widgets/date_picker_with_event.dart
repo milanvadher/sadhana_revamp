@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
+import 'package:sadhana/utils/apputils.dart';
 
 class AppCalendarCarousel extends StatefulWidget {
   DateTime selectedDate;
@@ -13,7 +14,8 @@ class AppCalendarCarousel extends StatefulWidget {
 
 class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
   DateTime selectedDate;
-
+  bool isDarkTheme;
+  Color textColor;
   static Color color = Colors.red;
   static Widget _eventIcon = Padding(
     padding: EdgeInsets.only(top: 23),
@@ -38,6 +40,8 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    isDarkTheme = AppUtils.isDarkTheme(context);
+    textColor = isDarkTheme ? Colors.white : Colors.black;
     _markedDateMap = new EventList(
       events: Map.fromIterable(widget.events != null ? widget.events : [], key: (v) => v, value: (v) => ["E"]),
     );
@@ -60,6 +64,7 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
       thisMonthDayBorderColor: Colors.grey,
       weekFormat: false,
       height: 350.0,
+      daysTextStyle: TextStyle(color: textColor),
       selectedDateTime: selectedDate,
       daysHaveCircularBorder: true,
       maxSelectedDate: DateTime.now(),

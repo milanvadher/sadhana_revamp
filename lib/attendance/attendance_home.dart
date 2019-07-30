@@ -131,7 +131,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         title: InkWell(
-          onTap: () => _selectDate(),
+          onTap: () => _onSelectDate(),
           child: Row(
             children: <Widget>[
               AppTitleWithSubTitle(
@@ -285,7 +285,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     );
   }
 
-  Future<void> _selectDate() async {
+  Future<void> _onSelectDate() async {
     final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
     if (picked != null) {
       selectedDate = picked;
@@ -340,7 +340,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   void _onPopupSelected(PopUpMenu result) {
     switch (result) {
       case PopUpMenu.changeDate:
-        _selectDate();
+        _onSelectDate();
         break;
       case PopUpMenu.attendanceSummary:
         Navigator.pushNamed(context, AttendanceSummaryPage.routeName);
@@ -441,7 +441,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 msg: "Attendance submitted successfully.",
                 doneButtonFn: () {
                   Navigator.pop(context);
-                  Navigator.pop(context);
+                  //Navigator.pop(context);
                 });
           }
         }

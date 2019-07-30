@@ -10,6 +10,7 @@ import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/chart_utils.dart';
 import 'package:sadhana/widgets/circle_progress_bar.dart';
 import 'package:sadhana/widgets/create_sadhana_dialog.dart';
@@ -39,6 +40,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   Sadhana sadhana;
   SadhanaStatistics statistics;
   Brightness theme;
+  bool isLightTheme = false;
   Color color;
   SadhanaDAO sadhanaDAO = SadhanaDAO();
   static DateTime now = new DateTime.now();
@@ -54,14 +56,18 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     try {
       super.didChangeDependencies();
       sadhana = widget.sadhana;
-      ChartUtils.generateStatistics(sadhana);
-      statistics = sadhana.statistics;
-      List<DateTime> events = statistics.events;
-      _holidays = new Map.fromIterable(events, key: (v) => v, value: (v) => [true]);
+      loadData();
     } catch(e,s) {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
+  }
+
+  loadData() {
+    ChartUtils.generateStatistics(sadhana);
+    statistics = sadhana.statistics;
+    List<DateTime> events = statistics.events;
+    _holidays = new Map.fromIterable(events, key: (v) => v, value: (v) => [true]);
   }
 
   @override
@@ -266,6 +272,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   _onSadhanaEdited(Sadhana sadhana) {
     setState(() {
       this.sadhana = sadhana;
+      loadData();
     });
   }
 

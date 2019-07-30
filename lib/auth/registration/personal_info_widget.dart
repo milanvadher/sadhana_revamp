@@ -44,7 +44,9 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   @override
   void initState() {
     super.initState();
-    loadCountries();
+    if(!widget.viewMode) {
+      loadCountries();
+    }
   }
 
   loadCountries() async {

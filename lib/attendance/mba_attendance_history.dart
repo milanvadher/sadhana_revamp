@@ -9,6 +9,7 @@ import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
@@ -33,7 +34,7 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
   EventList<MBAAttendance> _markedDateMap;
   var len = 9;
   double cHeight;
-
+  Color textColor;
   @override
   void initState() {
     super.initState();
@@ -85,10 +86,10 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
     );
   }
 
-
   @override
   Widget pageToDisplay() {
     cHeight = MediaQuery.of(context).size.height;
+    textColor = AppUtils.isDarkTheme(context) ? Colors.white : Colors.black;
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.name),
@@ -97,9 +98,14 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            buildCalendar(),
-            markerRepresent(Colors.red, "Absent"),
-            markerRepresent(Colors.green, "Present"),
+            Padding(
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: buildCalendar(),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[markerRepresent(Colors.red, "Absent"), markerRepresent(Colors.green, "Present"),],
+            ),
           ],
         ),
       ),
@@ -110,12 +116,10 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
     return CalendarCarousel<MBAAttendance>(
       dayPadding: 0,
       weekDayMargin: EdgeInsets.only(bottom: 2),
-      height: cHeight * 0.63,
-      weekendTextStyle: TextStyle(
-        color: Colors.red,
-      ),
+      height: cHeight * 0.61,
       todayButtonColor: Colors.transparent,
-      todayTextStyle: TextStyle(color: Colors.black),
+      daysTextStyle: TextStyle(color: textColor),
+      todayTextStyle: TextStyle(color: textColor),
       markedDatesMap: _markedDateMap,
       markedDateShowIcon: true,
       markedDateIconMaxShown: 1,
@@ -126,15 +130,31 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
     );
   }
 
-  Widget markerRepresent(Color color, String data) {
+  /*Widget markerRepresent(Color color, String data) {
     return new ListTile(
+      dense: true,
       leading: new CircleAvatar(
         backgroundColor: color,
-        radius: 20,
+        radius: 18,
       ),
-      title: new Text(
-        data,
-      ),
+      title: new Text(data),
+    );
+  }*/
+  Widget markerRepresent(Color color, String data) {
+    return Row(
+      children: <Widget>[
+        CircleAvatar(
+          backgroundColor: color,
+          radius: 18,
+        ),
+        SizedBox(
+          width: 20,
+        ),
+        Text(
+          data,
+          textScaleFactor: 1.3,
+        )
+      ],
     );
   }
 }

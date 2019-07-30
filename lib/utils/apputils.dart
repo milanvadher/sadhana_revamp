@@ -45,6 +45,10 @@ class AppUtils {
     return values;
   }
 
+  static bool isDarkTheme(BuildContext context) {
+    return Brightness.dark == Theme.of(context).brightness;
+  }
+
   static bool isNumeric(String s) {
     if (s == null) {
       return false;

@@ -75,11 +75,12 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
     }
   }
 
-  void _searchPressed() {
+  void _onSearchPressed() {
     setState(() {
       if (this._searchIcon.icon == Icons.search) {
         this._searchIcon = new Icon(Icons.close);
         this._appBarTitle = new TextField(
+          autofocus: true,
           controller: _filter,
           cursorColor: Colors.white,
           keyboardType: TextInputType.text,
@@ -115,7 +116,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
         actions: <Widget>[
           IconButton(
             icon: _searchIcon,
-            onPressed: _searchPressed,
+            onPressed: _onSearchPressed,
           ),
         ],
       ),
