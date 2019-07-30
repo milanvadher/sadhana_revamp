@@ -19,11 +19,11 @@ class Constant {
   static int displayDays = 30;
 
   static final List<DateTime> syncReminder = [
-    DateTime(2019, 1, 1, 18),
-    DateTime(2019, 1, 2, 18),
-    DateTime(2019, 1, 3, 18),
-    DateTime(2019, 1, 4, 18),
-    DateTime(2019, 1, 5, 18),
+    DateTime(2019, 1, 1, 8),
+    DateTime(2019, 1, 2, 8),
+    DateTime(2019, 1, 3, 8),
+    DateTime(2019, 1, 4, 8),
+    DateTime(2019, 1, 5, 8),
   ];
   static final String syncReminderTitle = "Sync Reminder";
   static final String syncReminderBody = "Please sync your sadhana by click on sync button.";

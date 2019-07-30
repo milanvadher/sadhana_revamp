@@ -88,7 +88,7 @@ class RegistrationPageState extends BaseState<RegistrationPage> {
       onWillPop: () async => widget.profileEdit,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.profileEdit ? 'Profile': 'Registration'),
+          title: Text(widget.profileEdit ? 'Profile Update': 'Registration'),
         ),
         body: SafeArea(
           child: ListView(

@@ -73,7 +73,8 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       barChartData.add(BarData(xaxis, timeSeries.value, timeSeries.time));
     }
     List<BarData> finalBarChartData = barChartData.reversed.toList();
-    viewport = OrdinalViewport(finalBarChartData.last.xAxis, 8);
+    if(finalBarChartData.isNotEmpty)
+      viewport = OrdinalViewport(finalBarChartData.last.xAxis, 8);
     seriesList = [
       new Series<BarData, String>(
         id: 'Sadhana',

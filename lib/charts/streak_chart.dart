@@ -20,12 +20,15 @@ class StreakChart extends StatelessWidget {
   }
 
   factory StreakChart.withStreakList(Color color, List<Streak> streakList) {
-    streakList.sort((a, b) => b.diff.compareTo(a.diff));
-    int maxStreak = ChartUtils.bestStreak;
-    if (streakList.length - 1 < maxStreak) maxStreak = streakList.length - 1;
-    List<Streak> finalList = streakList.sublist(0, maxStreak - 1);
-    finalList.sort((a, b) => b.start.compareTo(a.start));
-    return StreakChart(finalList, color);
+    if(streakList.isNotEmpty) {
+      streakList.sort((a, b) => b.diff.compareTo(a.diff));
+      int maxStreak = ChartUtils.bestStreak;
+      if (streakList.length < maxStreak) maxStreak = streakList.length;
+      List<Streak> finalList = streakList.sublist(0, maxStreak);
+      finalList.sort((a, b) => b.start.compareTo(a.start));
+      return StreakChart(finalList, color);
+    } else
+      return StreakChart([], color);
   }
 
   @override

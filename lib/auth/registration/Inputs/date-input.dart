@@ -93,7 +93,7 @@ class DateInput extends StatelessWidget {
     return CommonFunction.getTitleAndNameForProfilePage(
       screenWidth: screenWidth,
       title: labelText,
-      value: Constant.APP_DATE_FORMAT.format(selectedDate),
+      value: selectedDate != null ? Constant.APP_DATE_FORMAT.format(selectedDate) : '',
       titleWidth: viewModeTitleWidth,
     );
   }

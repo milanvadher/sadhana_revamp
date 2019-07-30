@@ -178,7 +178,6 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   Widget _buildCardView(Attendance attendance) {
-    print('${attendance.firstName} ${attendance.reason}');
     return Container(
       padding: EdgeInsets.only(left: 10, right: 10),
       child: Card(

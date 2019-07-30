@@ -211,7 +211,6 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
   Widget getWeeklyOffViewMode() {
     double screenWidth = MediaQuery.of(context).size.width;
     String values = AppUtils.listToString(_register.holidays);
-    values = values.substring(1, values.length);
     return Container(
       padding: EdgeInsets.symmetric(vertical: !viewMode ? 10.0 : 5),
       alignment: Alignment.bottomLeft,

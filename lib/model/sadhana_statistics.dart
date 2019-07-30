@@ -2,10 +2,10 @@ import 'package:sadhana/charts/model/filter_type.dart';
 import 'package:sadhana/charts/model/streak.dart';
 
 class SadhanaStatistics {
-  int score;
-  int total;
-  int monthTotal;
-  int totalValue;
+  int score = 0;
+  int total = 0;
+  int monthTotal = 0;
+  int totalValue = 0;
   DateTime firstSadhanaDate;
   Map<DateTime, int> countByDay = Map();
   Map<DateTime, int> countByMonth = Map();

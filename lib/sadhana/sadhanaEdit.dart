@@ -51,12 +51,17 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   @override
   void didChangeDependencies() {
-    super.didChangeDependencies();
-    sadhana = widget.sadhana;
-    ChartUtils.generateStatistics(sadhana);
-    statistics = sadhana.statistics;
-    List<DateTime> events = statistics.events;
-    _holidays = new Map.fromIterable(events, key: (v) => v, value: (v) => [true]);
+    try {
+      super.didChangeDependencies();
+      sadhana = widget.sadhana;
+      ChartUtils.generateStatistics(sadhana);
+      statistics = sadhana.statistics;
+      List<DateTime> events = statistics.events;
+      _holidays = new Map.fromIterable(events, key: (v) => v, value: (v) => [true]);
+    } catch(e,s) {
+      print(s);
+      CommonFunction.displayErrorDialog(context: context);
+    }
   }
 
   @override
@@ -90,7 +95,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               isFirst: true,
             ),
             buildBoxLayout(Padding(
-              padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
               child: _buildTableCalendar(),
             )),
             buildBoxLayout(SizedBox(
