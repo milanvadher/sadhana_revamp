@@ -2,11 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:sadhana/attendance/attendance_home.dart';
 import 'package:sadhana/auth/login/login.dart';
-import 'package:sadhana/auth/profile/profile_page.dart';
-import 'package:sadhana/auth/profile/test_ui.dart';
-import 'package:sadhana/auth/registration/registration_request.dart';
 import 'package:sadhana/comman.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/sadhana/home.dart';
@@ -14,8 +10,6 @@ import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
-import 'package:sadhana/widgets/reorderable_list_demo.dart';
-import 'package:sadhana/widgets/scrollable_tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SadhanaApp extends StatefulWidget {
