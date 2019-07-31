@@ -12,10 +12,13 @@ import 'package:sadhana/model/mba_center.dart';
 import 'package:sadhana/model/registration_request.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationRequestPage extends StatefulWidget {
+  String mhtId;
+  RegistrationRequestPage({this.mhtId});
   @override
   State<StatefulWidget> createState() => new RegistrationRequestPageState();
 }
@@ -30,6 +33,9 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   @override
   void initState() {
     super.initState();
+    if(!AppUtils.isNullOrEmpty(widget.mhtId)) {
+      request.mhtId = widget.mhtId;
+    }
     loadData();
   }
 
@@ -102,6 +108,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
         NumberInput(
           isRequiredValidation: true,
           labelText: "MHT ID",
+          enabled: false,
           onSaved: (val) => request.mhtId = val?.toInt().toString(),
           digitOnly: true,
         ),

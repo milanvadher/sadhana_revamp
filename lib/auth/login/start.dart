@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sadhana/commonvalidation.dart';
 import 'package:sadhana/model/logindatastate.dart';
 
@@ -39,7 +40,8 @@ class StartWidget extends StatelessWidget {
           child: TextFormField(
             initialValue: loginState.mhtId,
             validator: CommonValidation.mhtIdValidation,
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.number,
+            inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
               icon: Icon(Icons.email),
               border: OutlineInputBorder(),
@@ -47,6 +49,7 @@ class StartWidget extends StatelessWidget {
             ),
             onSaved: (value) => loginState.mhtId = value,
             maxLines: 1,
+            maxLength: 6,
           ),
         ),
       ],

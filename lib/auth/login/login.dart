@@ -287,7 +287,7 @@ class LoginPageState extends BaseState<LoginPage> {
               doneButtonText: "Register",
               doneButtonFn: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage(mhtId: loginState.mhtId,)));
               });
         }
       } catch (e, s) {
