@@ -57,7 +57,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       super.didChangeDependencies();
       sadhana = widget.sadhana;
       loadData();
-    } catch(e,s) {
+    } catch (e, s) {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
@@ -78,7 +78,8 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       appBar: AppBar(
         actionsIconTheme:
             Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
-        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme:
+            Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         title: Text(sadhana.sadhanaName, style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
         backgroundColor: color,
         actions: <Widget>[
@@ -183,31 +184,50 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
         _buildTitle("Overview"),
         Padding(
           padding: EdgeInsets.only(
-            left: 20,
+            left: 15,
           ),
-          child: Row(
-            children: <Widget>[
-              SizedBox(
-                height: 30,
-                child: CircleProgressBar(
-                  backgroundColor: Colors.grey,
-                  foregroundColor: color,
-                  value: statistics.score / 100,
+          child: SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: <Widget>[
+                Container(
+                  width: 30,
+                  child: CircleProgressBar(
+                    backgroundColor: Colors.grey,
+                    foregroundColor: color,
+                    value: statistics.score / 100,
+                  ),
                 ),
-              ),
-              SizedBox(width: 15),
-              _buildTitleValue("Score", '${statistics.score} %'),
-              SizedBox(width: 15),
-              _buildTitleValue("Total", statistics.total.toString()),
-              SizedBox(width: 15),
-              _buildTitleValue("This Month", statistics.monthTotal.toString()),
-              SizedBox(width: 15),
-              sadhana.isNumeric ? _buildTitleValue("Total Value", statistics.totalValue.toString()) : Container(),
-            ],
+                getSizeBox(),
+                _buildTitleValue("Score", '${statistics.score} %'),
+                getSizeBox(),
+                _buildTitleValue("Total", statistics.total.toString()),
+                getSizeBox(),
+                sadhana.isNumeric ? _buildTitleValue("${getTotalValueTitle()}", statistics.totalValue.toString()) : Container(),
+                sadhana.isNumeric ? getSizeBox() : Container(),
+                _buildTitleValue("This Month", statistics.monthTotal.toString()),
+                getSizeBox(),
+                sadhana.isNumeric ? _buildTitleValue("${getTotalValueTitle()}", statistics.monthValue.toString()) : Container(),
+              ],
+            ),
           ),
         )
       ],
     );
+  }
+
+  Widget getSizeBox() {
+    return SizedBox(width: sadhana.isNumeric ? 8 : 15);
+  }
+
+  String getTotalValueTitle() {
+    if (AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME))
+      return 'Hours';
+    else if (AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.vanchanName))
+      return 'Pages';
+    else
+      return 'Values';
   }
 
   _buildTitleValue(String title, String value) {
@@ -301,7 +321,8 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               child: Text(
                 '${date.day}',
                 style: TextStyle().copyWith(
-                    color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                    color:
+                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: _holidays.containsKey(date) ? color : Colors.transparent,
             ),
@@ -314,7 +335,8 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               child: Text(
                 '${date.day}',
                 style: TextStyle(
-                    color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                    color:
+                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: color,
             ),

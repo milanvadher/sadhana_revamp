@@ -5,6 +5,7 @@ class SadhanaStatistics {
   int score = 0;
   int total = 0;
   int monthTotal = 0;
+  int monthValue = 0;
   int totalValue = 0;
   DateTime firstSadhanaDate;
   Map<DateTime, int> countByDay = Map();

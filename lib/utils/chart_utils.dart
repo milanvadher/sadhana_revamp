@@ -38,6 +38,7 @@ class ChartUtils {
       int total = 0;
       int monthTotal = 0;
       int totalValue = 0;
+      int monthValue = 0;
 
       activities.sort((a, b) => a.sadhanaDate.compareTo(b.sadhanaDate));
       statistics.firstSadhanaDate = activities[0].sadhanaDate;
@@ -52,6 +53,8 @@ class ChartUtils {
             events.add(sadhanaDate);
             total++;
           }
+          if (CacheData.today.month == sadhanaDate.month)
+            monthValue += sadhanaValue;
           totalValue += sadhanaValue;
         }
 
@@ -113,6 +116,7 @@ class ChartUtils {
       statistics.countByYear = countByYear;
       statistics.countByQuarter = countByQuarter;
       statistics.countByDay = countByDay;
+      statistics.monthValue = monthValue;
       addMissingValues(sadhana.isNumeric, statistics);
     }
   }

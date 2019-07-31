@@ -178,6 +178,7 @@ class AppSharedPrefUtil {
 
   static Future<AppSetting> getServerSetting() async {
     String serverSetting = await getString(SharedPrefConstant.s_server_setting);
+    print('#################################  $serverSetting');
     if (serverSetting == null) {
       return AppSetting.getDefaulServerAppSetting();
     } else {
