@@ -22,17 +22,13 @@ class ChartUtils {
   }
 
   static generateStatistics(Sadhana sadhana) {
-    SadhanaStatistics statistics = sadhana.statistics;
+    SadhanaStatistics statistics = SadhanaStatistics();
+    sadhana.statistics = statistics;
     List<Activity> activities = sadhana.activitiesByDate.values.toList();
     if (activities != null && activities.isNotEmpty) {
       int counter = 0;
       DateTime maxNumberHistory = CacheData.today.add(Duration(days: -maxNumberValueHistoryDays));
       DateTime scoreStartDate = DateTime.now().add(Duration(days: -31));
-      Map<DateTime, int> countByMonth = new Map();
-      Map<DateTime, int> countByYear = new Map();
-      Map<DateTime, int> countByWeek = new Map();
-      Map<DateTime, int> countByQuarter = new Map();
-      Map<DateTime, int> countByDay = new Map();
       List<DateTime> events = new List();
       List<Streak> streakList = List();
       int total = 0;
@@ -66,15 +62,20 @@ class ChartUtils {
         //Count Calculation
         if (sadhana.isActivityDone(activity)) {
           if (CacheData.today.month == sadhanaDate.month) monthTotal++;
-          groupBy<DateTime>(countByMonth, DateTime(sadhanaDate.year, sadhanaDate.month));
-          groupBy<DateTime>(countByYear, DateTime(sadhanaDate.year));
-          groupBy<DateTime>(countByWeek, getStartWeekDay(sadhanaDate)); // Start with Mon
-          groupBy<DateTime>(countByQuarter, getStartQuarterDay(sadhanaDate));
+          groupBy<DateTime>(statistics.countByMonth, DateTime(sadhanaDate.year, sadhanaDate.month));
+          groupBy<DateTime>(statistics.countByYear, DateTime(sadhanaDate.year));
+          groupBy<DateTime>(statistics.countByWeek, getStartWeekDay(sadhanaDate)); // Start with Mon
+          groupBy<DateTime>(statistics.countByQuarter, getStartQuarterDay(sadhanaDate));
         }
+        //Numeric Calculation
         if (sadhanaValue > 0 && sadhana.isNumeric) {
           if (sadhanaDate.isAfter(maxNumberHistory)) {
-            countByDay[sadhanaDate] = sadhanaValue;
+            statistics.valueByDay[sadhanaDate] = sadhanaValue;
           }
+          groupBy<DateTime>(statistics.valueByMonth, DateTime(sadhanaDate.year, sadhanaDate.month), value: sadhanaValue);
+          groupBy<DateTime>(statistics.valueByYear, DateTime(sadhanaDate.year), value: sadhanaValue);
+          groupBy<DateTime>(statistics.valueByWeek, getStartWeekDay(sadhanaDate), value: sadhanaValue); // Start with Mon
+          groupBy<DateTime>(statistics.valueByQuarter, getStartQuarterDay(sadhanaDate), value: sadhanaValue);
         }
 
         //Streak Calculation (Should be At Last)
@@ -105,17 +106,12 @@ class ChartUtils {
       }
 
       statistics.events = events;
-      statistics.countByMonth = countByMonth;
-      statistics.countByMonthWithoutMissing = Map.from(countByMonth);
+      statistics.countByMonthWithoutMissing = Map.from(statistics.countByMonth);
       statistics.score = ((counter / 31) * 100).toInt();
       statistics.streakList = streakList;
       statistics.total = total;
       statistics.totalValue = totalValue;
       statistics.monthTotal = monthTotal;
-      statistics.countByWeek = countByWeek;
-      statistics.countByYear = countByYear;
-      statistics.countByQuarter = countByQuarter;
-      statistics.countByDay = countByDay;
       statistics.monthValue = monthValue;
       addMissingValues(sadhana.isNumeric, statistics);
     }
@@ -155,7 +151,7 @@ class ChartUtils {
     );
     if (isNumeric) {
       addMissingGeneric(
-        countMap: statistics.countByDay,
+        countMap: statistics.valueByDay,
         start: today.add(Duration(days: -maxNumberValueHistoryDays)),
         end: today,
         getNext: (current) => current.add(Duration(days: 1)),
@@ -178,11 +174,11 @@ class ChartUtils {
     }
   }
 
-  static void groupBy<D>(Map<D, int> counts, D key) {
+  static void groupBy<D>(Map<D, int> counts, D key, {int value = 1}) {
     if (counts[key] == null) {
-      counts[key] = 1;
+      counts[key] = value;
     } else {
-      counts[key] = counts[key] + 1;
+      counts[key] = counts[key] + value;
     }
   }
 }

@@ -18,7 +18,9 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationRequestPage extends StatefulWidget {
   String mhtId;
+
   RegistrationRequestPage({this.mhtId});
+
   @override
   State<StatefulWidget> createState() => new RegistrationRequestPageState();
 }
@@ -33,7 +35,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   @override
   void initState() {
     super.initState();
-    if(!AppUtils.isNullOrEmpty(widget.mhtId)) {
+    if (!AppUtils.isNullOrEmpty(widget.mhtId)) {
       request.mhtId = widget.mhtId;
     }
     loadData();
@@ -54,15 +56,18 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   @override
   Widget pageToDisplay() {
     return new Scaffold(
+      appBar: AppBar(
+        title: Text('Registration Request'),
+      ),
       backgroundColor: Colors.white,
       body: new Form(
         key: _formIndiaKey,
         autovalidate: _autoValidate,
         child: SafeArea(
           child: new ListView(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.only(left: 20, top: 20,bottom: 10,right: 20),
             children: <Widget>[
-              _titleAndLogo(),
+              //_titleAndLogo(),
               _indiaLoginFields(),
             ],
           ),
@@ -75,19 +80,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
     return Column(
       children: <Widget>[
         new SizedBox(height: 25),
-        new Column(
-          children: <Widget>[
-            new Image.asset('images/logo_2.jpg', height: 100),
-            new SizedBox(height: 10.0),
-            new Text(
-              'Registration Request',
-              textScaleFactor: 1.5,
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-              ),
-            )
-          ],
-        ),
+        Image.asset('images/logo_2.jpg', height: 100),
         new SizedBox(height: 20.0),
         new Container(
           decoration: BoxDecoration(
@@ -109,6 +102,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           isRequiredValidation: true,
           labelText: "MHT ID",
           enabled: false,
+          valueText: request.mhtId,
           onSaved: (val) => request.mhtId = val?.toInt().toString(),
           digitOnly: true,
         ),
@@ -154,24 +148,16 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           children: <Widget>[
             new Container(
               child: new RaisedButton(
-                child: Text(
-                  'Request',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: Text('Request', style: TextStyle(color: Colors.white)),
                 elevation: 4.0,
-                padding: EdgeInsets.all(20.0),
                 onPressed: _submitRequest,
               ),
             ),
             new SizedBox(width: 15.0),
             new Container(
               child: new RaisedButton(
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: Text('Cancel', style: TextStyle(color: Colors.white)),
                 elevation: 4.0,
-                padding: EdgeInsets.all(20.0),
                 onPressed: () {
                   Navigator.pop(context);
                 },

@@ -78,8 +78,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       appBar: AppBar(
         actionsIconTheme:
             Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
-        iconTheme:
-            Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         title: Text(sadhana.sadhanaName, style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
         backgroundColor: color,
         actions: <Widget>[
@@ -88,52 +87,56 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
         ],
       ),
       body: SafeArea(
-        child: ListView(
-          children: <Widget>[
-            _buildTopHeader(),
-            buildBoxLayout(_buildOverView()),
-            buildBoxLayout(
-              Column(
-                children: <Widget>[
-                  _buildTitle('Best Streak'),
-                  StreakChart.withStreakList(color, statistics.streakList),
-                ],
-              ),
-              isFirst: true,
-            ),
-            buildBoxLayout(Padding(
-              padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-              child: _buildTableCalendar(),
-            )),
-            buildBoxLayout(SizedBox(
-              height: 290.0,
-              child: TotalStatisticsBarChart(
-                statistics,
-                getChartColor(color),
-                isNumeric: sadhana.isNumeric,
-              ),
-            )),
-            buildBoxLayout(Column(
+        child: ListView(children: <Widget>[
+          Container(
+            child: Column(
               children: <Widget>[
-                _buildTitle("Total"),
-                SizedBox(
-                  height: 250.0,
-                  child: TotalStatisticsChart.forMonth(getChartColor(color), statistics.countByMonthWithoutMissing),
-                )
+                _buildTopHeader(),
+                buildBoxLayout(_buildOverView()),
+                buildBoxLayout(
+                  Column(
+                    children: <Widget>[
+                      _buildTitle('Best Streak'),
+                      StreakChart.withStreakList(color, statistics.streakList),
+                    ],
+                  ),
+                  isFirst: true,
+                ),
+                buildBoxLayout(Padding(
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: _buildTableCalendar(),
+                )),
+                buildBoxLayout(SizedBox(
+                  height: 290.0,
+                  child: TotalStatisticsBarChart(
+                    statistics,
+                    getChartColor(color),
+                    isNumeric: sadhana.isNumeric,
+                  ),
+                )),
+                buildBoxLayout(Column(
+                  children: <Widget>[
+                    _buildTitle("Total"),
+                    SizedBox(
+                      height: 250.0,
+                      child: TotalStatisticsChart.forMonth(getChartColor(color), statistics.countByMonthWithoutMissing),
+                    )
+                  ],
+                )),
+                sadhana.isNumeric
+                    ? buildBoxLayout(SizedBox(
+                        height: 290.0,
+                        child: TotalStatisticsBarChart(
+                          statistics,
+                          getChartColor(color),
+                          forHistory: true,
+                        ),
+                      ))
+                    : Container(),
               ],
-            )),
-            sadhana.isNumeric
-                ? buildBoxLayout(SizedBox(
-                    height: 290.0,
-                    child: TotalStatisticsBarChart(
-                      statistics,
-                      getChartColor(color),
-                      forHistory: true,
-                    ),
-                  ))
-                : Container(),
-          ],
-        ),
+            ),
+          )
+        ]),
       ),
     );
   }
@@ -321,8 +324,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               child: Text(
                 '${date.day}',
                 style: TextStyle().copyWith(
-                    color:
-                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                    color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: _holidays.containsKey(date) ? color : Colors.transparent,
             ),
@@ -335,8 +337,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               child: Text(
                 '${date.day}',
                 style: TextStyle(
-                    color:
-                        _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
+                    color: _holidays.containsKey(date) ? (theme == Brightness.light ? Colors.white : Colors.black) : Colors.black),
               ),
               backgroundColor: color,
             ),

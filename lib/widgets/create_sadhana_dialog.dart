@@ -6,14 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/auth/registration/Inputs/time-input.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
-import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/color_picker_dialog.dart';
 
@@ -81,7 +79,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
         iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         backgroundColor: color,
         // centerTitle: true,
-        title: Text('$operation Sadhana', style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
+        title: Text('$operation Sadhana'),
       ),
       body: SafeArea(
         child: ListView(
@@ -97,13 +95,17 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   }
 
   Widget buildBottomBar() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(child: Text("Note : This sadhana will not be synced to server.")),
-        SizedBox(height: 6,)
-      ],
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(color: theme == Brightness.dark ? Colors.white : Colors.black),
+          children: <TextSpan>[
+            TextSpan(text: 'Note: ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            TextSpan(text: 'This sadhana will not be synced to server.'),
+          ],
+        ),
+      ),
     );
   }
 

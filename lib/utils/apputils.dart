@@ -40,7 +40,7 @@ class AppUtils {
     if(data != null && data.isNotEmpty) {
       data.forEach((s) => AppUtils.isNullOrEmpty(s.toString()) ? '' : values = '$values, ${s.toString()}');
       if(values.length > 1)
-        values.substring(1, values.length);
+        values = values.substring(1, values.length);
     }
     return values;
   }

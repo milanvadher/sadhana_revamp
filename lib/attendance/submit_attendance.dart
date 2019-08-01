@@ -127,17 +127,17 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
     }
 
     Widget _buildListView() {
+      List<Widget> cartList = summary.map((s) => _buildCardView(s)).toList();
+      cartList.add(SizedBox(height: 70));
       return Container(
         padding: EdgeInsets.only(top: 15),
-        child: ListView.builder(
-          itemCount: summary.length + 1,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == summary.length)
-              return SizedBox(height: 70);
-            else
-              return _buildCardView(summary[index]);
-          },
-        ),
+        child: ListView(children: [
+          Container(
+            child: Column(
+              children: cartList,
+            ),
+          )
+        ]),
       );
     }
 

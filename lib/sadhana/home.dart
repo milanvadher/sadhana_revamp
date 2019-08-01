@@ -325,12 +325,12 @@ class HomePageState extends BaseState<HomePage> {
         Icon(Icons.sync, size: 14),
         SizedBox(width: 5),
         Container(
-          child: new RichText(
-            text: new TextSpan(
-              style: new TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
               children: <TextSpan>[
-                new TextSpan(text: 'Last Sadhana Synced on: '),
-                new TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: 'Last Sadhana Synced on: '),
+                TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
           ),

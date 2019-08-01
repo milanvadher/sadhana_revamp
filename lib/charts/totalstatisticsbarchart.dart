@@ -39,9 +39,6 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   }
 
   loadData() async {
-    if(widget.forHistory) {
-      filterType = FilterType.Day;
-    }
     if(!widget.forHistory) {
         filterType = await AppSharedPrefUtil.getChartFilter();
     } else
@@ -51,7 +48,12 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
 
   generateSeriesList() {
     List<TimeSeries> listOfTimeSeries = List();
-    Map<DateTime, int> counts = widget.statistics.getCounts(filterType);
+    Map<DateTime, int> counts;
+    if(widget.forHistory)
+      counts = widget.statistics.getTotalValues(filterType);
+    else
+      counts = widget.statistics.getCounts(filterType);
+
     counts.forEach((month, value) {
       listOfTimeSeries.add(TimeSeries(month, value));
     });
@@ -141,12 +143,10 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       dense: true,
       title: Text(widget.forHistory ? 'History' : 'Total',
           style: TextStyle(color: getFlutterColor(widget.color), fontSize: ChartUtils.chartTitleSize)),
-      trailing: !widget.forHistory
-          ? SizedBox(
+      trailing: SizedBox(
               width: 80,
               child: buildTotalTypeDropDown(),
-            )
-          : null,
+            ),
     );
   }
 
@@ -156,7 +156,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
 
   buildTotalTypeDropDown() {
     Map<String, dynamic> valuesByLabel = new Map.fromIterable(FilterType.values, key: (v) => FilterTypeLabel[v], value: (v) => v);
-    if (!widget.isNumeric) valuesByLabel.remove("Day");
+    if (!widget.forHistory) valuesByLabel.remove("Day");
     return DropdownButton<dynamic>(
       isExpanded: true,
       isDense: true,
@@ -210,7 +210,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
             lineStyle: new LineStyleSpec(
               color: MaterialPalette.gray.shade500,
             )),
-        tickProviderSpec: filterType == FilterType.Day ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
+        tickProviderSpec: widget.forHistory ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
       ),
       behaviors: [
         SlidingViewport(),

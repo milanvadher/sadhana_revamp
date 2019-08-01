@@ -221,14 +221,14 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   Widget _buildListView() {
-    //List<Widget> cartList = session.attendance.map((attendance) => _buildCardView(attendance)).toList();
-    //cartList.add(SizedBox(height: 70));
+    List<Widget> cartList = session.attendance.map((attendance) => _buildCardView(attendance)).toList();
+    cartList.add(SizedBox(height: 70));
     return Container(
       padding: EdgeInsets.only(top: 10),
       child: ListView(children: [
         Container(
           child: Column(
-            children: session.attendance.map((attendance) => _buildCardView(attendance)).toList(),
+            children: cartList,
           ),
         )
       ]),
@@ -267,7 +267,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                   heroTag: _dvdFormButton,
                   onPressed: () => _onDVDClick(),
                   backgroundColor: Colors.white,
-                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Colors.red),
+                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFF9D0C0E)),
                 )
               : Container(),
           !isSimcityGroup ? SizedBox(width: 20) : Container(),
