@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/auth/profile/profile_update_page.dart';
 import 'package:sadhana/auth/profile/seva_profile_page.dart';
 import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
@@ -25,6 +26,7 @@ class _ProfilePageState extends BaseState<ProfilePage> {
   Register mbaProfile;
   List<TabPage> pages = [];
   ApiService api = ApiService();
+  ScrollableTabsDemo scrollableTabsPage;
 
   @override
   void initState() {
@@ -42,7 +44,7 @@ class _ProfilePageState extends BaseState<ProfilePage> {
 
   @override
   Widget pageToDisplay() {
-    return ScrollableTabsDemo(
+    return scrollableTabsPage = ScrollableTabsDemo(
       title: "Profile",
       actions: _buildActions(),
       pages: [
@@ -133,15 +135,28 @@ class _ProfilePageState extends BaseState<ProfilePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => RegistrationPage(
-                registrationData: mbaProfile,
-                profileEdit: true,
+          builder: (context) => ProfileUpdatePage(
+                mbaProfile: mbaProfile,
+                pageType: getUpdateProfilePageType(),
                 onProfileEdit: _onProfileEdit,
               ),
         ),
       );
     } else {
       CommonFunction.displayInternetNotAvailableDialog(context: context);
+    }
+  }
+
+  getUpdateProfilePageType() {
+    switch(scrollableTabsPage.index()) {
+      case 0:
+        return UpdateProfilePageType.BASIC;
+      case 1:
+        return UpdateProfilePageType.Family;
+      case 2:
+        return UpdateProfilePageType.Professional;
+      case 3:
+        return UpdateProfilePageType.Seva;
     }
   }
 

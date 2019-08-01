@@ -26,7 +26,7 @@ class StartWidget extends StatelessWidget {
               ),
               Center(
                 child: Text(
-                  'Please enter Mahatma I-Card/Temporary Id (\'Z\') Number to Proceed:',
+                  'Please enter Mahatma I-Card Number to Proceed:',
                   textAlign: TextAlign.center,
                 ),
               ),

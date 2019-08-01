@@ -20,16 +20,25 @@ class ScrollableTabsDemo extends StatefulWidget {
   final TabsStyle tabsDemoStyle;
   final String title;
   final List<Widget> actions;
-  const ScrollableTabsDemo({Key key, this.pages, this.tabsDemoStyle = TabsStyle.textOnly, this.title, this.actions}) : super(key: key);
+  ScrollableTabsDemo({Key key, this.pages, this.tabsDemoStyle = TabsStyle.textOnly, this.title, this.actions}) : super(key: key);
+
+  int index() {
+    return state._controller.index;
+  }
+
+  ScrollableTabsDemoState state;
 
   @override
-  ScrollableTabsDemoState createState() => ScrollableTabsDemoState();
+  ScrollableTabsDemoState createState() {
+    state = ScrollableTabsDemoState();
+    return state;
+  }
+
 }
 
 class ScrollableTabsDemoState extends State<ScrollableTabsDemo> with SingleTickerProviderStateMixin {
   TabController _controller;
-  bool _customIndicator = false;
-
+  ScrollableTabsDemoState();
   @override
   void initState() {
     super.initState();
@@ -42,66 +51,15 @@ class ScrollableTabsDemoState extends State<ScrollableTabsDemo> with SingleTicke
     super.dispose();
   }
 
-  Decoration getIndicator() {
-    if (!_customIndicator) return const UnderlineTabIndicator();
-
-    switch (widget.tabsDemoStyle) {
-      case TabsStyle.iconsAndText:
-        return ShapeDecoration(
-          shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4.0)),
-                side: BorderSide(
-                  color: Colors.white24,
-                  width: 2.0,
-                ),
-              ) +
-              const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4.0)),
-                side: BorderSide(
-                  color: Colors.transparent,
-                  width: 4.0,
-                ),
-              ),
-        );
-
-      case TabsStyle.iconsOnly:
-        return ShapeDecoration(
-          shape: const CircleBorder(
-                side: BorderSide(
-                  color: Colors.white24,
-                  width: 2.0,
-                ),
-              ) +
-              const CircleBorder(
-                side: BorderSide(
-                  color: Colors.transparent,
-                  width: 4.0,
-                ),
-              ),
-        );
-
-      case TabsStyle.textOnly:
-        return ShapeDecoration(
-          shape: const StadiumBorder(
-                side: BorderSide(
-                  color: Colors.white24,
-                  width: 2.0,
-                ),
-              ) +
-              const StadiumBorder(
-                side: BorderSide(
-                  color: Colors.transparent,
-                  width: 4.0,
-                ),
-              ),
-        );
-    }
-    return null;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    widget.state = this;
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor = Theme.of(context).accentColor;
+    widget.state = this;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -131,9 +89,7 @@ class ScrollableTabsDemoState extends State<ScrollableTabsDemo> with SingleTicke
           case TabsStyle.iconsOnly:
             return Tab(icon: Icon(page.icon));
           case TabsStyle.textOnly:
-            return Tab(
-              text: page.text,
-            );
+            return Tab(text: page.text);
         }
         return null;
       }).toList(),
