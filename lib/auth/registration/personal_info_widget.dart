@@ -6,7 +6,7 @@ import 'package:sadhana/auth/registration/Inputs/date-input.dart';
 import 'package:sadhana/auth/registration/Inputs/dropdown-input.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/country.dart';
 import 'package:sadhana/model/register.dart';

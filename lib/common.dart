@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:path/path.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/message_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -17,7 +18,7 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 class CommonFunction {
   static AppOptionsPage appOptionsPage;
 
-  static displayErrorDialog({@required BuildContext context, String msg}) {
+  static displayErrorDialog({@required BuildContext context, String msg, String error}) {
     if (msg != null && msg.toUpperCase().contains("SOCKET")) msg = "Looks like you lost your Internet !!";
     if (msg == null) msg = MessageConstant.COMMON_ERROR_MSG;
     if (context != null) {
@@ -26,12 +27,22 @@ class CommonFunction {
         msg: msg,
         type: 'error',
         barrierDismissible: false,
+        errorHint: error,
       );
     }
   }
 
-  static Widget getTitleAndName(
-      {@required double screenWidth, @required String title, @required String value, bool forProfilePage}) {
+  static void wrapWithTryCatch(BuildContext context, Function function) {
+    try {
+      function();
+    } catch(e,s) {
+      print(e);
+      print(s);
+      CommonFunction.displayErrorDialog(context: context, error: e);
+    }
+  }
+
+  static Widget getTitleAndName({@required double screenWidth, @required String title, @required String value, bool forProfilePage}) {
     return Container(
       padding: EdgeInsets.all(5),
       child: Row(
@@ -136,8 +147,7 @@ class CommonFunction {
     return null;
   }
 
-  static Future<bool> registerUser(
-      {@required Register register, @required BuildContext context, bool generateToken = true}) async {
+  static Future<bool> registerUser({@required Register register, @required BuildContext context, bool generateToken = true}) async {
     if (generateToken) {
       ApiService apiService = ApiService();
       Response res = await apiService.generateToken(register.mhtId);
@@ -180,6 +190,7 @@ class CommonFunction {
       Function doneCancelFn,
       AlertDialog Function() builder,
       Widget widget,
+      String errorHint,
       bool closeable = true}) {
     if (context != null) {
       String newTitle = title != null ? title : type == 'error' ? 'Error' : type == 'success' ? title : 'Success';
@@ -195,59 +206,62 @@ class CommonFunction {
                 shape: new RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5.0),
                 ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    widget != null ? widget : Container(),
-                    SizedBox(height: 5),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5),
-                      child: Text(
-                        msg != null
-                            ? msg
-                            : type == 'error'
-                                ? "Looks like your lack of \n Imagination ! "
-                                : "Looks like today is your luckyday ... !!",
-                        style: TextStyle(color: Theme.of(context).textTheme.caption.color),
-                      ),
-                    ),
-                    SizedBox(height: 20.0),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        FlatButton(
-                          color: type == 'error' ? kQuizErrorRed : Colors.green[600],
-                          child: Text(
-                            doneButtonText = doneButtonText ?? "OK",
-                            style: TextStyle(color: kQuizBackgroundWhite),
-                          ),
-                          onPressed: doneButtonFn != null
-                              ? doneButtonFn
-                              : () {
-                                  Navigator.pop(context);
-                                },
+                content: InkWell(
+                  onLongPress: errorHint == null ? () {} : () {alertDialog(context: context, msg: errorHint);},
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      widget != null ? widget : Container(),
+                      SizedBox(height: 5),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Text(
+                          msg != null
+                              ? msg
+                              : type == 'error'
+                                  ? "Looks like your lack of \n Imagination ! "
+                                  : "Looks like today is your luckyday ... !!",
+                          style: TextStyle(color: Theme.of(context).textTheme.caption.color),
                         ),
-                        showCancelButton ? SizedBox(width: 10) : new Container(),
-                        showCancelButton
-                            ? FlatButton(
-                                color: kQuizErrorRed,
-                                child: Text(
-                                  cancelButtonText ?? 'Cancel',
-                                  style: TextStyle(
-                                    color: kQuizBackgroundWhite,
+                      ),
+                      SizedBox(height: 20.0),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          FlatButton(
+                            color: type == 'error' ? kQuizErrorRed : Colors.green[600],
+                            child: Text(
+                              doneButtonText = doneButtonText ?? "OK",
+                              style: TextStyle(color: kQuizBackgroundWhite),
+                            ),
+                            onPressed: doneButtonFn != null
+                                ? doneButtonFn
+                                : () {
+                                    Navigator.pop(context);
+                                  },
+                          ),
+                          showCancelButton ? SizedBox(width: 10) : new Container(),
+                          showCancelButton
+                              ? FlatButton(
+                                  color: kQuizErrorRed,
+                                  child: Text(
+                                    cancelButtonText ?? 'Cancel',
+                                    style: TextStyle(
+                                      color: kQuizBackgroundWhite,
+                                    ),
                                   ),
-                                ),
-                                onPressed: doneCancelFn != null
-                                    ? doneCancelFn
-                                    : () {
-                                        Navigator.pop(context);
-                                      },
-                              )
-                            : new Container(),
-                      ],
-                    ),
-                  ],
+                                  onPressed: doneCancelFn != null
+                                      ? doneCancelFn
+                                      : () {
+                                          Navigator.pop(context);
+                                        },
+                                )
+                              : new Container(),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ));
         },

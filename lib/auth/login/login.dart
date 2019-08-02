@@ -7,7 +7,7 @@ import 'package:sadhana/auth/login/start.dart';
 import 'package:sadhana/auth/login/verify.dart';
 import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/auth/registration/registration_request.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/logindatastate.dart';
 import 'package:sadhana/model/profile.dart';

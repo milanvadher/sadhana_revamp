@@ -6,7 +6,7 @@ import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
 import 'package:sadhana/auth/registration/registration_step.dart';
 import 'package:sadhana/auth/registration/seav_info_widget.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/sadhana/home.dart';

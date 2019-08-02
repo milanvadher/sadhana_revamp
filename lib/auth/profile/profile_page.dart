@@ -6,7 +6,7 @@ import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
 import 'package:sadhana/auth/registration/registration.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -139,6 +139,7 @@ class _ProfilePageState extends BaseState<ProfilePage> {
                 mbaProfile: mbaProfile,
                 pageType: getUpdateProfilePageType(),
                 onProfileEdit: _onProfileEdit,
+                onCancel: _onProfileEdit,
               ),
         ),
       );

@@ -6,12 +6,14 @@ class CircleProgressBar extends StatelessWidget {
   final Color backgroundColor;
   final Color foregroundColor;
   final double value;
+  final bool displayValue;
 
   const CircleProgressBar({
     Key key,
     this.backgroundColor,
     @required this.foregroundColor,
     @required this.value,
+    this.displayValue = false,
   }) : super(key: key);
 
   @override
@@ -21,7 +23,11 @@ class CircleProgressBar extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 1,
       child: CustomPaint(
-        child: Container(),
+        child: displayValue
+            ? Center(
+                child: Text('100%', textScaleFactor: 0.8),
+              )
+            : Container(),
         foregroundPainter: CircleProgressBarPainter(
           strokeWidth: 5,
           backgroundColor: backgroundColor,

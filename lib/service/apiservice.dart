@@ -252,8 +252,9 @@ class ApiService {
 
   Future<Response> getSessionDates(String group) async {
     Map<String, dynamic> data = {'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.get_session_dates', data: data);
+    //Response res = await _postApi(url: '/mba.attendance.get_session_dates', data: data);
     //Response res = http.Response("{\"message\":{\"data\":[\"2019-07-05\",\"2019-07-04\"]}}", 200);
+    Response res = http.Response("{\"message\":{\"msg\":\"ProgrammingError(1064, \\\"You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ') ORDER BY `first_name`' at line 1\\\")\"}}", 500);
     return res;
   }
 

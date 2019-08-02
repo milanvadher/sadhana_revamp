@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/charts/streak_chart.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/main.dart';
@@ -191,17 +191,28 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
           ),
           child: SizedBox(
             height: 40,
+            //height: 70,
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: <Widget>[
-                Container(
-                  width: 30,
-                  child: CircleProgressBar(
-                    backgroundColor: Colors.grey,
-                    foregroundColor: color,
-                    value: statistics.score / 100,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      width: 30,
+                      //width: 40,
+                      child: CircleProgressBar(
+                        backgroundColor: Colors.grey,
+                        foregroundColor: color,
+                        value: statistics.score / 100,
+                        //displayValue: true,
+                        displayValue: false,
+                      ),
+                    ),
+                  ],
                 ),
+                //_buildTitleValue2(),
                 getSizeBox(),
                 _buildTitleValue("Score", '${statistics.score} %'),
                 getSizeBox(),
@@ -220,6 +231,22 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
     );
   }
 
+  Widget buildScore() {
+    return Column(
+      children: <Widget>[
+        Container(),
+        Container(
+          width: 30,
+          child: CircleProgressBar(
+            backgroundColor: Colors.grey,
+            foregroundColor: color,
+            value: statistics.score / 100,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget getSizeBox() {
     return SizedBox(width: sadhana.isNumeric ? 8 : 15);
   }
@@ -233,13 +260,52 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
       return 'Values';
   }
 
-  _buildTitleValue(String title, String value) {
+  _buildTitleValue2() {
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Text('149', textScaleFactor: 1.1, style: TextStyle(color: color)),
+                    Text('days', textScaleFactor: 0.7),
+                  ],
+                ),
+                SizedBox(width: 10),
+                Column(
+                  children: <Widget>[
+                    Text('149', textScaleFactor: 1.1, style: TextStyle(color: color)),
+                    Text('pages', textScaleFactor: 0.7),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 2),
+            Text('Total'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  _buildTitleValue(String title, String value, {String hint}) {
     return Column(
       children: <Widget>[
-        Text(
-          value,
-          style: TextStyle(color: color),
-        ),
+        hint != null ? RichText(
+          text: TextSpan(
+            style: TextStyle(color: theme == Brightness.dark ? Colors.white : Colors.black),
+            children: <TextSpan>[
+              TextSpan(text: value, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+              TextSpan(text: hint, style: TextStyle(fontSize: 6)),
+            ],
+          ),
+        ) : Text(value, style: TextStyle(color: color)),
         Text(title),
       ],
     );

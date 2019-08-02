@@ -10,7 +10,7 @@ import 'package:sadhana/attendance/submit_attendance.dart';
 import 'package:sadhana/attendance/widgets/date_picker_with_event.dart';
 import 'package:sadhana/attendance/widgets/dvd_form.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -267,7 +267,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                   heroTag: _dvdFormButton,
                   onPressed: () => _onDVDClick(),
                   backgroundColor: Colors.white,
-                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFF9D0C0E)),
+                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11)),
                 )
               : Container(),
           !isSimcityGroup ? SizedBox(width: 20) : Container(),
@@ -448,7 +448,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       }
     } catch (e, s) {
       print(s);
-      CommonFunction.displayErrorDialog(context: context);
+      CommonFunction.displayErrorDialog(context: context , error: e);
     }
     stopOverlay();
   }

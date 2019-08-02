@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 
 class RadioInput extends StatelessWidget {
   RadioInput({
