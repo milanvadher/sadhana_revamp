@@ -32,9 +32,9 @@ class CommonFunction {
     }
   }
 
-  static void wrapWithTryCatch(BuildContext context, Function function) {
+  static Future<void> wrapWithTryCatch(BuildContext context, Function function, {String msg}) async {
     try {
-      function();
+      await function();
     } catch(e,s) {
       print(e);
       print(s);

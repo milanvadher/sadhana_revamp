@@ -25,6 +25,8 @@ class Constant {
     DateTime(2019, 1, 15, 16),
   ];
 
+  static final DateTime fillReminder = DateTime(2000, 1, 1, 17);
+
   static final String syncReminderTitle = "Sync Reminder";
   static final String syncReminderBody = "Please sync your sadhana by click on sync button.";
   // Month names

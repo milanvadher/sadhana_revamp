@@ -114,7 +114,7 @@ class _DVDFormState extends State<DVDForm> {
                           ),
                         )
                       : Container(),
-                  RaisedButton(
+                  OutlineButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },

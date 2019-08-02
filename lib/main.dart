@@ -14,9 +14,9 @@ import 'app.dart';
 import 'constant/constant.dart';
 
 void main() {
-   /*if (!Platform.isIOS) {
+   if (!Platform.isIOS) {
      schedulePeriodicSync();
-   }*/
+   }
   initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
 }
 final int periodicID = 0;
@@ -37,4 +37,5 @@ void syncPeriodic() async {
     await SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
   }
   await SyncActivityUtils.checkForSyncReminder();
+  await SyncActivityUtils.checkForFillReminder();
 }

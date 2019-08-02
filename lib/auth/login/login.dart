@@ -200,7 +200,7 @@ class LoginPageState extends BaseState<LoginPage> {
         break;
       case 2: //Verify
         if (loginState.mobileChangeRequestStart)
-          return await sumbitMobileChangeReq();
+          return await submitMobileChangeReq();
         else
           return _verify(context);
         break;
@@ -383,8 +383,12 @@ class LoginPageState extends BaseState<LoginPage> {
     return false;
   }
 
-  Future<bool> sumbitMobileChangeReq() async {
+  Future<bool> submitMobileChangeReq() async {
     try {
+      if(loginState.profileData.mobileNo1 == loginState.newMobile) {
+        CommonFunction.alertDialog(context: context, type: 'error', msg: "Your old mobile number and new mobile are same.");
+        return false;
+      }
       startOverlay();
       Response res = await api.changeMobile(loginState.mhtId, loginState.profileData.mobileNo1, loginState.newMobile);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -406,7 +410,7 @@ class LoginPageState extends BaseState<LoginPage> {
     if (await CommonFunction.registerUser(register: otpData.profile, context: context)) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => HomePage(optionsPage: CommonFunction.appOptionsPage,),
         ),
       );
     }

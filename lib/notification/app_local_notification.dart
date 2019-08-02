@@ -18,6 +18,7 @@ class AppLocalNotification {
     color: Colors.redAccent,
     largeIcon: "ic_notification_large_icon",
     largeIconBitmapSource: BitmapSource.Drawable,
+    style: AndroidNotificationStyle.BigText,
     //ongoing: true,  // Sticky Notification
   );
   
@@ -54,6 +55,7 @@ class AppLocalNotification {
       color: Colors.redAccent,
       largeIcon: "ic_notification_large_icon",
       largeIconBitmapSource: BitmapSource.Drawable,
+      style: AndroidNotificationStyle.BigText,
       //ongoing: true,  // Sticky Notification
     );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();

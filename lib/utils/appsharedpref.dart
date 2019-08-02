@@ -249,14 +249,31 @@ class AppSharedPrefUtil {
   }
 
   static Future<void> saveSyncRemindedDate(DateTime date) async {
-    if (date != null) await saveString(SharedPrefConstant.s_sync_reminded_date, prefDateFormat.format(date));
+    await saveDate(SharedPrefConstant.s_sync_reminded_date, date);
   }
 
   static Future<DateTime> getSyncRemindedDate() async {
-    String strSyncRemindedDate = await getString(SharedPrefConstant.s_sync_reminded_date);
-    if (strSyncRemindedDate != null) {
-      return prefDateFormat.parse(strSyncRemindedDate);
+    return await getDate(SharedPrefConstant.s_sync_reminded_date);
+  }
+
+  static Future<void> saveFillRemindedDate(DateTime date) async {
+    await saveDate(SharedPrefConstant.s_fill_reminded_date, date);
+  }
+
+  static Future<DateTime> getFillRemindedDate() async {
+    return await getDate(SharedPrefConstant.s_fill_reminded_date);
+  }
+
+  static Future<void> saveDate(String prefName, DateTime date) async {
+    if (date != null) await saveString(prefName, prefDateFormat.format(date));
+  }
+
+  static Future<DateTime> getDate(String prefName) async {
+    String strDate = await getString(prefName);
+    if (strDate != null) {
+      return prefDateFormat.parse(strDate);
     }
     return null;
   }
+
 }

@@ -263,7 +263,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 RaisedButton(
                   onPressed: onOKClick,
                   color: color,
-                  child: Text('Save', style: TextStyle(color: theme == Brightness.light ? Colors.white : Colors.black)),
+                  child: Text('Save'),
                 ),
                 OutlineButton(
                   highlightedBorderColor: color,

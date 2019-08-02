@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
@@ -23,12 +24,13 @@ class SyncActivityUtils {
   static final String MODULE = "[BackgroundSync]";
   static AppLocalNotification appLocalNotification = new AppLocalNotification();
   static loadActivityFromServer(List<Sadhana> sadhanas, {BuildContext context}) async {
-    if(await AppSharedPrefUtil.isUserRegistered()) {
+    if (await AppSharedPrefUtil.isUserRegistered()) {
       Response res = await apiService.getActivity();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+        List<WSSadhanaActivity> wsSadhanaActivity =
+            wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
         Map<String, Sadhana> sadhanaByServerSName = new Map();
         sadhanas.forEach((sadhana) {
           sadhanaByServerSName[sadhana.serverSName] = sadhana;
@@ -83,7 +85,7 @@ class SyncActivityUtils {
   }
 
   static Future<bool> syncAllUnSyncActivity({bool onBackground = true, BuildContext context, bool forceSync = false}) async {
-    if(await AppSharedPrefUtil.isUserRegistered()) {
+    if (await AppSharedPrefUtil.isUserRegistered()) {
       bool isSynced = false;
       if (!isSyncing || forceSync) {
         try {
@@ -103,8 +105,8 @@ class SyncActivityUtils {
                 }
               }
               List<WSSadhanaActivity> wsSadhanaActivities = new List();
-              activitiesByServerSName
-                  .forEach((serverSName, activities) => wsSadhanaActivities.add(WSSadhanaActivity.fromActivity(serverSName, activities)));
+              activitiesByServerSName.forEach(
+                  (serverSName, activities) => wsSadhanaActivities.add(WSSadhanaActivity.fromActivity(serverSName, activities)));
               Response res = await apiService.syncActivity(wsSadhanaActivities);
               AppResponse appResponse;
               if (onBackground)
@@ -143,30 +145,64 @@ class SyncActivityUtils {
   }
 
   static Future<void> checkForSyncReminder() async {
-    print('$MODULE Checking Sync Reminder');
-    DateTime now = DateTime.now();
-    //appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
-    for(DateTime reminderDate in Constant.syncReminder) {
-      if(reminderDate.day == now.day && reminderDate.hour == now.hour) {
-        print('$MODULE Date and Hour match ${reminderDate.day} ${reminderDate.hour}');
-        if(!await _isRemindedToday(now)) {
-          DateTime lastSynced = await AppSharedPrefUtil.getLastSyncTime();
-          print('$MODULE lastSynced: $lastSynced');
-          if(lastSynced == null || (lastSynced != null && lastSynced.month != now.month)) {
-            print('$MODULE Displaying notification');
-            appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody);
-            AppSharedPrefUtil.saveSyncRemindedDate(now);
+    await CommonFunction.wrapWithTryCatch(null, () async {
+      print('$MODULE Checking Sync Reminder');
+      DateTime now = DateTime.now();
+      //appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
+      for (DateTime reminderDate in Constant.syncReminder) {
+        if (reminderDate.day == now.day && reminderDate.hour == now.hour) {
+          print('$MODULE Date and Hour match ${reminderDate.day} ${reminderDate.hour}');
+          if (!await _isRemindedToday(await AppSharedPrefUtil.getSyncRemindedDate())) {
+            DateTime lastSynced = await AppSharedPrefUtil.getLastSyncTime();
+            print('$MODULE lastSynced: $lastSynced');
+            if (lastSynced == null || (lastSynced != null && lastSynced.month != now.month)) {
+              print('$MODULE Displaying notification');
+              appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody);
+              AppSharedPrefUtil.saveSyncRemindedDate(now);
+            }
+          } else {
+            print('$MODULE $now is already reminded');
           }
-        } else {
-          print('$MODULE $now is already reminded');
         }
       }
+    });
+  }
+
+  static Future<void> checkForFillReminder() async {
+    await CommonFunction.wrapWithTryCatch(null, () async {
+      print('$MODULE Checking Fill Reminder');
+      appLocalNotification.showNotification(
+          "Checking fill reminder", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}",
+          id: 213412);
+      DateTime now = DateTime.now();
+      if (Constant.fillReminder.hour == now.hour && !await _isRemindedToday(await AppSharedPrefUtil.getFillRemindedDate())) {
+        Map<int, Sadhana> sadhanaById = await CacheData.getSadhanasById();
+
+        sadhanaById.forEach((id, sadhana) {
+          if (sadhana.isPreloaded) {
+            if (isEntryExist(sadhana.activitiesByDate, 4)) return;
+          }
+        });
+        print('$MODULE No any entry exist so showing notification');
+        String date = Constant.APP_DATE_FORMAT.format(CacheData.today.add(Duration(days: -3)));
+        AppLocalNotification().showNotification("Sadhana Reminder", "Did you forgot to fill sadhana of $date?");
+        AppSharedPrefUtil.saveFillRemindedDate(now);
+      }
+    });
+  }
+
+  static bool isEntryExist(Map<int, Activity> activitiesByDate, int days) {
+    DateTime day = CacheData.today;
+    print('$MODULE all activity $activitiesByDate');
+    for (int i = 0; i < days; i++) {
+      print('$MODULE $day checking date ${activitiesByDate[day]}');
+      if (activitiesByDate[day] != null && activitiesByDate[day].sadhanaValue > 0) return true;
+      day = day.add(Duration(days: -1));
     }
+    return false;
   }
 
-  static Future<bool> _isRemindedToday(DateTime now) async {
-    DateTime remindedDate = await AppSharedPrefUtil.getSyncRemindedDate();
-    return (remindedDate != null && now.difference(remindedDate).inDays == 0);
+  static Future<bool> _isRemindedToday(DateTime remindedDate) async {
+    return (remindedDate != null && CacheData.today.difference(remindedDate).inDays == 0);
   }
-
 }
