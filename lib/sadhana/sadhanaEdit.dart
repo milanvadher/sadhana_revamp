@@ -93,15 +93,6 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               children: <Widget>[
                 _buildTopHeader(),
                 buildBoxLayout(_buildOverView()),
-                buildBoxLayout(
-                  Column(
-                    children: <Widget>[
-                      _buildTitle('Best Streak'),
-                      StreakChart.withStreakList(color, statistics.streakList),
-                    ],
-                  ),
-                  isFirst: true,
-                ),
                 buildBoxLayout(Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: _buildTableCalendar(),
@@ -114,25 +105,35 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                     isNumeric: sadhana.isNumeric,
                   ),
                 )),
+                sadhana.isNumeric
+                    ? buildBoxLayout(SizedBox(
+                  height: 290.0,
+                  child: TotalStatisticsBarChart(
+                    statistics,
+                    getChartColor(color),
+                    forHistory: true,
+                    sadhanaName: sadhana.sadhanaName,
+                  ),
+                ))
+                    : Container(),
                 buildBoxLayout(Column(
                   children: <Widget>[
-                    _buildTitle("Total"),
+                    _buildTitle("Statistics"),
                     SizedBox(
                       height: 250.0,
                       child: TotalStatisticsChart.forMonth(getChartColor(color), statistics.countByMonthWithoutMissing),
                     )
                   ],
                 )),
-                sadhana.isNumeric
-                    ? buildBoxLayout(SizedBox(
-                        height: 290.0,
-                        child: TotalStatisticsBarChart(
-                          statistics,
-                          getChartColor(color),
-                          forHistory: true,
-                        ),
-                      ))
-                    : Container(),
+                buildBoxLayout(
+                  Column(
+                    children: <Widget>[
+                      _buildTitle('Best Streak'),
+                      StreakChart.withStreakList(color, statistics.streakList),
+                    ],
+                  ),
+                  isFirst: true,
+                ),
               ],
             ),
           )
@@ -218,11 +219,15 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                 getSizeBox(),
                 _buildTitleValue("Total", statistics.total.toString()),
                 getSizeBox(),
-                sadhana.isNumeric ? _buildTitleValue("${getTotalValueTitle()}", statistics.totalValue.toString()) : Container(),
+                sadhana.isNumeric
+                    ? _buildTitleValue("${AppUtils.getCountTitleForSadhana(sadhana.sadhanaName)}", statistics.totalValue.toString())
+                    : Container(),
                 sadhana.isNumeric ? getSizeBox() : Container(),
                 _buildTitleValue("This Month", statistics.monthTotal.toString()),
                 getSizeBox(),
-                sadhana.isNumeric ? _buildTitleValue("${getTotalValueTitle()}", statistics.monthValue.toString()) : Container(),
+                sadhana.isNumeric
+                    ? _buildTitleValue("${AppUtils.getCountTitleForSadhana(sadhana.sadhanaName)}", statistics.monthValue.toString())
+                    : Container(),
               ],
             ),
           ),
@@ -249,15 +254,6 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   Widget getSizeBox() {
     return SizedBox(width: sadhana.isNumeric ? 8 : 15);
-  }
-
-  String getTotalValueTitle() {
-    if (AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.SEVANAME))
-      return 'Hours';
-    else if (AppUtils.equalsIgnoreCase(sadhana.sadhanaName, Constant.vanchanName))
-      return 'Pages';
-    else
-      return 'Values';
   }
 
   _buildTitleValue2() {
@@ -297,15 +293,17 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   _buildTitleValue(String title, String value, {String hint}) {
     return Column(
       children: <Widget>[
-        hint != null ? RichText(
-          text: TextSpan(
-            style: TextStyle(color: theme == Brightness.dark ? Colors.white : Colors.black),
-            children: <TextSpan>[
-              TextSpan(text: value, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-              TextSpan(text: hint, style: TextStyle(fontSize: 6)),
-            ],
-          ),
-        ) : Text(value, style: TextStyle(color: color)),
+        hint != null
+            ? RichText(
+                text: TextSpan(
+                  style: TextStyle(color: theme == Brightness.dark ? Colors.white : Colors.black),
+                  children: <TextSpan>[
+                    TextSpan(text: value, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+                    TextSpan(text: hint, style: TextStyle(fontSize: 6)),
+                  ],
+                ),
+              )
+            : Text(value, style: TextStyle(color: color)),
         Text(title),
       ],
     );

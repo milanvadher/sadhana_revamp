@@ -57,15 +57,16 @@ class Attendance {
   @JsonKey(ignore: true)
   String get name => '$firstName $lastName';
 
-  @JsonKey(name: 'is_present', fromJson: _isPresentFromJson, toJson: _isPresentToJson)
+  @JsonKey(name: 'is_present', fromJson: AppUtils.convertToIntToBool, toJson: AppUtils.convertBoolToInt)
   bool isPresent;
 
   @JsonKey(name: 'absent_reason')
   String reason;
 
   Attendance();
-  static bool _isPresentFromJson(int isPresent) => isPresent != null ? isPresent > 0 ? true : false : false;
-  static int _isPresentToJson(bool isPresent) => isPresent ? 1 : 0;
+  //static bool _isPresentFromJson(int isPresent) => AppUtils.convertToIntToBool(isPresent);
+  //static int _isPresentToJson(bool isPresent) => AppUtils.convertBoolToInt(isPresent);
+
 
   factory Attendance.fromJson(Map<String, dynamic> json) => _$AttendanceFromJson(json);
   Map<String, dynamic> toJson() => _$AttendanceToJson(this);

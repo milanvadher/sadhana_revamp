@@ -169,7 +169,7 @@ class _ProfilePageState extends BaseState<ProfilePage> {
     if (await AppUtils.isInternetConnected()) {
       startOverlay();
       try {
-        Response res = await api.sendOTP(mbaProfile.mhtId, mbaProfile.email, mbaProfile.mobileNo1);
+        Response res = await api.getMBAProfile();
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           OtpData otpData = OtpData.fromJson(appResponse.data);

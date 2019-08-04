@@ -11,7 +11,7 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:vibration/vibration.dart';
+import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info/device_info.dart';
 
@@ -33,6 +33,18 @@ class AppUtils {
       else
         return false;
     }
+  }
+  static int convertBoolToInt(bool boolValue, {int defaultValue = 0}) {
+    return boolValue != null ? (boolValue ? 1 : 0) : defaultValue;
+  }
+
+  static String getCountTitleForSadhana(String sadhanaName) {
+    if (AppUtils.equalsIgnoreCase(sadhanaName, Constant.SEVANAME))
+      return 'Hours';
+    else if (AppUtils.equalsIgnoreCase(sadhanaName, Constant.vanchanName))
+      return 'Pages';
+    else
+      return 'Counts';
   }
 
   static String listToString(List<dynamic> data) {
@@ -144,14 +156,14 @@ class AppUtils {
   }
 
   static vibratePhone({int duration}) {
-    // Vibration.hasVibrator().then((canVibrate) {
-    //   if (canVibrate) {
-    //     if (duration != null && duration > 0)
-    //       Vibration.vibrate(duration: duration);
-    //     else
-    //       Vibration.vibrate();
-    //   }
-    // });
+     Vibration.hasVibrator().then((canVibrate) {
+       if (canVibrate) {
+         if (duration != null && duration > 0)
+           Vibration.vibrate(duration: duration);
+         else
+           Vibration.vibrate();
+       }
+     });
   }
 
   static Future<bool> isInternetConnected() async {

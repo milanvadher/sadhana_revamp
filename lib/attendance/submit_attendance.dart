@@ -5,7 +5,6 @@ import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/common.dart';
-import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -94,7 +93,11 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
                     children: <Widget>[
                       IconButton(
                         icon: Icon(Icons.message),
-                        onPressed: () => setState(() => data.showRemarks = !data.showRemarks),
+                        onPressed: () => setState(() {
+                          data.showRemarks = !data.showRemarks;
+                          if(!data.showRemarks)
+                            data.lessAttendanceReason = '';
+                        } ),
                       ),
                       Container(
                         width: 40,
@@ -115,6 +118,8 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
                               valueText: data.lessAttendanceReason,
                               onSaved: (val) => data.lessAttendanceReason = val,
                               padding: EdgeInsets.all(0),
+                              maxLength: 125,
+                              showCounter: false,
                               contentPadding: EdgeInsets.all(13),
                             ),
                           ),

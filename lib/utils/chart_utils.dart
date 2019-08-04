@@ -1,5 +1,4 @@
 import 'package:sadhana/charts/model/streak.dart';
-import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
@@ -9,26 +8,29 @@ class ChartUtils {
   static final double chartTitleSize = 16;
   static final int bestStreak = 5;
   static final int maxNumberValueHistoryDays = 90;
+  static final int scroeRangeDays = 31;
 
   static getScore(List<Activity> activities) {
     int counter = 0;
-    DateTime time = DateTime.now().add(Duration(days: -31));
+    DateTime time = DateTime.now().add(Duration(days: -scroeRangeDays));
+    DateTime nextDay = CacheData.today.add(Duration(days: 1));
     activities.forEach((activity) {
-      if (activity.sadhanaDate.isAfter(time)) {
+      if (activity.sadhanaDate.isAfter(time) && activity.sadhanaDate.isBefore(nextDay)) {
         if (activity.sadhanaValue > 0) counter++;
       }
     });
-    return ((counter / 31) * 100);
+    return ((counter / scroeRangeDays) * 100);
   }
 
   static generateStatistics(Sadhana sadhana) {
     SadhanaStatistics statistics = SadhanaStatistics();
     sadhana.statistics = statistics;
+    DateTime nextDay = CacheData.today.add(Duration(days: 1));
     List<Activity> activities = sadhana.activitiesByDate.values.toList();
     if (activities != null && activities.isNotEmpty) {
       int counter = 0;
       DateTime maxNumberHistory = CacheData.today.add(Duration(days: -maxNumberValueHistoryDays));
-      DateTime scoreStartDate = DateTime.now().add(Duration(days: -31));
+      DateTime scoreStartDate = DateTime.now().add(Duration(days: -scroeRangeDays));
       List<DateTime> events = new List();
       List<Streak> streakList = List();
       int total = 0;
@@ -55,7 +57,7 @@ class ChartUtils {
         }
 
         //Score Calculation
-        if (sadhanaDate.isAfter(scoreStartDate)) {
+        if (sadhanaDate.isAfter(scoreStartDate) && activity.sadhanaDate.isBefore(nextDay)) {
           if (sadhana.isActivityDone(activity)) counter++;
         }
 
@@ -107,7 +109,7 @@ class ChartUtils {
 
       statistics.events = events;
       statistics.countByMonthWithoutMissing = Map.from(statistics.countByMonth);
-      statistics.score = ((counter / 31) * 100).toInt();
+      statistics.score = ((counter / scroeRangeDays) * 100).toInt();
       statistics.streakList = streakList;
       statistics.total = total;
       statistics.totalValue = totalValue;

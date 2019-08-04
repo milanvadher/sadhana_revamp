@@ -19,6 +19,8 @@ class TextInputField extends StatelessWidget {
     this.viewMode = false,
     this.inputFormatters,
     this.viewModeTitleWidth,
+    this.maxLength,
+    this.showCounter = true,
     this.prefixIcon,
   }) : super(key: key);
 
@@ -26,6 +28,8 @@ class TextInputField extends StatelessWidget {
   final String valueText;
   final String hintText;
   final bool viewMode;
+  final int maxLength;
+  final bool showCounter;
   final bool enabled;
   final bool autoFocus;
   final bool isRequiredValidation;
@@ -74,8 +78,10 @@ class TextInputField extends StatelessWidget {
         hintText: hintText ?? 'Enter a $labelText',
         contentPadding: contentPadding,
         prefixIcon : prefixIcon,
+        counterText: showCounter ? null : '',
       ),
       initialValue: valueText,
+      maxLength: maxLength,
       enabled: enabled,
       inputFormatters: inputFormatters,
       keyboardType: textInputType,

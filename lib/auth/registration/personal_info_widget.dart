@@ -129,6 +129,18 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           valueText: _register.center,
           viewMode: viewMode,
         ),
+        !AppUtils.equalsIgnoreCase(_register.center, _register.group) ? TextInputField(
+          enabled: false,
+          labelText: 'Group',
+          valueText: _register.group,
+          viewMode: viewMode,
+        ) : Container(),
+        TextInputField(
+          enabled: false,
+          labelText: 'Aptputra',
+          valueText: _register.aptName,
+          viewMode: viewMode,
+        ),
         // B_date
         widget.profileEdit ? Container() : DateInput(
           labelText: 'Birth Date',
@@ -216,8 +228,12 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
                 onChanged: (value) {
                   setState(() {
                     _register.sameAsPermanentAddress = value;
-                    if(_register.sameAsPermanentAddress)
+                    if(_register.sameAsPermanentAddress) {
+                      _register.currentAddress = _register.permanentAddress;
                       isExpandedAddress[1] = false;
+                    } else {
+                      _register.currentAddress = Address();
+                    }
                   });
                 },
               ),
@@ -266,7 +282,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
 
   Widget addressForView(String title, Address address) {
     double screenWidth = MediaQuery.of(context).size.width;
-    String city = address.city.replaceAll("-", ", ");
+    String city = address.city?.replaceAll("-", ", ");
     String valueText = '${address.addressLine1} ${address.addressLine2} ${address.pincode} $city';
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5),

@@ -15,7 +15,9 @@ import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/widgets/action_item.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/boolean_item.dart';
 import 'package:sadhana/widgets/them_item.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 
 class AppOptions {
   AppOptions({this.theme, this.platform});
@@ -66,8 +68,7 @@ class AppOptionsPage extends StatefulWidget {
 }
 
 class _AppOptionsPageState extends BaseState<AppOptionsPage> {
-  bool isAllowSyncFromServer = false;
-
+  bool isAllowSyncFromServer = true;
   @override
   void initState() {
     super.initState();
@@ -82,6 +83,15 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
     });
   }
 
+  loadData() async {
+    WSAppSetting appSetting = await AppSettingUtil.getServerAppSetting();
+    if (appSetting != null) {
+      if (await AppSharedPrefUtil.isUserRegistered()) {
+        isAllowSyncFromServer = appSetting.allowSyncFromServer;
+      }
+    }
+  }
+
   @override
   Widget pageToDisplay() {
     return Scaffold(
@@ -91,7 +101,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
       body: SafeArea(
         child: ListView(
           children: <Widget>[
-            ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', onProfile, 'View/Edit your profile'),
+            ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', onProfile, 'View/Edit your profile', showRightIcon: true,),
             Divider(height: 0),
             _Heading('Settings'),
             Column(
@@ -110,7 +120,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               Column(
                 children: <Widget>[
                   Divider(height: 0),
-                  ActionItem(Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug'),
+                  ActionItem(Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug', showRightIcon: true,),
                 ],
               ),
             ]),
@@ -137,7 +147,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
   }
 
   void onProfile() {
-    Navigator.pushReplacement(
+    Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => ProfilePage(),

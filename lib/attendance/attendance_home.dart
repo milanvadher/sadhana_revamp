@@ -65,7 +65,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         await loadSessionDates();
         await loadSession(selectedDate);
         setState(() {
-          checkForReadOnly();
+          setReadOnlyField();
         });
       } else {
         CommonFunction.alertDialog(context: context, msg: "You don't have right for Attendance");
@@ -122,6 +122,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   onCheck(Attendance attendance) {
     setState(() {
       attendance.isPresent = !attendance.isPresent;
+      if (attendance.isPresent) attendance.reason = '';
     });
   }
 
@@ -206,6 +207,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                       padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
                       child: TextInputField(
                         valueText: attendance.reason,
+                        maxLength: 125,
+                        showCounter: false,
                         enabled: !isReadOnly,
                         isRequiredValidation: true,
                         labelText: "Reason for Absent",
@@ -288,7 +291,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Future<void> _onSelectDate() async {
     final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
     if (picked != null) {
-      selectedDate = picked;
+      setState(() {
+        selectedDate = picked;
+      });
       if (isSimcityGroup) {
         Navigator.pushReplacement(
           context,
@@ -297,33 +302,51 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           ),
         );
       } else {
-        checkForReadOnly();
+        setReadOnlyField();
         loadSession(selectedDate);
       }
     }
   }
 
-  void checkForReadOnly() {
-    if (_userRole.isSimCityGroup) {
-      if (selectedDate.isBefore(CacheData.today.add(Duration(days: -AttendanceConstant.SIMCITY_MAX_ALLOWED))))
-        isReadOnly = true;
-      else
-        isReadOnly = false;
-    } else {
-      if (selectedDate.month == CacheData.today.month) {
-        if (isCurrentMonthAttendanceSubmitted())
-          isReadOnly = true;
+  void setReadOnlyField() {
+    setState(() {
+      isReadOnly = isSelectedDateReadOnly();
+    });
+  }
+
+  bool isSelectedDateReadOnly() {
+    return CommonFunction.tryCatchSync(context, () {
+      if (_userRole.isSimCityGroup) {
+        if (selectedDate.isBefore(CacheData.today.add(Duration(days: -AttendanceConstant.SIMCITY_MAX_ALLOWED))))
+          return true;
         else
-          isReadOnly = false;
+          return false;
       } else {
-        if (CacheData.pendingMonth != null && selectedDate.month == CacheData.pendingMonth.month)
-          isReadOnly = false;
-        else
-          isReadOnly = true;
+        if (selectedDate.month == CacheData.today.month) {
+          if (isCurrentMonthAttendanceSubmitted())
+            return true;
+          else
+            return false;
+        }
+        if (CacheData.pendingMonth != null && selectedDate.month >= CacheData.pendingMonth.month)
+          return false;
+        else {
+          if (CacheData.pendingMonth == null) {
+            DateTime lastSubmittedMonth = getLastSubmittedMonth();
+            if (lastSubmittedMonth == null || selectedDate.month > lastSubmittedMonth.month) return false;
+          }
+        }
+        return true;
       }
+    });
+  }
+
+  DateTime getLastSubmittedMonth() {
+    if (_sessionDates != null && _sessionDates.isNotEmpty) {
+      _sessionDates.sort((a, b) => b.compareTo(a));
+      return _sessionDates.first;
     }
-    //Temp
-    //if (_sessionDates.contains(selectedDate)) isReadOnly = true;
+    return null;
   }
 
   bool isCurrentMonthAttendanceSubmitted() {
@@ -370,7 +393,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   void onAttendanceSubmitted(bool isSubmitted) {
     setState(() {
-      checkForReadOnly();
+      setReadOnlyField();
     });
   }
 
@@ -414,7 +437,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
-    if (CacheData.isAttendanceSubmissionPending()) {
+    if (CacheData.isAttendanceSubmissionPending() && CacheData.pendingMonth.month != selectedDate.month) {
       String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
       CommonFunction.alertDialog(
           context: context,
@@ -435,6 +458,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
             _sessionDates.add(session.dateTime);
+            if (CacheData.pendingMonth == null) CacheData.pendingMonth = session.dateTime;
             CommonFunction.alertDialog(
                 closeable: false,
                 context: context,
@@ -448,7 +472,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       }
     } catch (e, s) {
       print(s);
-      CommonFunction.displayErrorDialog(context: context , error: e);
+      CommonFunction.displayErrorDialog(context: context, error: e);
     }
     stopOverlay();
   }

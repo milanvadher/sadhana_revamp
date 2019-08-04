@@ -34,9 +34,9 @@ class _ProfileUpdatePageState extends BaseState<ProfileUpdatePage> {
   @override
   Widget pageToDisplay() {
     return WillPopScope(
-      onWillPop: () {
+      onWillPop: () async {
         if (widget.onCancel != null) widget.onCancel();
-        Navigator.pop(context);
+        return true;
       },
       child: Scaffold(
         appBar: AppBar(title: Text(getTitle())),
@@ -101,6 +101,10 @@ class _ProfileUpdatePageState extends BaseState<ProfileUpdatePage> {
     startOverlay();
     try {
       print(widget.mbaProfile.toJson());
+      if(widget.pageType == UpdateProfilePageType.BASIC) {
+        if(widget.mbaProfile.sameAsPermanentAddress)
+          widget.mbaProfile.currentAddress = widget.mbaProfile.permanentAddress;
+      }
       Response res = await api.updateMBAProfile(widget.mbaProfile);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {

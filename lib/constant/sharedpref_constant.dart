@@ -18,4 +18,5 @@ class SharedPrefConstant {
   static final String s_chart_filter = "s_chart_filter";
   static final String s_sync_reminded_date = "s_sync_reminded_date";
   static final String s_fill_reminded_date = "s_fill_reminded_date";
+
 }

@@ -12,6 +12,7 @@ import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
@@ -23,14 +24,14 @@ class SyncActivityUtils {
   static bool isSyncing = false;
   static final String MODULE = "[BackgroundSync]";
   static AppLocalNotification appLocalNotification = new AppLocalNotification();
+
   static loadActivityFromServer(List<Sadhana> sadhanas, {BuildContext context}) async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       Response res = await apiService.getActivity();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         List<dynamic> wsActivities = appResponse.data;
-        List<WSSadhanaActivity> wsSadhanaActivity =
-            wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
+        List<WSSadhanaActivity> wsSadhanaActivity = wsActivities.map((wsActivity) => WSSadhanaActivity.fromJson(wsActivity)).toList();
         Map<String, Sadhana> sadhanaByServerSName = new Map();
         sadhanas.forEach((sadhana) {
           sadhanaByServerSName[sadhana.serverSName] = sadhana;
@@ -145,19 +146,19 @@ class SyncActivityUtils {
   }
 
   static Future<void> checkForSyncReminder() async {
-    await CommonFunction.wrapWithTryCatch(null, () async {
+    await CommonFunction.tryCatchAsync(null, () async {
       print('$MODULE Checking Sync Reminder');
       DateTime now = DateTime.now();
       //appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
       for (DateTime reminderDate in Constant.syncReminder) {
         if (reminderDate.day == now.day && reminderDate.hour == now.hour) {
           print('$MODULE Date and Hour match ${reminderDate.day} ${reminderDate.hour}');
-          if (!await _isRemindedToday(await AppSharedPrefUtil.getSyncRemindedDate())) {
+          if (!await _isToday(await AppSharedPrefUtil.getSyncRemindedDate())) {
             DateTime lastSynced = await AppSharedPrefUtil.getLastSyncTime();
             print('$MODULE lastSynced: $lastSynced');
             if (lastSynced == null || (lastSynced != null && lastSynced.month != now.month)) {
               print('$MODULE Displaying notification');
-              appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody);
+              appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody, id: 1001);
               AppSharedPrefUtil.saveSyncRemindedDate(now);
             }
           } else {
@@ -169,23 +170,21 @@ class SyncActivityUtils {
   }
 
   static Future<void> checkForFillReminder() async {
-    await CommonFunction.wrapWithTryCatch(null, () async {
+    await CommonFunction.tryCatchAsync(null, () async {
       print('$MODULE Checking Fill Reminder');
-      appLocalNotification.showNotification(
-          "Checking fill reminder", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}",
-          id: 213412);
+      //appLocalNotification.showNotification("Checking fill reminder", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 213412);
       DateTime now = DateTime.now();
-      if (Constant.fillReminder.hour == now.hour && !await _isRemindedToday(await AppSharedPrefUtil.getFillRemindedDate())) {
+      int editableDays = (await AppSettingUtil.getServerAppSetting()).editableDays;
+      if (Constant.fillReminder.hour == now.hour && !await _isToday(await AppSharedPrefUtil.getFillRemindedDate())) {
         Map<int, Sadhana> sadhanaById = await CacheData.getSadhanasById();
-
-        sadhanaById.forEach((id, sadhana) {
+        for (var entry in sadhanaById.entries) {
+          Sadhana sadhana = entry.value;
           if (sadhana.isPreloaded) {
-            if (isEntryExist(sadhana.activitiesByDate, 4)) return;
+            if (isEntryExist(sadhana.activitiesByDate, editableDays)) return;
           }
-        });
+        }
         print('$MODULE No any entry exist so showing notification');
-        String date = Constant.APP_DATE_FORMAT.format(CacheData.today.add(Duration(days: -3)));
-        AppLocalNotification().showNotification("Sadhana Reminder", "Did you forgot to fill sadhana of $date?");
+        AppLocalNotification().showNotification("Sadhana Reminder", "Don't forget to fill last $editableDays days sadhana?", id: 1002);
         AppSharedPrefUtil.saveFillRemindedDate(now);
       }
     });
@@ -195,14 +194,15 @@ class SyncActivityUtils {
     DateTime day = CacheData.today;
     print('$MODULE all activity $activitiesByDate');
     for (int i = 0; i < days; i++) {
-      print('$MODULE $day checking date ${activitiesByDate[day]}');
-      if (activitiesByDate[day] != null && activitiesByDate[day].sadhanaValue > 0) return true;
+      print('$MODULE ${day.millisecondsSinceEpoch} checking date ${activitiesByDate[day.millisecondsSinceEpoch]}');
+      Activity activity = activitiesByDate[day.millisecondsSinceEpoch];
+      if (activity != null && activity.sadhanaValue > 0) return true;
       day = day.add(Duration(days: -1));
     }
     return false;
   }
 
-  static Future<bool> _isRemindedToday(DateTime remindedDate) async {
+  static Future<bool> _isToday(DateTime remindedDate) async {
     return (remindedDate != null && CacheData.today.difference(remindedDate).inDays == 0);
   }
 }

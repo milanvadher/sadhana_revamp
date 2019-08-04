@@ -32,9 +32,18 @@ class CommonFunction {
     }
   }
 
-  static Future<void> wrapWithTryCatch(BuildContext context, Function function, {String msg}) async {
+  static dynamic tryCatchAsync(BuildContext context, Function function, {String msg}) async {
     try {
-      await function();
+      return await function();
+    } catch(e,s) {
+      print(e);
+      print(s);
+      CommonFunction.displayErrorDialog(context: context, error: e);
+    }
+  }
+  static dynamic tryCatchSync(BuildContext context, Function function, {String msg}) {
+    try {
+      return function();
     } catch(e,s) {
       print(e);
       print(s);
@@ -69,7 +78,7 @@ class CommonFunction {
   static Widget getTitleAndNameForProfilePage(
       {@required double screenWidth, @required String title, @required String value, double titleWidth}) {
     titleWidth = titleWidth == null ? 85 : titleWidth;
-    if (title == null || title == 'null') title = '';
+    if (value == null || value == 'null') value = '';
     return Container(
       padding: EdgeInsets.all(5),
       child: Row(

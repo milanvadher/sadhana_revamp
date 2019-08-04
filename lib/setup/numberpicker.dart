@@ -490,6 +490,7 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
                 onChanged: (value) {
                   setState(() {});
                 },
+                maxLength: 300,
                 decoration: InputDecoration(
                   labelText: 'Remark',
                   border: OutlineInputBorder(),

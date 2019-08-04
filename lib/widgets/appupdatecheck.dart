@@ -14,7 +14,7 @@ import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
-import 'package:sadhana/wsmodel/WSAppSetting.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 import '../main.dart';
@@ -59,7 +59,7 @@ class OnAppOpenBackgroundThread {
     if (checkapp_setting_util.dart) {*/
     if (await AppUtils.isInternetConnected() && !isChecking) {
       isChecking = true;
-      AppSetting appSetting = await AppSettingUtil.getServerAppSetting();
+      WSAppSetting appSetting = await AppSettingUtil.getServerAppSetting();
       if (appSetting != null && appSetting.version != null) {
         String version = await AppSettingUtil.getAppVersion();
         Version currentVersion = Version(version: version);

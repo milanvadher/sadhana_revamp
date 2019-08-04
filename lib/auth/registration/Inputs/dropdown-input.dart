@@ -81,11 +81,11 @@ class DropDownInputState extends State<DropDownInput> {
       alignment: Alignment.bottomLeft,
       child: InputDecorator(
         decoration: InputDecoration(
-            labelText: selectedValue != null ? widget.labelText : null,
+            labelText: selectedValue != null ? getHint() : null,
             hasFloatingPlaceholder: true,
             border: OutlineInputBorder(),
             enabled: widget.enabled,
-            hintText: widget.labelText),
+            hintText: getHint()),
         //isEmpty: widget.valuesByLabel == null || widget.valuesByLabel.isEmpty,
         child: DropdownButtonHideUnderline(
           child: new IgnorePointer(
@@ -93,7 +93,7 @@ class DropDownInputState extends State<DropDownInput> {
             child: new DropdownButton<dynamic>(
               isExpanded: true,
               isDense: true,
-              hint: Text('Select ${widget.labelText}'),
+              hint: Text('Select ${getHint()}'),
               items: getDropDownMenuItem(widget.valuesByLabel),
               onChanged: (value) {
                 selectedValue = value;
@@ -106,6 +106,10 @@ class DropDownInputState extends State<DropDownInput> {
         ),
       ),
     );
+  }
+
+  String getHint() {
+    return widget.isRequiredValidation ? '${widget.labelText} *' : widget.labelText;
   }
 
   List<DropdownMenuItem> getDropDownMenuItem(Map<String, dynamic> valuesByLabel) {

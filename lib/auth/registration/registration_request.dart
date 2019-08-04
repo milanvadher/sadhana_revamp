@@ -178,7 +178,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         CommonFunction.alertDialog(
             context: context,
-            msg: "You will get confirmation on your mobile within 24 Hours or You can contact to " + Constant.MBA_MAILID,
+            msg: "We will get back to you soon after review your request or You can contact to " + Constant.MBA_MAILID,
             type: "success",
             doneButtonText: "OK",
             doneButtonFn: () {

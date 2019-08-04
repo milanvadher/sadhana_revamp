@@ -47,7 +47,7 @@ class _RemarkPickerDialogControllerState extends State<RemarkPickerDialog> {
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: TextField(
                 enabled : widget.isEnabled,
-                maxLength: 150,
+                maxLength: 300,
                 controller: remarkCtrl,
                 onChanged: (value) {
                   setState(() {});

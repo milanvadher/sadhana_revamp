@@ -39,7 +39,7 @@ Attendance _$AttendanceFromJson(Map<String, dynamic> json) {
     ..mhtId = json['mht_id'] as String
     ..firstName = json['first_name'] as String
     ..lastName = json['last_name'] as String
-    ..isPresent = Attendance._isPresentFromJson(json['is_present'] as int)
+    ..isPresent = AppUtils.convertToIntToBool(json['is_present'] as int)
     ..reason = json['absent_reason'] as String;
 }
 
@@ -48,6 +48,6 @@ Map<String, dynamic> _$AttendanceToJson(Attendance instance) =>
       'mht_id': instance.mhtId,
       'first_name': instance.firstName,
       'last_name': instance.lastName,
-      'is_present': Attendance._isPresentToJson(instance.isPresent),
+      'is_present': AppUtils.convertBoolToInt(instance.isPresent),
       'absent_reason': instance.reason
     };

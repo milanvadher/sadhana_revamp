@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/charts/custom_bar_label_decorator.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
 import 'package:flutter/painting.dart' as FlutterColor;
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/chart_utils.dart';
 
 import 'model/filter_type.dart';
@@ -15,10 +17,11 @@ import 'model/filter_type.dart';
 class TotalStatisticsBarChart extends StatefulWidget {
   final Color color;
   final bool isNumeric;
+  final String sadhanaName;
   final SadhanaStatistics statistics;
   final bool forHistory;
 
-  TotalStatisticsBarChart(this.statistics, this.color, {this.forHistory = false, this.isNumeric = false});
+  TotalStatisticsBarChart(this.statistics, this.color, {this.forHistory = false, this.isNumeric = false, this.sadhanaName});
 
   @override
   _TotalStatisticsBarChartState createState() => _TotalStatisticsBarChartState();
@@ -39,10 +42,10 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   }
 
   loadData() async {
-    if(!widget.forHistory) {
+    //if(!widget.forHistory) {
         filterType = await AppSharedPrefUtil.getChartFilter();
-    } else
-      filterType = FilterType.Day;
+    /*} else
+      filterType = FilterType.Month;*/
     setState(() {generateSeriesList();});
   }
 
@@ -141,7 +144,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   buildTitle() {
     return ListTile(
       dense: true,
-      title: Text(widget.forHistory ? 'History' : 'Total',
+      title: Text(widget.forHistory ? 'No of ${AppUtils.getCountTitleForSadhana(widget.sadhanaName)}' : 'No of Days',
           style: TextStyle(color: getFlutterColor(widget.color), fontSize: ChartUtils.chartTitleSize)),
       trailing: SizedBox(
               width: 80,

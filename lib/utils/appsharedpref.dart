@@ -9,7 +9,7 @@ import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/utils/apputils.dart';
-import 'package:sadhana/wsmodel/WSAppSetting.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSharedPrefUtil {
@@ -176,17 +176,17 @@ class AppSharedPrefUtil {
     await saveString(SharedPrefConstant.s_register_profile, json.encode(registerProfile.toJson()));
   }
 
-  static Future<AppSetting> getServerSetting() async {
+  static Future<WSAppSetting> getServerSetting() async {
     String serverSetting = await getString(SharedPrefConstant.s_server_setting);
     print('#################################  $serverSetting');
     if (serverSetting == null) {
-      return AppSetting.getDefaulServerAppSetting();
+      return WSAppSetting.getDefaulServerAppSetting();
     } else {
-      return AppSetting.fromJson(json.decode(serverSetting));
+      return WSAppSetting.fromJson(json.decode(serverSetting));
     }
   }
 
-  static Future<void> saveServerSetting(AppSetting appSetting) async {
+  static Future<void> saveServerSetting(WSAppSetting appSetting) async {
     await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting.toJson()));
   }
 
