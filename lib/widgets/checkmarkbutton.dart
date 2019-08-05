@@ -35,12 +35,12 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
     color = theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor;
     return Container(
       color:
-          widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade100 : Colors.grey.shade800) : Theme.of(context).cardColor,
+          widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
       height: 50,
       width: widget.width,
       child: InkWell(
-        onTap: widget.isDisabled ? null : onClicked,
-        onLongPress: widget.isDisabled ? null : onLongPress,
+        onTap: onClicked,
+        onLongPress: onLongPress,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 7, horizontal: 4),
           child: Container(
@@ -81,12 +81,38 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   }
 
   onClicked() {
+    if(widget.isDisabled) {
+      if(activity.remarks != null && activity.remarks.isNotEmpty) {
+        showReadOnlyDialog();
+        return;
+      }
+      return;
+    }
     AppUtils.vibratePhone(duration: 10);
     activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
     if (widget.onClick != null) widget.onClick(widget.activity);
   }
 
+  void showReadOnlyDialog() {
+    showDialog<String>(
+        context: context,
+        builder: (_) {
+          return RemarkPickerDialog(
+            title: Text(title),
+            remark: activity.remarks,
+            isEnabled: false,
+          );
+        });
+  }
+
   onLongPress() {
+    if(widget.isDisabled) {
+      if(activity.remarks != null && activity.remarks.isNotEmpty) {
+        showReadOnlyDialog();
+        return;
+      }
+      return;
+    }
     showDialog<String>(
         context: context,
         builder: (_) {

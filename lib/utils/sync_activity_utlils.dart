@@ -184,7 +184,7 @@ class SyncActivityUtils {
           }
         }
         print('$MODULE No any entry exist so showing notification');
-        AppLocalNotification().showNotification("Sadhana Reminder", "Don't forget to fill last $editableDays days sadhana?", id: 1002);
+        AppLocalNotification().showNotification("Sadhana Reminder", "Don't forget to fill last $editableDays days sadhana", id: 1002);
         AppSharedPrefUtil.saveFillRemindedDate(now);
       }
     });

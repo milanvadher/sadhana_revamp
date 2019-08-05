@@ -57,10 +57,9 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
                 if (activity == null)
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
                 bool isDisabled = false;
-                /*if(sadhana.isPreloaded) {
+                if(sadhana.isPreloaded) {
                     isDisabled = index >= editableDays ? true : false;
-                }*/
-
+                }
                 return sadhana.type == SadhanaType.BOOLEAN
                     ? CheckmarkButton(
                         sadhana: sadhana,

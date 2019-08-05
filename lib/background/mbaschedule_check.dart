@@ -40,6 +40,10 @@ class MBAScheduleCheck {
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if(appResponse.status == WSConstant.SUCCESS_CODE) {
           String fileUrl = appResponse.data;
+          if(AppUtils.isNullOrEmpty(fileUrl)) {
+            CommonFunction.alertDialog(context: context, msg: "No any schedule is available, Please try after some time.");
+            return null;
+          }
           String dir = await AppFileUtil.getMBAScheduleDir();
           File file = await AppFileUtil.saveImage(_apiService.getMBAScheduleAbsoluteUrl(fileUrl), dir);
           AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);

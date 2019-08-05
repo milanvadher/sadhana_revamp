@@ -190,6 +190,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         TextInputField(
           labelText: 'Company Name',
           viewMode: viewMode,
+          isRequiredValidation: true,
           valueText: _register.companyName,
           onSaved: (value) => _register.companyName = value,
         ),

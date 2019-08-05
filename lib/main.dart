@@ -14,9 +14,9 @@ import 'app.dart';
 import 'constant/constant.dart';
 
 void main() {
-   if (!Platform.isIOS) {
+   /*if (!Platform.isIOS) {
      schedulePeriodicSync();
-   }
+   }*/
   initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
 }
 final int periodicID = 0;
@@ -25,7 +25,6 @@ void schedulePeriodicSync() async {
   if(await AppSharedPrefUtil.isUserRegistered()) {
     await AndroidAlarmManager.initialize();
     WSAppSetting serverSetting = await AppSettingUtil.getServerAppSetting();
-    print('######################################   ${serverSetting.periodicSyncIntervalInMin}');
     await AndroidAlarmManager.periodic(Duration(minutes: serverSetting.periodicSyncIntervalInMin), periodicID, syncPeriodic, wakeup: true);
     //await AndroidAlarmManager.oneShot(const Duration(seconds: 5), oneShotID, printOneShot);
   }

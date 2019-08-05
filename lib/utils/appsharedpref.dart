@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppSharedPrefUtil {
   static SharedPreferences _pref;
   static final DateFormat prefDateFormat = DateFormat('dd-MM-yyyy');
+  static final DateFormat prefTimeFormat = DateFormat('dd-MM-yyyy hh:mm');
 /*static final AppSharedPrefUtil _singleton = new AppSharedPrefUtil._internal();
 
   factory AppSharedPrefUtil() {
@@ -178,7 +179,6 @@ class AppSharedPrefUtil {
 
   static Future<WSAppSetting> getServerSetting() async {
     String serverSetting = await getString(SharedPrefConstant.s_server_setting);
-    print('#################################  $serverSetting');
     if (serverSetting == null) {
       return WSAppSetting.getDefaulServerAppSetting();
     } else {
@@ -227,12 +227,12 @@ class AppSharedPrefUtil {
     if (strInternetDate == null) {
       return null;
     } else {
-      return prefDateFormat.parse(strInternetDate);
+      return prefTimeFormat.parse(strInternetDate);
     }
   }
 
   static Future<void> saveInternetDate(DateTime date) async {
-    if (date != null) await saveString(SharedPrefConstant.s_internet_date, prefDateFormat.format(date));
+    if (date != null) await saveString(SharedPrefConstant.s_internet_date, prefTimeFormat.format(date));
   }
 
   static Future<void> saveChartFilter(String chartFilter) async {

@@ -32,17 +32,18 @@ class OnAppOpenBackgroundThread {
   }
 
   startThread() async {
-    if(await AppUtils.isInternetConnected()) {
-      if (await AppSharedPrefUtil.isUserRegistered()) {
-        updateUserRole();
-        SyncActivityUtils.syncAllUnSyncActivity(context: context);
-        MBAScheduleCheck.getMBASchedule();
-        await checkTokenExpiration();
+    CommonFunction.tryCatchAsync(context, () async {
+      if(await AppUtils.isInternetConnected()) {
+        if (await AppSharedPrefUtil.isUserRegistered()) {
+          updateUserRole();
+          SyncActivityUtils.syncAllUnSyncActivity(context: context);
+          MBAScheduleCheck.getMBASchedule();
+          await checkTokenExpiration();
+        }
+        AppUtils.updateInternetDate();
+        await checkForNewAppUpdate();
       }
-      await AppUtils.updateInternetDate();
-      await checkForNewAppUpdate();
-    }
-    await checkServerDate();
+    });
   }
 
   Future<bool> checkForNewAppUpdate() async {
@@ -75,11 +76,15 @@ class OnAppOpenBackgroundThread {
     //}
   }
 
-  checkServerDate() async {
-/*    DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
+
+
+  static Future<bool> validateMobileDate(BuildContext context) async {
+    DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
     if (internetDate != null) {
       DateTime currentTime = DateTime.now();
-      if (currentTime.isBefore(internetDate) && internetDate.difference(currentTime).inDays > 2) {
+      print("########### $currentTime $internetDate ${internetDate.difference(currentTime).inDays}" );
+      if (currentTime.isBefore(internetDate) && internetDate.difference(currentTime).inDays >= 1) {
+        print('############ Displayed dialog');
         CommonFunction.alertDialog(
           closeable: false,
           context: context,
@@ -89,8 +94,10 @@ class OnAppOpenBackgroundThread {
             exit(0);
           },
         );
+        return false;
       }
-    }*/
+    }
+    return true;
   }
 
   checkTokenExpiration() async {

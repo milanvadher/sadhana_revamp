@@ -2,12 +2,12 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:charts_flutter/flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart' as FlutterColor;
 import 'package:intl/intl.dart';
 import 'package:sadhana/charts/custom_bar_label_decorator.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
-import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
-import 'package:flutter/painting.dart' as FlutterColor;
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/chart_utils.dart';
@@ -43,16 +43,18 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
 
   loadData() async {
     //if(!widget.forHistory) {
-        filterType = await AppSharedPrefUtil.getChartFilter();
+    filterType = await AppSharedPrefUtil.getChartFilter();
     /*} else
       filterType = FilterType.Month;*/
-    setState(() {generateSeriesList();});
+    setState(() {
+      generateSeriesList();
+    });
   }
 
   generateSeriesList() {
     List<TimeSeries> listOfTimeSeries = List();
     Map<DateTime, int> counts;
-    if(widget.forHistory)
+    if (widget.forHistory)
       counts = widget.statistics.getTotalValues(filterType);
     else
       counts = widget.statistics.getCounts(filterType);
@@ -78,8 +80,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       barChartData.add(BarData(xaxis, timeSeries.value, timeSeries.time));
     }
     List<BarData> finalBarChartData = barChartData.reversed.toList();
-    if(finalBarChartData.isNotEmpty)
-      viewport = OrdinalViewport(finalBarChartData.last.xAxis, 8);
+    if (finalBarChartData.isNotEmpty) viewport = OrdinalViewport(finalBarChartData.last.xAxis, 8);
     seriesList = [
       new Series<BarData, String>(
         id: 'Sadhana',
@@ -147,9 +148,9 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       title: Text(widget.forHistory ? 'No of ${AppUtils.getCountTitleForSadhana(widget.sadhanaName)}' : 'No of Days',
           style: TextStyle(color: getFlutterColor(widget.color), fontSize: ChartUtils.chartTitleSize)),
       trailing: SizedBox(
-              width: 80,
-              child: buildTotalTypeDropDown(),
-            ),
+        width: 80,
+        child: buildTotalTypeDropDown(),
+      ),
     );
   }
 
@@ -169,8 +170,8 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
         setState(() {
           filterType = value;
           generateSeriesList();
-          if(!(filterType == FilterType.Day || filterType == FilterType.Quarter))
-              AppSharedPrefUtil.saveChartFilter(filterType.toString());
+          if (!(filterType == FilterType.Day || filterType == FilterType.Quarter))
+            AppSharedPrefUtil.saveChartFilter(filterType.toString());
         });
       },
       value: filterType,
@@ -188,52 +189,54 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   }
 
   buildBarChart() {
-    return BarChart(
-      seriesList,
-      animate: false,
-      domainAxis: new OrdinalAxisSpec(
-        tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
-        renderSpec: new SmallTickRendererSpec(
-          labelStyle: new TextStyleSpec(
-            fontSize: 12,
-            color: widget.color,
-          ),
-          lineStyle: new LineStyleSpec(
-            color: MaterialPalette.gray.shade500,
-          ),
-        ),
-        viewport: viewport,
-      ),
-      primaryMeasureAxis: new NumericAxisSpec(
-        renderSpec: new GridlineRendererSpec(
+    return CommonFunction.tryCatchSync(context, () {
+      return BarChart(
+        seriesList,
+        animate: false,
+        domainAxis: new OrdinalAxisSpec(
+          tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
+          renderSpec: new SmallTickRendererSpec(
             labelStyle: new TextStyleSpec(
               fontSize: 12,
               color: widget.color,
             ),
             lineStyle: new LineStyleSpec(
               color: MaterialPalette.gray.shade500,
-            )),
-        tickProviderSpec: widget.forHistory ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
-      ),
-      behaviors: [
-        SlidingViewport(),
-        /*new ChartTitle(
+            ),
+          ),
+          viewport: viewport,
+        ),
+        primaryMeasureAxis: new NumericAxisSpec(
+          renderSpec: new GridlineRendererSpec(
+              labelStyle: new TextStyleSpec(
+                fontSize: 12,
+                color: widget.color,
+              ),
+              lineStyle: new LineStyleSpec(
+                color: MaterialPalette.gray.shade500,
+              )),
+          tickProviderSpec: widget.forHistory ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
+        ),
+        behaviors: [
+          SlidingViewport(),
+          /*new ChartTitle(
           'Total',
           behaviorPosition: BehaviorPosition.top,
           titleOutsideJustification: OutsideJustification.start,
           innerPadding: 18,
           titleStyleSpec: TextStyleSpec(color: widget.color),
         ),*/
-        new PanAndZoomBehavior(),
-      ],
-      //defaultRenderer: LineRendererConfig(includePoints: true),
-      //defaultRenderer: BarLaneRendererConfig(),
-      defaultRenderer: new BarRendererConfig<String>(
-        strokeWidthPx: 0.3,
-        barRendererDecorator: CustomBarLabelDecorator<String>(
-            labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
-      ),
-    );
+          new PanAndZoomBehavior(),
+        ],
+        //defaultRenderer: LineRendererConfig(includePoints: true),
+        //defaultRenderer: BarLaneRendererConfig(),
+        defaultRenderer: new BarRendererConfig<String>(
+          strokeWidthPx: 0.3,
+          barRendererDecorator: CustomBarLabelDecorator<String>(
+              labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
+        ),
+      );
+    });
   }
 }
 

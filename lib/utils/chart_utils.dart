@@ -84,13 +84,14 @@ class ChartUtils {
         if (i < activities.length - 1) {
           Activity current = activities[i];
           Activity next = activities[i + 1];
-          if (!sadhana.isActivityDone(current)) {
+
+          if(sadhana.isActivityDone(current) && !sadhana.isActivityDone(next)) {
+            streakList.add(Streak(start, current.sadhanaDate));
+          } else if(!sadhana.isActivityDone(current) && sadhana.isActivityDone(next)) {
             start = next.sadhanaDate;
-            continue;
-          } else if (next.sadhanaDate.difference(current.sadhanaDate).inDays > 1) {
+          } else if(sadhana.isActivityDone(current) && sadhana.isActivityDone(next) && next.sadhanaDate.difference(current.sadhanaDate).inDays > 1) {
             streakList.add(Streak(start, current.sadhanaDate));
             start = next.sadhanaDate;
-            continue;
           }
         }
       }

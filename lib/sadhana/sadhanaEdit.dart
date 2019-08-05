@@ -10,6 +10,7 @@ import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/model/sadhana_statistics.dart';
+import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/chart_utils.dart';
 import 'package:sadhana/widgets/circle_progress_bar.dart';
@@ -93,6 +94,15 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
               children: <Widget>[
                 _buildTopHeader(),
                 buildBoxLayout(_buildOverView()),
+                buildBoxLayout(
+                  Column(
+                    children: <Widget>[
+                      _buildTitle('Best Streak'),
+                      StreakChart.withStreakList(color, statistics.streakList),
+                    ],
+                  ),
+                  isFirst: true,
+                ),
                 buildBoxLayout(Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: _buildTableCalendar(),
@@ -125,15 +135,6 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
                     )
                   ],
                 )),
-                buildBoxLayout(
-                  Column(
-                    children: <Widget>[
-                      _buildTitle('Best Streak'),
-                      StreakChart.withStreakList(color, statistics.streakList),
-                    ],
-                  ),
-                  isFirst: true,
-                ),
               ],
             ),
           )
@@ -346,6 +347,7 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   Future<void> deleteSadhana() async {
     await sadhanaDAO.delete(sadhana.id);
+    AppLocalNotification().cancelNotification(sadhana.id);
     Navigator.pop(context);
     Navigator.pop(context);
     if (widget.onDelete != null) widget.onDelete(sadhana.id);

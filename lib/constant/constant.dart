@@ -27,8 +27,8 @@ class Constant {
 
   static final DateTime fillReminder = DateTime(2000, 1, 1, 20);
 
-  static final String syncReminderTitle = "Sync Reminder";
-  static final String syncReminderBody = "Please sync your sadhana by click on sync button.";
+  static final String syncReminderTitle = "Upload Sadhana";
+  static final String syncReminderBody = "Please upload your last month sadhana by click on cloud button.";
   // Month names
   static List<String> monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

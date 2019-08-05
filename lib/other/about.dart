@@ -101,8 +101,8 @@ class AboutState extends BaseState<About> {
                   text: "mbaapps@googlegroups.com",
                   url: "mailto:" + Constant.MBA_MAILID + "?subject=Bug%20Report%20of%20Sadhana",
                 ),
-                SizedBox(height: 30),
-                Text("MHT ID: $mhtid", style: TextStyle(fontSize: 14),),
+                /*SizedBox(height: 30),
+                Text("MHT ID: $mhtid", style: TextStyle(fontSize: 14),),*/
               ],
             ),
           )

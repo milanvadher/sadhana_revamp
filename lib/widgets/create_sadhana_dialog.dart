@@ -150,6 +150,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                     isRequiredValidation: true,
                     enabled: !isPreloaded,
                     labelText: 'Target',
+
                     valueText: target.toString(),
                     onSaved: (double value) {
                       target = value.toInt();
@@ -294,6 +295,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     if (value < 1) {
       return 'Invalid Target value.';
     }
+    if(value > 100)
+      return 'Max 100 value is allowed.';
   }
 
   String _getReminderText() {
@@ -332,6 +335,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       _mainColor = colors;
     });
   }
+
+
 
   onOKClick() async {
     _formKey.currentState.save();

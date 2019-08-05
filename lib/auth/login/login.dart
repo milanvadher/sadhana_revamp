@@ -264,6 +264,11 @@ class LoginPageState extends BaseState<LoginPage> {
     if (await AppUtils.isInternetConnected()) {
       startOverlay();
       try {
+        try {
+          loginState.mhtId = int.parse(loginState.mhtId).toString();
+        } catch (e,s) {
+          print(e); print(s);
+        }
         Response res = await api.getUserProfile(loginState.mhtId);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
         print(appResponse.status);

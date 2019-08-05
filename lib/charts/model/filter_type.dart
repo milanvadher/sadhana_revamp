@@ -26,6 +26,8 @@ Map<FilterType, NumericTickProviderSpec> FilterTypeTickProviderSpec = {
 NumericTickProviderSpec getDayTickProviderSpec(int maxValue) {
   int tick = 4;
   int inc = (maxValue / tick).round();
+  if(inc == 0)
+    inc = 1;
   List<TickSpec<num>> ticks = List();
   ticks.add(TickSpec<num>(0));
   int value = inc;

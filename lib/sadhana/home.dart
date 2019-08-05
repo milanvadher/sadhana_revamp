@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -19,8 +18,6 @@ import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/sadhana.dart';
-import 'package:sadhana/notification/app_local_notification.dart';
-import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
@@ -82,6 +79,9 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadData() async {
+    new Future.delayed(Duration.zero, () {
+      validateMobileDate();
+    });
     loadSadhana();
     checkSimcityMBA();
     new Future.delayed(Duration.zero, () {
@@ -625,6 +625,14 @@ class HomePageState extends BaseState<HomePage> {
   }
 
 
+  void validateMobileDate() async {
+    if (!await OnAppOpenBackgroundThread.validateMobileDate(context)) {
+      await AppUtils.updateInternetDate();
+    } else {
+      await AppUtils.updateInternetDate();
+      await OnAppOpenBackgroundThread.validateMobileDate(context);
+    }
+  }
 
   void _onSyncClicked() async {
     //Navigator.pushNamed(context, RegistrationPage.routeName);

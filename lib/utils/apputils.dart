@@ -197,9 +197,11 @@ class AppUtils {
   }
 
   static Future<void> updateInternetDate() async {
-    DateTime internetDate = await NTP.now();
-    if(internetDate != null) {
-      AppSharedPrefUtil.saveInternetDate(internetDate);
+    if(await AppUtils.isInternetConnected()) {
+      DateTime internetDate = await NTP.now();
+      if(internetDate != null) {
+        AppSharedPrefUtil.saveInternetDate(internetDate);
+      }
     }
   }
 }

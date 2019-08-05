@@ -23,7 +23,6 @@ class AppSettingUtil {
         if(appSetting == null)
           appSetting = await AppSharedPrefUtil.getServerSetting();
       }
-      print('#############  $appSetting');
       return appSetting;
     });
   }
