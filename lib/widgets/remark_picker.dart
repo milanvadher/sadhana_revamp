@@ -52,6 +52,7 @@ class _RemarkPickerDialogControllerState extends State<RemarkPickerDialog> {
                 onChanged: (value) {
                   setState(() {});
                 },
+                textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                   labelText: 'Remark',
                   border: OutlineInputBorder(),

@@ -72,6 +72,7 @@ class TextInputField extends StatelessWidget {
         color: !enabled ? Theme.of(context).copyWith().disabledColor : Theme.of(context).textTheme.copyWith().title.color,
       ),
       autofocus: autoFocus,
+      textCapitalization: TextCapitalization.sentences,
       decoration: InputDecoration(
         labelText: isRequiredValidation ? "$labelText *" : labelText,
         border: OutlineInputBorder(),

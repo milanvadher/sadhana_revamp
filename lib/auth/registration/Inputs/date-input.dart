@@ -40,7 +40,7 @@ class DateInput extends StatelessWidget {
                 : null,
             child: InputDecorator(
               decoration: InputDecoration(
-                labelText: labelText,
+                labelText: isRequiredValidation ? '$labelText *' : labelText,
                 enabled: enable,
                 border: OutlineInputBorder(),
               ),

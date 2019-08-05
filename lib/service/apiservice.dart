@@ -8,6 +8,7 @@ import 'package:meta/meta.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/registration_request.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
@@ -289,6 +290,13 @@ class ApiService {
     Map<String, dynamic> data = session.toJson();
     Response res = await _postApi(url: '/mba.attendance.save_attendance', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
+    return res;
+  }
+
+  Future<Response> deleteAttendanceSession(DateTime sessionDate) async {
+    Map<String, dynamic> data = {'session_date' : WSConstant.wsDateFormat.format(sessionDate)};
+    //Response res = await _postApi(url: '/mba.attendance.delete_attendance', data: data);
+    Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 

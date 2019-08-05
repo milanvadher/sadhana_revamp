@@ -51,7 +51,6 @@ ThemeData _buildDarkTheme() {
       colorScheme: colorScheme,
       textTheme: ButtonTextTheme.primary,
     ),
-    
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: primaryColor
     ),

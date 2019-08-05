@@ -486,6 +486,7 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
             Padding(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: TextField(
+                textCapitalization: TextCapitalization.sentences,
                 controller: remarkCtrl,
                 onChanged: (value) {
                   setState(() {});

@@ -88,6 +88,7 @@ class _DVDFormState extends State<DVDForm> {
               SizedBox(height: paddingBtwInput),
               TextFormField(
                 enabled: !widget.isReadOnly,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                   labelText: 'Remarks',
                   border: OutlineInputBorder(),

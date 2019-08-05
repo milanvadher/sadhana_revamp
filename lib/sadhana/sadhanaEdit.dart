@@ -293,6 +293,8 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
 
   _buildTitleValue(String title, String value, {String hint}) {
     return Column(
+      //crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         hint != null
             ? RichText(

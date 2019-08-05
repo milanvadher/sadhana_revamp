@@ -11,6 +11,7 @@ import 'package:sadhana/attendance/widgets/date_picker_with_event.dart';
 import 'package:sadhana/attendance/widgets/dvd_form.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/common.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -48,7 +49,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   bool isSimcityGroup = false;
   final GlobalKey<FormState> _attendanceForm = GlobalKey<FormState>();
   bool isReadOnly = false;
-
+  bool isEditMode = false;
   @override
   void initState() {
     super.initState();
@@ -88,6 +89,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {
             session = Session.fromJson(appResponse.data);
+            isEditMode = true;
           });
           print(session);
         }
@@ -240,6 +242,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   List<Widget> _buildAction() {
     return <Widget>[
+      (!isReadOnly & isEditMode) ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick) : Container(),
       PopupMenuButton<PopUpMenu>(
         onSelected: _onPopupSelected,
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
@@ -434,6 +437,36 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   void _onDVDEntered(DVDInfo dvdInfo) {
     DVDInfo.setSession(session, dvdInfo);
+  }
+
+  _onDeleteClick() {
+    CommonFunction.alertDialog(
+        context: context,
+        title: 'Are you sure ?',
+        msg: "Do you want to delete ${Constant.APP_DATE_FORMAT.format(selectedDate)} Session?",
+        showCancelButton: true,
+        doneButtonFn: deleteSession);
+  }
+
+  deleteSession() async {
+    Navigator.pop(context);
+    CommonFunction.tryCatchAsync(context, () async {
+      Response res = await _api.deleteAttendanceSession(session.dateTime);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        setState(() {
+          _sessionDates.remove(session.dateTime);
+          selectedDate = session.dateTime;
+        });
+        CommonFunction.alertDialog(
+            closeable: false,
+            context: context,
+            msg: "Attendance deleted successfully.",
+            doneButtonFn: () {
+              Navigator.pop(context);
+            });
+      }
+    });
   }
 
   void _onSubmit() async {
