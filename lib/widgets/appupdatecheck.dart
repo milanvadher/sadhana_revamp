@@ -89,7 +89,7 @@ class OnAppOpenBackgroundThread {
           closeable: false,
           context: context,
           type: 'error',
-          msg: "Your mobile date is not proper, Please change it and reopen App.",
+          msg: "Your mobile date is not correct, Please change it to current date to use the App.",
           doneButtonFn: () {
             exit(0);
           },

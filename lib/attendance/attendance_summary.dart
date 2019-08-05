@@ -57,9 +57,9 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
+        if(allSummary == null)
+          allSummary = [];
         filteredSummary = allSummary;
-        if(filteredSummary == null)
-          filteredSummary = [];
         setTitle();
         print(filteredSummary);
       }

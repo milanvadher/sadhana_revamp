@@ -1,0 +1,9 @@
+
+Verify Below Details
+
+Verify :  ***** API URL  ******
+1. application id  => sadhanatest
+2. SadhanaQA Title
+3. App Name => Sadhana Testing
+
+

@@ -242,7 +242,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   List<Widget> _buildAction() {
     return <Widget>[
-      (!isReadOnly & isEditMode) ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick) : Container(),
+      //(!isReadOnly & isEditMode) ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick) : Container(),
       PopupMenuButton<PopUpMenu>(
         onSelected: _onPopupSelected,
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[

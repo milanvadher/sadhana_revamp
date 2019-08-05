@@ -41,7 +41,7 @@ class MBAScheduleCheck {
         if(appResponse.status == WSConstant.SUCCESS_CODE) {
           String fileUrl = appResponse.data;
           if(AppUtils.isNullOrEmpty(fileUrl)) {
-            CommonFunction.alertDialog(context: context, msg: "No any schedule is available, Please try after some time.");
+            CommonFunction.alertDialog(context: context, msg: "No schedule is available, Please try after some time.");
             return null;
           }
           String dir = await AppFileUtil.getMBAScheduleDir();
