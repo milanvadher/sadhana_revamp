@@ -82,9 +82,7 @@ class OnAppOpenBackgroundThread {
     DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
     if (internetDate != null) {
       DateTime currentTime = DateTime.now();
-      print("########### $currentTime $internetDate ${internetDate.difference(currentTime).inDays}" );
       if (currentTime.isBefore(internetDate) && internetDate.difference(currentTime).inDays >= 1) {
-        print('############ Displayed dialog');
         CommonFunction.alertDialog(
           closeable: false,
           context: context,

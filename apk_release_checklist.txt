@@ -2,8 +2,8 @@
 Verify Below Details
 
 Verify :  ***** API URL  ******
-1. application id  => sadhanatest
-2. SadhanaQA Title
-3. App Name => Sadhana Testing
+1. applicationId  => sadhanatest
+2. SadhanaQA Title (home.dart)
+3. App Name(android:label) => Sadhana Testing
 
 
