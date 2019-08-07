@@ -26,14 +26,15 @@ void schedulePeriodicSync() async {
     await AndroidAlarmManager.initialize();
     WSAppSetting serverSetting = await AppSettingUtil.getServerAppSetting();
     await AndroidAlarmManager.periodic(Duration(minutes: serverSetting.periodicSyncIntervalInMin), periodicID, syncPeriodic, wakeup: true);
+    //await AndroidAlarmManager.periodic(Duration(seconds: 10), periodicID, syncPeriodic, wakeup: true);  //Dummy
     //await AndroidAlarmManager.oneShot(const Duration(seconds: 5), oneShotID, printOneShot);
   }
 }
 
 void syncPeriodic() async {
   if(await AppUtils.isInternetConnected()) {
-    print('Starting periodic sync on' + DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now()));
-    AppUtils.updateInternetDate();
+    print('Starting periodic sync on: ' + DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now()));
+    await AppUtils.updateInternetDate();
     await SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
   }
   await SyncActivityUtils.checkForSyncReminder();

@@ -77,7 +77,7 @@ class SyncActivityUtils {
     if (await AppSharedPrefUtil.isUserRegistered() && (await _getUnSyncActivity()).length == 0) {
       await AppSharedPrefUtil.saveLastSyncTime(DateTime.now());
       print(CacheData.lastSyncTime);
-      main();
+      //main();
     }
   }
 
@@ -87,6 +87,8 @@ class SyncActivityUtils {
 
   static Future<bool> syncAllUnSyncActivity({bool onBackground = true, BuildContext context, bool forceSync = false}) async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
+      //Dummy Notification
+      await appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
       bool isSynced = false;
       if (!isSyncing || forceSync) {
         try {
@@ -118,7 +120,7 @@ class SyncActivityUtils {
               if (appResponse.status == WSConstant.SUCCESS_CODE) {
                 for (Activity activity in activities) {
                   activity.isSynced = true;
-                  _activityDAO.updateActivitySync(activity);
+                  await _activityDAO.updateActivitySync(activity);
                 }
                 isSynced = true;
               }
@@ -149,7 +151,6 @@ class SyncActivityUtils {
     await CommonFunction.tryCatchAsync(null, () async {
       print('$MODULE Checking Sync Reminder');
       DateTime now = DateTime.now();
-      //appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
       for (DateTime reminderDate in Constant.syncReminder) {
         if (reminderDate.day == now.day && reminderDate.hour == now.hour) {
           print('$MODULE Date and Hour match ${reminderDate.day} ${reminderDate.hour}');
@@ -158,8 +159,8 @@ class SyncActivityUtils {
             print('$MODULE lastSynced: $lastSynced');
             if (lastSynced == null || (lastSynced != null && lastSynced.month != now.month)) {
               print('$MODULE Displaying notification');
-              appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody, id: 1001);
-              AppSharedPrefUtil.saveSyncRemindedDate(now);
+              await appLocalNotification.showNotification(Constant.syncReminderTitle, Constant.syncReminderBody, id: 1001);
+              await AppSharedPrefUtil.saveSyncRemindedDate(now);
             }
           } else {
             print('$MODULE $now is already reminded');
@@ -184,8 +185,8 @@ class SyncActivityUtils {
           }
         }
         print('$MODULE No any entry exist so showing notification');
-        AppLocalNotification().showNotification("Sadhana Reminder", "Don't forget to fill last $editableDays days sadhana", id: 1002);
-        AppSharedPrefUtil.saveFillRemindedDate(now);
+        await AppLocalNotification().showNotification("Sadhana Reminder", "Don't forget to fill last $editableDays days sadhana", id: 1002);
+        await AppSharedPrefUtil.saveFillRemindedDate(now);
       }
     });
   }

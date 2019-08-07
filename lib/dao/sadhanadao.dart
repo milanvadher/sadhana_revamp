@@ -35,12 +35,15 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
   }
 
   @override
-  Future<List<Sadhana>> getAll() async {
+  Future<List<Sadhana>> getAll({bool withAllActivity = false}) async {
     List<Sadhana> sadhanas = await super.getAll();
     for (Sadhana sadhana in sadhanas) {
       List<Activity> activities = await _activityDAO.getHomeVisibleActivityBySadhanaId(sadhana.id);
       loadActivityToSadhana(sadhana, activities);
-      loadAllActivity(sadhana);
+      if(withAllActivity)
+        await loadAllActivity(sadhana);
+      else
+        loadAllActivity(sadhana);
     }
     sadhanas.sort((a, b) => a.index.compareTo(b.index));
     CacheData.addSadhanas(sadhanas);

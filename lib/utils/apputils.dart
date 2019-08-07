@@ -200,7 +200,7 @@ class AppUtils {
     if(await AppUtils.isInternetConnected()) {
       DateTime internetDate = await NTP.now();
       if(internetDate != null) {
-        AppSharedPrefUtil.saveInternetDate(internetDate);
+        await AppSharedPrefUtil.saveInternetDate(internetDate);
       }
     }
   }

@@ -40,7 +40,7 @@ class CacheData {
 
   static Future<Map<int, Sadhana>> getSadhanasById() async {
     if (_sadhanasById.isEmpty) {
-      await sadhanaDAO.getAll();
+      await sadhanaDAO.getAll(withAllActivity: true);
     }
     return _sadhanasById;
   }
