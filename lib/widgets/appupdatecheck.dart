@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/background/mbaschedule_check.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/colors.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/version.dart';
@@ -10,20 +13,41 @@ import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
-import 'package:sadhana/wsmodel/WSAppSetting.dart';
+import 'package:sadhana/utils/sync_activity_utlils.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
-import 'package:synchronized/synchronized.dart';
 
 import '../main.dart';
 
-class AppUpdateCheck {
+class OnAppOpenBackgroundThread {
   static bool isChecking = false;
+  final BuildContext context;
+
   ApiService api = ApiService();
-  static void startAppUpdateCheckThread(BuildContext context) {
-    Future.delayed(Duration(seconds: 1), () => AppUpdateCheck().checkForNewAppUpdate(context));
+
+  OnAppOpenBackgroundThread(this.context);
+
+  static void startBackgroundThread(BuildContext context) {
+    Future.delayed(Duration(seconds: 1), () => OnAppOpenBackgroundThread(context).runThread());
   }
 
-  void checkForNewAppUpdate(BuildContext context) async {
+  runThread() async {
+    await CommonFunction.tryCatchAsync(context, () async {
+      if(await AppUtils.isInternetConnected()) {
+        if (await AppSharedPrefUtil.isUserRegistered()) {
+          await updateUserRole();
+          await SyncActivityUtils.syncAllUnSyncActivity(context: context);
+          await MBAScheduleCheck.getMBASchedule();
+          await checkTokenExpiration();
+        }
+        await AppUtils.updateInternetDate();
+        await checkForNewAppUpdate();
+      }
+    });
+  }
+
+  Future<bool> checkForNewAppUpdate() async {
+    bool isUpdated = false;
     /*bool check = true;
     int checkAfter = await AppSharedPrefUtil.getAppUpdateCheckAfter();
     if (checkAfter > 0) {
@@ -36,40 +60,59 @@ class AppUpdateCheck {
     if (checkapp_setting_util.dart) {*/
     if (await AppUtils.isInternetConnected() && !isChecking) {
       isChecking = true;
-      AppSetting appSetting = await AppSettingUtil.getServerAppSetting();
+      WSAppSetting appSetting = await AppSettingUtil.getServerAppSetting();
       if (appSetting != null && appSetting.version != null) {
         String version = await AppSettingUtil.getAppVersion();
         Version currentVersion = Version(version: version);
         Version playStoreVersion = Version(version: appSetting.version);
         if (playStoreVersion.compareTo(currentVersion) > 0) {
           showUpdateDialog(context: context);
-        } else {
-          await checkTokenExpiration(context);
-          await updateUserRole(context);
+          isUpdated = true;
         }
-
       }
     }
     isChecking = false;
-
+    return isUpdated;
     //}
   }
 
-  checkTokenExpiration(BuildContext context) async {
+
+
+  static Future<bool> validateMobileDate(BuildContext context) async {
+    DateTime internetDate = await AppSharedPrefUtil.getInternetDate();
+    if (internetDate != null) {
+      DateTime currentTime = DateTime.now();
+      if (currentTime.isBefore(internetDate) && internetDate.difference(currentTime).inDays >= 1) {
+        CommonFunction.alertDialog(
+          closeable: false,
+          context: context,
+          type: 'error',
+          msg: "Your mobile date is not correct, Please change it to current date to use the App.",
+          doneButtonFn: () {
+            exit(0);
+          },
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
+  checkTokenExpiration() async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       Response res = await api.validateToken();
       AppResponseParser.parseResponse(res, context: context);
     }
   }
 
-  updateUserRole(BuildContext context) async {
+  updateUserRole() async {
     Response res = await api.getUserRole();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       UserRole userRole = UserRole.fromJson(appResponse.data);
       if (userRole != null) {
-        AppSharedPrefUtil.saveUserRole(userRole);
-        main();
+        await AppSharedPrefUtil.saveUserRole(userRole);
+        //main();
       }
     }
   }

@@ -3,14 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:sadhana/attendance/model/dvd_info.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/utils/apputils.dart';
 
 class DVDForm extends StatefulWidget {
   final Session session;
   final Function(DVDInfo) onDVDSubmit;
+  final bool isReadOnly;
 
-  const DVDForm({Key key, @required this.session, this.onDVDSubmit}) : super(key: key);
+  const DVDForm({Key key, @required this.session, this.onDVDSubmit, this.isReadOnly = true}) : super(key: key);
 
   @override
   _DVDFormState createState() => _DVDFormState();
@@ -47,11 +48,13 @@ class _DVDFormState extends State<DVDForm> {
                       {'label': 'Satsang', 'value': 'Satsang'},
                       {'label': 'Parayan', 'value': 'Parayan'},
                     ],
-                    handleRadioValueChange: (value) {
-                      setState(() {
-                        dvdInfo.dvdType = value;
-                      });
-                    },
+                    handleRadioValueChange: widget.isReadOnly
+                        ? null
+                        : (value) {
+                            setState(() {
+                              dvdInfo.dvdType = value;
+                            });
+                          },
                   ),
                 ],
               ),
@@ -84,6 +87,8 @@ class _DVDFormState extends State<DVDForm> {
               ),
               SizedBox(height: paddingBtwInput),
               TextFormField(
+                enabled: !widget.isReadOnly,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                   labelText: 'Remarks',
                   border: OutlineInputBorder(),
@@ -95,17 +100,26 @@ class _DVDFormState extends State<DVDForm> {
               ),
               SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  RaisedButton(
-                    onPressed: submitForm,
-                    child: Text('Submit'),
-                  ),
-                  RaisedButton(
+                  !widget.isReadOnly
+                      ? Container(
+                          child: Row(
+                            children: <Widget>[
+                              RaisedButton(
+                                onPressed: submitForm,
+                                child: Text('Submit'),
+                              ),
+                              SizedBox(width: 20)
+                            ],
+                          ),
+                        )
+                      : Container(),
+                  OutlineButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('Cancel'),
+                    child: Text(widget.isReadOnly ? 'OK' : 'Cancel'),
                   ),
                 ],
               )
@@ -114,8 +128,9 @@ class _DVDFormState extends State<DVDForm> {
         ));
   }
 
-  buildNumberInputField({String label,int initialValue,Function onSaved}) {
+  buildNumberInputField({String label, int initialValue, Function onSaved}) {
     return TextFormField(
+      enabled: !widget.isReadOnly,
       onSaved: onSaved,
       inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
       initialValue: initialValue?.toString(),

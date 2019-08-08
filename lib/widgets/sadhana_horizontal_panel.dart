@@ -5,13 +5,14 @@ import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/widgets/checkmarkbutton.dart';
+import 'package:sadhana/widgets/nameheading.dart';
 import 'package:sadhana/widgets/numberbutton.dart';
 
 class SadhanaHorizontalPanel extends StatefulWidget {
   final List<DateTime> daysToDisplay;
   final Sadhana sadhana;
-
-  SadhanaHorizontalPanel({this.daysToDisplay, this.sadhana});
+  final double buttonWidth;
+  SadhanaHorizontalPanel({this.daysToDisplay, this.sadhana, this.buttonWidth = 40});
 
   @override
   _SadhanaHorizontalPanelState createState() => _SadhanaHorizontalPanelState();
@@ -22,6 +23,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
   ActivityDAO activityDAO = ActivityDAO();
   int editableDays = 4;
   DateTime today = DateTime.now();
+
   @override
   void initState() {
     // TODO: implement initState
@@ -49,7 +51,8 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: List.generate(
-              daysToDisplay.length, (int index) {
+              daysToDisplay.length,
+              (int index) {
                 Activity activity = sadhana.activitiesByDate[widget.daysToDisplay[index].millisecondsSinceEpoch];
                 if (activity == null)
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
@@ -57,10 +60,21 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
                 if(sadhana.isPreloaded) {
                     isDisabled = index >= editableDays ? true : false;
                 }
-                    
                 return sadhana.type == SadhanaType.BOOLEAN
-                    ? CheckmarkButton(sadhana: sadhana, activity: activity, onClick: onClick, isDisabled: isDisabled,)
-                    : NumberButton(sadhana: sadhana, activity: activity, onClick: onClick, isDisabled: isDisabled,);
+                    ? CheckmarkButton(
+                        sadhana: sadhana,
+                        activity: activity,
+                        onClick: onClick,
+                        isDisabled: isDisabled,
+                        width: widget.buttonWidth,
+                      )
+                    : NumberButton(
+                        sadhana: sadhana,
+                        activity: activity,
+                        onClick: onClick,
+                        isDisabled: isDisabled,
+                        width: widget.buttonWidth,
+                      );
               },
             ),
           ),
@@ -70,7 +84,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
   }
 
   onClick(Activity activity) {
-    if(sadhana.isPreloaded)
+    if (sadhana.isPreloaded)
       activity.isSynced = false;
     else
       activity.isSynced = true;
@@ -84,9 +98,11 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
         sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;
       });
     });
+    var namingState = listOfNamingState[sadhana.sadhanaName];
+    if(namingState != null)
+      namingState.setState(() {});
     /*setState(() {
       widget.sadhana.sadhanaData[activity.sadhanaDate] = activity;
     });*/
   }
 }
-

@@ -62,5 +62,7 @@ class AppSimpleAutoCompleteTextField extends AutoCompleteTextField<String> {
       style,
       keyboardType,
       textInputAction,
-      controller);
+      controller,
+      FocusNode()
+  );
 }

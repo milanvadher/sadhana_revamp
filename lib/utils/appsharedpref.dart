@@ -2,17 +2,20 @@ import 'dart:convert';
 
 import 'package:intl/intl.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/charts/model/filter_type.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
-import 'package:sadhana/wsmodel/WSAppSetting.dart';
+import 'package:sadhana/utils/apputils.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSharedPrefUtil {
   static SharedPreferences _pref;
-
+  static final DateFormat prefDateFormat = DateFormat('dd-MM-yyyy');
+  static final DateFormat prefTimeFormat = DateFormat('dd-MM-yyyy hh:mm');
 /*static final AppSharedPrefUtil _singleton = new AppSharedPrefUtil._internal();
 
   factory AppSharedPrefUtil() {
@@ -30,6 +33,7 @@ class AppSharedPrefUtil {
     await loadPref();
     _pref.setBool(prefStr, isDone);
   }
+
   static Future<bool> getBool(String prefStr, {bool defaultValue = false}) async {
     await loadPref();
     return _pref.getBool(prefStr) == null ? defaultValue : _pref.getBool(prefStr);
@@ -39,6 +43,7 @@ class AppSharedPrefUtil {
     await loadPref();
     return _pref.getString(prefStr) == null ? defaultValue : _pref.getString(prefStr);
   }
+
   static Future<void> saveString(String prefStr, String value) async {
     await loadPref();
     _pref.setString(prefStr, value);
@@ -46,11 +51,12 @@ class AppSharedPrefUtil {
 
   static Future<dynamic> getObjectJson(String key) async {
     String objectJson = await getString(key);
-    if(objectJson != null) {
+    if (objectJson != null) {
       return json.decode(objectJson);
     }
     return null;
   }
+
   static Future<void> saveObjectJson(String key, Object objectJson) async {
     await saveString(key, json.encode(objectJson));
   }
@@ -87,17 +93,22 @@ class AppSharedPrefUtil {
     await saveBoolean(SharedPrefConstant.b_isUserRegistered, isUserRegistered);
   }
 
-
-  static Future<void> saveLasySyncTime(DateTime lastSyncTime) async {
-    String sLastSyncTime = DateFormat(Constant.APP_DATE_FORMAT).format(lastSyncTime);
+  static Future<void> saveLastSyncTime(DateTime lastSyncTime) async {
+    String sLastSyncTime = Constant.SYNC_DATE_FORMAT.format(lastSyncTime);
     CacheData.lastSyncTime = sLastSyncTime;
     return saveString(SharedPrefConstant.s_last_sync_time, sLastSyncTime);
   }
 
-  static Future<String> getLastSyncTime() async {
+  static Future<String> getStrLastSyncTime() async {
     String sLastSyncTime = await getString(SharedPrefConstant.s_last_sync_time);
     CacheData.lastSyncTime = sLastSyncTime;
     return sLastSyncTime;
+  }
+
+  static Future<DateTime> getLastSyncTime() async {
+    String sLastSyncTime = await getString(SharedPrefConstant.s_last_sync_time);
+    CacheData.lastSyncTime = sLastSyncTime;
+    return Constant.SYNC_DATE_FORMAT.parse(sLastSyncTime);
   }
 
   static Future<void> saveToken(String token) async {
@@ -119,7 +130,7 @@ class AppSharedPrefUtil {
 
   static Future<UserRole> getUserRole() async {
     dynamic objectJson = await getObjectJson(SharedPrefConstant.obj_user_role);
-    if(objectJson != null) {
+    if (objectJson != null) {
       return UserRole.fromJson(objectJson);
     } else
       return null;
@@ -133,8 +144,6 @@ class AppSharedPrefUtil {
     await saveBoolean(SharedPrefConstant.b_force_sync_remain, isForceSyncRemained);
   }
 
-
-
   static Future<void> saveMhtId(String mhtId) async {
     await saveString('mht_id', mhtId);
   }
@@ -145,7 +154,7 @@ class AppSharedPrefUtil {
 
   static Future<Profile> getUserProfile() async {
     String userProfile = await getString(SharedPrefConstant.s_profile_data);
-    if(userProfile != null) {
+    if (userProfile != null) {
       return Profile.fromJson(json.decode(userProfile));
     }
     return null;
@@ -156,28 +165,28 @@ class AppSharedPrefUtil {
     await saveString(SharedPrefConstant.s_profile_data, json.encode(userProfile.toJson()));
   }
 
-  static Future<Register> getRegisterProfile() async {
+  static Future<Register> getMBAProfile() async {
     String registerProfile = await getString(SharedPrefConstant.s_register_profile);
-    if(registerProfile != null) {
+    if (registerProfile != null) {
       return Register.fromJson(json.decode(registerProfile));
     }
     return null;
   }
 
-  static Future<void> saveRegisterProfile(Register registerProfile) async {
+  static Future<void> saveMBAProfile(Register registerProfile) async {
     await saveString(SharedPrefConstant.s_register_profile, json.encode(registerProfile.toJson()));
   }
 
-  static Future<AppSetting> getServerSetting() async {
+  static Future<WSAppSetting> getServerSetting() async {
     String serverSetting = await getString(SharedPrefConstant.s_server_setting);
-    if(serverSetting == null) {
-      return AppSetting.getDefaulServerAppSetting();
+    if (serverSetting == null) {
+      return WSAppSetting.getDefaulServerAppSetting();
     } else {
-      return AppSetting.fromJson(json.decode(serverSetting));
+      return WSAppSetting.fromJson(json.decode(serverSetting));
     }
   }
 
-  static Future<void> saveServerSetting(AppSetting appSetting) async {
+  static Future<void> saveServerSetting(WSAppSetting appSetting) async {
     await saveString(SharedPrefConstant.s_server_setting, json.encode(appSetting.toJson()));
   }
 
@@ -191,7 +200,7 @@ class AppSharedPrefUtil {
 
   static Future<DateTime> getMBAScheduleMonth() async {
     String strDate = await getString(SharedPrefConstant.s_mba_schedule_month);
-    if(strDate != null)
+    if (strDate != null)
       return DateFormat(Constant.APP_MONTH_FORMAT).parse(strDate);
     else
       return null;
@@ -211,6 +220,60 @@ class AppSharedPrefUtil {
     await loadPref();
     _pref.clear();
     return true;
+  }
+
+  static Future<DateTime> getInternetDate() async {
+    String strInternetDate = await getString(SharedPrefConstant.s_internet_date);
+    if (strInternetDate == null) {
+      return null;
+    } else {
+      return prefTimeFormat.parse(strInternetDate);
+    }
+  }
+
+  static Future<void> saveInternetDate(DateTime date) async {
+    if (date != null) await saveString(SharedPrefConstant.s_internet_date, prefTimeFormat.format(date));
+  }
+
+  static Future<void> saveChartFilter(String chartFilter) async {
+    if (chartFilter != null) await saveString(SharedPrefConstant.s_chart_filter, chartFilter);
+  }
+
+  static Future<FilterType> getChartFilter() async {
+    String strFilter = await getString(SharedPrefConstant.s_chart_filter);
+    FilterType filterType = FilterType.Month;
+    if (strFilter != null) {
+      return FilterType.values.firstWhere((e) => AppUtils.equalsIgnoreCase(e.toString(), strFilter));
+    }
+    return filterType;
+  }
+
+  static Future<void> saveSyncRemindedDate(DateTime date) async {
+    await saveDate(SharedPrefConstant.s_sync_reminded_date, date);
+  }
+
+  static Future<DateTime> getSyncRemindedDate() async {
+    return await getDate(SharedPrefConstant.s_sync_reminded_date);
+  }
+
+  static Future<void> saveFillRemindedDate(DateTime date) async {
+    await saveDate(SharedPrefConstant.s_fill_reminded_date, date);
+  }
+
+  static Future<DateTime> getFillRemindedDate() async {
+    return await getDate(SharedPrefConstant.s_fill_reminded_date);
+  }
+
+  static Future<void> saveDate(String prefName, DateTime date) async {
+    if (date != null) await saveString(prefName, prefDateFormat.format(date));
+  }
+
+  static Future<DateTime> getDate(String prefName) async {
+    String strDate = await getString(prefName);
+    if (strDate != null) {
+      return prefDateFormat.parse(strDate);
+    }
+    return null;
   }
 
 }

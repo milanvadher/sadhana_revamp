@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ntp/ntp.dart';
 import 'package:permission/permission.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:vibration/vibration.dart';
+import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info/device_info.dart';
 
@@ -31,6 +34,32 @@ class AppUtils {
         return false;
     }
   }
+  static int convertBoolToInt(bool boolValue, {int defaultValue = 0}) {
+    return boolValue != null ? (boolValue ? 1 : 0) : defaultValue;
+  }
+
+  static String getCountTitleForSadhana(String sadhanaName) {
+    if (AppUtils.equalsIgnoreCase(sadhanaName, Constant.SEVANAME))
+      return 'Hours';
+    else if (AppUtils.equalsIgnoreCase(sadhanaName, Constant.vanchanName))
+      return 'Pages';
+    else
+      return 'Counts';
+  }
+
+  static String listToString(List<dynamic> data) {
+    String values = '';
+    if(data != null && data.isNotEmpty) {
+      data.forEach((s) => AppUtils.isNullOrEmpty(s.toString()) ? '' : values = '$values, ${s.toString()}');
+      if(values.length > 1)
+        values = values.substring(1, values.length);
+    }
+    return values;
+  }
+
+  static bool isDarkTheme(BuildContext context) {
+    return Brightness.dark == Theme.of(context).brightness;
+  }
 
   static bool isNumeric(String s) {
     if (s == null) {
@@ -48,6 +77,8 @@ class AppUtils {
 
   static DateTime tryParse(String dateString, List<String> formats, {bool throwErrorIfNotParse = false}) {
     dynamic throwError;
+    if(formats == null)
+      formats = [WSConstant.DATE_TIME_FORMAT, WSConstant.DATE_TIME_FORMAT2, WSConstant.DATE_FORMAT];
     for (String format in formats) {
       try {
         return DateFormat(format).parse(dateString);
@@ -125,14 +156,14 @@ class AppUtils {
   }
 
   static vibratePhone({int duration}) {
-    // Vibration.hasVibrator().then((canVibrate) {
-    //   if (canVibrate) {
-    //     if (duration != null && duration > 0)
-    //       Vibration.vibrate(duration: duration);
-    //     else
-    //       Vibration.vibrate();
-    //   }
-    // });
+     Vibration.hasVibrator().then((canVibrate) {
+       if (canVibrate) {
+         if (duration != null && duration > 0)
+           Vibration.vibrate(duration: duration);
+         else
+           Vibration.vibrate();
+       }
+     });
   }
 
   static Future<bool> isInternetConnected() async {
@@ -163,5 +194,14 @@ class AppUtils {
 
   static List<T> fromJsonList<T>(dynamic json, Function(Map<String, dynamic>) fromJson) {
     return (json as List)?.map<T>((e) => e == null ? null : fromJson(e as Map<String, dynamic>))?.toList();
+  }
+
+  static Future<void> updateInternetDate() async {
+    if(await AppUtils.isInternetConnected()) {
+      DateTime internetDate = await NTP.now();
+      if(internetDate != null) {
+        await AppSharedPrefUtil.saveInternetDate(internetDate);
+      }
+    }
   }
 }

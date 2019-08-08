@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/attendance/mba_attendance_history.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -7,6 +8,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AttendanceSummaryPage extends StatefulWidget {
@@ -25,7 +27,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   final TextEditingController _filter = new TextEditingController();
   ApiService _api = ApiService();
   int month = new DateTime.now().month;
-
+  UserRole _userRole;
   @override
   void initState() {
     super.initState();
@@ -49,13 +51,16 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
 
   void loadData() async {
     startLoading();
-    UserRole userRole = await AppSharedPrefUtil.getUserRole();
-    if (userRole != null) {
-      Response res = await _api.getAttendanceSummary("Group 1");
+    _userRole = await AppSharedPrefUtil.getUserRole();
+    if (_userRole != null) {
+      Response res = await _api.getAttendanceSummary(_userRole.groupName);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        allSummary = AttendanceSummary.fromJsonList(appResponse.data);
+        allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
+        if(allSummary == null)
+          allSummary = [];
         filteredSummary = allSummary;
+        setTitle();
         print(filteredSummary);
       }
     }
@@ -65,17 +70,19 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   void _filteredSummary() async {
     if (_searchText.isNotEmpty) {
       setState(() {
-        filteredSummary =
-            filteredSummary.where((summary) => summary.name.toLowerCase().contains(_searchText.toLowerCase())).toList(growable: true);
+        filteredSummary = filteredSummary
+            .where((summary) => summary.name.toLowerCase().contains(_searchText.toLowerCase()))
+            .toList(growable: true);
       });
     }
   }
 
-  void _searchPressed() {
+  void _onSearchPressed() {
     setState(() {
       if (this._searchIcon.icon == Icons.search) {
         this._searchIcon = new Icon(Icons.close);
         this._appBarTitle = new TextField(
+          autofocus: true,
           controller: _filter,
           cursorColor: Colors.white,
           keyboardType: TextInputType.text,
@@ -89,28 +96,33 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
         );
       } else {
         this._searchIcon = new Icon(Icons.search);
-        this._appBarTitle = new Text('Attendance Summary');
+        setTitle();
         filteredSummary = allSummary;
         _filter.clear();
       }
     });
   }
 
+  setTitle() {
+    _appBarTitle = AppTitleWithSubTitle(title: 'Attendance Summary', subTitle: _userRole.groupTitle,);
+  }
+
   @override
   Widget pageToDisplay() {
     _filteredSummary();
     return Scaffold(
+      backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         centerTitle: true,
         title: _appBarTitle,
         actions: <Widget>[
           IconButton(
             icon: _searchIcon,
-            onPressed: _searchPressed,
+            onPressed: _onSearchPressed,
           ),
         ],
       ),
-      body: _buildListView(),
+      body: SafeArea(child: _buildListView()),
     );
   }
 
@@ -128,44 +140,45 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
 
   _buildCardView(AttendanceSummary data) {
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: EdgeInsets.only(left: 10, right: 10),
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
         elevation: 5,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 20),
-              child: Text(data.name),
+        child: ListTile(
+          onTap: () {
+            onListTileClick(data);
+          },
+          contentPadding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+          dense: true,
+          title: Text(data.name),
+          trailing: Container(
+            decoration: BoxDecoration(
+              color: Colors.red.shade500,
             ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10)),
-                color: Colors.blueGrey,
-              ),
-              width: 50,
-              height: 60,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  Text(
-                    '${data.presentDates}/${data.totalAttendanceDates}',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
+            width: 60,
+            height: 60,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
+                  style: TextStyle(color: Colors.white),
+                ),
+                Text(
+                  '${data.presentDates}/${data.totalAttendanceDates}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  onListTileClick(AttendanceSummary summary) {
+    Navigator.push(context, MaterialPageRoute(
+      builder: (context) => MBAAttendanceHistory(mhtID: summary.mhtId, name: summary.name,),
+    ),);
   }
 }

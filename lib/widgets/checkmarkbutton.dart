@@ -10,11 +10,9 @@ class CheckmarkButton extends StatefulWidget {
   Sadhana sadhana;
   Activity activity;
   bool isDisabled;
-  CheckmarkButton(
-      {@required this.sadhana,
-      @required this.activity,
-      this.onClick,
-      this.isDisabled = false});
+  final double width;
+
+  CheckmarkButton({@required this.sadhana, @required this.activity, this.onClick, this.isDisabled = false, this.width = 40});
 
   @override
   _CheckmarkButtonState createState() => _CheckmarkButtonState();
@@ -27,67 +25,94 @@ class _CheckmarkButtonState extends State<CheckmarkButton> {
   Brightness theme;
   ActivityDAO activityDAO = ActivityDAO();
   Color color;
+
   @override
   Widget build(BuildContext context) {
     activity = widget.activity;
     sadhana = widget.sadhana;
     title = sadhana.sadhanaName;
     theme = Theme.of(context).brightness;
-    color = theme == Brightness.light
-            ? widget.sadhana.lColor
-            : widget.sadhana.dColor;
+    color = theme == Brightness.light ? widget.sadhana.lColor : widget.sadhana.dColor;
     return Container(
-      color: widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
+      color:
+          widget.isDisabled ? (theme == Brightness.light ? Colors.grey.shade300 : Colors.grey.shade800) : Theme.of(context).cardColor,
       height: 50,
+      width: widget.width,
       child: InkWell(
-        onTap: widget.isDisabled ? null : onClicked,
-        onLongPress: widget.isDisabled ? null : onLongPress,
+        onTap: onClicked,
+        onLongPress: onLongPress,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 8,horizontal: 4),
+          padding: EdgeInsets.symmetric(vertical: 7, horizontal: 4),
           child: Container(
-          width: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: (color).withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
-            border: Border.all(
-              color: color,
-              width: 2,
-              style: widget.activity.sadhanaValue > 0
-                  ? BorderStyle.solid
-                  : BorderStyle.none,
+            //width: 28,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: (color).withAlpha(widget.activity.sadhanaValue > 0 ? 20 : 0),
+              border: Border.all(
+                color: color,
+                width: 2,
+                style: widget.activity.sadhanaValue > 0 ? BorderStyle.solid : BorderStyle.none,
+              ),
             ),
+            child: Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              AnimatedContainer(
+                duration: Duration(seconds: 5),
+                child: widget.activity.sadhanaValue > 0
+                    ? Icon(
+                        Icons.done,
+                        size: 20.0,
+                        color: color,
+                      )
+                    : Icon(
+                        Icons.close,
+                        size: 20.0,
+                        color: Colors.grey,
+                      ),
+              ),
+              CircleAvatar(
+                maxRadius: activity.remarks != null && activity.remarks.isNotEmpty ? 2 : 0,
+                backgroundColor: color,
+              ),
+            ]),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: AnimatedContainer(
-              duration: Duration(seconds: 5),
-              width: 40,
-              child: widget.activity.sadhanaValue > 0
-                  ? Icon(
-                      Icons.done,
-                      size: 20.0,
-                      color: color,
-                    )
-                  : Icon(
-                      Icons.close,
-                      size: 20.0,
-                      color: Colors.grey,
-                    ),
-            ),
-          ),
-        ),
         ),
       ),
     );
   }
 
   onClicked() {
+    if(widget.isDisabled) {
+      if(activity.remarks != null && activity.remarks.isNotEmpty) {
+        showReadOnlyDialog();
+        return;
+      }
+      return;
+    }
     AppUtils.vibratePhone(duration: 10);
     activity.sadhanaValue = activity.sadhanaValue > 0 ? 0 : 1;
     if (widget.onClick != null) widget.onClick(widget.activity);
   }
 
+  void showReadOnlyDialog() {
+    showDialog<String>(
+        context: context,
+        builder: (_) {
+          return RemarkPickerDialog(
+            title: Text(title),
+            remark: activity.remarks,
+            isEnabled: false,
+          );
+        });
+  }
+
   onLongPress() {
+    if(widget.isDisabled) {
+      if(activity.remarks != null && activity.remarks.isNotEmpty) {
+        showReadOnlyDialog();
+        return;
+      }
+      return;
+    }
     showDialog<String>(
         context: context,
         builder: (_) {

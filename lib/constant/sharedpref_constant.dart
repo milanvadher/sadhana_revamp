@@ -13,4 +13,10 @@ class SharedPrefConstant {
   static final String s_mba_schedule_month = "s_mba_schedule_month";
   static final String b_force_sync_remain = "b_force_sync_remain";
   static final String obj_user_role = "s_user_roles";
+  static final String s_internet_date = "s_internet_date";
+
+  static final String s_chart_filter = "s_chart_filter";
+  static final String s_sync_reminded_date = "s_sync_reminded_date";
+  static final String s_fill_reminded_date = "s_fill_reminded_date";
+
 }

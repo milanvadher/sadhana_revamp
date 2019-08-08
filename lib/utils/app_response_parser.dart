@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/auth/login/login.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/message_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -20,16 +20,14 @@ class AppResponseParser {
       logout(context);
     } else {
       if (res.statusCode == 500 || res.statusCode == 502)
-        serverResponse =
-            new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
+        serverResponse = new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG , data: res.body));
       else {
         try {
           serverResponse = ServerResponse.fromJson(json.decode(res.body));
         } catch (error, s) {
           print(error);
           print(s);
-          serverResponse =
-              new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG));
+          serverResponse = new ServerResponse(appResponse: AppResponse(status: res.statusCode, msg: MessageConstant.COMMON_ERROR_MSG, data: error));
         }
       }
       AppResponse appResponse = serverResponse.appResponse;
@@ -39,11 +37,12 @@ class AppResponseParser {
         if (context != null) {
           CommonFunction.alertDialog(
             context: context,
-            //title: 'Error - ' + appResponse.status.toString(),
-            title: 'Error',
+            title: 'Error - ' + appResponse.status.toString(),
+            //title: 'Error',
             msg: appResponse.msg != null ? appResponse.msg : MessageConstant.COMMON_ERROR_MSG,
             type: 'error',
             doneButtonText: 'OK',
+            errorHint: appResponse.data,
           );
         }
       }

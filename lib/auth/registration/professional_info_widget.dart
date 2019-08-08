@@ -6,7 +6,7 @@ import 'package:sadhana/auth/registration/Inputs/date-input.dart';
 import 'package:sadhana/auth/registration/Inputs/dropdown-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/education.dart';
@@ -14,18 +14,19 @@ import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/skill.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class ProfessionalInfoWidget extends StatefulWidget {
   final Register register;
   final Function startLoading;
   final Function stopLoading;
-
+  final bool viewMode;
   const ProfessionalInfoWidget({
     Key key,
     @required this.register,
     @required this.startLoading,
-    @required this.stopLoading,
+    @required this.stopLoading, this.viewMode = false,
   }) : super(key: key);
 
   @override
@@ -38,11 +39,14 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
   ApiService api = new ApiService();
   List<String> skills = [];
   List<String> educations = [];
+  bool viewMode;
   @override
   void initState() {
     super.initState();
-    loadSkills();
-    loadEducation();
+    if(!widget.viewMode) {
+      loadSkills();
+      loadEducation();
+    }
   }
 
   loadSkills() async {
@@ -81,12 +85,14 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
   @override
   Widget build(BuildContext context) {
     _register = widget.register;
+    viewMode = widget.viewMode;
     return Column(
       children: <Widget>[
         // Education Qualification
         DropDownInput(
             items: educations,
             labelText: 'Education Qualification',
+            viewMode: viewMode,
             valueText: _register.studyDetail ?? null,
             onChange: (value) {
               setState(() {
@@ -97,6 +103,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         RadioInput(
           labelText: 'Occupation',
           radioValue: _register.occupation,
+          viewMode: viewMode,
           radioData: [
             {'label': 'Job', 'value': 'Job'},
             {'label': 'Business', 'value': 'Business'},
@@ -111,6 +118,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         ),
         DateInput(
           labelText: 'Job/Business Start Date',
+          viewMode: viewMode,
           selectedDate: _register.jobStartDate == null ? null : DateTime.parse(_register.jobStartDate),
           selectDate: (DateTime date) {
             setState(() {
@@ -120,17 +128,18 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         ),
         TextInputField(
           labelText: 'Work City',
+          viewMode: viewMode,
           valueText: _register.workCity,
           onSaved: (value) => _register.workCity = value,
           isRequiredValidation: true,
         ),
-        Container(
+        viewMode ? Container() : Container(
           child: ListTile(
             title: Text('Weekly off in your Job/Occupation/Business'),
             contentPadding: EdgeInsets.only(left: 5),
           ),
         ),
-        Container(
+        viewMode ? getWeeklyOffViewMode() : Container(
           child: Wrap(
               children: List.generate(Constant.weekName.length, (int index) {
             return Column(
@@ -161,6 +170,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         ComboboxInput(
           labelText: 'Skills',
           listData: skills,
+          viewMode: viewMode,
           selectedData: _register.skills,
           isRequiredValidation: true,
           handleValueSelect: (value) {
@@ -179,6 +189,7 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         ),
         TextInputField(
           labelText: 'Company Name',
+          viewMode: viewMode,
           valueText: _register.companyName,
           onSaved: (value) => _register.companyName = value,
         ),
@@ -189,10 +200,21 @@ class _ProfessionalInfoWidgetState extends State<ProfessionalInfoWidget> {
         ),*/
         TextInputField(
           labelText: 'Remarks',
+          viewMode: viewMode,
           valueText: _register.personalNotes,
           onSaved: (value) => _register.personalNotes = value,
         ),
       ],
+    );
+  }
+
+  Widget getWeeklyOffViewMode() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    String values = AppUtils.listToString(_register.holidays);
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: !viewMode ? 10.0 : 5),
+      alignment: Alignment.bottomLeft,
+      child: CommonFunction.getTitleAndNameForProfilePage(screenWidth: screenWidth, title: "Weekly off", value: values,),
     );
   }
 }

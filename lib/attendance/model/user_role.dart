@@ -1,15 +1,21 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/utils/apputils.dart';
 part "user_role.g.dart";
 
 @JsonSerializable()
 class UserRole {
+  @JsonKey(name: 'group_title')
+  String groupTitle;
   @JsonKey(name: 'group_name')
   String groupName;
   @JsonKey(name: 'role')
   String role;
-  @JsonKey(name: 'is_simcity_group', defaultValue: true)
-  bool isSimCityGroup;
-
+  @JsonKey(name: 'center')
+  String center;
+  @JsonKey(ignore: true)
+  bool get isSimCityGroup => AppUtils.equalsIgnoreCase(center, WSConstant.center_Simcity);
+  bool get isAttendanceCord => AppUtils.equalsIgnoreCase(WSConstant.ROLE_ATTENDANCECOORD, role);
   UserRole();
 
   factory UserRole.fromJson(Map<String, dynamic> json) => _$UserRoleFromJson(json);

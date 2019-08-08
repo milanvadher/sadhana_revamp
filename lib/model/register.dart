@@ -33,6 +33,8 @@ class Register {
   String bDate;
   String gDate;
   String center;
+  String group;
+  String aptName;
   String mobileNo1;
   String mobileNo2;
   String email;
@@ -107,6 +109,8 @@ class Register {
     bDate = json["b_date"];
     gDate = json["g_date"];
     center = json["center"];
+    group = json['group_title'];
+    aptName = json['apt_name'];
     mobileNo1 = json["mobile_no_1"];
     mobileNo2 = json["mobile_no_2"];
     email = json["email"];
@@ -153,6 +157,8 @@ class Register {
     data["b_date"] = this.bDate;
     data["g_date"] = this.gDate;
     data["center"] = this.center;
+    data['group_title'] = this.group;
+    data['apt_name'] = this.aptName;
     data["mobile_no_1"] = this.mobileNo1;
     data["mobile_no_2"] = this.mobileNo2;
     data["email"] = this.email;
@@ -199,9 +205,10 @@ class Register {
     else
       return input;
   }
+
   @override
   String toString() {
-    return "Register{mhtId: $mhtId, firstName: $firstName, middleName: $middleName, lastName: $lastName, bDate: $bDate, gDate: $gDate, center: $center, mobileNo1: $mobileNo1, mobileNo2: $mobileNo2, email: $email, fatherName: $fatherName, fatherGnan: $fatherGnan, fatherGDate: $fatherGDate, fatherMbaApproval: $fatherMbaApproval, brotherCount: $brotherCount, motherName: $motherName, motherGnan: $motherGnan, motherGDate: $motherGDate, motherMbaApproval: $motherMbaApproval, sisterCount: $sisterCount, studyDetail: $studyDetail, occupation: $occupation, jobStartDate: $jobStartDate, companyName: $companyName, workCity: $workCity, skills: $skills, health: $health, personalNotes: $personalNotes, bloodGroup: $bloodGroup, tshirtSize: $tshirtSize, registered: $registered, permanentAddress: $permanentAddress, currentAddress: $currentAddress}";
+    return 'Register{mhtId: $mhtId, firstName: $firstName, middleName: $middleName, lastName: $lastName, bDate: $bDate, gDate: $gDate, center: $center, group: $group, aptName: $aptName, mobileNo1: $mobileNo1, mobileNo2: $mobileNo2, email: $email, fatherName: $fatherName, fatherGnan: $fatherGnan, fatherGDate: $fatherGDate, fatherMbaApproval: $fatherMbaApproval, brotherCount: $brotherCount, motherName: $motherName, motherGnan: $motherGnan, motherGDate: $motherGDate, motherMbaApproval: $motherMbaApproval, sisterCount: $sisterCount, studyDetail: $studyDetail, occupation: $occupation, jobStartDate: $jobStartDate, companyName: $companyName, workCity: $workCity, skills: $skills, health: $health, personalNotes: $personalNotes, bloodGroup: $bloodGroup, tshirtSize: $tshirtSize, registered: $registered, holidays: $holidays, permanentAddress: $permanentAddress, currentAddress: $currentAddress, sameAsPermanentAddress: $sameAsPermanentAddress, sevaProfile: $sevaProfile}';
   }
 
 }

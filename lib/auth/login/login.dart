@@ -6,7 +6,8 @@ import 'package:sadhana/auth/login/mobile_request_success.dart';
 import 'package:sadhana/auth/login/start.dart';
 import 'package:sadhana/auth/login/verify.dart';
 import 'package:sadhana/auth/registration/registration.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/auth/registration/registration_request.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/logindatastate.dart';
 import 'package:sadhana/model/profile.dart';
@@ -44,6 +45,7 @@ class LoginPageState extends BaseState<LoginPage> {
   ScrollController _scrollController = new ScrollController();
   LoginState loginState;
   List<GlobalKey<FormState>> formKeys = List.generate(4, (index) => GlobalKey());
+
   @override
   initState() {
     super.initState();
@@ -141,8 +143,8 @@ class LoginPageState extends BaseState<LoginPage> {
         children: <Widget>[
           RaisedButton(
             onPressed: onStepContinue,
-            child: Text(
-                currentStep != loginSteps.length - 1 ? 'CONTINUE' : loginState.mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
+            child:
+                Text(currentStep != loginSteps.length - 1 ? 'CONTINUE' : loginState.mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
           ),
           SizedBox(
             width: 10,
@@ -198,7 +200,7 @@ class LoginPageState extends BaseState<LoginPage> {
         break;
       case 2: //Verify
         if (loginState.mobileChangeRequestStart)
-          return await sumbitMobileChangeReq();
+          return await submitMobileChangeReq();
         else
           return _verify(context);
         break;
@@ -238,6 +240,8 @@ class LoginPageState extends BaseState<LoginPage> {
           },
           doneButtonFn: goToHomePage,
         );
+      } else {
+        goToHomePage();
       }
     }
   }
@@ -260,8 +264,14 @@ class LoginPageState extends BaseState<LoginPage> {
     if (await AppUtils.isInternetConnected()) {
       startOverlay();
       try {
+        try {
+          loginState.mhtId = int.parse(loginState.mhtId).toString();
+        } catch (e,s) {
+          print(e); print(s);
+        }
         Response res = await api.getUserProfile(loginState.mhtId);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
+        print(appResponse.status);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** Login Data ::: ');
           print(appResponse.data);
@@ -271,6 +281,19 @@ class LoginPageState extends BaseState<LoginPage> {
           });
           stopOverlay();
           return true;
+        } else if (appResponse.status == WSConstant.CODE_ENTITY_NOT_FOUND) {
+          print('inside data');
+          CommonFunction.alertDialog(
+              context: context,
+              msg:
+                  "Your Mht Id is not registered with us, Pls Check again, "
+                      "If it is correct and you are Dada's MBA then Kindly click Register button to enter registration details.",
+              showCancelButton: true,
+              doneButtonText: "Register",
+              doneButtonFn: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage(mhtId: loginState.mhtId,)));
+              });
         }
       } catch (e, s) {
         print(e);
@@ -365,8 +388,12 @@ class LoginPageState extends BaseState<LoginPage> {
     return false;
   }
 
-  Future<bool> sumbitMobileChangeReq() async {
+  Future<bool> submitMobileChangeReq() async {
     try {
+      if(loginState.profileData.mobileNo1 == loginState.newMobile) {
+        CommonFunction.alertDialog(context: context, type: 'error', msg: "Your old mobile number and new mobile are same.");
+        return false;
+      }
       startOverlay();
       Response res = await api.changeMobile(loginState.mhtId, loginState.profileData.mobileNo1, loginState.newMobile);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -388,7 +415,7 @@ class LoginPageState extends BaseState<LoginPage> {
     if (await CommonFunction.registerUser(register: otpData.profile, context: context)) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => HomePage(optionsPage: CommonFunction.appOptionsPage,),
         ),
       );
     }

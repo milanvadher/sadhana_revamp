@@ -4,6 +4,7 @@ import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/entity.dart';
+import 'package:sadhana/model/sadhana_statistics.dart';
 import 'package:sadhana/utils/apputils.dart';
 
 class Sadhana extends Entity {
@@ -48,7 +49,20 @@ class Sadhana extends Entity {
   DateTime reminderTime;
   String reminderDays;
   Map<int, Activity> activitiesByDate = new Map();
+  bool isLoadedAllActivity = false;
+  bool get isNumeric => type == SadhanaType.NUMBER;
 
+  bool isActivityDone(Activity activity) {
+    if (activity.sadhanaValue > 0) {
+      bool isDone = true;
+      if (isNumeric && activity.sadhanaValue < targetValue)
+        isDone = false;
+      return isDone;
+    }
+    return false;
+  }
+
+  SadhanaStatistics statistics = SadhanaStatistics();
   Sadhana({
     id,
     this.sadhanaName,

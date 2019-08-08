@@ -7,41 +7,47 @@ part of 'session.dart';
 // **************************************************************************
 
 Session _$SessionFromJson(Map<String, dynamic> json) {
-  return Session(
-      date: json['date'] as String,
-      group: json['group'] as String,
-      dvdType: json['dvdtype'] as String,
-      dvdNo: json['dvdno'] as int,
-      dvdPart: json['dvdpart'] as int,
-      remark: json['remark'] as String,
-      attendance: (json['attendance'] as List)
-          ?.map((e) =>
-              e == null ? null : Attendance.fromJson(e as Map<String, dynamic>))
-          ?.toList());
+  return Session()
+    ..date = json['session_date'] as String
+    ..group = json['group_name'] as String
+    ..dvdType = json['dvdtype'] as String
+    ..dvdNo = json['dvd_no'] as int
+    ..dvdPart = json['dvd_part'] as int
+    ..remark = json['remark'] as String
+    ..sessionType = json['session_type'] as String
+    ..attendance = (json['attendance'] as List)
+            ?.map((e) => e == null
+                ? null
+                : Attendance.fromJson(e as Map<String, dynamic>))
+            ?.toList() ??
+        [];
 }
 
 Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
-      'date': instance.date,
-      'group': instance.group,
+      'session_date': instance.date,
+      'group_name': instance.group,
       'dvdtype': instance.dvdType,
-      'dvdno': instance.dvdNo,
-      'dvdpart': instance.dvdPart,
+      'dvd_no': instance.dvdNo,
+      'dvd_part': instance.dvdPart,
       'remark': instance.remark,
+      'session_type': instance.sessionType,
       'attendance': instance.attendance?.map((e) => e?.toJson())?.toList()
     };
 
 Attendance _$AttendanceFromJson(Map<String, dynamic> json) {
-  return Attendance(
-      mhtId: json['mht_id'] as String,
-      isPresent: Attendance._isPresentFromJson(json['isPresent'] as int),
-      absentReason: json['absentreason'] as String)
-    ..name = json['name'] as String;
+  return Attendance()
+    ..mhtId = json['mht_id'] as String
+    ..firstName = json['first_name'] as String
+    ..lastName = json['last_name'] as String
+    ..isPresent = AppUtils.convertToIntToBool(json['is_present'] as int)
+    ..reason = json['absent_reason'] as String;
 }
 
 Map<String, dynamic> _$AttendanceToJson(Attendance instance) =>
     <String, dynamic>{
       'mht_id': instance.mhtId,
-      'name': instance.name,
-      'isPresent': Attendance._isPresentToJson(instance.isPresent),
-      'absentreason': instance.absentReason
+      'first_name': instance.firstName,
+      'last_name': instance.lastName,
+      'is_present': AppUtils.convertBoolToInt(instance.isPresent),
+      'absent_reason': instance.reason
     };
