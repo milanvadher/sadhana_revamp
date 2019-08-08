@@ -163,7 +163,7 @@ class _ProfileUpdatePageState extends BaseState<ProfileUpdatePage> {
       case UpdateProfilePageType.BASIC:
         return 'Basic';
       case UpdateProfilePageType.Family:
-        return 'Familty';
+        return 'Family';
       case UpdateProfilePageType.Professional:
         return 'Professional';
       case UpdateProfilePageType.Seva:

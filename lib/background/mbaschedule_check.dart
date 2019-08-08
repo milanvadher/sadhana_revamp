@@ -46,7 +46,7 @@ class MBAScheduleCheck {
           }
           String dir = await AppFileUtil.getMBAScheduleDir();
           File file = await AppFileUtil.saveImage(_apiService.getMBAScheduleAbsoluteUrl(fileUrl), dir);
-          AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);
+          await AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);
           return file;
         }
       } else {

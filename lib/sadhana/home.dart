@@ -142,11 +142,12 @@ class HomePageState extends BaseState<HomePage> {
         print('on Connectivity change');
         if (await AppUtils.isInternetConnected()) {
           await AppSettingUtil.getServerAppSetting(forceFromServer: true);
-          OnAppOpenBackgroundThread.startBackgroundThread(context);
-          AppUtils.updateInternetDate();
+          await OnAppOpenBackgroundThread(context).runThread();
+          //OnAppOpenBackgroundThread.startBackgroundThread(context);
+          //await AppUtils.updateInternetDate();
           if (await AppSharedPrefUtil.isUserRegistered()) {
-            SyncActivityUtils.syncAllUnSyncActivity(context: context);
-            MBAScheduleCheck.getMBASchedule();
+            await SyncActivityUtils.syncAllUnSyncActivity(context: context);
+            //await MBAScheduleCheck.getMBASchedule();
           }
         }
       }
@@ -266,7 +267,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('SadhanaQA'),
+        title: Text('Sadhana'),
         actions: _buildActions(),
       ),
       body: SafeArea(

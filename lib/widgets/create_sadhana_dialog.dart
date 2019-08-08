@@ -41,12 +41,12 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   Sadhana sadhana;
   bool isPreloaded = false;
   Color color;
-  final formats = {
+  /*final formats = {
     //InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
     //InputType.date: DateFormat('yyyy-MM-dd'),
     InputType.time: DateFormat(Constant.APP_TIME_FORMAT),
   };
-  final InputType inputType = InputType.time;
+  final InputType inputType = InputType.time;*/
   DateTime reminderTime;
   AppLocalNotification appLocalNotification = new AppLocalNotification();
   String operation;
@@ -173,28 +173,31 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: DateTimePickerFormField(
-                inputType: inputType,
-                format: formats[inputType],
-                editable: false,
-                initialTime: reminderTime != null
-                    ? TimeOfDay(
-                        hour: reminderTime.hour,
-                        minute: reminderTime.minute,
-                      )
-                    : TimeOfDay(hour: 7, minute: 0),
+              child: DateTimeField(
+                format: Constant.APP_TIME_FORMAT,
+                onShowPicker: (context, currentValue) async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  if(time != null)
+                    return DateTimeField.convert(time);
+                  else
+                    return null;
+                },
+                initialValue: reminderTime,
+                readOnly: true,
+                resetIcon: Icon(Icons.delete),
                 decoration: InputDecoration(
                   labelText: _getReminderText(),
                   hasFloatingPlaceholder: false,
                   hintText: "Reminder",
                 ),
-                onChanged: (dt) => setState(
-                      () {
-                        if (dt != null) {
-                          reminderTime = dt;
-                        }
-                      },
-                    ),
+                onSaved: (dt) {
+                  setState(() {
+                    reminderTime = dt;
+                  });
+                },
               ),
             ),
             // TimeInput(
@@ -262,7 +265,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 RaisedButton(
-                  onPressed: onOKClick,
+                  onPressed: onSaveClick,
                   color: color,
                   child: Text('Save'),
                 ),
@@ -300,7 +303,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   }
 
   String _getReminderText() {
-    return reminderTime != null ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime) : "Reminder";
+    //return reminderTime != null ? Constant.APP_TIME_FORMAT.format(reminderTime) : "Reminder";
+    return "Reminder";
   }
 
   void _onChangeType(dynamic value) {
@@ -338,7 +342,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
 
 
 
-  onOKClick() async {
+  onSaveClick() async {
     _formKey.currentState.save();
     if (_formKey.currentState.validate()) {
       //_formKey.currentState.save();
@@ -381,6 +385,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     if (sadhana.reminderTime != null) {
       Time time = Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
       appLocalNotification.scheduleSadhanaDailyAtTime(sadhana, time);
+    } else {
+      appLocalNotification.cancelNotification(sadhana.id);
     }
   }
 }

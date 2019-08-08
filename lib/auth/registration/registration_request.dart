@@ -178,7 +178,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         CommonFunction.alertDialog(
             context: context,
-            msg: "We will get back to you soon after review your request or You can contact to " + Constant.MBA_MAILID,
+            msg: "We will get back to you soon after reviewing your request or You can also contact " + Constant.MBA_MAILID,
             type: "success",
             doneButtonText: "OK",
             doneButtonFn: () {

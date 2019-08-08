@@ -28,19 +28,19 @@ class OnAppOpenBackgroundThread {
   OnAppOpenBackgroundThread(this.context);
 
   static void startBackgroundThread(BuildContext context) {
-    Future.delayed(Duration(seconds: 1), () => OnAppOpenBackgroundThread(context).startThread());
+    Future.delayed(Duration(seconds: 1), () => OnAppOpenBackgroundThread(context).runThread());
   }
 
-  startThread() async {
-    CommonFunction.tryCatchAsync(context, () async {
+  runThread() async {
+    await CommonFunction.tryCatchAsync(context, () async {
       if(await AppUtils.isInternetConnected()) {
         if (await AppSharedPrefUtil.isUserRegistered()) {
-          updateUserRole();
-          SyncActivityUtils.syncAllUnSyncActivity(context: context);
-          MBAScheduleCheck.getMBASchedule();
+          await updateUserRole();
+          await SyncActivityUtils.syncAllUnSyncActivity(context: context);
+          await MBAScheduleCheck.getMBASchedule();
           await checkTokenExpiration();
         }
-        AppUtils.updateInternetDate();
+        await AppUtils.updateInternetDate();
         await checkForNewAppUpdate();
       }
     });
@@ -111,8 +111,8 @@ class OnAppOpenBackgroundThread {
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       UserRole userRole = UserRole.fromJson(appResponse.data);
       if (userRole != null) {
-        AppSharedPrefUtil.saveUserRole(userRole);
-        main();
+        await AppSharedPrefUtil.saveUserRole(userRole);
+        //main();
       }
     }
   }

@@ -88,7 +88,7 @@ class SyncActivityUtils {
   static Future<bool> syncAllUnSyncActivity({bool onBackground = true, BuildContext context, bool forceSync = false}) async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       //Dummy Notification
-      await appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
+      //await appLocalNotification.showNotification("Sync is Running", "Date : ${DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now())}", id: 13232);
       bool isSynced = false;
       if (!isSyncing || forceSync) {
         try {

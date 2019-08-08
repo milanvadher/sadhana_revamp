@@ -283,7 +283,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   Widget addressForView(String title, Address address) {
     double screenWidth = MediaQuery.of(context).size.width;
     String city = address.city?.replaceAll("-", ", ");
-    String valueText = '${address.addressLine1} ${address.addressLine2} ${address.pincode} $city';
+    String valueText = '${address.addressLine1} ${address.addressLine2} $city ${address.pincode}';
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5),
       alignment: Alignment.bottomLeft,

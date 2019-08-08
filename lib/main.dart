@@ -32,11 +32,16 @@ void schedulePeriodicSync() async {
 }
 
 void syncPeriodic() async {
-  if(await AppUtils.isInternetConnected()) {
-    print('Starting periodic sync on: ' + DateFormat(Constant.APP_TIME_FORMAT).format(DateTime.now()));
-    await AppUtils.updateInternetDate();
-    await SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
+  try {
+    if(await AppUtils.isInternetConnected()) {
+      print('Starting periodic sync on: ' + Constant.APP_TIME_FORMAT.format(DateTime.now()));
+      await AppUtils.updateInternetDate();
+      await SyncActivityUtils.syncAllUnSyncActivity(onBackground: true);
+    }
+    await SyncActivityUtils.checkForSyncReminder();
+    await SyncActivityUtils.checkForFillReminder();
+  } catch(e,s) {
+    print('###### Error while background sync : $e');
+    print(s);
   }
-  await SyncActivityUtils.checkForSyncReminder();
-  await SyncActivityUtils.checkForFillReminder();
 }

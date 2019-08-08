@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Constant {
-  static final String APP_TIME_FORMAT = "hh:mm a";
+  static final DateFormat APP_TIME_FORMAT = DateFormat("hh:mm a");
   static final DateFormat APP_DATE_FORMAT = DateFormat('dd-MMM-yyyy');
   static final DateFormat SYNC_DATE_FORMAT = DateFormat('dd-MM-yy');
   static final String APP_MONTH_FORMAT = 'MMM';
