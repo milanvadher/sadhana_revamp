@@ -1,45 +1,65 @@
 import 'dart:io';
 
+import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
+import 'package:sadhana/utils/apputils.dart';
 
-class AppSetting {
+part "ws_app_setting.g.dart";
+
+@JsonSerializable()
+class WSAppSetting {
   static const int DEFAULT_EditableDays = 4;
   static const int DEFAULT_periodicSyncIntervalInMin = 5;
+
+  @JsonKey(name: 'app_version_android')
   String appVersionAndroid;
+  @JsonKey(name: 'app_version_ios')
   String appVersionIos;
-  int editableDays;
-  String serverDate;
-  int periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin;
   String get version => Platform.isIOS ? appVersionIos : appVersionAndroid;
+
+  @JsonKey(name: 'editable_days' , defaultValue: DEFAULT_EditableDays)
+  int editableDays;
+
+  @JsonKey(name: 'periodic_sync_interval', defaultValue: DEFAULT_periodicSyncIntervalInMin)
+  int periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin;
+
+  @JsonKey(name: 'allow_sync_from_server', fromJson: AppUtils.convertToIntToBool , toJson: AppUtils.convertBoolToInt)
   bool allowSyncFromServer;
-  bool forceSync;
+
+  @JsonKey(name: 'show_csv_option', fromJson: AppUtils.convertToIntToBool , toJson: AppUtils.convertBoolToInt)
   bool showCSVOption = false;
-  AppSetting(
+
+  WSAppSetting(
       {this.appVersionAndroid,
       this.appVersionIos,
       this.editableDays =  DEFAULT_EditableDays,
-      this.serverDate,
       this.periodicSyncIntervalInMin = DEFAULT_periodicSyncIntervalInMin,
       this.allowSyncFromServer = false,
       this.showCSVOption = false});
 
-  static Future<AppSetting> getDefaulServerAppSetting() async {
+  static Future<WSAppSetting> getDefaulServerAppSetting() async {
     String appVersion = await AppSettingUtil.getAppVersion();
-    return AppSetting(appVersionAndroid: appVersion, appVersionIos: appVersion);
+    return WSAppSetting(appVersionAndroid: appVersion, appVersionIos: appVersion);
   }
 
-  AppSetting.fromJson(Map<String, dynamic> json) {
+  factory WSAppSetting.fromJson(Map<String, dynamic> json) => _$WSAppSettingFromJson(json);
+  Map<String, dynamic> toJson() => _$WSAppSettingToJson(this);
+
+  @override
+  String toString() {
+    return 'WSAppSetting{appVersionAndroid: $appVersionAndroid, appVersionIos: $appVersionIos, editableDays: $editableDays, periodicSyncIntervalInMin: $periodicSyncIntervalInMin, allowSyncFromServer: $allowSyncFromServer, showCSVOption: $showCSVOption}';
+  }
+
+
+/*  WSAppSetting.fromJson(Map<String, dynamic> json) {
     appVersionAndroid = json['app_version_android'];
     appVersionIos = json['app_version_ios'];
     editableDays = json['editable_days'] ?? DEFAULT_EditableDays;
-    serverDate = json['server_date'];
     periodicSyncIntervalInMin = json['periodic_sync_interval'] ?? DEFAULT_periodicSyncIntervalInMin;
     allowSyncFromServer = false;
     if(json['allow_sync_from_server'] != null)
       allowSyncFromServer = json['allow_sync_from_server'] > 0 ? true : false;
-    forceSync = false;
-    if(json['forceSync'] != null)
-      forceSync = json['forceSync'] > 0 ? true : false;
     if(json['show_csv_option'] != null)
       showCSVOption = json['show_csv_option'] > 0 ? true : false;
   }
@@ -49,10 +69,9 @@ class AppSetting {
     data['app_version_android'] = this.appVersionAndroid;
     data['app_version_ios'] = this.appVersionIos;
     data['editable_days'] = this.editableDays;
-    data['server_date'] = this.serverDate;
+    data['periodic_sync_interval'] = this.periodicSyncIntervalInMin ?? DEFAULT_periodicSyncIntervalInMin;
     data['allow_sync_from_server'] = this.allowSyncFromServer ? 1 : 0;
-    data['forceSync'] = this.forceSync ? 1 : 0;
     data['show_csv_option'] = this.showCSVOption ? 1 : 0;
     return data;
-  }
+  }*/
 }

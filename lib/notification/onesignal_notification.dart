@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:onesignal/onesignal.dart';
-import 'package:sadhana/comman.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/model/register.dart';
 
 class OneSignalNotification {

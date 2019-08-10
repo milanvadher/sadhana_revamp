@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
@@ -32,7 +32,7 @@ class MBAScheduleCheck {
       }
       if(await AppUtils.isInternetConnected()) {
         String date = DateFormat(WSConstant.DATE_FORMAT).format(DateTime.now());
-        String center = 'Simandhar City';
+        String center = WSConstant.center_Simcity;
         Profile profile = await CacheData.getUserProfile();
         if(profile != null && AppUtils.isNullOrEmpty(profile.center))
           center = profile.center;
@@ -40,13 +40,17 @@ class MBAScheduleCheck {
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if(appResponse.status == WSConstant.SUCCESS_CODE) {
           String fileUrl = appResponse.data;
+          if(AppUtils.isNullOrEmpty(fileUrl)) {
+            CommonFunction.alertDialog(context: context, msg: "No schedule is available, Please try after some time.");
+            return null;
+          }
           String dir = await AppFileUtil.getMBAScheduleDir();
           File file = await AppFileUtil.saveImage(_apiService.getMBAScheduleAbsoluteUrl(fileUrl), dir);
-          AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);
+          await AppSharedPrefUtil.saveMBASchedule(DateTime.now(), file.path);
           return file;
         }
       } else {
-        CommonFunction.alertDialog(context: context, msg: "Please connect to internet to show MBA Schedule");
+        CommonFunction.displayInternetNotAvailableDialog(context: context);
       }
     }
     return null;

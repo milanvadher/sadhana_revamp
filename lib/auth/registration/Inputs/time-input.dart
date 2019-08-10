@@ -44,7 +44,7 @@ class TimeInput extends StatelessWidget {
           title: Text(labelText),
           trailing: Text(
                 selectedTime != null ? 
-                  DateFormat(Constant.APP_TIME_FORMAT).format(
+                  Constant.APP_TIME_FORMAT.format(
                     DateTime(
                       today.year,
                       today.month,

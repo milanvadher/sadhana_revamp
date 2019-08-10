@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/auth/profile/profile_page.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
@@ -12,7 +13,11 @@ import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
+import 'package:sadhana/widgets/action_item.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/boolean_item.dart';
+import 'package:sadhana/widgets/them_item.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 
 class AppOptions {
   AppOptions({this.theme, this.platform});
@@ -48,113 +53,14 @@ class _Heading extends StatelessWidget {
   }
 }
 
-class _ActionItem extends StatelessWidget {
-  const _ActionItem(this.icon, this.iconColor, this.text, this.onTap, this.subtitle);
-  final IconData icon;
-  final List<Color> iconColor;
-  final String text;
-  final VoidCallback onTap;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    Brightness theme = Theme.of(context).brightness;
-    return Column(
-      children: <Widget>[
-        ListTile(
-          leading: CircleAvatar(
-            child: Icon(
-              icon,
-              color: theme == Brightness.light ? iconColor[0] : iconColor[1],
-            ),
-            backgroundColor: theme == Brightness.light ? iconColor[0].withAlpha(20) : iconColor[1].withAlpha(20),
-          ),
-          title: Text(text),
-          subtitle: Text(subtitle),
-          trailing: Icon(Icons.chevron_right),
-          onTap: onTap,
-        ),
-        Divider(height: 0),
-      ],
-    );
-  }
-}
-
-class _ThemeItem extends StatelessWidget {
-  const _ThemeItem(this.options, this.onOptionsChanged);
-
-  final AppOptions options;
-  final ValueChanged<AppOptions> onOptionsChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        _BooleanItem(
-          options.theme == kDarkAppTheme ? Icons.brightness_high : Icons.brightness_low,
-          Colors.grey,
-          'Dark Theme',
-          options.theme == kDarkAppTheme,
-          (bool value) {
-            onOptionsChanged(
-              options.copyWith(
-                theme: value ? kDarkAppTheme : kLightAppTheme,
-              ),
-            );
-          },
-          switchKey: const Key('dark_theme'),
-        ),
-        Divider(height: 0),
-      ],
-    );
-  }
-}
-
-class _BooleanItem extends StatelessWidget {
-  const _BooleanItem(this.icon, this.iconColor, this.title, this.value, this.onChanged, {this.switchKey});
-
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  // [switchKey] is used for accessing the switch from driver tests.
-  final Key switchKey;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListTile(
-      leading: CircleAvatar(
-        child: Icon(
-          icon,
-          color: iconColor,
-        ),
-        backgroundColor: iconColor.withAlpha(20),
-      ),
-      title: Text(title),
-      subtitle: Text('Customise app theme'),
-      trailing: Switch(
-        key: switchKey,
-        value: value,
-        onChanged: onChanged,
-        activeColor: const Color(0xFF39CEFD),
-        activeTrackColor: isDark ? Colors.white30 : Colors.black26,
-      ),
-    );
-  }
-}
-
 class AppOptionsPage extends StatefulWidget {
-  const AppOptionsPage({
+  AppOptionsPage({
     Key key,
     this.options,
     this.onOptionsChanged,
   }) : super(key: key);
 
-  final AppOptions options;
+  AppOptions options;
   final ValueChanged<AppOptions> onOptionsChanged;
 
   @override
@@ -162,20 +68,28 @@ class AppOptionsPage extends StatefulWidget {
 }
 
 class _AppOptionsPageState extends BaseState<AppOptionsPage> {
-  bool isAllowSyncFromServer = false;
-
+  bool isAllowSyncFromServer = true;
   @override
   void initState() {
     super.initState();
-    AppSettingUtil.getServerAppSetting().then((appSetting) async{
+    AppSettingUtil.getServerAppSetting().then((appSetting) async {
       if (appSetting != null) {
-        if(await AppSharedPrefUtil.isUserRegistered()) {
+        if (await AppSharedPrefUtil.isUserRegistered()) {
           setState(() {
             isAllowSyncFromServer = appSetting.allowSyncFromServer;
           });
         }
       }
     });
+  }
+
+  loadData() async {
+    WSAppSetting appSetting = await AppSettingUtil.getServerAppSetting();
+    if (appSetting != null) {
+      if (await AppSharedPrefUtil.isUserRegistered()) {
+        isAllowSyncFromServer = appSetting.allowSyncFromServer;
+      }
+    }
   }
 
   @override
@@ -187,17 +101,18 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
       body: SafeArea(
         child: ListView(
           children: <Widget>[
+            ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', onProfile, 'View/Edit your profile', showRightIcon: true,),
+            Divider(height: 0),
             _Heading('Settings'),
             Column(
               children: <Widget>[
                 Divider(height: 0),
-                //_ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', () {}, 'View/Edit your profile'),
-                _ThemeItem(widget.options, widget.onOptionsChanged),
+                ThemeItem(widget.options, onThemeChanged),
                 isAllowSyncFromServer
-                    ? _ActionItem(Icons.cloud_download, Constant.colors[3], 'Load Data From Server', loadPreloadedActivity,
+                    ? ActionItem(Icons.cloud_download, Constant.colors[3], 'Load Data From Server', loadPreloadedActivity,
                         'Load your sadhana data from server')
                     : Container(),
-                _ActionItem(Icons.file_download, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
+                ActionItem(Icons.file_download, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
               ],
             ),
           ]..addAll(<Widget>[
@@ -205,8 +120,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               Column(
                 children: <Widget>[
                   Divider(height: 0),
-                  _ActionItem(
-                      Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug'),
+                  ActionItem(Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug', showRightIcon: true,),
                 ],
               ),
             ]),
@@ -215,8 +129,29 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
     );
   }
 
+  void onThemeChanged(AppOptions newOptions) {
+    setState(() {
+      widget.options = newOptions;
+      widget.onOptionsChanged(newOptions);
+    });
+    /*widget.onOptionsChanged(newOptions);
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        prefs.setBool('isDarkMode', newOptions.theme == kLightAppTheme ? false : true);
+      });
+    });*/
+  }
+
   void openAboutPage() {
     Navigator.pushNamed(context, About.routeName);
+  }
+
+  void onProfile() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfilePage(),
+        ));
   }
 
   void askForSyncActivity() {
@@ -232,7 +167,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
   }
 
   void loadPreloadedActivity() async {
-    if(await AppUtils.isInternetConnected()) {
+    if (await AppUtils.isInternetConnected()) {
       setState(() {
         isOverlay = true;
       });
@@ -248,9 +183,8 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         isOverlay = false;
       });
     } else {
-      CommonFunction.displayInernetNotAvailableDialog(context: context);
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
-
   }
 
   _onBackup() async {

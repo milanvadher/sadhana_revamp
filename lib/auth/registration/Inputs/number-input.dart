@@ -31,7 +31,7 @@ class NumberInput extends StatelessWidget {
           color: !enabled ? Theme.of(context).copyWith().disabledColor : Theme.of(context).textTheme.copyWith().title.color,
         ),
         decoration: InputDecoration(
-          labelText: labelText,
+          labelText: isRequiredValidation ? "$labelText *" : labelText,
           border: OutlineInputBorder(),
         ),
         initialValue: valueText,

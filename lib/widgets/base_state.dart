@@ -12,15 +12,28 @@ abstract class BaseState<T extends StatefulWidget> extends State<T> {
 
   void startLoading() {
     setState(() {
-      isOverlay = true;
+      isLoading = true;
     });
   }
 
   void stopLoading() {
     setState(() {
+      isLoading = false;
+    });
+  }
+
+  void startOverlay() {
+    setState(() {
+      isOverlay = true;
+    });
+  }
+
+  void stopOverlay() {
+    setState(() {
       isOverlay = false;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;

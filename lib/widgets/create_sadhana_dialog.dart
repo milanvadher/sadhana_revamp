@@ -6,14 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/auth/registration/Inputs/time-input.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
-import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/color_picker_dialog.dart';
 
@@ -43,15 +41,16 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   Sadhana sadhana;
   bool isPreloaded = false;
   Color color;
-  final formats = {
+  /*final formats = {
     //InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
     //InputType.date: DateFormat('yyyy-MM-dd'),
     InputType.time: DateFormat(Constant.APP_TIME_FORMAT),
   };
-  final InputType inputType = InputType.time;
+  final InputType inputType = InputType.time;*/
   DateTime reminderTime;
   AppLocalNotification appLocalNotification = new AppLocalNotification();
   String operation;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -70,27 +69,41 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;
-    if (sadhana != null)
-      color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
+    if (sadhana != null) color = theme == Brightness.light ? sadhana.lColor : sadhana.dColor;
     operation = widget.isEditMode ? 'Edit' : 'Create';
     //AppLocalNotification.initAppLocalNotification(context);
     return Scaffold(
       appBar: AppBar(
-        actionsIconTheme: Theme.of(context).copyWith().accentIconTheme.copyWith(
-            color: theme == Brightness.light ? Colors.white : Colors.black),
-        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(
-            color: theme == Brightness.light ? Colors.white : Colors.black),
+        actionsIconTheme:
+            Theme.of(context).copyWith().accentIconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
+        iconTheme: Theme.of(context).copyWith().iconTheme.copyWith(color: theme == Brightness.light ? Colors.white : Colors.black),
         backgroundColor: color,
         // centerTitle: true,
-        title: Text('$operation Sadhana',
-            style: TextStyle(
-                color:
-                    theme == Brightness.light ? Colors.white : Colors.black)),
+        title: Text('$operation Sadhana'),
       ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-          children: <Widget>[sadhanaCreateEditForm()],
+          children: <Widget>[
+            sadhana == null || !sadhana.isPreloaded ? buildBottomBar() : Container(),
+            sadhanaCreateEditForm(),
+          ],
+        ),
+      ),
+      //bottomNavigationBar: sadhana == null || !sadhana.isPreloaded ? buildBottomBar() : null,
+    );
+  }
+
+  Widget buildBottomBar() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(color: theme == Brightness.dark ? Colors.white : Colors.black),
+          children: <TextSpan>[
+            TextSpan(text: 'Note: ', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            TextSpan(text: 'This sadhana will not be synced to server.'),
+          ],
         ),
       ),
     );
@@ -125,11 +138,11 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 ? Container()
                 : RadioInput(
                     handleRadioValueChange: _onChangeType,
-                    lableText: 'Type',
+                    labelText: 'Type',
                     radioValue: radioValue,
                     radioData: [
-                      {'lable': 'Yes / No', 'value': 0},
-                      {'lable': 'Number', 'value': 1},
+                      {'label': 'Yes / No', 'value': 0},
+                      {'label': 'Number', 'value': 1},
                     ],
                   ),
             radioValue == 1
@@ -137,6 +150,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                     isRequiredValidation: true,
                     enabled: !isPreloaded,
                     labelText: 'Target',
+
                     valueText: target.toString(),
                     onSaved: (double value) {
                       target = value.toInt();
@@ -152,37 +166,38 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 child: ListTile(
                   title: const Text('Change Color'),
                   trailing: CircleAvatar(
-                    backgroundColor: theme == Brightness.light
-                        ? _mainColor[0]
-                        : _mainColor[1],
+                    backgroundColor: theme == Brightness.light ? _mainColor[0] : _mainColor[1],
                   ),
                 ),
               ),
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: DateTimePickerFormField(
-                inputType: inputType,
-                format: formats[inputType],
-                editable: false,
-                initialTime: reminderTime != null
-                    ? TimeOfDay(
-                        hour: reminderTime.hour,
-                        minute: reminderTime.minute,
-                      )
-                    : TimeOfDay(hour: 7, minute: 0),
+              child: DateTimeField(
+                format: Constant.APP_TIME_FORMAT,
+                onShowPicker: (context, currentValue) async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  if(time != null)
+                    return DateTimeField.convert(time);
+                  else
+                    return null;
+                },
+                initialValue: reminderTime,
+                readOnly: true,
+                resetIcon: Icon(Icons.delete),
                 decoration: InputDecoration(
                   labelText: _getReminderText(),
                   hasFloatingPlaceholder: false,
                   hintText: "Reminder",
                 ),
-                onChanged: (dt) => setState(
-                      () {
-                        if (dt != null) {
-                          reminderTime = dt;
-                        }
-                      },
-                    ),
+                onSaved: (dt) {
+                  setState(() {
+                    reminderTime = dt;
+                  });
+                },
               ),
             ),
             // TimeInput(
@@ -250,13 +265,9 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 RaisedButton(
-                  onPressed: onOKClick,
+                  onPressed: onSaveClick,
                   color: color,
-                  child: Text('Save',
-                      style: TextStyle(
-                          color: theme == Brightness.light
-                              ? Colors.white
-                              : Colors.black)),
+                  child: Text('Save'),
                 ),
                 OutlineButton(
                   highlightedBorderColor: color,
@@ -277,9 +288,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     bool isCheckSadhanaExist = false;
     if (!widget.isEditMode)
       isCheckSadhanaExist = true;
-    else if (sadhana != null &&
-        !AppUtils.equalsIgnoreCase(sadhana.sadhanaName, value))
-      isCheckSadhanaExist = true;
+    else if (sadhana != null && !AppUtils.equalsIgnoreCase(sadhana.sadhanaName, value)) isCheckSadhanaExist = true;
     if (isCheckSadhanaExist && AppUtils.isSadhanaExist(value)) {
       return 'Sadhana with $name name is already exists.';
     }
@@ -289,12 +298,13 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     if (value < 1) {
       return 'Invalid Target value.';
     }
+    if(value > 100)
+      return 'Max 100 value is allowed.';
   }
 
   String _getReminderText() {
-    return reminderTime != null
-        ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime)
-        : "Reminder";
+    //return reminderTime != null ? Constant.APP_TIME_FORMAT.format(reminderTime) : "Reminder";
+    return "Reminder";
   }
 
   void _onChangeType(dynamic value) {
@@ -308,8 +318,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     showDialog(
       context: context,
       builder: (_) {
-        return ColorPickerDialog.getColorPickerDialog(
-            context, _mainColor, _onColorSelected);
+        return ColorPickerDialog.getColorPickerDialog(context, _mainColor, _onColorSelected);
       },
     );
   }
@@ -331,7 +340,9 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     });
   }
 
-  onOKClick() async {
+
+
+  onSaveClick() async {
     _formKey.currentState.save();
     if (_formKey.currentState.validate()) {
       //_formKey.currentState.save();
@@ -352,11 +363,10 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
         sadhana.description = des;
         sadhana.lColor = _mainColor[0];
         sadhana.dColor = _mainColor[1];
-        sadhana.type =
-            radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
+        sadhana.type = radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
       }
       sadhana.reminderTime = reminderTime;
-      if (sadhana.type == SadhanaType.NUMBER)
+      if (sadhana.isNumeric)
         sadhana.targetValue = target;
       else
         sadhana.targetValue = 1;
@@ -373,9 +383,10 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
 
   void scheduleLocalNotification() {
     if (sadhana.reminderTime != null) {
-      Time time =
-          Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
+      Time time = Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
       appLocalNotification.scheduleSadhanaDailyAtTime(sadhana, time);
+    } else {
+      appLocalNotification.cancelNotification(sadhana.id);
     }
   }
 }

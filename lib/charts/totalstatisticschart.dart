@@ -10,20 +10,10 @@ class TotalStatisticsChart extends StatelessWidget {
   final List<charts.Series> seriesList;
   final bool animate;
   final Color color;
+
   TotalStatisticsChart(this.seriesList, this.color, {this.animate});
 
-  factory TotalStatisticsChart.withActivity(Color color, List<Activity> activities) {
-    Map<DateTime, int> countByMonth = new Map();
-    activities.forEach((activity) {
-      if (activity.sadhanaValue > 0) {
-        DateTime activityMonth = DateTime(activity.sadhanaDate.year, activity.sadhanaDate.month);
-        if (countByMonth[activityMonth] == null) {
-          countByMonth[activityMonth] = 1;
-        } else {
-          countByMonth[activityMonth] = countByMonth[activityMonth] + 1;
-        }
-      }
-    });
+  factory TotalStatisticsChart.forMonth(Color color, Map<DateTime, int> countByMonth) {
     List<TimeSeries> timeSeries = List();
     countByMonth.forEach((month, value) {
       timeSeries.add(TimeSeries(month, value));
@@ -45,7 +35,9 @@ class TotalStatisticsChart extends StatelessWidget {
       animate: false,
     );
   }
+
   DateTime today = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return new charts.TimeSeriesChart(
@@ -82,19 +74,37 @@ class TotalStatisticsChart extends StatelessWidget {
             ],
           )),
       behaviors: [
-        new charts.ChartTitle(
+        /*new charts.ChartTitle(
           'Total',
           behaviorPosition: charts.BehaviorPosition.top,
           titleOutsideJustification: charts.OutsideJustification.start,
           innerPadding: 18,
           titleStyleSpec: charts.TextStyleSpec(color: color),
-        ),
+        ),*/
         new charts.PanAndZoomBehavior(),
+        /*new charts.LinePointHighlighter(
+            showHorizontalFollowLine: charts.LinePointHighlighterFollowLineType.none,
+            showVerticalFollowLine: charts.LinePointHighlighterFollowLineType.nearest,
+            symbolRenderer: charts.RectSymbolRenderer(isSolid: true),
+        ),
+        new charts.SelectNearest(eventTrigger: charts.SelectionTrigger.tapAndDrag),
+        new charts.RangeAnnotation([
+          new charts.LineAnnotationSegment(
+            new DateTime(2019, 7, 21),
+            charts.RangeAnnotationAxisType.domain,
+            startLabel: 'Oct 4',
+            labelPosition: AnnotationLabelPosition.margin,
+          ),
+        ]),*/
+
+        //charts.RangeAnnotation([new charts.LineAnnotationSegment<num>(1, RangeAnnotationAxisType.measure)]),
       ],
       dateTimeFactory: const charts.LocalDateTimeFactory(),
-      defaultRenderer: new charts.LineRendererConfig(
+      defaultRenderer: LineRendererConfig(includePoints: true, symbolRenderer: charts.CircleSymbolRenderer(isSolid: true)),
+      /*new charts.LineRendererConfig(
         includePoints: true,
-      ),
+        symbolRenderer: charts.CircleSymbolRenderer(isSolid: true, )
+      ),*/
       selectionModels: [
         SelectionModelConfig(changedListener: (SelectionModel model) {
           if (model.hasDatumSelection) print(model.selectedSeries[0].measureFn(model.selectedDatum[0].index));

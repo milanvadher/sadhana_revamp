@@ -5,10 +5,12 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
+import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/activitydao.dart';
@@ -53,9 +55,9 @@ class HomePageState extends BaseState<HomePage> {
   DateTime today = new DateTime(now.year, now.month, now.day);
   DateTime previousMonth = DateTime(now.year, now.month - 1);
   static int durationInDays = Constant.displayDays;
-  List<Sadhana> tmpSadhanas = new List();
   List<Sadhana> sadhanas = new List();
-  double headerWidth = 150.0;
+  double headerWidth = 130.0;
+  double buttonWidth = 45;
   Brightness theme;
   BuildContext context;
   bool isSimcityMBA = false;
@@ -66,30 +68,69 @@ class HomePageState extends BaseState<HomePage> {
   int sadhanaIndex = 0;
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   bool isUserRegistered = false;
-  bool showCSVOption = false;
+  bool showOptionMenu = false;
+  bool isAttendanceCord = false;
+  UserRole role;
+
   @override
   void initState() {
     super.initState();
+    loadData();
+  }
+
+  loadData() async {
+    new Future.delayed(Duration.zero, () {
+      validateMobileDate();
+    });
     loadSadhana();
     checkSimcityMBA();
     new Future.delayed(Duration.zero, () {
-      AppUpdateCheck.startAppUpdateCheckThread(context);
+      OnAppOpenBackgroundThread.startBackgroundThread(context);
     });
     AppUtils.askForPermission();
-    AppSharedPrefUtil.isUserRegistered().then((isUserRegisterd) {
+    AppSharedPrefUtil.isUserRegistered().then((isUserRegistered) {
       setState(() {
-        this.isUserRegistered = isUserRegisterd;
+        this.isUserRegistered = isUserRegistered;
       });
     });
-    AppSettingUtil.getServerAppSetting().then((appSetting) {
+    loadUserRole();
+    /*AppSettingUtil.getServerAppSetting().then((appSetting) {
       setState(() {
         showCSVOption = appSetting.showCSVOption;
       });
-    });
-    subscribeConnnectivityChange();
+    });*/
+    subscribeConnectivityChange();
   }
 
-  void subscribeConnnectivityChange() {
+  loadUserRole() async {
+    await loadUserRoleFromServer();
+    await loadUserRoleFromSharedPref();
+  }
+
+  loadUserRoleFromSharedPref() async {
+    role = await AppSharedPrefUtil.getUserRole();
+    if (role != null) {
+      if (role.isAttendanceCord) {
+        setState(() {
+          showOptionMenu = true;
+          isAttendanceCord = true;
+        });
+      } else {
+        setState(() {
+          showOptionMenu = false;
+          isAttendanceCord = false;
+        });
+      }
+    }
+  }
+
+  loadUserRoleFromServer() async {
+    if (await AppUtils.isInternetConnected()) {
+      await CacheData.loadUserRole(context);
+    }
+  }
+
+  void subscribeConnectivityChange() {
     _connectivitySubscription = Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
   }
 
@@ -99,18 +140,21 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if (!isFirst) {
         print('on Connectivity change');
-        await AppSettingUtil.getServerAppSetting(forceFromServer: true);
-        SyncActivityUtils.syncAllUnSyncActivity(context: context);
-        if (await AppSharedPrefUtil.isUserRegistered()) {
-          MBAScheduleCheck.getMBASchedule();
-          AppUpdateCheck.startAppUpdateCheckThread(context);
+        if (await AppUtils.isInternetConnected()) {
+          await AppSettingUtil.getServerAppSetting(forceFromServer: true);
+          await OnAppOpenBackgroundThread(context).runThread();
+          //OnAppOpenBackgroundThread.startBackgroundThread(context);
+          //await AppUtils.updateInternetDate();
+          if (await AppSharedPrefUtil.isUserRegistered()) {
+            await SyncActivityUtils.syncAllUnSyncActivity(context: context);
+            //await MBAScheduleCheck.getMBASchedule();
+          }
         }
       }
       isFirst = false;
     } catch (error, s) {
-      print(error);
-      print(s);
       print("Error while sync all activity:" + error);
+      print(s);
     }
   }
 
@@ -121,7 +165,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void loadSadhana() async {
-    await AppSharedPrefUtil.getLastSyncTime();
+    await AppSharedPrefUtil.getStrLastSyncTime();
     await createPreloadedSadhana();
     await sadhanaDAO.getAll();
     setState(() {
@@ -137,7 +181,7 @@ class HomePageState extends BaseState<HomePage> {
   Future<void> createPreloadedSadhana() async {
     try {
       if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
-        startLoading();
+        startOverlay();
         Response res = await _api.getSadhanas();
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -146,13 +190,13 @@ class HomePageState extends BaseState<HomePage> {
           for (Sadhana sadhana in sadhanaList) {
             await sadhanaDAO.insertOrUpdate(sadhana);
           }
-          stopLoading();
+          stopOverlay();
           AppSharedPrefUtil.saveCreatedPreloadedSadhana(true);
           if (await AppSharedPrefUtil.isUserRegistered()) {
             askForPreloadActivity(sadhanaList);
           }
         }
-        stopLoading();
+        stopOverlay();
       }
     } catch (error, s) {
       print(error);
@@ -198,7 +242,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void loadPreloadedActivity(List<Sadhana> sadhanas) async {
-    startLoading();
+    startOverlay();
     try {
       await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
     } catch (error, s) {
@@ -206,7 +250,7 @@ class HomePageState extends BaseState<HomePage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 
   @override
@@ -237,6 +281,7 @@ class HomePageState extends BaseState<HomePage> {
                     children: _buildLeftPanel(),
                   ),
                 ),
+
                 Container(
                   width: mobileWidth - headerWidth,
                   child: Container(
@@ -264,24 +309,37 @@ class HomePageState extends BaseState<HomePage> {
         tooltip: 'Add new Sadhana',
       ),
       bottomNavigationBar: CacheData.lastSyncTime != null && isUserRegistered
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Icon(Icons.sync, size: 14),
-                SizedBox(width: 5),
-                Container(
-                    child: new RichText(
-                  text: new TextSpan(
-                    style: new TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
-                    children: <TextSpan>[
-                      new TextSpan(text: 'Last Sadhana Synced on: '),
-                      new TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                )),
+                _buildSyncStatus(),
+                SizedBox(
+                  height: 5,
+                )
               ],
             )
           : null, // It should null if container then will cover whole page
+    );
+  }
+
+  Widget _buildSyncStatus() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Icon(Icons.sync, size: 14),
+        SizedBox(width: 5),
+        Container(
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
+              children: <TextSpan>[
+                TextSpan(text: 'Last Sadhana Synced on: '),
+                TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -299,7 +357,7 @@ class HomePageState extends BaseState<HomePage> {
 
   List<Widget> _buildLeftPanel() {
     List<Widget> widgets = new List();
-    widgets.add(_mainHeaderTitle('<<' + Constant.monthName[today.month - 1] + '>>'));
+    widgets.add(_mainHeaderTitle(DateFormat.MMMM().format(today)));
     List<Widget> sadhanaHeadings = sadhanas.map((sadhana) {
       return NameHeading(headerWidth: headerWidth, sadhana: sadhana);
     }).toList();
@@ -321,7 +379,7 @@ class HomePageState extends BaseState<HomePage> {
           child: Text(
             title,
             overflow: TextOverflow.fade,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
       ),
@@ -333,7 +391,11 @@ class HomePageState extends BaseState<HomePage> {
     List<Widget> rightWidgets = new List();
     rightWidgets.add(_headerList(daysToDisplay));
     List<Widget> activityWidgets = sadhanas.map((sadhana) {
-      return SadhanaHorizontalPanel(sadhana: sadhana, daysToDisplay: daysToDisplay);
+      return SadhanaHorizontalPanel(
+        sadhana: sadhana,
+        daysToDisplay: daysToDisplay,
+        buttonWidth: buttonWidth,
+      );
     }).toList();
     rightWidgets.addAll(activityWidgets);
     return rightWidgets;
@@ -348,7 +410,7 @@ class HomePageState extends BaseState<HomePage> {
   Widget _headerListData(String weekDay, int date) {
     return Container(
       height: 60,
-      width: 48,
+      width: buttonWidth,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -380,7 +442,7 @@ class HomePageState extends BaseState<HomePage> {
   void checkSimcityMBA() async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       Profile profile = await CacheData.getUserProfile();
-      if (profile != null && AppUtils.equalsIgnoreCase('Simandhar City', profile.center)) {
+      if (profile != null && AppUtils.equalsIgnoreCase(WSConstant.center_Simcity, profile.center)) {
         setState(() {
           isSimcityMBA = true;
         });
@@ -404,15 +466,15 @@ class HomePageState extends BaseState<HomePage> {
               tooltip: 'Sync Data',
             )
           : Container(),
-      showCSVOption ?
-      PopupMenuButton(
-        onSelected: (value) {
-          handleOptionClick(value);
-        },
-        tooltip: 'Press to get more options',
-        itemBuilder: (BuildContext context) {
-          return [
-            PopupMenuItem(
+      showOptionMenu
+          ? PopupMenuButton(
+              onSelected: (value) {
+                handleOptionClick(value);
+              },
+              tooltip: 'Press to get more options',
+              itemBuilder: (BuildContext context) {
+                return [
+                  /*PopupMenuItem(
               child: ListTile(
                 trailing: Icon(Icons.save_alt, color: Colors.red),
                 title: Text('Save CSV'),
@@ -425,26 +487,36 @@ class HomePageState extends BaseState<HomePage> {
                 title: Text('Share CSV     '),
               ),
               value: 'share_excel',
-            ),
-            PopupMenuItem(
-              child: ListTile(
-                trailing: Icon(Icons.settings, color: Colors.blueGrey),
-                title: Text('Options    '),
-              ),
-              value: 'options',
-            ),
-          ];
-        },
-      ) : IconButton(
-        icon: Icon(Icons.settings),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => widget.optionsPage),
-          );
-        },
-        tooltip: 'Options',
-      )
+            ),*/
+                  PopupMenuItem(
+                    child: ListTile(
+                      trailing: Icon(Icons.settings, color: Colors.blueGrey),
+                      title: Text('Options    '),
+                    ),
+                    value: 'options',
+                  ),
+                  isAttendanceCord
+                      ? PopupMenuItem(
+                          child: ListTile(
+                            trailing: Icon(Icons.assignment_turned_in, color: Colors.blueGrey),
+                            title: Text('Attendance'),
+                          ),
+                          value: 'attendance',
+                        )
+                      : null,
+                ];
+              },
+            )
+          : IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => widget.optionsPage),
+                );
+              },
+              tooltip: 'Options',
+            )
     ];
   }
 
@@ -459,16 +531,75 @@ class HomePageState extends BaseState<HomePage> {
         onShareExcel();
         break;
       case 'options':
-        print('On press options');
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => widget.optionsPage),
         );
         break;
+      case 'order_change':
+        showChangeOrderDialog();
+        break;
       case 'attendance':
-        Navigator.pushNamed(context, AttendanceHomePage.routeName);
+        onAttendanceClick();
         break;
     }
+  }
+
+  showChangeOrderDialog() async {
+    return await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(children: <Widget>[
+            Builder(
+              builder: (BuildContext context) => Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: 12,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        title: Text("City"),
+                        onTap: () => {},
+                      );
+                    },
+                  ),
+                )
+              ]
+          ),
+            )
+          ]);
+        });
+  }
+
+  void onAttendanceClick() async {
+    startOverlay();
+    if (await AppUtils.isInternetConnected()) {
+      await CacheData.loadAttendanceData(context);
+      if (CacheData.userRole != null) {
+        loadUserRoleFromSharedPref();
+        if (isAttendanceCord) {
+          if (CacheData.isAttendanceSubmissionPending()) {
+            String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
+            CommonFunction.alertDialog(
+                context: context,
+                msg: "$strMonth month's attendance submission is pending, Please submit Attendance.",
+                doneButtonFn: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, AttendanceHomePage.routeName);
+                });
+          } else {
+            Navigator.pushNamed(context, AttendanceHomePage.routeName);
+          }
+          stopOverlay();
+        }
+      } else
+        print("User role is null");
+    } else {
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
+    }
+    stopOverlay();
   }
 
   Future<File> getGeneratedCSVPath(date) async {
@@ -481,9 +612,9 @@ class HomePageState extends BaseState<HomePage> {
     try {
       /*String filePath = '/storage/emulated/0/Sadhana/June.jpg';
       await openFile(File(filePath));*/
-      startLoading();
+      startOverlay();
       File file = await MBAScheduleCheck.getMBASchedule(context: context);
-      stopLoading();
+      stopOverlay();
       if (file != null) {
         OpenFile.open(file.path);
       }
@@ -494,23 +625,33 @@ class HomePageState extends BaseState<HomePage> {
     }
   }
 
+
+  void validateMobileDate() async {
+    if (!await OnAppOpenBackgroundThread.validateMobileDate(context)) {
+      await AppUtils.updateInternetDate();
+    } else {
+      await AppUtils.updateInternetDate();
+      await OnAppOpenBackgroundThread.validateMobileDate(context);
+    }
+  }
+
   void _onSyncClicked() async {
     //Navigator.pushNamed(context, RegistrationPage.routeName);
     try {
       if (await AppUtils.isInternetConnected()) {
-        startLoading();
+        startOverlay();
         if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
           CommonFunction.alertDialog(context: context, msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
-        CommonFunction.displayInernetNotAvailableDialog(context: context);
+        CommonFunction.displayInternetNotAvailableDialog(context: context);
       }
     } catch (error, s) {
       print(error);
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
   }
 
   void onShareExcel() {
@@ -546,6 +687,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
 /*
+List<Sadhana> tmpSadhanas = new List();
   void addSadhana({
     @required int id,
     @required SadhanaType type,

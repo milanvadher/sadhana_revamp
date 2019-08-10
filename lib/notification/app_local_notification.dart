@@ -1,12 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/model/sadhana.dart';
 
 class AppLocalNotification {
   static final AppLocalNotification _singleton = new AppLocalNotification._internal();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  AndroidNotificationDetails androidGeneralChannel = AndroidNotificationDetails(
+    "General",
+    "General",
+    "This channel is Notifcation",
+    importance: Importance.Max,
+    priority: Priority.High,
+    playSound: true,
+    color: Colors.redAccent,
+    largeIcon: "ic_notification_large_icon",
+    largeIconBitmapSource: BitmapSource.Drawable,
+    style: AndroidNotificationStyle.BigText,
+    //ongoing: true,  // Sticky Notification
+  );
+  
   BuildContext _context;
   factory AppLocalNotification() {
     return _singleton;
@@ -22,6 +37,12 @@ class AppLocalNotification {
     var initializationSettings = InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: onSelectNotification);
   }
+  
+  Future<void> showNotification(String title, String msg, {int id = 1456}) async {
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(androidGeneralChannel, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(id, title, msg, platformChannelSpecifics);
+  }
 
   Future<void> scheduleSadhanaDailyAtTime(Sadhana sadhana, Time time) async {
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
@@ -34,6 +55,7 @@ class AppLocalNotification {
       color: Colors.redAccent,
       largeIcon: "ic_notification_large_icon",
       largeIconBitmapSource: BitmapSource.Drawable,
+      style: AndroidNotificationStyle.BigText,
       //ongoing: true,  // Sticky Notification
     );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
