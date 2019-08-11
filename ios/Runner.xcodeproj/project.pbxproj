@@ -20,21 +20,21 @@
 		E509A79722BFA98D00016BE0 /* liburl_launcher.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E509A79622BFA98D00016BE0 /* liburl_launcher.a */; };
 		E51E140C22BA9A9F005032FC /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = E51E140B22BA9A9F005032FC /* NotificationService.m */; };
 		E51E141022BA9A9F005032FC /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E51E140822BA9A9F005032FC /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E53E185922FE9646006BBE09 /* libonesignal_flutter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E185822FE9646006BBE09 /* libonesignal_flutter.a */; };
+		E53E185B22FE9AA5006BBE09 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E185A22FE9AA5006BBE09 /* libFMDB.a */; };
+		E53E185D22FE9AA5006BBE09 /* libonesignal_flutter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E185C22FE9AA5006BBE09 /* libonesignal_flutter.a */; };
 		E53E733E22B94A330018211F /* Flutter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9740EEBA1CF902C7004384FC /* Flutter.framework */; };
 		E53E733F22B94A330018211F /* Flutter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9740EEBA1CF902C7004384FC /* Flutter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E53E734122B94A450018211F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E734022B94A450018211F /* SystemConfiguration.framework */; };
-		E53E734B22B952ED0018211F /* libonesignal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E734A22B952ED0018211F /* libonesignal.a */; };
 		E53E734F22B954530018211F /* liburl_launcher.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E734E22B954530018211F /* liburl_launcher.a */; };
 		E53E735122B9546E0018211F /* libpath_provider.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E735022B9546E0018211F /* libpath_provider.a */; };
 		E53E735322B954810018211F /* libpermission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E735222B954810018211F /* libpermission.a */; };
 		E53E735522B954810018211F /* libshare_extend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E735422B954810018211F /* libshare_extend.a */; };
 		E53E735722B954810018211F /* libshared_preferences.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E735622B954810018211F /* libshared_preferences.a */; };
 		E53E735922B954810018211F /* libsqflite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E735822B954810018211F /* libsqflite.a */; };
-		E53E735B22B954C80018211F /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E53E735A22B954C80018211F /* libFMDB.a */; };
 		E558611522BAA6E100E5950D /* libdevice_info.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558611422BAA6E100E5950D /* libdevice_info.a */; };
 		E558611722BAA6F400E5950D /* libconnectivity.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558611622BAA6F400E5950D /* libconnectivity.a */; };
 		E558611922BAA70D00E5950D /* libflutter_local_notifications.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558611822BAA70D00E5950D /* libflutter_local_notifications.a */; };
-		E558611B22BAA72500E5950D /* libonesignal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558611A22BAA72500E5950D /* libonesignal.a */; };
 		E558611D22BAA74100E5950D /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558611C22BAA74100E5950D /* libFMDB.a */; };
 		E558611F22BAA76900E5950D /* libpermission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558611E22BAA76900E5950D /* libpermission.a */; };
 		E558612122BAA77D00E5950D /* libopen_file.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E558612022BAA77D00E5950D /* libopen_file.a */; };
@@ -122,6 +122,9 @@
 		E53472DC22B8097E0053C518 /* onesignal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = onesignal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E53472DE22B80B760053C518 /* OneSignalNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		E53472DF22B80B920053C518 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		E53E185822FE9646006BBE09 /* libonesignal_flutter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libonesignal_flutter.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E53E185A22FE9AA5006BBE09 /* libFMDB.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libFMDB.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		E53E185C22FE9AA5006BBE09 /* libonesignal_flutter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libonesignal_flutter.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E53E734022B94A450018211F /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		E53E734A22B952ED0018211F /* libonesignal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libonesignal.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E53E734E22B954530018211F /* liburl_launcher.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = liburl_launcher.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -170,14 +173,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E53E735B22B954C80018211F /* libFMDB.a in Frameworks */,
+				E53E185B22FE9AA5006BBE09 /* libFMDB.a in Frameworks */,
+				E53E185D22FE9AA5006BBE09 /* libonesignal_flutter.a in Frameworks */,
 				E53E735322B954810018211F /* libpermission.a in Frameworks */,
 				E53E735522B954810018211F /* libshare_extend.a in Frameworks */,
 				E53E735722B954810018211F /* libshared_preferences.a in Frameworks */,
 				E53E735922B954810018211F /* libsqflite.a in Frameworks */,
 				E53E735122B9546E0018211F /* libpath_provider.a in Frameworks */,
 				E53E734F22B954530018211F /* liburl_launcher.a in Frameworks */,
-				E53E734B22B952ED0018211F /* libonesignal.a in Frameworks */,
 				E53E734122B94A450018211F /* SystemConfiguration.framework in Frameworks */,
 				3B80C3941E831B6300D905FE /* App.framework in Frameworks */,
 				E53E733E22B94A330018211F /* Flutter.framework in Frameworks */,
@@ -189,6 +192,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E53E185922FE9646006BBE09 /* libonesignal_flutter.a in Frameworks */,
 				E509A79722BFA98D00016BE0 /* liburl_launcher.a in Frameworks */,
 				E5E1346C22BD445B0022137D /* libsqflite.a in Frameworks */,
 				E5E1346A22BD43E80022137D /* libpath_provider.a in Frameworks */,
@@ -196,7 +200,6 @@
 				E558612122BAA77D00E5950D /* libopen_file.a in Frameworks */,
 				E558611F22BAA76900E5950D /* libpermission.a in Frameworks */,
 				E558611D22BAA74100E5950D /* libFMDB.a in Frameworks */,
-				E558611B22BAA72500E5950D /* libonesignal.a in Frameworks */,
 				E558611922BAA70D00E5950D /* libflutter_local_notifications.a in Frameworks */,
 				E558611722BAA6F400E5950D /* libconnectivity.a in Frameworks */,
 				E558611522BAA6E100E5950D /* libdevice_info.a in Frameworks */,
@@ -285,6 +288,9 @@
 		DF320AA6AA6069D9D60EF2F5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E53E185A22FE9AA5006BBE09 /* libFMDB.a */,
+				E53E185C22FE9AA5006BBE09 /* libonesignal_flutter.a */,
+				E53E185822FE9646006BBE09 /* libonesignal_flutter.a */,
 				E509A79622BFA98D00016BE0 /* liburl_launcher.a */,
 				E509A79422BFA4E900016BE0 /* libPods-OneSignalNotificationServiceExtension.a */,
 				E509A79222BFA4CB00016BE0 /* libPods-OneSignalNotificationServiceExtension.a */,
@@ -425,7 +431,7 @@
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = EMDJBANZF9;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -441,7 +447,7 @@
 					E51E140722BA9A9F005032FC = {
 						CreatedOnToolsVersion = 10.1;
 						DevelopmentTeam = EMDJBANZF9;
-						ProvisioningStyle = Manual;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -683,8 +689,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = ic_launcher;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = EMDJBANZF9;
 				ENABLE_BITCODE = NO;
@@ -701,7 +707,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.sheelsadhak.sadhana;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = SadhanaFlutterDistributionProfile;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -819,8 +825,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = ic_launcher;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = EMDJBANZF9;
 				ENABLE_BITCODE = NO;
@@ -841,7 +847,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.sheelsadhak.sadhana;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = SadhanaFlutterDistributionProfile;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -853,8 +859,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = ic_launcher;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = EMDJBANZF9;
 				ENABLE_BITCODE = NO;
@@ -872,7 +878,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sheelsadhak.sadhana;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = SadhanaFlutterDistributionProfile;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -887,9 +893,9 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = EMDJBANZF9;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
@@ -899,7 +905,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sheelsadhak.sadhana.OneSignalNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = SadhanaOneSignalExtnDisbnProfile;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -914,9 +920,9 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = EMDJBANZF9;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
@@ -926,7 +932,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sheelsadhak.sadhana.OneSignalNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = SadhanaOneSignalExtnDisbnProfile;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -941,9 +947,9 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = EMDJBANZF9;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
@@ -952,7 +958,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sheelsadhak.sadhana.OneSignalNotificationServiceExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = SadhanaOneSignalExtnDisbnProfile;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
