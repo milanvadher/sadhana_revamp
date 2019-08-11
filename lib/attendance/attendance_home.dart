@@ -50,6 +50,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   final GlobalKey<FormState> _attendanceForm = GlobalKey<FormState>();
   bool isReadOnly = false;
   bool isEditMode = false;
+
   @override
   void initState() {
     super.initState();
@@ -246,12 +247,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       PopupMenuButton<PopUpMenu>(
         onSelected: _onPopupSelected,
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
-              //const PopupMenuItem<PopUpMenu>(value: PopUpMenu.changeDate, child: Text('Change Date')),
-              !isSimcityGroup
-                  ? const PopupMenuItem<PopUpMenu>(value: PopUpMenu.submitAttendance, child: Text('Submit Attendance'))
-                  : null,
-              const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
-            ],
+          //const PopupMenuItem<PopUpMenu>(value: PopUpMenu.changeDate, child: Text('Change Date')),
+          !isSimcityGroup ? const PopupMenuItem<PopUpMenu>(value: PopUpMenu.submitAttendance, child: Text('Submit Attendance')) : null,
+          const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
+        ],
         //icon: Icon(Icons.menu),
       ),
     ];
@@ -259,13 +258,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   Widget _buildFloatingActionButton() {
     return Container(
-      height: 70,
-      width: MediaQuery.of(context).size.width / 2,
-      decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(80),
-      ),
+      height: 60,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           !isSimcityGroup
@@ -425,10 +420,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             children: <Widget>[
               Builder(
                 builder: (BuildContext context) => DVDForm(
-                      session: session,
-                      onDVDSubmit: _onDVDEntered,
-                      isReadOnly: isReadOnly,
-                    ),
+                  session: session,
+                  onDVDSubmit: _onDVDEntered,
+                  isReadOnly: isReadOnly,
+                ),
               )
             ],
           );
@@ -516,9 +511,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         context,
         MaterialPageRoute(
           builder: (context) => SubmitAttendancePage(
-                CacheData.pendingMonth,
-                onAttendanceSubmit: onAttendanceSubmitted,
-              ),
+            CacheData.pendingMonth,
+            onAttendanceSubmit: onAttendanceSubmitted,
+          ),
         ),
       );
     }
