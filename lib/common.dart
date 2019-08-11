@@ -38,6 +38,7 @@ class CommonFunction {
     } catch(e,s) {
       print(e);
       print(s);
+      //CommonFunction.displayErrorDialog(context: context, error: e.toString());
       CommonFunction.displayErrorDialog(context: context, error: e);
     }
   }
@@ -47,7 +48,7 @@ class CommonFunction {
     } catch(e,s) {
       print(e);
       print(s);
-      CommonFunction.displayErrorDialog(context: context, error: e);
+      CommonFunction.displayErrorDialog(context: context, error: e.toString());
     }
   }
 

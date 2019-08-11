@@ -26,7 +26,8 @@ class AppSharedPrefUtil {
   AppSharedPrefUtil._internal()*/
 
   static Future<void> loadPref() async {
-    _pref = await SharedPreferences.getInstance();
+    if(_pref != null)
+      _pref = await SharedPreferences.getInstance();
   }
 
   static Future<void> saveBoolean(String prefStr, bool isDone) async {
