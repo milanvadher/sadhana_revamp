@@ -26,7 +26,7 @@ class AppSharedPrefUtil {
   AppSharedPrefUtil._internal()*/
 
   static Future<void> loadPref() async {
-    if(_pref != null)
+    if(_pref == null)
       _pref = await SharedPreferences.getInstance();
   }
 
