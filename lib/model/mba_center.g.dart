@@ -12,5 +12,7 @@ MBACenter _$MBACenterFromJson(Map<String, dynamic> json) {
     ..title = json['center_name'] as String;
 }
 
-Map<String, dynamic> _$MBACenterToJson(MBACenter instance) =>
-    <String, dynamic>{'name': instance.name, 'center_name': instance.title};
+Map<String, dynamic> _$MBACenterToJson(MBACenter instance) => <String, dynamic>{
+      'name': instance.name,
+      'center_name': instance.title,
+    };

@@ -38,6 +38,7 @@ class ValidateInputState extends State<ValidateInput> {
           if(widget.validator != null)
             return widget.validator(value);
         }
+        return null;
       },
       onSaved: (value) {
         if (widget.onSave != null) widget.onSave(value);

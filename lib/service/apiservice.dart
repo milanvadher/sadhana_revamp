@@ -17,7 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static final _baseServerUrl = 'http://52.140.97.54'; //Test
-  // static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
+  //static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
   static final _apiUrl = '$_baseServerUrl/api/method';
 
   Map<String, String> headers = {'content-type': 'application/json'};
@@ -293,10 +293,10 @@ class ApiService {
     return res;
   }
 
-  Future<Response> deleteAttendanceSession(DateTime sessionDate) async {
-    Map<String, dynamic> data = {'session_date' : WSConstant.wsDateFormat.format(sessionDate)};
-    //Response res = await _postApi(url: '/mba.attendance.delete_attendance', data: data);
-    Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
+  Future<Response> deleteAttendanceSession(DateTime sessionDate, String group) async {
+    Map<String, dynamic> data = {'session_date' : WSConstant.wsDateFormat.format(sessionDate), 'group_name': group};
+    Response res = await _postApi(url: '/mba.attendance.delete_session', data: data);
+    //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 

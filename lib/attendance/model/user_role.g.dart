@@ -18,5 +18,5 @@ Map<String, dynamic> _$UserRoleToJson(UserRole instance) => <String, dynamic>{
       'group_title': instance.groupTitle,
       'group_name': instance.groupName,
       'role': instance.role,
-      'center': instance.center
+      'center': instance.center,
     };

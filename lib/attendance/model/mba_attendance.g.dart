@@ -15,5 +15,5 @@ MBAAttendance _$MBAAttendanceFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$MBAAttendanceToJson(MBAAttendance instance) =>
     <String, dynamic>{
       'session_date': instance.sessionDate,
-      'is_present': MBAAttendance._isPresentToJson(instance.isPresent)
+      'is_present': MBAAttendance._isPresentToJson(instance.isPresent),
     };

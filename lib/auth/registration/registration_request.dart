@@ -1,5 +1,7 @@
 // Package import
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/auth/registration/Inputs/dropdown-input.dart';
@@ -14,6 +16,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/imagepicker/image_input.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationRequestPage extends StatefulWidget {
@@ -31,6 +34,8 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   ApiService _api = new ApiService();
   RegistrationRequest request = RegistrationRequest();
   List<MBACenter> centerList;
+  bool _dadasMba;
+  File iCardPhoto;
 
   @override
   void initState() {
@@ -51,28 +56,76 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
       });
     }
     stopLoading();
+    await AppUtils.askForPermission();
   }
 
   @override
   Widget pageToDisplay() {
     return new Scaffold(
-      appBar: AppBar(
-        title: Text('Registration Request'),
-      ),
+      appBar: AppBar(title: Text('Registration Request')),
       backgroundColor: Colors.white,
       body: new Form(
         key: _formIndiaKey,
         autovalidate: _autoValidate,
         child: SafeArea(
           child: new ListView(
-            padding: EdgeInsets.only(left: 20, top: 20,bottom: 10,right: 20),
+            padding: EdgeInsets.only(left: 20, top: 20, bottom: 10, right: 20),
             children: <Widget>[
               //_titleAndLogo(),
-              _indiaLoginFields(),
+              _areyouMBA(),
+              _dadasMba == null ? Container() : _dadasMba ? buildRequestPage() : buildNonMBA(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _handleRadioValueChange(bool value) {
+    setState(() {
+      _dadasMba = value;
+    });
+  }
+
+  Widget buildNonMBA() {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+            child: Wrap(
+          runSpacing: 20,
+          alignment: WrapAlignment.center,
+          children: <Widget>[
+            Text(
+              "Currently this app is only for MBA and Sankul Bhaio",
+              style: TextStyle(color: Colors.red),
+              textScaleFactor: 1.2,
+            ),
+            RaisedButton(
+              child: Text('Back', style: TextStyle(color: Colors.white)),
+              elevation: 4.0,
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        )),
+      ),
+    );
+  }
+
+  Widget _areyouMBA() {
+    return Column(
+      children: <Widget>[
+        Text("Are you part of Dada's MBA / Sankul Bhaio?"),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(value: false, groupValue: _dadasMba, onChanged: _handleRadioValueChange),
+            Text('No', style: new TextStyle(fontSize: 16.0)),
+            Radio(value: true, groupValue: _dadasMba, onChanged: _handleRadioValueChange),
+            Text('Yes', style: new TextStyle(fontSize: 16.0)),
+          ],
+        )
+      ],
     );
   }
 
@@ -95,7 +148,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
     );
   }
 
-  Widget _indiaLoginFields() {
+  Widget buildRequestPage() {
     return Column(
       children: <Widget>[
         NumberInput(
@@ -143,6 +196,13 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           valueText: request.center ?? "",
           isRequiredValidation: true,
         ),
+        ImageInput(
+          title: 'Mahatama I-Card',
+          onImagePicked: onImagePicked,
+          image: iCardPhoto,
+          isRequired: true,
+        ),
+        SizedBox(height: 15.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -169,10 +229,25 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
     );
   }
 
+  void onImagePicked(File image) async {
+    await CommonFunction.tryCatchAsync(context, () async {
+      print('File size ${await image.length()/1024} ');
+      setState(() {
+        iCardPhoto = image;
+      });
+    });
+  }
+
   void _submitRequest() async {
     if (_formIndiaKey.currentState.validate()) {
       _formIndiaKey.currentState.save();
       startOverlay();
+      if (Platform.isAndroid)
+        request.requestSource = 'Android';
+      else
+        request.requestSource = 'iOS';
+      print('File size ${await iCardPhoto.length()/1024} ');
+      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);
       Response res = await _api.sendRequest(request);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {

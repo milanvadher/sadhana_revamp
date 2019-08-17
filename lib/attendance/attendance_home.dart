@@ -243,7 +243,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   List<Widget> _buildAction() {
     return <Widget>[
-      //(!isReadOnly & isEditMode) ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick) : Container(),
+      (!isReadOnly & isEditMode) ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick) : Container(),
       PopupMenuButton<PopUpMenu>(
         onSelected: _onPopupSelected,
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
@@ -446,7 +446,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   deleteSession() async {
     Navigator.pop(context);
     CommonFunction.tryCatchAsync(context, () async {
-      Response res = await _api.deleteAttendanceSession(session.dateTime);
+      Response res = await _api.deleteAttendanceSession(session.dateTime, _userRole.groupName);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         setState(() {

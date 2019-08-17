@@ -23,5 +23,5 @@ Map<String, dynamic> _$AttendanceSummaryToJson(AttendanceSummary instance) =>
       'last_name': instance.lastName,
       'total_session_for_mht': instance.totalAttendanceDates,
       'present_dates': instance.presentDates,
-      'less_attendance_reason': instance.lessAttendanceReason
+      'less_attendance_reason': instance.lessAttendanceReason,
     };

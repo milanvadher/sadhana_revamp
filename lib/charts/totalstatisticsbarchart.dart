@@ -52,6 +52,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   }
 
   generateSeriesList() {
+    maxValue = 0;
     List<TimeSeries> listOfTimeSeries = List();
     Map<DateTime, int> counts;
     if (widget.forHistory)

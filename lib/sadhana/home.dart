@@ -267,7 +267,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('Sadhana'),
+        title: Text('SadhanaQA'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -281,7 +281,6 @@ class HomePageState extends BaseState<HomePage> {
                     children: _buildLeftPanel(),
                   ),
                 ),
-
                 Container(
                   width: mobileWidth - headerWidth,
                   child: Container(

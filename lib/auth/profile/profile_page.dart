@@ -5,7 +5,6 @@ import 'package:sadhana/auth/profile/seva_profile_page.dart';
 import 'package:sadhana/auth/registration/family_info_widget.dart';
 import 'package:sadhana/auth/registration/personal_info_widget.dart';
 import 'package:sadhana/auth/registration/professional_info_widget.dart';
-import 'package:sadhana/auth/registration/registration.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/register.dart';
@@ -32,6 +31,7 @@ class _ProfilePageState extends BaseState<ProfilePage> {
   void initState() {
     super.initState();
     loadData();
+    _refreshFromServer(byUser: false);
   }
 
   loadData() async {
@@ -119,7 +119,7 @@ class _ProfilePageState extends BaseState<ProfilePage> {
       ),
       IconButton(
         icon: Icon(Icons.refresh),
-        onPressed: _onRefresh,
+        onPressed: _refreshFromServer,
         tooltip: 'Refresh',
       ),
       /*IconButton(
@@ -165,9 +165,10 @@ class _ProfilePageState extends BaseState<ProfilePage> {
     loadData();
   }
 
-  void _onRefresh() async {
+  void _refreshFromServer({bool byUser = true}) async {
     if (await AppUtils.isInternetConnected()) {
-      startOverlay();
+      if(byUser)
+        startOverlay();
       try {
         Response res = await api.getMBAProfile();
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -176,7 +177,8 @@ class _ProfilePageState extends BaseState<ProfilePage> {
           if (otpData != null && otpData.profile != null && otpData.profile.firstName != null) {
             mbaProfile = otpData.profile;
             await AppSharedPrefUtil.saveMBAProfile(mbaProfile);
-            CommonFunction.alertDialog(context: context, msg: "Your Profile reloaded successfully.", type: 'success');
+            if(byUser)
+              CommonFunction.alertDialog(context: context, msg: "Your Profile reloaded successfully.", type: 'success');
             loadData();
           }
         }
@@ -185,7 +187,8 @@ class _ProfilePageState extends BaseState<ProfilePage> {
       }
       stopOverlay();
     } else {
-      CommonFunction.displayInternetNotAvailableDialog(context: context);
+      if(byUser)
+        CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
   }
 }

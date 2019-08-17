@@ -13,7 +13,9 @@ RegistrationRequest _$RegistrationRequestFromJson(Map<String, dynamic> json) {
     ..center = json['center'] as String
     ..emailId = json['email'] as String
     ..firstName = json['first_name'] as String
-    ..lastName = json['last_name'] as String;
+    ..lastName = json['last_name'] as String
+    ..requestSource = json['request_source'] as String
+    ..iCardPhoto = json['icard_photo'] as String;
 }
 
 Map<String, dynamic> _$RegistrationRequestToJson(
@@ -24,5 +26,7 @@ Map<String, dynamic> _$RegistrationRequestToJson(
       'center': instance.center,
       'email': instance.emailId,
       'first_name': instance.firstName,
-      'last_name': instance.lastName
+      'last_name': instance.lastName,
+      'request_source': instance.requestSource,
+      'icard_photo': instance.iCardPhoto,
     };

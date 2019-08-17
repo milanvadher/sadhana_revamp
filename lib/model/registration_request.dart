@@ -16,6 +16,11 @@ class RegistrationRequest {
   String firstName;
   @JsonKey(name: 'last_name')
   String lastName;
+  @JsonKey(name: 'request_source')
+  String requestSource;
+  @JsonKey(name: 'icard_photo')
+  String iCardPhoto;
+
   RegistrationRequest();
 
   factory RegistrationRequest.fromJson(Map<String, dynamic> json) => _$RegistrationRequestFromJson(json);

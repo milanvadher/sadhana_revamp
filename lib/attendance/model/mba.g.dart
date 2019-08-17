@@ -7,8 +7,13 @@ part of 'mba.dart';
 // **************************************************************************
 
 MBA _$MBAFromJson(Map<String, dynamic> json) {
-  return MBA(mhtId: json['mht_id'] as String, name: json['name'] as String);
+  return MBA(
+    mhtId: json['mht_id'] as String,
+    name: json['name'] as String,
+  );
 }
 
-Map<String, dynamic> _$MBAToJson(MBA instance) =>
-    <String, dynamic>{'mht_id': instance.mhtId, 'name': instance.name};
+Map<String, dynamic> _$MBAToJson(MBA instance) => <String, dynamic>{
+      'mht_id': instance.mhtId,
+      'name': instance.name,
+    };

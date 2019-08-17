@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
@@ -30,6 +33,10 @@ class CommonFunction {
         errorHint: error,
       );
     }
+  }
+
+  static String getBase64String(File file) {
+    return base64Encode(file.readAsBytesSync());
   }
 
   static dynamic tryCatchAsync(BuildContext context, Function function, {String msg}) async {

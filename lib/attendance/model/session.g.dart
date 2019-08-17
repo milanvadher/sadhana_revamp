@@ -31,7 +31,7 @@ Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'dvd_part': instance.dvdPart,
       'remark': instance.remark,
       'session_type': instance.sessionType,
-      'attendance': instance.attendance?.map((e) => e?.toJson())?.toList()
+      'attendance': instance.attendance?.map((e) => e?.toJson())?.toList(),
     };
 
 Attendance _$AttendanceFromJson(Map<String, dynamic> json) {
@@ -49,5 +49,5 @@ Map<String, dynamic> _$AttendanceToJson(Attendance instance) =>
       'first_name': instance.firstName,
       'last_name': instance.lastName,
       'is_present': AppUtils.convertBoolToInt(instance.isPresent),
-      'absent_reason': instance.reason
+      'absent_reason': instance.reason,
     };

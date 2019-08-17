@@ -25,7 +25,7 @@ class MobileChangeRequestSuccessWidget extends StatelessWidget {
         Container(
           padding: EdgeInsets.all(10),
           child: Text(
-            'Your Request is successfully send',
+            'Your Request is successfully sent.',
             style: TextStyle(fontSize: 30),
           ),
         ),
