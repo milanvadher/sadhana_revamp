@@ -485,7 +485,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           Response res = await _api.submitAttendanceSession(session);
           AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
-            _sessionDates.add(session.dateTime);
+            setState(() {
+              _sessionDates.add(session.dateTime);
+              isEditMode = true;
+            });
             if (CacheData.pendingMonth == null) CacheData.pendingMonth = session.dateTime;
             CommonFunction.alertDialog(
                 closeable: false,
