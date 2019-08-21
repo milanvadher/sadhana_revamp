@@ -46,10 +46,17 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   SadhanaDAO sadhanaDAO = SadhanaDAO();
   static DateTime now = new DateTime.now();
   DateTime today = new DateTime(now.year, now.month, now.day);
-
+  CalendarController _calendarController;
   @override
   void initState() {
     super.initState();
+    _calendarController = CalendarController();
+  }
+
+  @override
+  void dispose() {
+    _calendarController.dispose();
+    super.dispose();
   }
 
   @override
@@ -373,13 +380,14 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
         weekendStyle: TextStyle(color: color),
         weekdayStyle: TextStyle(color: color),
       ),
-      forcedCalendarFormat: CalendarFormat.month,
-      formatAnimation: FormatAnimation.slide,
+      calendarController: _calendarController,
+      initialCalendarFormat: CalendarFormat.month,
+      availableCalendarFormats: const {CalendarFormat.month: ''},
       availableGestures: AvailableGestures.horizontalSwipe,
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarStyle: CalendarStyle(
-        todayColor: _holidays.containsKey(today) ? color : Colors.transparent,
-        todayStyle: TextStyle().copyWith(color: Colors.black),
+        //todayColor: _holidays.containsKey(today) ? color : Colors.transparent,
+        //todayStyle: TextStyle().copyWith(color: Colors.black),
         weekendStyle: TextStyle().copyWith(),
         holidayStyle: TextStyle(color: Colors.red),
         outsideHolidayStyle: TextStyle(color: Colors.green),

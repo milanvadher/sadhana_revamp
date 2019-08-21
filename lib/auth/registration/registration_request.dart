@@ -16,7 +16,6 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
-import 'package:sadhana/widgets/imagepicker/image_input.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationRequestPage extends StatefulWidget {
@@ -196,13 +195,13 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           valueText: request.center ?? "",
           isRequiredValidation: true,
         ),
-        ImageInput(
+        /*ImageInput(
           title: 'Mahatama I-Card',
           onImagePicked: onImagePicked,
           image: iCardPhoto,
           isRequired: true,
         ),
-        SizedBox(height: 15.0),
+        SizedBox(height: 15.0),*/
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
