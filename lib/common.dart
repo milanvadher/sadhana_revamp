@@ -45,8 +45,7 @@ class CommonFunction {
     } catch(e,s) {
       print(e);
       print(s);
-      //CommonFunction.displayErrorDialog(context: context, error: e.toString());
-      CommonFunction.displayErrorDialog(context: context, error: e);
+      CommonFunction.displayErrorDialog(context: context, error: e.toString());
     }
   }
   static dynamic tryCatchSync(BuildContext context, Function function, {String msg}) {

@@ -13,15 +13,17 @@ import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'app.dart';
 import 'constant/constant.dart';
 
-void main() {
-   if (!Platform.isIOS) {
-     schedulePeriodicSync();
-   }
-  initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
+Future<void> main() async {
+  await initializeDateFormatting();
+  runApp(const SadhanaApp());
+  if (!Platform.isIOS) {
+    await schedulePeriodicSync();
+  }
 }
+
 final int periodicID = 0;
 
-void schedulePeriodicSync() async {
+Future<void> schedulePeriodicSync() async {
   if(await AppSharedPrefUtil.isUserRegistered()) {
     await AndroidAlarmManager.initialize();
     WSAppSetting serverSetting = await AppSettingUtil.getServerAppSetting();

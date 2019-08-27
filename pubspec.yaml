@@ -44,7 +44,7 @@ dependencies:
   flutter_local_notifications: ^0.7.1+1
   datetime_picker_formfield: ^0.4.1
   share_extend: ^1.0.8
-  android_alarm_manager: ^0.4.1+8
+  android_alarm_manager: ^0.4.3
   connectivity: ^0.4.3+6
   package_info: ^0.4.0+3
   #onesignal: ^1.1.0
