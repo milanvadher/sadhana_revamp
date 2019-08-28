@@ -21,7 +21,7 @@ if (flutterRoot == null) {
 
 //def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 //if (flutterVersionCode == null) {
-def flutterVersionCode = '2011'
+def flutterVersionCode = '2012'
 //}
 
 //def flutterVersionName = localProperties.getProperty('flutter.versionName')
@@ -60,7 +60,7 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false
+            minifyEnabled true
             useProguard true
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -86,7 +86,7 @@ buildscript {
     dependencies {
         // ...
         // OneSignal-Gradle-Plugin
-        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.10.2, 0.99.99]'
+        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:0.12.5'
     }
 }
 //apply plugin: 'com.google.gms.google-services'

@@ -6,5 +6,6 @@ Verify Below Details
 3. SadhanaQA Title (home.dart)
 4. App Name(android:label) => Sadhana Testing
 5. Remove dummy notification
+6. main dart
 
 

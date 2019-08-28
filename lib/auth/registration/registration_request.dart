@@ -196,13 +196,13 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           valueText: request.center ?? "",
           isRequiredValidation: true,
         ),
-        ImageInput(
+        /*ImageInput(
           title: 'Mahatama I-Card',
           onImagePicked: onImagePicked,
           image: iCardPhoto,
           isRequired: true,
         ),
-        SizedBox(height: 15.0),
+        SizedBox(height: 15.0),*/
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

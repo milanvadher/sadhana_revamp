@@ -14,11 +14,11 @@ import 'app.dart';
 import 'constant/constant.dart';
 
 Future<void> main() async {
-  await initializeDateFormatting();
-  runApp(const SadhanaApp());
   if (!Platform.isIOS) {
     await schedulePeriodicSync();
   }
+  await initializeDateFormatting();
+  runApp(const SadhanaApp());
 }
 
 final int periodicID = 0;
@@ -26,9 +26,9 @@ final int periodicID = 0;
 Future<void> schedulePeriodicSync() async {
   if(await AppSharedPrefUtil.isUserRegistered()) {
     await AndroidAlarmManager.initialize();
-    WSAppSetting serverSetting = await AppSettingUtil.getServerAppSetting();
+    WSAppSetting serverSetting = await AppSharedPrefUtil.getServerSetting();
     await AndroidAlarmManager.periodic(Duration(minutes: serverSetting.periodicSyncIntervalInMin), periodicID, syncPeriodic, wakeup: true);
-    //await AndroidAlarmManager.periodic(Duration(seconds: 10), periodicID, syncPeriodic, wakeup: true);  //Dummy
+    //await AndroidAlarmManager.periodic(Duration(minutes: 1), periodicID, syncPeriodic, wakeup: true);  //Dummy
     //await AndroidAlarmManager.oneShot(const Duration(seconds: 5), oneShotID, printOneShot);
   }
 }
