@@ -18,6 +18,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/remark_picker.dart';
 import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
@@ -177,7 +178,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         child: session != null ? _buildListView() : Container(),
       )),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _buildFloatingActionButton(),
+      floatingActionButton: session != null ? _buildFloatingActionButton() : Container(),
     );
   }
 
@@ -263,15 +264,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          !isSimcityGroup
-              ? FloatingActionButton(
-                  heroTag: _dvdFormButton,
-                  onPressed: () => _onDVDClick(),
-                  backgroundColor: Colors.white,
-                  child: Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11)),
-                )
-              : Container(),
-          !isSimcityGroup ? SizedBox(width: 20) : Container(),
+          FloatingActionButton(
+            heroTag: _dvdFormButton,
+            onPressed: () => _onDVDClick(),
+            backgroundColor: Colors.white,
+            child: isSimcityGroup
+                ? Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent)
+                : Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11)),
+          ),
+          SizedBox(width: 20),
           !isReadOnly
               ? FloatingActionButton.extended(
                   heroTag: _saveButton,
@@ -410,24 +411,44 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             return new DVDForm(session: session);
           },
           fullscreenDialog: true));*/
-    await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: Center(
-              child: Text('MBA DVD Details'),
-            ),
-            children: <Widget>[
-              Builder(
-                builder: (BuildContext context) => DVDForm(
-                  session: session,
-                  onDVDSubmit: _onDVDEntered,
-                  isReadOnly: isReadOnly,
-                ),
-              )
-            ],
-          );
-        });
+    if(isSimcityGroup) {
+      showDialog<String>(
+          context: context,
+          builder: (_) {
+            return RemarkPickerDialog(
+              title: Text("Remark"),
+              remark: session.remark,
+              isEnabled: !isReadOnly,
+            );
+          }).then(onRemarkEntered);
+    } else {
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return SimpleDialog(
+              title: Center(
+                child: Text('MBA DVD Details'),
+              ),
+              children: <Widget>[
+                Builder(
+                  builder: (BuildContext context) => DVDForm(
+                    session: session,
+                    onDVDSubmit: _onDVDEntered,
+                    isReadOnly: isReadOnly,
+                  ),
+                )
+              ],
+            );
+          });
+    }
+  }
+
+  onRemarkEntered(String remark) {
+    if (!AppUtils.isNullOrEmpty(remark)) {
+      setState(() {
+        session.remark = remark;
+      });
+    }
   }
 
   void _onDVDEntered(DVDInfo dvdInfo) {
@@ -459,6 +480,12 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             msg: "Attendance deleted successfully.",
             doneButtonFn: () {
               Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AttendanceHomePage(date: selectedDate),
+                ),
+              );
             });
       }
     });

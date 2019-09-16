@@ -246,8 +246,8 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
         request.requestSource = 'Android';
       else
         request.requestSource = 'iOS';
-      print('File size ${await iCardPhoto.length()/1024} ');
-      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);
+      /*print('File size ${await iCardPhoto.length()/1024} ');
+      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);*/
       Response res = await _api.sendRequest(request);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
