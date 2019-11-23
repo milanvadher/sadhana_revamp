@@ -193,9 +193,9 @@ class SyncActivityUtils {
 
   static bool isEntryExist(Map<int, Activity> activitiesByDate, int days) {
     DateTime day = CacheData.today;
-    print('$MODULE all activity $activitiesByDate');
+    //print('$MODULE all activity $activitiesByDate');
     for (int i = 0; i < days; i++) {
-      print('$MODULE ${day.millisecondsSinceEpoch} checking date ${activitiesByDate[day.millisecondsSinceEpoch]}');
+      //print('$MODULE ${day.millisecondsSinceEpoch} checking date ${activitiesByDate[day.millisecondsSinceEpoch]}');
       Activity activity = activitiesByDate[day.millisecondsSinceEpoch];
       if (activity != null && activity.sadhanaValue > 0) return true;
       day = day.add(Duration(days: -1));

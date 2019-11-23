@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ntp/ntp.dart';
 import 'package:permission/permission.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
@@ -197,11 +198,13 @@ class AppUtils {
   }
 
   static Future<void> updateInternetDate() async {
-    if(await AppUtils.isInternetConnected()) {
-      DateTime internetDate = await NTP.now();
-      if(internetDate != null) {
-        await AppSharedPrefUtil.saveInternetDate(internetDate);
+    await CommonFunction.tryCatchAsync(null, () async {
+      if(await AppUtils.isInternetConnected()) {
+        DateTime internetDate = await NTP.now();
+        if(internetDate != null) {
+          await AppSharedPrefUtil.saveInternetDate(internetDate);
+        }
       }
-    }
+    });
   }
 }
