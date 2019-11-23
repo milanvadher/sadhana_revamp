@@ -16,6 +16,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/imagepicker/image_input.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationRequestPage extends StatefulWidget {
@@ -245,8 +246,8 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
         request.requestSource = 'Android';
       else
         request.requestSource = 'iOS';
-      print('File size ${await iCardPhoto.length()/1024} ');
-      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);
+      /*print('File size ${await iCardPhoto.length()/1024} ');
+      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);*/
       Response res = await _api.sendRequest(request);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
