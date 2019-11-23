@@ -9,6 +9,7 @@ import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/center_change_request.dart';
 import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/registration_request.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
@@ -19,6 +20,7 @@ class ApiService {
   static final _baseServerUrl = 'http://52.140.97.54'; //Test
   //static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
   static final _apiUrl = '$_baseServerUrl/api/method';
+  static final _resourceApiUrl = '$_baseServerUrl/api/resource';
 
   Map<String, String> headers = {'content-type': 'application/json'};
   bool enableMock = false;
@@ -40,9 +42,11 @@ class ApiService {
   }
 
   Future<Response> _postApi(
-      {@required String url, @required Map<String, dynamic> data}) async {
+      {@required String url,
+      @required Map<String, dynamic> data,
+      bool isResource = false}) async {
     await checkLogin();
-    String postUrl = _apiUrl + url;
+    String postUrl = isResource ? _resourceApiUrl + url : _apiUrl + url;
     await appendCommonDataToBody(data);
     String body = json.encode(data);
     print('Post Url:' + postUrl + '\tReq:' + body);
@@ -102,10 +106,18 @@ class ApiService {
 
   Future<Response> sendRequest(RegistrationRequest registrationRequest) async {
     Map<String, dynamic> data = registrationRequest.toJson();
-    Response res = await _postApi(url: '/mba.user.req_mba_registration', data: data);
+    Response res =
+        await _postApi(url: '/mba.user.req_mba_registration', data: data);
     return res;
   }
 
+  Future<Response> centerChangeRequest(
+      CenterChangeRequest centerChangeRequest) async {
+    Map<String, dynamic> data = centerChangeRequest.toJson();
+    Response res = await _postApi(
+        url: '/Center%20Change%20Request', data: data, isResource: true);
+    return res;
+  }
 
   Future<Response> changeMobile(
       String mht_id, String oldNo, String newNo) async {
@@ -244,7 +256,6 @@ class ApiService {
     }
   }
 
-
   //Attendance API
   Future<Response> getUserRole() async {
     Map<String, dynamic> data = {};
@@ -255,14 +266,16 @@ class ApiService {
 
   Future<Response> getMonthPendingForAttendance(String group) async {
     Map<String, dynamic> data = {'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.get_month_pending_for_attendance', data: data);
+    Response res = await _postApi(
+        url: '/mba.attendance.get_month_pending_for_attendance', data: data);
     //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
     return res;
   }
 
   Future<Response> getSessionDates(String group) async {
     Map<String, dynamic> data = {'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.get_session_dates', data: data);
+    Response res =
+        await _postApi(url: '/mba.attendance.get_session_dates', data: data);
     //Response res = http.Response("{\"message\":{\"data\":[\"2019-07-05\",\"2019-07-04\"]}}", 200);
     //Response res = http.Response("{\"message\":{\"msg\":\"ProgrammingError(1064, \\\"You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ') ORDER BY `first_name`' at line 1\\\")\"}}", 500);
     return res;
@@ -270,7 +283,8 @@ class ApiService {
 
   Future<Response> getMBAOfGroup(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group_name': group};
-    Response res = await _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
+    Response res =
+        await _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
     //Response res = http.Response(
     //    "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"Kanazariya\"},{\"mht_id\":\"111111\",\"first_name\":\"Divyang\",\"last_name\":\"Mistry\"},{\"mht_id\":\"222222\",\"first_name\":\"Milan\",\"last_name\":\"Vadher\"},{\"mht_id\":\"333333\",\"first_name\":\"Gaurav\",\"last_name\":\"Suri\"},{\"mht_id\":\"444444\",\"first_name\":\"Parth\",\"last_name\":\"Gudkha\"},{\"mht_id\":\"555555\",\"first_name\":\"Laxit\",\"last_name\":\"Patel\"},{\"mht_id\":\"666666\",\"first_name\":\"Vijay\",\"last_name\":\"Yadav\"}]}}",
     //    200);
@@ -279,7 +293,8 @@ class ApiService {
 
   Future<Response> getAttendanceSession(String date, String group) async {
     Map<String, dynamic> data = {'session_date': date, 'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    Response res =
+        await _postApi(url: '/mba.attendance.get_attendance', data: data);
     //Response res = http.Response(
     //    "{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}",
     //    200);
@@ -288,21 +303,28 @@ class ApiService {
 
   Future<Response> submitAttendanceSession(Session session) async {
     Map<String, dynamic> data = session.toJson();
-    Response res = await _postApi(url: '/mba.attendance.save_attendance', data: data);
+    Response res =
+        await _postApi(url: '/mba.attendance.save_attendance', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 
-  Future<Response> deleteAttendanceSession(DateTime sessionDate, String group) async {
-    Map<String, dynamic> data = {'session_date' : WSConstant.wsDateFormat.format(sessionDate), 'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.delete_session', data: data);
+  Future<Response> deleteAttendanceSession(
+      DateTime sessionDate, String group) async {
+    Map<String, dynamic> data = {
+      'session_date': WSConstant.wsDateFormat.format(sessionDate),
+      'group_name': group
+    };
+    Response res =
+        await _postApi(url: '/mba.attendance.delete_session', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 
   Future<Response> getMonthlySummary(String month, String group) async {
     Map<String, dynamic> data = {'month': month, 'group_name': group};
-    Response res = await _postApi(url: '/mba.group_api.get_monthly_summary', data: data);
+    Response res =
+        await _postApi(url: '/mba.group_api.get_monthly_summary', data: data);
     /*Response res = http.Response(
         "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\",\"totalattendancedates\":9,\"presentdates\":2,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Divyang Mistry\",\"totalattendancedates\":9,\"presentdates\":7,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Milan Vadher\",\"totalattendancedates\":9,\"presentdates\":6,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Gaurav Suri\",\"totalattendancedates\":9,\"presentdates\":9,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Parth Gudkha\",\"totalattendancedates\":9,\"presentdates\":8,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Laxit Patel\",\"totalattendancedates\":9,\"presentdates\":4,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Vijay Yadav\",\"totalattendancedates\":9,\"presentdates\":3,\"lessattendancereason\":\"\"}]}}",
         200);*/
@@ -311,27 +333,34 @@ class ApiService {
 
   Future<Response> getAttendanceSummary(String group) async {
     Map<String, dynamic> data = {'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.get_attendance_summary', data: data);
+    Response res = await _postApi(
+        url: '/mba.attendance.get_attendance_summary', data: data);
     /*Response res = http.Response(
         "{\"message\":{\"data\":{\"session_start_date\":\"2019-03-01\",\"total_attendance_dates\":3,\"details\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"\",\"present_dates\":2,\"total_attendance_dates\":3},{\"mht_id\":\"55354\",\"first_name\":\"Parth\",\"last_name\":\"Gudhka\",\"present_dates\":3,\"total_attendance_dates\":3}]}}}",
         200);*/
     return res;
   }
 
-  Future<Response> submitMontlyReport(String month, String group, List<AttendanceSummary> summary) async {
-    Map<String, dynamic> data = {'month' : month, 'group_name': group, 'less_attendance_reasons' : AttendanceSummary.toJsonList(summary)};
-    Response res = await _postApi(url: '/mba.group_api.submit_monthly_report', data: data);
+  Future<Response> submitMontlyReport(
+      String month, String group, List<AttendanceSummary> summary) async {
+    Map<String, dynamic> data = {
+      'month': month,
+      'group_name': group,
+      'less_attendance_reasons': AttendanceSummary.toJsonList(summary)
+    };
+    Response res =
+        await _postApi(url: '/mba.group_api.submit_monthly_report', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 
   Future<Response> getMBAAttendance(String mhtId, String group) async {
-    Map<String, dynamic> data = {'mba_mht_id': mhtId , 'group_name': group};
-    Response res = await _postApi(url: '/mba.attendance.get_mba_attendance', data: data);
+    Map<String, dynamic> data = {'mba_mht_id': mhtId, 'group_name': group};
+    Response res =
+        await _postApi(url: '/mba.attendance.get_mba_attendance', data: data);
     /*Response res = http.Response(
         "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"name\":\"Kamlesh Kanazariya\",\"totalattendancedates\":9,\"presentdates\":2,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Divyang Mistry\",\"totalattendancedates\":9,\"presentdates\":7,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Milan Vadher\",\"totalattendancedates\":9,\"presentdates\":6,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Gaurav Suri\",\"totalattendancedates\":9,\"presentdates\":9,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Parth Gudkha\",\"totalattendancedates\":9,\"presentdates\":8,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Laxit Patel\",\"totalattendancedates\":9,\"presentdates\":4,\"lessattendancereason\":\"\"},{\"mht_id\":\"61758\",\"name\":\"Vijay Yadav\",\"totalattendancedates\":9,\"presentdates\":3,\"lessattendancereason\":\"\"}]}}",
         200);*/
     return res;
   }
-
 }
