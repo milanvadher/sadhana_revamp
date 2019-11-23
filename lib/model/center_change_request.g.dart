@@ -11,7 +11,8 @@ CenterChangeRequest _$CenterChangeRequestFromJson(Map<String, dynamic> json) {
     ..mhtId = json['mht_id'] as String
     ..centerName = json['center_name'] as String
     ..startDate = json['start_date'] as String
-    ..reason = json['reason'] as String;
+    ..reason = json['reason'] as String
+    ..status = json['status'] as String;
 }
 
 Map<String, dynamic> _$CenterChangeRequestToJson(
@@ -21,4 +22,5 @@ Map<String, dynamic> _$CenterChangeRequestToJson(
       'center_name': instance.centerName,
       'start_date': instance.startDate,
       'reason': instance.reason,
+      'status': instance.status,
     };

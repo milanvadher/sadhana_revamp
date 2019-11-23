@@ -146,6 +146,7 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
     if (_formIndiaKey.currentState.validate()) {
       _formIndiaKey.currentState.save();
       startOverlay();
+      request.status = "New";
       Response res = await _api.centerChangeRequest(request);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {

@@ -14,6 +14,8 @@ class CenterChangeRequest {
   String startDate;
   @JsonKey(name: 'reason')
   String reason;
+  @JsonKey(name: 'status')
+  String status;
 
   CenterChangeRequest();
 
