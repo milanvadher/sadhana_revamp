@@ -46,18 +46,18 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   SadhanaDAO sadhanaDAO = SadhanaDAO();
   static DateTime now = new DateTime.now();
   DateTime today = new DateTime(now.year, now.month, now.day);
-  CalendarController _calendarController;
+  //CalendarController _calendarController;
   @override
   void initState() {
     super.initState();
-    _calendarController = CalendarController();
+    //_calendarController = CalendarController();
   }
 
-  @override
+  /*@override
   void dispose() {
     _calendarController.dispose();
     super.dispose();
-  }
+  }*/
 
   @override
   void didChangeDependencies() {

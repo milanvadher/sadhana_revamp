@@ -13,20 +13,22 @@ import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'app.dart';
 import 'constant/constant.dart';
 
-void main() {
-   if (!Platform.isIOS) {
-     schedulePeriodicSync();
-   }
-  initializeDateFormatting().then((_) => runApp(const SadhanaApp()));
+Future<void> main() async {
+  if (!Platform.isIOS) {
+    await schedulePeriodicSync();
+  }
+  await initializeDateFormatting();
+  runApp(const SadhanaApp());
 }
+
 final int periodicID = 0;
 
-void schedulePeriodicSync() async {
+Future<void> schedulePeriodicSync() async {
   if(await AppSharedPrefUtil.isUserRegistered()) {
     await AndroidAlarmManager.initialize();
-    WSAppSetting serverSetting = await AppSettingUtil.getServerAppSetting();
+    WSAppSetting serverSetting = await AppSharedPrefUtil.getServerSetting();
     await AndroidAlarmManager.periodic(Duration(minutes: serverSetting.periodicSyncIntervalInMin), periodicID, syncPeriodic, wakeup: true);
-    //await AndroidAlarmManager.periodic(Duration(seconds: 10), periodicID, syncPeriodic, wakeup: true);  //Dummy
+    //await AndroidAlarmManager.periodic(Duration(minutes: 1), periodicID, syncPeriodic, wakeup: true);  //Dummy
     //await AndroidAlarmManager.oneShot(const Duration(seconds: 5), oneShotID, printOneShot);
   }
 }
