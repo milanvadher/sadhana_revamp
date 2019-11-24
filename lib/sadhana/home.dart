@@ -71,7 +71,7 @@ class HomePageState extends BaseState<HomePage> {
   bool showOptionMenu = false;
   bool isAttendanceCord = false;
   UserRole role;
-
+  int androidVersion;
   @override
   void initState() {
     super.initState();
@@ -79,6 +79,9 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadData() async {
+    if(Platform.isAndroid) {
+      androidVersion = await AppUtils.getAndroidOSVersion();
+    }
     new Future.delayed(Duration.zero, () {
       validateMobileDate();
     });
@@ -267,7 +270,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('SadhanaQA'),
+        title: Text('Sadhana'),
         actions: _buildActions(),
       ),
       body: SafeArea(
@@ -401,9 +404,31 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   getDaysToDisplay() {
-    return List.generate(durationInDays, (int index) {
+    List<DateTime> dates =  List.generate(durationInDays, (int index) {
+      DateTime date = today.subtract(new Duration(days: index));
       return today.subtract(new Duration(days: index));
     });
+    if(androidVersion != null && androidVersion < 23) {
+      addMissing(dates);
+    }
+    return dates;
+  }
+
+  void addMissing(List<DateTime> dates) {
+    DateTime date26;
+    int index26;
+    for(int i = 0; i< dates.length - 1; i++) {
+      DateTime currentDate = dates[i];
+      DateTime nextDate = dates[i+1];
+      if(currentDate.day == 28 && nextDate.day == 26) {
+        date26 = nextDate;
+        index26 = i + 1;
+      }
+    }
+    DateTime date27 = new DateTime(date26.year, date26.month, 27);
+    if(index26 != null && date26 != null) {
+      dates.insert(index26, date27);
+    }
   }
 
   Widget _headerListData(String weekDay, int date) {
