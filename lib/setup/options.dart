@@ -7,6 +7,7 @@ import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/other/about.dart';
+import 'package:sadhana/profileSetting/centerChangeRequest.dart';
 import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/setup/themes.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
@@ -101,8 +102,9 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
       body: SafeArea(
         child: ListView(
           children: <Widget>[
-            ActionItem(Icons.person_outline, Constant.colors[0], 'Profile', onProfile, 'View/Edit your profile', showRightIcon: true,),
-            Divider(height: 0),
+            _Heading('Profile'),
+            ActionItem(Icons.person_outline, Constant.colors[0], 'Edit Profile', onProfile, 'View/Edit your profile', showRightIcon: true,),
+            ActionItem(Icons.person_outline, Constant.colors[0], 'Change Center', onChangeCenter, 'Change you center', showRightIcon: true,),
             _Heading('Settings'),
             Column(
               children: <Widget>[
@@ -151,6 +153,14 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         context,
         MaterialPageRoute(
           builder: (context) => ProfilePage(),
+        ));
+  }
+
+  void onChangeCenter() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CenterChangeRequestPage(),
         ));
   }
 
