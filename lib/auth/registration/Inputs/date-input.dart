@@ -12,12 +12,8 @@ class DateInput extends StatelessWidget {
       this.selectDate,
       this.enable = true,
       this.viewMode = false,
-<<<<<<< HEAD
-      this.viewModeTitleWidth, this.isFutureAllow = false,
-=======
       this.viewModeTitleWidth,
       this.isFutureAllow = false,
->>>>>>> branch 'development' of https://github.com/milanvadher/sadhana_revamp.git
       this.isRequiredValidation = false})
       : super(key: key);
 
@@ -29,7 +25,6 @@ class DateInput extends StatelessWidget {
   final bool viewMode;
   final bool isFutureAllow;
   final double viewModeTitleWidth;
-  final isFutureAllow;
   BuildContext context;
 
   buildDateInputPicker(BuildContext context) {
@@ -71,11 +66,7 @@ class DateInput extends StatelessWidget {
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
       firstDate: DateTime(1950, 1),
-<<<<<<< HEAD
       lastDate: isFutureAllow ? DateTime(2099, 1): DateTime.now(),
-=======
-      lastDate: isFutureAllow ? DateTime(2099,1) : DateTime.now(),
->>>>>>> branch 'development' of https://github.com/milanvadher/sadhana_revamp.git
     );
     if (picked != null && picked != selectedDate) selectDate(picked);
   }
