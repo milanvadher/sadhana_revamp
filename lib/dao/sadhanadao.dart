@@ -5,7 +5,6 @@ import 'package:sadhana/dao/basedao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
-import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/apputils.dart';
 

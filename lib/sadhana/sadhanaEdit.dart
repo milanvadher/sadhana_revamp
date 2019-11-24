@@ -1,6 +1,5 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:sadhana/charts/streak_chart.dart';
 import 'package:sadhana/charts/totalstatisticsbarchart.dart';
 import 'package:sadhana/charts/totalstatisticschart.dart';

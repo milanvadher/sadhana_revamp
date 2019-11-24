@@ -52,8 +52,8 @@ class ImagePickerHandler {
     if(image != null) {
       File croppedFile = await ImageCropper.cropImage(
         sourcePath: image.path,
-        ratioX: 1.0,
-        ratioY: 1.0,
+        //ratioX: 1.0,
+        //ratioY: 1.0,
       );
       _listener.userImage(croppedFile);
     }
