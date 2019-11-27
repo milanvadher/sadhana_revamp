@@ -86,7 +86,7 @@ class _ImageInputState extends State<ImageInput> with TickerProviderStateMixin, 
 
   void _onUploadPhotoBtnClick() async {
     await AppUtils.askForPermission();
-    if(await AppUtils.checkPermission()) {
+    if(await AppUtils.askForPermission()) {
       imagePicker.showDialog(context);
     }
   }

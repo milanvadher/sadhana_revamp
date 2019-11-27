@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:ntp/ntp.dart';
-import 'package:permission/permission.dart';
+//import 'package:permission/permission.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -111,7 +112,7 @@ class AppUtils {
     return androidInfo.version.sdkInt;
   }
 
-  static askForPermission() async {
+  /*static askForPermission() async {
     List<PermissionName> permissions = [PermissionName.Storage];
     if (Platform.isAndroid) {
       if (await getAndroidOSVersion() >= 23) {
@@ -139,6 +140,23 @@ class AppUtils {
       checkPermission = permissionStatus == PermissionStatus.allow ? true : false;
     }
     return checkPermission;
+  }*/
+
+  static Future<bool> askForPermission() async {
+    if (Platform.isAndroid) {
+      PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+      if (permission != PermissionStatus.granted) {
+        Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+        if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+          return true;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+    return false;
   }
 
   static bool isLightBrightness(BuildContext context) {

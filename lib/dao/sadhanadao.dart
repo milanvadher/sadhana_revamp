@@ -6,6 +6,7 @@ import 'package:sadhana/main.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/utils/apputils.dart';
 
 class SadhanaDAO extends BaseDAO<Sadhana> {
@@ -19,6 +20,12 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
         type: SadhanaType.BOOLEAN,
         lColor: Constant.colors[0][0],
         dColor: Constant.colors[0][1]);
+  }
+
+  SadhanaDAO();
+  @override
+  SadhanaDAO.withDBProvider(DBProvider idbProvider) : super.withDBProvider(idbProvider){
+    _activityDAO = ActivityDAO.withDBProvider(idbProvider);
   }
 
   @override

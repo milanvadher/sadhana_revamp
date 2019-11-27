@@ -5,9 +5,13 @@ import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/service/apiservice.dart';
+import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 
 class ActivityDAO extends BaseDAO<Activity> {
+  ActivityDAO();
+  @override
+  ActivityDAO.withDBProvider(DBProvider idbProvider) : super.withDBProvider(idbProvider);
   @override
   getDefaultInstance() {
     return Activity();

@@ -1,11 +1,16 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:sadhana/auth/profile/profile_page.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/dao/activitydao.dart';
+import 'package:sadhana/dao/sadhanadao.dart';
+import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/other/about.dart';
 import 'package:sadhana/profileSetting/centerChangeRequest.dart';
 import 'package:sadhana/service/dbprovider.dart';
@@ -103,8 +108,22 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         child: ListView(
           children: <Widget>[
             _Heading('Profile'),
-            ActionItem(Icons.person_outline, Constant.colors[0], 'Edit Profile', onProfile, 'View/Edit your profile', showRightIcon: true,),
-            ActionItem(Icons.person_outline, Constant.colors[0], 'Change Center', onChangeCenter, 'Change you center', showRightIcon: true,),
+            ActionItem(
+              Icons.person_outline,
+              Constant.colors[0],
+              'Edit Profile',
+              onProfile,
+              'View/Edit your profile',
+              showRightIcon: true,
+            ),
+            ActionItem(
+              Icons.person_outline,
+              Constant.colors[0],
+              'Change Center',
+              onChangeCenter,
+              'Change you center',
+              showRightIcon: true,
+            ),
             _Heading('Settings'),
             Column(
               children: <Widget>[
@@ -115,6 +134,8 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
                         'Load your sadhana data from server')
                     : Container(),
                 ActionItem(Icons.file_download, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
+                ActionItem(Icons.file_upload, Constant.colors[5], 'Import Data', _onImport,
+                    'Import Data your data which hass been taken backup. Select .db file.'),
               ],
             ),
           ]..addAll(<Widget>[
@@ -122,7 +143,14 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               Column(
                 children: <Widget>[
                   Divider(height: 0),
-                  ActionItem(Icons.info_outline, Constant.colors[12], 'About', openAboutPage, 'About Sadhana App and report bug', showRightIcon: true,),
+                  ActionItem(
+                    Icons.info_outline,
+                    Constant.colors[12],
+                    'About',
+                    openAboutPage,
+                    'About Sadhana App and report bug',
+                    showRightIcon: true,
+                  ),
                 ],
               ),
             ]),
@@ -213,6 +241,44 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
     }
     setState(() {
       isOverlay = false;
+    });
+  }
+
+  _onImport() async {
+    _openFileExplorer();
+  }
+
+  void _openFileExplorer() async {
+    await CommonFunction.tryCatchAsync(context, () async {
+      String _path = await FilePicker.getFilePath(type: FileType.ANY, fileExtension: '');
+      if (_path.endsWith(".db")) {
+        await importFile(_path);
+        CommonFunction.alertDialog(
+            context: context,
+            msg: "File Imported Successfully",
+            doneButtonFn: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
+      } else {
+        CommonFunction.alertDialog(context: context, msg: "Select Valid File which have extension .db");
+      }
+    });
+  }
+
+  void importFile(String _path) async {
+    SadhanaDAO sFileDAO = SadhanaDAO.withDBProvider(DBProvider(await DBProvider.getDB(_path)));
+    List<Sadhana> sadhanas = await sFileDAO.getAll(withAllActivity: true);
+    SadhanaDAO sadhanaDBDAO = SadhanaDAO();
+    sadhanas.forEach((sadhana) async {
+      Sadhana dbSadhana = await sadhanaDBDAO.insertOrUpdate(sadhana);
+      ActivityDAO activityDAO = ActivityDAO();
+      sadhana.activitiesByDate.removeWhere((k, v) => v.sadhanaValue <= 0);
+      sadhana.activitiesByDate.forEach((k, v) {
+        v.sadhanaId = dbSadhana.id;
+      });
+      activityDAO.batchActivityInsertForSync(sadhana, sadhana.activitiesByDate.values.toList(growable: true));
+      AppLocalNotification().scheduleSadhanaDailyAtTime(sadhana);
     });
   }
 }

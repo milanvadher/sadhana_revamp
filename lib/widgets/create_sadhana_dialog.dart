@@ -405,23 +405,13 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       else
         sadhana.targetValue = 1;
       await sadhanaDAO.insertOrUpdate(sadhana);
-      scheduleLocalNotification();
+      appLocalNotification.scheduleSadhanaDailyAtTime(sadhana);
       widget.onDone(sadhana);
       Navigator.pop(context);
     } else {
       setState(() {
         _autoValidate = true;
       });
-    }
-  }
-
-  void scheduleLocalNotification() {
-    if (sadhana.reminderTime != null) {
-      Time time =
-          Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
-      appLocalNotification.scheduleSadhanaDailyAtTime(sadhana, time);
-    } else {
-      appLocalNotification.cancelNotification(sadhana.id);
     }
   }
 }

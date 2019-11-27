@@ -7,6 +7,7 @@ import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/message_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
@@ -71,6 +72,7 @@ class AppResponseParser {
         DBProvider db = await DBProvider.db;
         db.deleteDB();
         await AppSharedPrefUtil.clear();
+        CacheData.clear();
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(

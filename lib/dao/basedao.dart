@@ -4,6 +4,10 @@ import 'package:sqflite/sqflite.dart';
 
 abstract class BaseDAO<T extends Entity> {
   DBProvider dbProvider = DBProvider.db;
+  BaseDAO();
+  BaseDAO.withDBProvider(DBProvider idbProvider){
+    this.dbProvider = idbProvider;
+  }
 
   getTableName();
 

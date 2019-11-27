@@ -107,4 +107,8 @@ class CacheData {
   static isAttendanceSubmissionPending() {
     return !userRole.isSimCityGroup && pendingMonth != null && today.month != CacheData.pendingMonth.month;
   }
+
+  static void clear() {
+    _sadhanasById = new Map();
+  }
 }

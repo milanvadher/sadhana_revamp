@@ -44,29 +44,34 @@ class AppLocalNotification {
     await flutterLocalNotificationsPlugin.show(id, title, msg, platformChannelSpecifics);
   }
 
-  Future<void> scheduleSadhanaDailyAtTime(Sadhana sadhana, Time time) async {
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      sadhana.sadhanaName,
-      sadhana.sadhanaName,
-      sadhana.description,
-      importance: Importance.Max,
-      priority: Priority.High,
-      playSound: true,
-      color: Colors.redAccent,
-      largeIcon: "ic_notification_large_icon",
-      largeIconBitmapSource: BitmapSource.Drawable,
-      style: AndroidNotificationStyle.BigText,
-      //ongoing: true,  // Sticky Notification
-    );
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.showDailyAtTime(
-      sadhana.id,
-      sadhana.sadhanaName,
-      sadhana.description,
-      time,
-      platformChannelSpecifics,
-    );
+  Future<void> scheduleSadhanaDailyAtTime(Sadhana sadhana) async {
+    if (sadhana.reminderTime != null) {
+      Time time = Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
+      var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        sadhana.sadhanaName,
+        sadhana.sadhanaName,
+        sadhana.description,
+        importance: Importance.Max,
+        priority: Priority.High,
+        playSound: true,
+        color: Colors.redAccent,
+        largeIcon: "ic_notification_large_icon",
+        largeIconBitmapSource: BitmapSource.Drawable,
+        style: AndroidNotificationStyle.BigText,
+        //ongoing: true,  // Sticky Notification
+      );
+      var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+      var platformChannelSpecifics = NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+      await flutterLocalNotificationsPlugin.showDailyAtTime(
+        sadhana.id,
+        sadhana.sadhanaName,
+        sadhana.description,
+        time,
+        platformChannelSpecifics,
+      );
+    } else {
+      cancelNotification(sadhana.id);
+    }
   }
 
   Future<void> cancelNotification(int id) async {
