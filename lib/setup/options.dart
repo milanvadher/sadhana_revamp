@@ -251,17 +251,19 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
   void _openFileExplorer() async {
     await CommonFunction.tryCatchAsync(context, () async {
       String _path = await FilePicker.getFilePath(type: FileType.ANY, fileExtension: '');
-      if (_path.endsWith(".db")) {
-        await importFile(_path);
-        CommonFunction.alertDialog(
-            context: context,
-            msg: "File Imported Successfully",
-            doneButtonFn: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            });
-      } else {
-        CommonFunction.alertDialog(context: context, msg: "Select Valid File which have extension .db");
+      if(_path != null) {
+        if (_path.endsWith(".db")) {
+          await importFile(_path);
+          CommonFunction.alertDialog(
+              context: context,
+              msg: "File Imported Successfully",
+              doneButtonFn: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
+        } else {
+          CommonFunction.alertDialog(context: context, msg: "Select Valid File which have extension .db");
+        }
       }
     });
   }
