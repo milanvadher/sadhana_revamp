@@ -115,7 +115,7 @@ class ApiService {
       CenterChangeRequest centerChangeRequest) async {
     Map<String, dynamic> data = centerChangeRequest.toJson();
     Response res = await _postApi(
-        url: '/Center%20Change%20Request', data: data, isResource: true);
+        url: '/mba.user.center_change_request', data: data, isResource: true);
     return res;
   }
 
