@@ -31,7 +31,7 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
       ),
     ),
   );
-  EventList _markedDateMap;
+  EventList<Event> _markedDateMap;
 
   @override
   void didChangeDependencies() {
@@ -44,7 +44,7 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
     isDarkTheme = AppUtils.isDarkTheme(context);
     textColor = isDarkTheme ? Colors.white : Colors.black;
     _markedDateMap = new EventList(
-      events: Map.fromIterable(widget.events != null ? widget.events : [], key: (v) => v, value: (v) => ["E"]),
+      events: Map.fromIterable(widget.events != null ? widget.events : [], key: (v) => v, value: (v) => [Event(date: v)]),
     );
     return buildDialog();
   }
