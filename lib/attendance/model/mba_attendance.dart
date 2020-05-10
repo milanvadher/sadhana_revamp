@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/utils/apputils.dart';
@@ -5,7 +7,7 @@ import 'package:sadhana/utils/apputils.dart';
 part "mba_attendance.g.dart";
 
 @JsonSerializable()
-class MBAAttendance {
+class MBAAttendance extends EventInterface{
   
   @JsonKey(name: 'session_date')
   String sessionDate;
@@ -33,5 +35,25 @@ class MBAAttendance {
   @override
   String toString() {
     return 'MBAAttendance{sessionDate: $sessionDate, isPresent: $isPresent}';
+  }
+
+  @override
+  DateTime getDate() {
+    return WSConstant.wsDateFormat.parse(sessionDate);
+  }
+
+  @override
+  Widget getDot() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget getIcon() {
+    return Container();
+  }
+
+  @override
+  String getTitle() {
+    return "Attendance";
   }
 }

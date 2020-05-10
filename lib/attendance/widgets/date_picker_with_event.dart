@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:sadhana/utils/apputils.dart';
 
 class AppCalendarCarousel extends StatefulWidget {
-  DateTime selectedDate;
+  final DateTime selectedDate;
   final List<DateTime> events;
 
   AppCalendarCarousel({Key key, this.selectedDate, this.events}) : super(key: key);
@@ -57,7 +58,7 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
   }
 
   buildCalendar() {
-    return CalendarCarousel(
+    return CalendarCarousel<Event>(
       onDayPressed: (DateTime date, List events) {
         this.setState(() => selectedDate = date);
       },

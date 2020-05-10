@@ -363,4 +363,13 @@ class ApiService {
         200);*/
     return res;
   }
+
+  Future<Response> fetchEvents({@required String groupName}) async {
+    Map<String, dynamic> data = {'group_name': groupName};
+    Response res = await _postApi(
+      url: '/mba.attendance.get_events',
+      data: data,
+    );
+    return res;
+  }
 }

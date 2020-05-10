@@ -250,7 +250,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
 
   void _openFileExplorer() async {
     await CommonFunction.tryCatchAsync(context, () async {
-      String _path = await FilePicker.getFilePath(type: FileType.ANY, fileExtension: '');
+      String _path = await FilePicker.getFilePath(type: FileType.any);
       if(_path != null) {
         if (_path.endsWith(".db")) {
           await importFile(_path);

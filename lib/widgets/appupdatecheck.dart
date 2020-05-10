@@ -41,7 +41,7 @@ class OnAppOpenBackgroundThread {
           await checkTokenExpiration();
         }
         await AppUtils.updateInternetDate();
-        await checkForNewAppUpdate();
+        // await checkForNewAppUpdate();
       }
     });
   }

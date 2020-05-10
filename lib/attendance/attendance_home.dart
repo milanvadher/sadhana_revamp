@@ -71,7 +71,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           setReadOnlyField();
         });
       } else {
-        CommonFunction.alertDialog(context: context, msg: "You don't have right for Attendance");
+        CommonFunction.alertDialog(
+            context: context, msg: "You don't have right for Attendance");
       }
     } catch (e, s) {
       print(e);
@@ -86,8 +87,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     try {
       String strDate = WSConstant.wsDateFormat.format(date);
       if (_sessionDates.contains(date)) {
-        Response res = await _api.getAttendanceSession(strDate, _userRole.groupName);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        Response res =
+            await _api.getAttendanceSession(strDate, _userRole.groupName);
+        AppResponse appResponse =
+            AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {
             session = Session.fromJson(appResponse.data);
@@ -97,12 +100,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         }
       } else {
         Response res = await _api.getMBAOfGroup(strDate, _userRole.groupName);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse =
+            AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
-          List<Attendance> attendances = Attendance.fromJsonList(appResponse.data);
-          String sessionType = isSimcityGroup ? WSConstant.sessionType_GD : WSConstant.sessionType_General;
+          List<Attendance> attendances =
+              Attendance.fromJsonList(appResponse.data);
+          String sessionType = isSimcityGroup
+              ? WSConstant.sessionType_GD
+              : WSConstant.sessionType_General;
           setState(() {
-            session = Session.fromAttendanceList(_userRole.groupName, strDate, sessionType, attendances);
+            session = Session.fromAttendanceList(
+                _userRole.groupName, strDate, sessionType, attendances);
             print('blank session' + session.toString());
           });
         }
@@ -115,11 +123,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   loadSessionDates() async {
     Response res = await _api.getSessionDates(_userRole.groupName);
-    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+    AppResponse appResponse =
+        AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
-      List<String> strDates = (appResponse.data as List)?.map((e) => e.toString())?.toList();
+      List<String> strDates =
+          (appResponse.data as List)?.map((e) => e.toString())?.toList();
       if (strDates != null)
-        strDates.forEach((str) => _sessionDates.add(AppUtils.tryParse(str, [WSConstant.DATE_FORMAT], throwErrorIfNotParse: true)));
+        strDates.forEach((str) => _sessionDates.add(AppUtils.tryParse(
+            str, [WSConstant.DATE_FORMAT],
+            throwErrorIfNotParse: true)));
     }
   }
 
@@ -133,7 +145,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   @override
   Widget pageToDisplay() {
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
+      // backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         title: InkWell(
           onTap: () => _onSelectDate(),
@@ -151,106 +163,131 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           ),
         ),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(50),
+          preferredSize: Size.fromHeight(55),
           child: Container(
-            color: Colors.blueGrey,
-            child: Card(
-              elevation: 8,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.only(top: 6, left: 20, bottom: 6),
-                    child: Text('Select All'),
-                  ),
-                  Checkbox(value: _selectAll, onChanged: isReadOnly ? null : _onSelectAll),
-                ],
+            decoration: BoxDecoration(
+              color: Colors.white30,
+              border: Border(
+                top: BorderSide(
+                  width: 0.0,
+                ),
               ),
+            ),
+            child: ListTile(
+              title: Text(
+                'Select ALL',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              trailing: Checkbox(
+                value: _selectAll,
+                onChanged: isReadOnly ? null : _onSelectAll,
+              ),
+              onTap: isReadOnly
+                  ? null
+                  : () {
+                      _onSelectAll(!_selectAll);
+                    },
+              selected: true,
             ),
           ),
         ),
         actions: _buildAction(),
       ),
       body: SafeArea(
-          child: Form(
-        key: _attendanceForm,
-        child: session != null ? _buildListView() : Container(),
-      )),
+        child: Form(
+          key: _attendanceForm,
+          child: session != null ? _buildNewListView() : Container(),
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: session != null ? _buildFloatingActionButton() : Container(),
+      floatingActionButton:
+          session != null ? _buildFloatingActionButton() : Container(),
     );
   }
 
-  Widget _buildCardView(Attendance attendance) {
-    return Container(
-      padding: EdgeInsets.only(left: 10, right: 10),
-      child: Card(
-          elevation: 5,
-          child: Column(
-            children: <Widget>[
-              ListTile(
-                dense: true,
-                title: Text(attendance.name),
-                onTap: isReadOnly
-                    ? null
-                    : () {
-                        onCheck(attendance);
-                      },
-                trailing: Checkbox(
-                  onChanged: isReadOnly
-                      ? null
-                      : (val) {
-                          onCheck(attendance);
-                        },
-                  value: attendance.isPresent,
-                ),
-              ),
-              !attendance.isPresent && isSimcityGroup
-                  ? Container(
-                      padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
-                      child: TextInputField(
-                        valueText: attendance.reason,
-                        maxLength: 125,
-                        showCounter: false,
-                        enabled: !isReadOnly,
-                        isRequiredValidation: true,
-                        labelText: "Reason for Absent",
-                        onSaved: (val) => attendance.reason = val,
-                        padding: EdgeInsets.all(0),
-                        contentPadding: EdgeInsets.all(13),
-                      ),
-                    )
-                  : Container()
-            ],
-          )),
-    );
-  }
-
-  Widget _buildListView() {
-    List<Widget> cartList = session.attendance.map((attendance) => _buildCardView(attendance)).toList();
-    cartList.add(SizedBox(height: 70));
-    return Container(
-      padding: EdgeInsets.only(top: 10),
-      child: ListView(children: [
-        Container(
-          child: Column(
-            children: cartList,
+  Widget userTile({
+    @required Attendance attendance,
+  }) {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: Text(attendance.name),
+          trailing: Checkbox(
+            onChanged: isReadOnly
+                ? null
+                : (val) {
+                    onCheck(attendance);
+                  },
+            value: attendance.isPresent,
           ),
-        )
-      ]),
+          onTap: isReadOnly
+              ? null
+              : () {
+                  onCheck(attendance);
+                },
+        ),
+        !attendance.isPresent && isSimcityGroup
+            ? Container(
+                padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+                child: TextInputField(
+                  valueText: attendance.reason,
+                  maxLength: 125,
+                  showCounter: false,
+                  enabled: !isReadOnly,
+                  isRequiredValidation: true,
+                  labelText: "Reason for Absent",
+                  onSaved: (val) => attendance.reason = val,
+                  padding: EdgeInsets.all(0),
+                  contentPadding: EdgeInsets.all(13),
+                ),
+              )
+            : Container()
+      ],
+    );
+  }
+
+  Widget _buildNewListView() {
+    return ListView.separated(
+      itemCount: session.attendance.length,
+      itemBuilder: (context, index) {
+        if (session.attendance.length - 1 == index) {
+          return Container(
+            margin: EdgeInsets.only(bottom: 80),
+            child: userTile(attendance: session.attendance[index]),
+          );
+        }
+        return userTile(attendance: session.attendance[index]);
+      },
+      separatorBuilder: (context, index) {
+        return Divider(
+          height: 0,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black,
+        );
+      },
     );
   }
 
   List<Widget> _buildAction() {
     return <Widget>[
-      (!isReadOnly & isEditMode) ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick) : Container(),
+      (!isReadOnly & isEditMode)
+          ? IconButton(icon: Icon(Icons.delete), onPressed: _onDeleteClick)
+          : Container(),
       PopupMenuButton<PopUpMenu>(
         onSelected: _onPopupSelected,
         itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
           //const PopupMenuItem<PopUpMenu>(value: PopUpMenu.changeDate, child: Text('Change Date')),
-          !isSimcityGroup ? const PopupMenuItem<PopUpMenu>(value: PopUpMenu.submitAttendance, child: Text('Submit Attendance')) : null,
-          const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
+          !isSimcityGroup
+              ? const PopupMenuItem<PopUpMenu>(
+                  value: PopUpMenu.submitAttendance,
+                  child: Text('Submit Attendance'))
+              : null,
+          const PopupMenuItem<PopUpMenu>(
+              value: PopUpMenu.attendanceSummary,
+              child: Text('Attendance Summary')),
         ],
         //icon: Icon(Icons.menu),
       ),
@@ -269,8 +306,12 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             onPressed: () => _onDVDClick(),
             backgroundColor: Colors.white,
             child: isSimcityGroup
-                ? Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent)
-                : Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11)),
+                ? Icon(Icons.chat,
+                    color: AppUtils.isNullOrEmpty(session.remark)
+                        ? Colors.red
+                        : Colors.blueAccent)
+                : Image.asset('assets/icon/iconfinder_BT_dvd_905549.png',
+                    color: Color(0xFFce0e11)),
           ),
           SizedBox(width: 20),
           !isReadOnly
@@ -288,7 +329,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   Future<void> _onSelectDate() async {
-    final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
+    final DateTime picked =
+        await showDatePickerWithEvents(context, selectedDate, _sessionDates);
     if (picked != null) {
       setState(() {
         selectedDate = picked;
@@ -316,7 +358,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   bool isSelectedDateReadOnly() {
     return CommonFunction.tryCatchSync(context, () {
       if (_userRole.isSimCityGroup) {
-        if (selectedDate.isBefore(CacheData.today.add(Duration(days: -AttendanceConstant.SIMCITY_MAX_ALLOWED))))
+        if (selectedDate.isBefore(CacheData.today
+            .add(Duration(days: -AttendanceConstant.SIMCITY_MAX_ALLOWED))))
           return true;
         else
           return false;
@@ -327,12 +370,14 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           else
             return false;
         }
-        if (CacheData.pendingMonth != null && selectedDate.month >= CacheData.pendingMonth.month)
+        if (CacheData.pendingMonth != null &&
+            selectedDate.month >= CacheData.pendingMonth.month)
           return false;
         else {
           if (CacheData.pendingMonth == null) {
             DateTime lastSubmittedMonth = getLastSubmittedMonth();
-            if (lastSubmittedMonth == null || selectedDate.month > lastSubmittedMonth.month) return false;
+            if (lastSubmittedMonth == null ||
+                selectedDate.month > lastSubmittedMonth.month) return false;
           }
         }
         return true;
@@ -377,9 +422,11 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   void onSubmitAttendanceClick() async {
     startOverlay();
     try {
-      await CacheData.loadPendingMonthForAttendance(_userRole.groupName, context);
+      await CacheData.loadPendingMonthForAttendance(
+          _userRole.groupName, context);
       if (CacheData.pendingMonth == null) {
-        CommonFunction.alertDialog(context: context, msg: "You have already submmited Attendance");
+        CommonFunction.alertDialog(
+            context: context, msg: "You have already submmited Attendance");
       } else {
         goToAttendanceSubmitPage();
       }
@@ -411,7 +458,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             return new DVDForm(session: session);
           },
           fullscreenDialog: true));*/
-    if(isSimcityGroup) {
+    if (isSimcityGroup) {
       showDialog<String>(
           context: context,
           builder: (_) {
@@ -459,7 +506,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     CommonFunction.alertDialog(
         context: context,
         title: 'Are you sure ?',
-        msg: "Do you want to delete ${Constant.APP_DATE_FORMAT.format(selectedDate)} Session?",
+        msg:
+            "Do you want to delete ${Constant.APP_DATE_FORMAT.format(selectedDate)} Session?",
         showCancelButton: true,
         doneButtonFn: deleteSession);
   }
@@ -467,8 +515,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   deleteSession() async {
     Navigator.pop(context);
     CommonFunction.tryCatchAsync(context, () async {
-      Response res = await _api.deleteAttendanceSession(session.dateTime, _userRole.groupName);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      Response res = await _api.deleteAttendanceSession(
+          session.dateTime, _userRole.groupName);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         setState(() {
           _sessionDates.remove(session.dateTime);
@@ -492,11 +542,13 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
-    if (CacheData.isAttendanceSubmissionPending() && CacheData.pendingMonth.month != selectedDate.month) {
+    if (CacheData.isAttendanceSubmissionPending() &&
+        CacheData.pendingMonth.month != selectedDate.month) {
       String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
       CommonFunction.alertDialog(
           context: context,
-          msg: "$strMonth month's attendance submission is pending, Please submit Attendance to continue.",
+          msg:
+              "$strMonth month's attendance submission is pending, Please submit Attendance to continue.",
           doneButtonFn: () {
             Navigator.pop(context);
             goToAttendanceSubmitPage();
@@ -510,13 +562,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         if (_validateDVD() && _validateAttendance()) {
           print(session);
           Response res = await _api.submitAttendanceSession(session);
-          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+          AppResponse appResponse =
+              AppResponseParser.parseResponse(res, context: context);
           if (appResponse.status == WSConstant.SUCCESS_CODE) {
             setState(() {
               _sessionDates.add(session.dateTime);
               isEditMode = true;
             });
-            if (CacheData.pendingMonth == null) CacheData.pendingMonth = session.dateTime;
+            if (CacheData.pendingMonth == null)
+              CacheData.pendingMonth = session.dateTime;
             CommonFunction.alertDialog(
                 closeable: false,
                 context: context,
@@ -551,8 +605,11 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   bool _validateDVD() {
     if (!isSimcityGroup) {
-      if (session.dvdNo == null && session.dvdPart == null && session.remark == null) {
-        CommonFunction.alertDialog(context: context, msg: "Please fill DVD Details", type: 'error');
+      if (session.dvdNo == null &&
+          session.dvdPart == null &&
+          session.remark == null) {
+        CommonFunction.alertDialog(
+            context: context, msg: "Please fill DVD Details", type: 'error');
         return false;
       }
     }
@@ -568,7 +625,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       }
     }
     if (!isAnyPresent) {
-      CommonFunction.alertDialog(context: context, msg: "One Person should be present", type: 'error');
+      CommonFunction.alertDialog(
+          context: context, msg: "One Person should be present", type: 'error');
       return false;
     }
     return true;

@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
+import 'package:sadhana/attendance/event_attendance.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/common.dart';
@@ -79,7 +80,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadData() async {
-    if(Platform.isAndroid) {
+    if (Platform.isAndroid) {
       androidVersion = await AppUtils.getAndroidOSVersion();
     }
     new Future.delayed(Duration.zero, () {
@@ -134,7 +135,8 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void subscribeConnectivityChange() {
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
+    _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen(onConnectivityChanged);
   }
 
   bool isFirst = true;
@@ -183,10 +185,12 @@ class HomePageState extends BaseState<HomePage> {
 
   Future<void> createPreloadedSadhana() async {
     try {
-      if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() && await AppUtils.isInternetConnected()) {
+      if (!await AppSharedPrefUtil.isCreatedPreloadedSadhana() &&
+          await AppUtils.isInternetConnected()) {
         startOverlay();
         Response res = await _api.getSadhanas();
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse =
+            AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           List<Sadhana> sadhanaList = Sadhana.fromJsonList(appResponse.data);
           print(sadhanaList);
@@ -247,7 +251,8 @@ class HomePageState extends BaseState<HomePage> {
   void loadPreloadedActivity(List<Sadhana> sadhanas) async {
     startOverlay();
     try {
-      await SyncActivityUtils.loadActivityFromServer(sadhanas, context: context);
+      await SyncActivityUtils.loadActivityFromServer(sadhanas,
+          context: context);
     } catch (error, s) {
       print(error);
       print(s);
@@ -259,7 +264,8 @@ class HomePageState extends BaseState<HomePage> {
   @override
   //Widget build(BuildContext context) {
   Widget pageToDisplay() {
-    if (widget.optionsPage == null) widget.optionsPage = CommonFunction.appOptionsPage;
+    if (widget.optionsPage == null)
+      widget.optionsPage = CommonFunction.appOptionsPage;
     sadhanas = CacheData.getSadhanas();
     theme = Theme.of(context).brightness;
     this.context = context;
@@ -333,10 +339,15 @@ class HomePageState extends BaseState<HomePage> {
         Container(
           child: RichText(
             text: TextSpan(
-              style: TextStyle(fontSize: 14.0, color: theme == Brightness.dark ? Colors.white : Colors.black),
+              style: TextStyle(
+                  fontSize: 14.0,
+                  color:
+                      theme == Brightness.dark ? Colors.white : Colors.black),
               children: <TextSpan>[
                 TextSpan(text: 'Last Sadhana Synced on: '),
-                TextSpan(text: '${CacheData.lastSyncTime}', style: new TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(
+                    text: '${CacheData.lastSyncTime}',
+                    style: new TextStyle(fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -404,11 +415,11 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   getDaysToDisplay() {
-    List<DateTime> dates =  List.generate(durationInDays, (int index) {
+    List<DateTime> dates = List.generate(durationInDays, (int index) {
       DateTime date = today.subtract(new Duration(days: index));
       return today.subtract(new Duration(days: index));
     });
-    if(androidVersion != null && androidVersion < 23) {
+    if (androidVersion != null && androidVersion < 23) {
       addMissing(dates);
     }
     return dates;
@@ -417,16 +428,16 @@ class HomePageState extends BaseState<HomePage> {
   void addMissing(List<DateTime> dates) {
     DateTime date26;
     int index26;
-    for(int i = 0; i< dates.length - 1; i++) {
+    for (int i = 0; i < dates.length - 1; i++) {
       DateTime currentDate = dates[i];
-      DateTime nextDate = dates[i+1];
-      if(currentDate.day == 28 && nextDate.day == 26) {
+      DateTime nextDate = dates[i + 1];
+      if (currentDate.day == 28 && nextDate.day == 26) {
         date26 = nextDate;
         index26 = i + 1;
       }
     }
     DateTime date27 = new DateTime(date26.year, date26.month, 27);
-    if(index26 != null && date26 != null) {
+    if (index26 != null && date26 != null) {
       dates.insert(index26, date27);
     }
   }
@@ -439,7 +450,10 @@ class HomePageState extends BaseState<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[Text(weekDay, textScaleFactor: 0.7), Text('$date', textScaleFactor: 0.9)],
+          children: <Widget>[
+            Text(weekDay, textScaleFactor: 0.7),
+            Text('$date', textScaleFactor: 0.9)
+          ],
         ),
       ),
     );
@@ -466,7 +480,9 @@ class HomePageState extends BaseState<HomePage> {
   void checkSimcityMBA() async {
     if (await AppSharedPrefUtil.isUserRegistered()) {
       Profile profile = await CacheData.getUserProfile();
-      if (profile != null && AppUtils.equalsIgnoreCase(WSConstant.center_Simcity, profile.center)) {
+      if (profile != null &&
+          AppUtils.equalsIgnoreCase(
+              WSConstant.center_Simcity, profile.center)) {
         setState(() {
           isSimcityMBA = true;
         });
@@ -522,12 +538,24 @@ class HomePageState extends BaseState<HomePage> {
                   isAttendanceCord
                       ? PopupMenuItem(
                           child: ListTile(
-                            trailing: Icon(Icons.assignment_turned_in, color: Colors.blueGrey),
+                            trailing: Icon(
+                              Icons.assignment_turned_in,
+                              color: Colors.blueGrey,
+                            ),
                             title: Text('Attendance'),
                           ),
                           value: 'attendance',
                         )
                       : null,
+                  PopupMenuItem(
+                    child: ListTile(
+                      trailing: Icon(
+                        Icons.event_available,
+                      ),
+                      title: Text('Event Attendance'),
+                    ),
+                    value: 'event_attendance',
+                  )
                 ];
               },
             )
@@ -566,7 +594,17 @@ class HomePageState extends BaseState<HomePage> {
       case 'attendance':
         onAttendanceClick();
         break;
+      case 'event_attendance':
+        onEventAttendanceClick();
+        break;
     }
+  }
+
+  onEventAttendanceClick() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => EventAttendance()),
+    );
   }
 
   showChangeOrderDialog() async {
@@ -575,9 +613,8 @@ class HomePageState extends BaseState<HomePage> {
         builder: (BuildContext context) {
           return SimpleDialog(children: <Widget>[
             Builder(
-              builder: (BuildContext context) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
+              builder: (BuildContext context) =>
+                  Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                 Container(
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -590,8 +627,7 @@ class HomePageState extends BaseState<HomePage> {
                     },
                   ),
                 )
-              ]
-          ),
+              ]),
             )
           ]);
         });
@@ -608,7 +644,8 @@ class HomePageState extends BaseState<HomePage> {
             String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
             CommonFunction.alertDialog(
                 context: context,
-                msg: "$strMonth month's attendance submission is pending, Please submit Attendance.",
+                msg:
+                    "$strMonth month's attendance submission is pending, Please submit Attendance.",
                 doneButtonFn: () {
                   Navigator.pop(context);
                   Navigator.pushNamed(context, AttendanceHomePage.routeName);
@@ -628,7 +665,8 @@ class HomePageState extends BaseState<HomePage> {
 
   Future<File> getGeneratedCSVPath(date) async {
     DateTime selectedMonth = date as DateTime;
-    DateTime toDate = new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
+    DateTime toDate =
+        new DateTime(selectedMonth.year, selectedMonth.month + 1, 0);
     return await AppCSVUtils.generateCSVBetween(selectedMonth, toDate);
   }
 
@@ -649,7 +687,6 @@ class HomePageState extends BaseState<HomePage> {
     }
   }
 
-
   void validateMobileDate() async {
     if (!await OnAppOpenBackgroundThread.validateMobileDate(context)) {
       await AppUtils.updateInternetDate();
@@ -664,8 +701,11 @@ class HomePageState extends BaseState<HomePage> {
     try {
       if (await AppUtils.isInternetConnected()) {
         startOverlay();
-        if (await SyncActivityUtils.syncAllUnSyncActivity(onBackground: false, context: context, forceSync: true)) {
-          CommonFunction.alertDialog(context: context, msg: "Your sadhana is successfully uploaded to server.");
+        if (await SyncActivityUtils.syncAllUnSyncActivity(
+            onBackground: false, context: context, forceSync: true)) {
+          CommonFunction.alertDialog(
+              context: context,
+              msg: "Your sadhana is successfully uploaded to server.");
         }
       } else {
         CommonFunction.displayInternetNotAvailableDialog(context: context);
@@ -679,7 +719,8 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onShareExcel() {
-    showMonthPicker(context: context, initialDate: previousMonth).then((date) => shareExcel(date));
+    showMonthPicker(context: context, initialDate: previousMonth)
+        .then((date) => shareExcel(date));
   }
 
   shareExcel(date) async {
@@ -692,7 +733,8 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   void onSaveExcel() {
-    showMonthPicker(context: context, initialDate: previousMonth).then((date) => saveExcel(date));
+    showMonthPicker(context: context, initialDate: previousMonth)
+        .then((date) => saveExcel(date));
   }
 
   saveExcel(date) async {
