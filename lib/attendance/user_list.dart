@@ -18,6 +18,7 @@ class _UserListState extends State<UserList> {
     return ListTile(
       title: Text(name),
       trailing: Checkbox(
+        activeColor: Colors.red.shade500,
         value: isChecked,
         onChanged: (value) {
           isChecked = value;
@@ -52,6 +53,8 @@ class _UserListState extends State<UserList> {
                 ),
               ),
               trailing: Checkbox(
+                activeColor: Colors.amber,
+                checkColor: Colors.black,
                 value: false,
                 onChanged: (value) {},
               ),

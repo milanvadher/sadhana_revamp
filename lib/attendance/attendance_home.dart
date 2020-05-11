@@ -181,6 +181,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 ),
               ),
               trailing: Checkbox(
+                activeColor: Colors.amber,
+                checkColor: Colors.black,
                 value: _selectAll,
                 onChanged: isReadOnly ? null : _onSelectAll,
               ),
@@ -210,46 +212,61 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Widget userTile({
     @required Attendance attendance,
   }) {
-    return Column(
-      children: <Widget>[
-        ListTile(
-          title: Text(attendance.name),
-          trailing: Checkbox(
-            onChanged: isReadOnly
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black,
+        ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(5),
+        ),
+      ),
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text(attendance.name),
+            trailing: Checkbox(
+              activeColor: Colors.red.shade500,
+              onChanged: isReadOnly
+                  ? null
+                  : (val) {
+                      onCheck(attendance);
+                    },
+              value: attendance.isPresent,
+            ),
+            onTap: isReadOnly
                 ? null
-                : (val) {
+                : () {
                     onCheck(attendance);
                   },
-            value: attendance.isPresent,
           ),
-          onTap: isReadOnly
-              ? null
-              : () {
-                  onCheck(attendance);
-                },
-        ),
-        !attendance.isPresent && isSimcityGroup
-            ? Container(
-                padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
-                child: TextInputField(
-                  valueText: attendance.reason,
-                  maxLength: 125,
-                  showCounter: false,
-                  enabled: !isReadOnly,
-                  isRequiredValidation: true,
-                  labelText: "Reason for Absent",
-                  onSaved: (val) => attendance.reason = val,
-                  padding: EdgeInsets.all(0),
-                  contentPadding: EdgeInsets.all(13),
-                ),
-              )
-            : Container()
-      ],
+          !attendance.isPresent && isSimcityGroup
+              ? Container(
+                  padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+                  child: TextInputField(
+                    valueText: attendance.reason,
+                    maxLength: 125,
+                    showCounter: false,
+                    enabled: !isReadOnly,
+                    isRequiredValidation: true,
+                    labelText: "Reason for Absent",
+                    onSaved: (val) => attendance.reason = val,
+                    padding: EdgeInsets.all(0),
+                    contentPadding: EdgeInsets.all(13),
+                  ),
+                )
+              : Container()
+        ],
+      ),
     );
   }
 
   Widget _buildNewListView() {
     return ListView.separated(
+      padding: EdgeInsets.symmetric(vertical: 12),
       itemCount: session.attendance.length,
       itemBuilder: (context, index) {
         if (session.attendance.length - 1 == index) {
@@ -261,12 +278,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         return userTile(attendance: session.attendance[index]);
       },
       separatorBuilder: (context, index) {
-        return Divider(
-          height: 0,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black,
-        );
+        return Divider();
       },
     );
   }

@@ -54,11 +54,12 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
     _userRole = await AppSharedPrefUtil.getUserRole();
     if (_userRole != null) {
       Response res = await _api.getAttendanceSummary(_userRole.groupName);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
-        if(allSummary == null)
-          allSummary = [];
+        allSummary =
+            AttendanceSummary.fromJsonList(appResponse.data['details']);
+        if (allSummary == null) allSummary = [];
         filteredSummary = allSummary;
         setTitle();
         print(filteredSummary);
@@ -71,7 +72,8 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
     if (_searchText.isNotEmpty) {
       setState(() {
         filteredSummary = filteredSummary
-            .where((summary) => summary.name.toLowerCase().contains(_searchText.toLowerCase()))
+            .where((summary) =>
+                summary.name.toLowerCase().contains(_searchText.toLowerCase()))
             .toList(growable: true);
       });
     }
@@ -104,14 +106,17 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   setTitle() {
-    _appBarTitle = AppTitleWithSubTitle(title: 'Attendance Summary', subTitle: _userRole.groupTitle,);
+    _appBarTitle = AppTitleWithSubTitle(
+      title: 'Attendance Summary',
+      subTitle: _userRole.groupTitle,
+    );
   }
 
   @override
   Widget pageToDisplay() {
     _filteredSummary();
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
+      // backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         centerTitle: true,
         title: _appBarTitle,
@@ -122,54 +127,67 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
           ),
         ],
       ),
-      body: SafeArea(child: _buildListView()),
-    );
-  }
-
-  _buildListView() {
-    return Container(
-      padding: EdgeInsets.only(top: 15),
-      child: ListView.builder(
-        itemCount: filteredSummary.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _buildCardView(filteredSummary[index]);
-        },
+      body: SafeArea(
+        child: _buildNewListView(),
       ),
     );
   }
 
-  _buildCardView(AttendanceSummary data) {
+  _buildNewListView() {
+    return ListView.separated(
+      padding: EdgeInsets.symmetric(vertical: 12),
+      separatorBuilder: (context, index) {
+        return Divider();
+      },
+      itemCount: filteredSummary.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _buildUserTile(filteredSummary[index]);
+      },
+    );
+  }
+
+  _buildUserTile(AttendanceSummary data) {
     return Container(
-      padding: EdgeInsets.only(left: 10, right: 10),
-      child: Card(
-        elevation: 5,
-        child: ListTile(
-          onTap: () {
-            onListTileClick(data);
-          },
-          contentPadding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-          dense: true,
-          title: Text(data.name),
-          trailing: Container(
-            decoration: BoxDecoration(
-              color: Colors.red.shade500,
+      margin: EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black,
+        ),
+        borderRadius: BorderRadius.all(
+          Radius.circular(5),
+        ),
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+        onTap: () {
+          onListTileClick(data);
+        },
+        title: Text(data.name),
+        trailing: Container(
+          decoration: BoxDecoration(
+            color: Colors.red.shade500,
+            borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(5),
+              topRight: Radius.circular(5),
             ),
-            width: 60,
-            height: 60,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
-                  style: TextStyle(color: Colors.white),
-                ),
-                Text(
-                  '${data.presentDates}/${data.totalAttendanceDates}',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+          ),
+          width: 60,
+          height: 60,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                '${data.presentDates}/${data.totalAttendanceDates}',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
           ),
         ),
       ),
@@ -177,8 +195,14 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   onListTileClick(AttendanceSummary summary) {
-    Navigator.push(context, MaterialPageRoute(
-      builder: (context) => MBAAttendanceHistory(mhtID: summary.mhtId, name: summary.name,),
-    ),);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MBAAttendanceHistory(
+          mhtID: summary.mhtId,
+          name: summary.name,
+        ),
+      ),
+    );
   }
 }
