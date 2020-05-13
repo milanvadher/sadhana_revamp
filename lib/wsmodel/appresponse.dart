@@ -1,3 +1,5 @@
+import 'package:sadhana/constant/wsconstants.dart';
+
 class ServerResponse {
   AppResponse appResponse;
 
@@ -36,4 +38,6 @@ class AppResponse {
     data['status'] = this.status;
     return data;
   }
+
+  bool get isSuccess => status == WSConstant.SUCCESS_CODE;
 }

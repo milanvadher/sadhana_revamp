@@ -3,6 +3,7 @@ import 'package:flutter_calendar_carousel/classes/event_list.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel;
 import 'package:http/http.dart';
 import 'package:sadhana/attendance/model/mba_attendance.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -29,7 +30,7 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
     MBAAttendance.name("2019-07-11", false),
     MBAAttendance.name("2019-07-12", true),
   ];*/
-  UserRole _userRole;
+  UserAccess _userAccess;
   ApiService _api = ApiService();
   EventList<MBAAttendance> _markedDateMap;
   var len = 9;
@@ -44,9 +45,9 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
   loadData() async {
     startLoading();
     try {
-      _userRole = await AppSharedPrefUtil.getUserRole();
-      if (_userRole != null) {
-        Response res = await _api.getMBAAttendance(widget.mhtID, _userRole.groupName);
+      _userAccess = await AppSharedPrefUtil.getUserAccess();
+      if (_userAccess != null) {
+        Response res = await _api.getMBAAttendance(widget.mhtID, _userAccess.fillAttendanceData.groupName);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
+import 'package:sadhana/attendance/model/event.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -114,11 +115,21 @@ class ApiService {
   Future<Response> centerChangeRequest(
       CenterChangeRequest centerChangeRequest) async {
     Map<String, dynamic> data = centerChangeRequest.toJson();
-    Response res = await _postApi(
-        url: '/mba.user.center_change_request', data: data, isResource: true);
-    return res;
+    String body = json.encode(data);
+    print('Post Url:' + "mba.user.center_change_request" + '\tReq:' + body);
+    //Response res = await _postApi(
+    //    url: '/mba.user.center_change_request', data: data, isResource: true);
+    return Response("", 200);
   }
 
+  Future<Response> getCenterChangeRequest() async {
+    Map<String, dynamic> data = {};
+    String body = json.encode(data);
+    print('Post Url:' + "mba.user.center_change_request" + '\tReq:' + body);
+    //Response res = await _postApi(
+    //    url: '/mba.user.get_center_change_request', data: data, isResource: true);
+    return Response("", 200);
+  }
   Future<Response> changeMobile(
       String mht_id, String oldNo, String newNo) async {
     Map<String, dynamic> data = {
@@ -264,16 +275,26 @@ class ApiService {
     return res;
   }
 
-  Future<Response> getMonthPendingForAttendance(String group) async {
-    Map<String, dynamic> data = {'group_name': group};
+  Future<Response> getUserAccess() async {
+    Map<String, dynamic> data = {};
+    Response res = await _postApi(url: '/mba.user.get_user_access', data: data);
+    String changedRes = res.body.replaceAll(":{\"f", ":{\"data\":{\"f").replaceAll("}}}", "}}}}");
+    print("changed res:" + changedRes);
+    Response res1 = http.Response(changedRes,200);
+    //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
+    return res1;
+  }
+
+  Future<Response> getMonthPendingForAttendance(String group, String eventName) async {
+    Map<String, dynamic> data = {'group_name': group, "event_name": eventName};
     Response res = await _postApi(
         url: '/mba.attendance.get_month_pending_for_attendance', data: data);
     //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
     return res;
   }
 
-  Future<Response> getSessionDates(String group) async {
-    Map<String, dynamic> data = {'group_name': group};
+  Future<Response> getSessionDates(String group, String eventName) async {
+    Map<String, dynamic> data = {'group_name': group, "event_name": eventName};
     Response res =
         await _postApi(url: '/mba.attendance.get_session_dates', data: data);
     //Response res = http.Response("{\"message\":{\"data\":[\"2019-07-05\",\"2019-07-04\"]}}", 200);
@@ -291,20 +312,30 @@ class ApiService {
     return res;
   }
 
-  Future<Response> getAttendanceSession(String date, String group) async {
-    Map<String, dynamic> data = {'session_date': date, 'group_name': group};
+  Future<Response> getAttendanceSession(String group, String eventName, String eventType, {String sessionName}) async {
+    Map<String, dynamic> data = {'session_name': sessionName, 'group_name': group, 'event_name' : eventName, 'event_type' : eventType};
+
     Response res =
-        await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    await _postApi(url: '/mba.attendance.get_attendance', data: data);
+    String changedRes = res.body.replaceAll("attendances", "attendance").replaceAll(":{\"ses", ":{\"data\":{\"ses").replaceAll(":{\"nam", ":{\"data\":{\"nam").replaceAll("]}]}}", "]}]}}}");
+    print("changed res:" + changedRes);
+    Response res1 = http.Response(changedRes,200);
     //Response res = http.Response(
     //    "{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}",
     //    200);
-    return res;
+    return res1;
   }
 
-  Future<Response> submitAttendanceSession(Session session) async {
-    Map<String, dynamic> data = session.toJson();
-    Response res =
-        await _postApi(url: '/mba.attendance.save_attendance', data: data);
+  Future<Response> getSessionAttendance(String sessionName, String group, String eventName, String eventType) async {
+    return getAttendanceSession(group, eventName, eventType, sessionName: sessionName);
+  }
+  Future<Response> getEventAttendance(String group, String eventName, String eventType) async {
+    return getAttendanceSession(group, eventName, eventType);
+  }
+
+  Future<Response> submitAttendanceSession(Event event) async {
+    Map<String, dynamic> data = event.toJson();
+    Response res = await _postApi(url: '/mba.attendance.save_attendance', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
@@ -366,10 +397,10 @@ class ApiService {
 
   Future<Response> fetchEvents({@required String groupName}) async {
     Map<String, dynamic> data = {'group_name': groupName};
-    Response res = await _postApi(
-      url: '/mba.attendance.get_events',
-      data: data,
-    );
-    return res;
+    Response res = await _postApi(url: '/mba.attendance.get_events', data: data);
+    String changedRes = res.body.replaceAll(":[{", ":{\"data\":[{").replaceAll("}]}", "}]}}");
+    print("changed res:" + changedRes);
+    Response res1 = http.Response(changedRes,200);
+    return res1;
   }
 }

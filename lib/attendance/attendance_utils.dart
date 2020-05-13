@@ -9,8 +9,8 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 class AttendanceUtils {
   static ApiService _api = ApiService();
 
-  static Future<DateTime> getAttendanceMonthPending(String group, BuildContext context) async {
-    Response res = await _api.getMonthPendingForAttendance(group);
+  static Future<DateTime> getAttendanceMonthPending(String group, String event_name, BuildContext context) async {
+    Response res = await _api.getMonthPendingForAttendance(group, event_name);
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       if (!AppUtils.isNullOrEmpty(appResponse.data)) {

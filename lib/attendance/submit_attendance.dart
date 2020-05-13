@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
+import 'package:sadhana/attendance/model/fill_attendance_data.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/common.dart';
@@ -30,7 +32,8 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
   ApiService _api = ApiService();
   List<AttendanceSummary> summary = new List();
   final GlobalKey<FormState> _submitForm = GlobalKey<FormState>();
-  UserRole _userRole;
+  UserAccess _userAccess;
+  FillAttendanceData _fillAttendanceData;
   Color textColor;
   String wsMonth;
   String strMonth;
@@ -49,14 +52,15 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
   void loadData() async {
     startLoading();
     try {
-      _userRole = await AppSharedPrefUtil.getUserRole();
-      if (_userRole != null) {
+      _userAccess = await AppSharedPrefUtil.getUserAccess();
+      if (_userAccess != null) {
+        _fillAttendanceData = _userAccess.fillAttendanceData;
         setState(() {
           wsMonth = WSConstant.wsDateFormat.format(widget.month);
           strMonth = DateFormat.yMMM().format(widget.month);
         });
 
-        Response res = await _api.getMonthlySummary(wsMonth, _userRole.groupName);
+        Response res = await _api.getMonthlySummary(wsMonth, _fillAttendanceData.groupName);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {
@@ -152,7 +156,7 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
         centerTitle: true,
         title: AppTitleWithSubTitle(
           title: 'Submit Attendance',
-          subTitle: '${_userRole.groupTitle} , $strMonth',
+          subTitle: '${_fillAttendanceData.groupTitle} , $strMonth',
         ),
       ),
       body: SafeArea(
@@ -193,10 +197,10 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
     try {
       startOverlay();
       List<AttendanceSummary> lessAttendanceReason = summary.where((s) => !AppUtils.isNullOrEmpty(s.lessAttendanceReason)).toList();
-      Response res = await _api.submitMontlyReport(wsMonth, _userRole.groupName, lessAttendanceReason);
+      Response res = await _api.submitMontlyReport(wsMonth, _fillAttendanceData.groupName, lessAttendanceReason);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        await CacheData.loadPendingMonthForAttendance(_userRole.groupName, context);
+        await CacheData.loadPendingMonthForAttendance(_fillAttendanceData.groupName, _fillAttendanceData.eventName, context);
         CommonFunction.alertDialog(
             closeable: false,
             context: context,

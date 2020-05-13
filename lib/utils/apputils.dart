@@ -40,6 +40,17 @@ class AppUtils {
     return boolValue != null ? (boolValue ? 1 : 0) : defaultValue;
   }
 
+  static String convertDateToDateStr(DateTime input, {String defaultValue = null}) {
+    if (input == null) {
+      return defaultValue;
+    } else {
+      return WSConstant.wsDateFormat.format(input);
+    }
+  }
+  static DateTime convertDateStrToDate(String strDate) {
+    return WSConstant.wsDateFormat.parse(strDate);
+  }
+
   static String getCountTitleForSadhana(String sadhanaName) {
     if (AppUtils.equalsIgnoreCase(sadhanaName, Constant.SEVANAME))
       return 'Hours';

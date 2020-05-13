@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
 import 'package:sadhana/attendance/event_attendance.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/common.dart';
@@ -70,8 +71,9 @@ class HomePageState extends BaseState<HomePage> {
   StreamSubscription<ConnectivityResult> _connectivitySubscription;
   bool isUserRegistered = false;
   bool showOptionMenu = false;
-  bool isAttendanceCord = false;
-  UserRole role;
+  bool fillAttendance = false;
+  bool fillEventAttendance = false;
+  UserAccess userAccess;
   int androidVersion;
   @override
   void initState() {
@@ -97,7 +99,7 @@ class HomePageState extends BaseState<HomePage> {
         this.isUserRegistered = isUserRegistered;
       });
     });
-    loadUserRole();
+    loadUserAccess();
     /*AppSettingUtil.getServerAppSetting().then((appSetting) {
       setState(() {
         showCSVOption = appSetting.showCSVOption;
@@ -106,31 +108,28 @@ class HomePageState extends BaseState<HomePage> {
     subscribeConnectivityChange();
   }
 
-  loadUserRole() async {
-    await loadUserRoleFromServer();
-    await loadUserRoleFromSharedPref();
+  loadUserAccess() async {
+    await loadUserAccessFromServer();
+    await loadUserAccessFromSharedPref();
   }
 
-  loadUserRoleFromSharedPref() async {
-    role = await AppSharedPrefUtil.getUserRole();
-    if (role != null) {
-      if (role.isAttendanceCord) {
-        setState(() {
+  loadUserAccessFromSharedPref() async {
+    userAccess = await AppSharedPrefUtil.getUserAccess();
+    if (userAccess != null) {
+      setState(() {
+        if(userAccess.fillEventAttendance)
+          fillEventAttendance = true;
+        if (userAccess.fillAttendance)
+            fillAttendance = true;
+        if(fillAttendance || fillEventAttendance)
           showOptionMenu = true;
-          isAttendanceCord = true;
-        });
-      } else {
-        setState(() {
-          showOptionMenu = false;
-          isAttendanceCord = false;
-        });
-      }
+      });
     }
   }
 
-  loadUserRoleFromServer() async {
+  loadUserAccessFromServer() async {
     if (await AppUtils.isInternetConnected()) {
-      await CacheData.loadUserRole(context);
+      await CacheData.loadUserAccess(context);
     }
   }
 
@@ -535,7 +534,7 @@ class HomePageState extends BaseState<HomePage> {
                     ),
                     value: 'options',
                   ),
-                  isAttendanceCord
+                  fillAttendance
                       ? PopupMenuItem(
                           child: ListTile(
                             trailing: Icon(
@@ -547,7 +546,7 @@ class HomePageState extends BaseState<HomePage> {
                           value: 'attendance',
                         )
                       : null,
-                  PopupMenuItem(
+                  fillEventAttendance ? PopupMenuItem(
                     child: ListTile(
                       trailing: Icon(
                         Icons.event_available,
@@ -555,7 +554,7 @@ class HomePageState extends BaseState<HomePage> {
                       title: Text('Event Attendance'),
                     ),
                     value: 'event_attendance',
-                  )
+                  ): null,
                 ];
               },
             )
@@ -595,15 +594,19 @@ class HomePageState extends BaseState<HomePage> {
         onAttendanceClick();
         break;
       case 'event_attendance':
-        onEventAttendanceClick();
+        onMyEventAttendanceClick();
         break;
     }
   }
 
-  onEventAttendanceClick() {
+  onMyEventAttendanceClick() {
+    goToEventAttendancePage(true);
+  }
+
+  goToEventAttendancePage(bool myAttendance) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EventAttendance()),
+      MaterialPageRoute(builder: (context) => EventAttendance(myAttendance: myAttendance)),
     );
   }
 
@@ -637,22 +640,27 @@ class HomePageState extends BaseState<HomePage> {
     startOverlay();
     if (await AppUtils.isInternetConnected()) {
       await CacheData.loadAttendanceData(context);
-      if (CacheData.userRole != null) {
-        loadUserRoleFromSharedPref();
-        if (isAttendanceCord) {
-          if (CacheData.isAttendanceSubmissionPending()) {
-            String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
-            CommonFunction.alertDialog(
-                context: context,
-                msg:
-                    "$strMonth month's attendance submission is pending, Please submit Attendance.",
-                doneButtonFn: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, AttendanceHomePage.routeName);
-                });
+      if (CacheData.userAccess != null) {
+        loadUserAccessFromSharedPref();
+        if (fillAttendance) {
+          if(userAccess.fillAttendanceData.isEventType) {
+            goToEventAttendancePage(false);
           } else {
-            Navigator.pushNamed(context, AttendanceHomePage.routeName);
+            if (CacheData.isAttendanceSubmissionPending()) {
+              String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
+              CommonFunction.alertDialog(
+                  context: context,
+                  msg:
+                  "$strMonth month's attendance submission is pending, Please submit Attendance.",
+                  doneButtonFn: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, AttendanceHomePage.routeName);
+                  });
+            } else {
+              Navigator.pushNamed(context, AttendanceHomePage.routeName);
+            }            
           }
+
           stopOverlay();
         }
       } else

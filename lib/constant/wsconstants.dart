@@ -17,4 +17,11 @@ class WSConstant {
   static final String sessionType_General = "General";
 
   static final String center_Simcity = 'Simandhar City';
+
+
+  static final String attendanceType_Center = 'Center';
+  static final String attendanceType_GD = 'GD';
+  static final String attendanceType_Event = 'Event';
+
+  static final String JOB_CHANGE = "Job Change";
 }

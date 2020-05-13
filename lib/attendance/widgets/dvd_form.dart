@@ -108,7 +108,7 @@ class _DVDFormState extends State<DVDForm> {
                             children: <Widget>[
                               RaisedButton(
                                 onPressed: submitForm,
-                                child: Text('Submit'),
+                                child: Text('Save'),
                               ),
                               SizedBox(width: 20)
                             ],

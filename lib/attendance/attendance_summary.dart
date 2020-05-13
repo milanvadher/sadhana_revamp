@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/attendance/mba_attendance_history.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
-import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/attendance/model/fill_attendance_data.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -27,7 +28,8 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   final TextEditingController _filter = new TextEditingController();
   ApiService _api = ApiService();
   int month = new DateTime.now().month;
-  UserRole _userRole;
+  UserAccess _userAccess;
+  FillAttendanceData _fillAttendanceData;
   @override
   void initState() {
     super.initState();
@@ -51,9 +53,10 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
 
   void loadData() async {
     startLoading();
-    _userRole = await AppSharedPrefUtil.getUserRole();
-    if (_userRole != null) {
-      Response res = await _api.getAttendanceSummary(_userRole.groupName);
+    _userAccess = await AppSharedPrefUtil.getUserAccess();
+    if (_userAccess != null && _userAccess.fillAttendanceData != null) {
+      _fillAttendanceData = _userAccess.fillAttendanceData;
+      Response res = await _api.getAttendanceSummary(_fillAttendanceData.groupName);
       AppResponse appResponse =
           AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
@@ -108,7 +111,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   setTitle() {
     _appBarTitle = AppTitleWithSubTitle(
       title: 'Attendance Summary',
-      subTitle: _userRole.groupTitle,
+      subTitle: _fillAttendanceData.groupTitle,
     );
   }
 

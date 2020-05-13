@@ -6,6 +6,8 @@ part "session.g.dart";
 
 @JsonSerializable()
 class Session {
+  @JsonKey(name: 'name')
+  String name;
   @JsonKey(name: 'session_date')
   String date;
   @JsonKey(name: 'group_name')
@@ -38,8 +40,9 @@ class Session {
 
   @override
   String toString() {
-    return 'Session{date: $date, group: $group, dvdType: $dvdType, dvdNo: $dvdNo, dvdPart: $dvdPart, remark: $remark, attendance: $attendance}';
+    return 'Session{name: $name, date: $date, group: $group, dvdType: $dvdType, dvdNo: $dvdNo, dvdPart: $dvdPart, remark: $remark, sessionType: $sessionType, attendance: $attendance}';
   }
+
 
 }
 

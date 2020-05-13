@@ -8,6 +8,7 @@ part of 'session.dart';
 
 Session _$SessionFromJson(Map<String, dynamic> json) {
   return Session()
+    ..name = json['name'] as String
     ..date = json['session_date'] as String
     ..group = json['group_name'] as String
     ..dvdType = json['dvdtype'] as String
@@ -24,6 +25,7 @@ Session _$SessionFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
+      'name': instance.name,
       'session_date': instance.date,
       'group_name': instance.group,
       'dvdtype': instance.dvdType,
