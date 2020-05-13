@@ -19,8 +19,10 @@ class EventAttendance extends StatefulWidget {
 
 class _EventAttendanceState extends State<EventAttendance> {
   ApiService _api = ApiService();
-  Future<List<Event>> futureEvent;
-
+  Future<List<Event>> events;
+  List<Event> openEvent;
+  List<Event> futureEvent;
+  List<Event> historyEvent;
   void onEventClick(Event event) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -102,7 +104,17 @@ class _EventAttendanceState extends State<EventAttendance> {
   @override
   void initState() {
     super.initState();
-    futureEvent = fetchEvents;
+    events = fetchEvents;
+    events.then((eventsList) => () {
+      for(Event event in eventsList) {
+        if(event.isEditable)
+          openEvent.add(event);
+        else if(event.startDateTime.isAfter(CacheData.today))
+          futureEvent.add(event);
+        else
+          historyEvent.add(event);
+      }
+    });
   }
 
   @override
@@ -113,7 +125,7 @@ class _EventAttendanceState extends State<EventAttendance> {
       ),
       body: SafeArea(
         child: FutureBuilder(
-          future: futureEvent,
+          future: events,
           builder: (context, AsyncSnapshot<List<Event>> snapshot) {
             if (snapshot.hasData) {
               return ListView.separated(
