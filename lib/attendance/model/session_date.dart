@@ -7,9 +7,9 @@ part "session_date.g.dart";
 
 @JsonSerializable()
 class SessionDate {
-  @JsonKey(name: 'session_name')
+  @JsonKey(name: 'name')
   String name;
-  @JsonKey(name: 'date')
+  @JsonKey(name: 'session_date')
   String date;
   SessionDate();
   DateTime get dateTime =>  date != null ? WSConstant.wsDateFormat.parse(date) : null;

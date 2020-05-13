@@ -317,7 +317,7 @@ class ApiService {
 
     Response res =
     await _postApi(url: '/mba.attendance.get_attendance', data: data);
-    String changedRes = res.body.replaceAll("attendances", "attendance").replaceAll(":{\"ses", ":{\"data\":{\"ses").replaceAll(":{\"nam", ":{\"data\":{\"nam").replaceAll("]}]}}", "]}]}}}");
+    String changedRes = res.body.replaceAll(":{\"ses", ":{\"data\":{\"ses").replaceAll(":{\"nam", ":{\"data\":{\"nam").replaceAll("]}]}}", "]}]}}}");
     print("changed res:" + changedRes);
     Response res1 = http.Response(changedRes,200);
     //Response res = http.Response(

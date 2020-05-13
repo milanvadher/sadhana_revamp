@@ -8,12 +8,12 @@ part of 'session_date.dart';
 
 SessionDate _$SessionDateFromJson(Map<String, dynamic> json) {
   return SessionDate()
-    ..name = json['session_name'] as String
-    ..date = json['date'] as String;
+    ..name = json['name'] as String
+    ..date = json['session_date'] as String;
 }
 
 Map<String, dynamic> _$SessionDateToJson(SessionDate instance) =>
     <String, dynamic>{
-      'session_name': instance.name,
-      'date': instance.date,
+      'name': instance.name,
+      'session_date': instance.date,
     };

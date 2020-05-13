@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/utils/apputils.dart';
 part 'attendance_summary.g.dart';
 
@@ -12,6 +13,11 @@ class AttendanceSummary {
 
   @JsonKey(name: 'last_name')
   String lastName;
+
+  @JsonKey(name: 'date')
+  String date;
+
+  DateTime get dateTime =>  date != null ? WSConstant.wsDateFormat.parse(date) : null;
 
   @JsonKey(ignore: true)
   String get name => '$firstName $lastName';
