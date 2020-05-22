@@ -12,8 +12,10 @@ import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/center_change_request.dart';
+import 'package:sadhana/model/jobinfo.dart';
 import 'package:sadhana/model/mba_center.dart';
 import 'package:sadhana/model/registration_request.dart';
+import 'package:sadhana/profileSetting/job_info_widget.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/apputils.dart';
@@ -39,12 +41,14 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
   var dateFormatter = new DateFormat(WSConstant.DATE_FORMAT);
   CenterChangeRequest request = CenterChangeRequest();
   List<MBACenter> centerList;
-
+  bool showJobInfo = true;
   @override
   void initState() {
     super.initState();
     if (!AppUtils.isNullOrEmpty(widget.mhtId)) {
       request.mhtId = widget.mhtId;
+      request.startDate = DateTime.now();
+      request.setJobInfo(JobInfo());
     }
     loadData();
   }
@@ -59,7 +63,18 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
       });
     }
     stopLoading();
-    await AppUtils.askForPermission();
+  }
+
+  loadCenterChangeRequest() async {
+    startLoading();
+    Response res = await _api.getCenterChangeRequest();
+    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+    if (appResponse.status == WSConstant.SUCCESS_CODE) {
+      setState(() {
+        request = CenterChangeRequest.fromJson(appResponse.data);
+      });
+    }
+    stopLoading();
   }
 
   @override
@@ -74,8 +89,6 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
           child: new ListView(
             padding: EdgeInsets.only(left: 20, top: 20, bottom: 10, right: 20),
             children: <Widget>[
-              //_titleAndLogo(),
-              // _areyouMBA(),
               buildRequestPage(),
             ],
           ),
@@ -87,11 +100,6 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
   Widget buildRequestPage() {
     return Column(
       children: <Widget>[
-        TextInputField(
-          isRequiredValidation: true,
-          labelText: "Reason",
-          onSaved: (val) => request.reason = val,
-        ),
         DropDownInput.fromMap(
           labelText: "Center",
           valuesByLabel: centerList != null
@@ -109,12 +117,33 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
           labelText: 'New Center Date',
           isRequiredValidation: true,
           isFutureAllow: true,
-          selectedDate: request.startDate != null ? DateTime.parse(request.startDate) : DateTime.now(),
+          selectedDate: request.startDate,
           selectDate: (DateTime date) {
             setState(() {
-              request.startDate = dateFormatter.format(date);
+              request.startDate = date;
             });
           },
+        ),
+        DropDownInput(
+          labelText: "Reason",
+          items: ['Job Change', 'Other'],
+          onChange: (value) {
+            setState(() {
+              if (value != null) request.reason = value;
+              if(AppUtils.equalsIgnoreCase(request.reason, "Job Change")) {
+
+              } else {
+
+              }
+            });
+          },
+          valueText: request.reason,
+          isRequiredValidation: true,
+        ),
+        TextInputField(
+          isRequiredValidation: true,
+          labelText: "Reason",
+          onSaved: (val) => request.reason = val,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -137,7 +166,8 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
               ),
             )
           ],
-        )
+        ),
+        showJobInfo ? JobInfoWidget(jobInfo: request.getJobInfo()) : Container(),
       ],
     );
   }

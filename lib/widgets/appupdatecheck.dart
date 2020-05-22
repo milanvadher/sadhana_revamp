@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/colors.dart';
@@ -14,10 +14,8 @@ import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
-import 'package:sadhana/wsmodel/ws_app_setting.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
-
-import '../main.dart';
+import 'package:sadhana/wsmodel/ws_app_setting.dart';
 
 class OnAppOpenBackgroundThread {
   static bool isChecking = false;
@@ -35,13 +33,13 @@ class OnAppOpenBackgroundThread {
     await CommonFunction.tryCatchAsync(context, () async {
       if(await AppUtils.isInternetConnected()) {
         if (await AppSharedPrefUtil.isUserRegistered()) {
-          await updateUserRole();
+          await updateUserAccess();
           await SyncActivityUtils.syncAllUnSyncActivity(context: context);
           await MBAScheduleCheck.getMBASchedule();
           await checkTokenExpiration();
         }
         await AppUtils.updateInternetDate();
-        // await checkForNewAppUpdate();
+        await checkForNewAppUpdate();
       }
     });
   }
@@ -105,13 +103,13 @@ class OnAppOpenBackgroundThread {
     }
   }
 
-  updateUserRole() async {
-    Response res = await api.getUserRole();
+  updateUserAccess() async {
+    Response res = await api.getUserAccess();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
-      UserRole userRole = UserRole.fromJson(appResponse.data);
+      UserAccess userRole = UserAccess.fromJson(appResponse.data);
       if (userRole != null) {
-        await AppSharedPrefUtil.saveUserRole(userRole);
+        await AppSharedPrefUtil.saveUserAccess(userRole);
         //main();
       }
     }

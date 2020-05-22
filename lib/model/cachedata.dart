@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:sadhana/attendance/model/fill_attendance_data.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
@@ -71,30 +73,31 @@ class CacheData {
   //Attendancne
   static bool isSubmittedCurrentMonthAttendance = false;
   static DateTime pendingMonth;
-  static UserRole userRole;
+  static UserAccess userAccess;
 
   static loadAttendanceData(BuildContext context) async {
-    await loadUserRole(context);
-    if(userRole != null) {
-      if(!userRole.isSimCityGroup) {
-        await loadPendingMonthForAttendance(userRole.groupName, context);
+    await loadUserAccess(context);
+    if(userAccess != null && userAccess.fillAttendanceData != null) {
+      FillAttendanceData fillAttendanceData = userAccess.fillAttendanceData;
+      if(fillAttendanceData.attendanceType == AttendanceType.CENTER) {
+        await loadPendingMonthForAttendance(fillAttendanceData.groupName, fillAttendanceData.eventName, context);
       }
     }
   }
 
-  static loadUserRole(BuildContext context) async {
-    Response res = await api.getUserRole();
+  static loadUserAccess(BuildContext context) async {
+    Response res = await api.getUserAccess();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
-      userRole = UserRole.fromJson(appResponse.data);
-      if (userRole != null) {
-        await AppSharedPrefUtil.saveUserRole(userRole);
+      userAccess = UserAccess.fromJson(appResponse.data);
+      if (userAccess != null) {
+        await AppSharedPrefUtil.saveUserAccess(userAccess);
       }
     }
   }
 
-  static loadPendingMonthForAttendance(String group, BuildContext context) async {
-    Response res = await api.getMonthPendingForAttendance(group);
+  static loadPendingMonthForAttendance(String group, String eventName, BuildContext context) async {
+    Response res = await api.getMonthPendingForAttendance(group, eventName);
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       if (!AppUtils.isNullOrEmpty(appResponse.data))
@@ -105,7 +108,7 @@ class CacheData {
   }
 
   static isAttendanceSubmissionPending() {
-    return !userRole.isSimCityGroup && pendingMonth != null && today.month != CacheData.pendingMonth.month;
+    return userAccess.fillAttendanceData.isCenterType && pendingMonth != null && today.month != CacheData.pendingMonth.month;
   }
 
   static void clear() {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sadhana/attendance/model/event.dart';
+import 'package:sadhana/attendance/model/event_bkp.dart';
 
 class UserList extends StatefulWidget {
   final Event event;

@@ -26,7 +26,7 @@ def flutterVersionCode = '8'
 
 //def flutterVersionName = localProperties.getProperty('flutter.versionName')
 //if (flutterVersionName == null) {
-def flutterVersionName = '1.1.2'
+def flutterVersionName = '1.1.3'
 //}
 
 apply plugin: 'com.android.application'

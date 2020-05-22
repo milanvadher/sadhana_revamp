@@ -1,60 +1,52 @@
-class EventResponse {
-  List<Event> message;
+import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/attendance/model/session.dart';
+import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/utils/apputils.dart';
 
-  EventResponse({this.message});
+part 'event.g.dart';
 
-  EventResponse.fromJson(Map<String, dynamic> json) {
-    if (json['message'] != null) {
-      message = new List<Event>();
-      json['message'].forEach((v) {
-        message.add(new Event.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.message != null) {
-      data['message'] = this.message.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
+@JsonSerializable()
 class Event {
+  @JsonKey(name: 'event_pk')
   String eventPk;
+  @JsonKey(name: 'event_name')
   String eventName;
+  @JsonKey(name: 'name')
+  String name;
+  @JsonKey(name: 'start_date')
   String startDate;
+  @JsonKey(name: 'end_date')
   String endDate;
+  @JsonKey(name: 'is_editable')
   bool isEditable;
+  @JsonKey(name: 'is_attendance_taken')
   bool isAttendanceTaken;
+  @JsonKey(name: 'sessions')
+  List<Session> sessions;
 
-  Event({
-    this.eventPk,
-    this.eventName,
-    this.startDate,
-    this.endDate,
-    this.isEditable,
-    this.isAttendanceTaken,
-  });
+  Event();
 
-  Event.fromJson(Map<String, dynamic> json) {
-    eventPk = json['event_pk'];
-    eventName = json['event_name'];
-    startDate = json['start_date'];
-    endDate = json['end_date'];
-    isEditable = json['is_editable'];
-    isAttendanceTaken = json['is_attendance_taken'];
+  DateTime get startDateTime =>  startDate != null ? WSConstant.wsDateFormat.parse(startDate) : null;
+
+  factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EventToJson(this);
+
+  Event.fromSession(String name, Session session) {
+    List<Session> sessions = List();
+    sessions.add(session);
+    this.name = name;
+    this.sessions = sessions;
+    this.eventPk = name;
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['event_pk'] = this.eventPk;
-    data['event_name'] = this.eventName;
-    data['start_date'] = this.startDate;
-    data['end_date'] = this.endDate;
-    data['is_editable'] = this.isEditable;
-    data['is_attendance_taken'] = this.isAttendanceTaken;
-    return data;
+  static Event fromJsonFun(Map<String, dynamic> json) => Event.fromJson(json);
+  static List<Event> fromJsonList(dynamic json) {
+    return AppUtils.fromJsonList<Event>(json, Event.fromJsonFun);
+  }
+
+  @override
+  String toString() {
+    return 'Event{eventPk: $eventPk, eventName: $eventName, name: $name, startDate: $startDate, endDate: $endDate, isEditable: $isEditable, isAttendanceTaken: $isAttendanceTaken, sessions: $sessions}';
   }
 }

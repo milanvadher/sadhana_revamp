@@ -1,29 +1,37 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:sadhana/attendance/model/user_role.dart';
-import 'package:sadhana/attendance/user_list.dart';
-import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/attendance/attendance_home.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
-import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/wsmodel/appresponse.dart';
 
 import '../common.dart';
 import 'model/event.dart';
 
 class EventAttendance extends StatefulWidget {
+  final bool myAttendance;
+  EventAttendance({this.myAttendance = false});
   @override
   _EventAttendanceState createState() => _EventAttendanceState();
 }
 
 class _EventAttendanceState extends State<EventAttendance> {
   ApiService _api = ApiService();
-  Future<List<Event>> futureEvent;
-
+  Future<List<Event>> events;
+  List<Event> openEvent;
+  List<Event> futureEvent;
+  List<Event> historyEvent;
   void onEventClick(Event event) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => UserList(event: event),
+        builder: (context) => AttendanceHomePage(
+          date: event.startDateTime,
+          eventName: event.eventPk,
+          eventTitle: event.eventName,
+          isEditMode: event.isAttendanceTaken,
+        ),
       ),
     );
   }
@@ -33,9 +41,7 @@ class _EventAttendanceState extends State<EventAttendance> {
   }) {
     return Container(
       color: event.isAttendanceTaken
-          ? Theme.of(context).brightness == Brightness.dark
-              ? Colors.yellow.shade600
-              : Colors.yellow.shade200
+          ? Theme.of(context).brightness == Brightness.dark ? Colors.yellow.shade600 : Colors.yellow.shade200
           : null,
       child: ListTile(
         selected: event.isAttendanceTaken,
@@ -59,13 +65,9 @@ class _EventAttendanceState extends State<EventAttendance> {
           ],
         ),
         subtitle: Text(
-          event.startDate.isNotEmpty
-              ? '${event.startDate} to ${event?.endDate}'
-              : '' ?? "",
+          event.startDate.isNotEmpty ? '${event.startDate} to ${event?.endDate}' : '' ?? "",
           style: Theme.of(context).textTheme.caption.copyWith(
-                color: event.isAttendanceTaken
-                    ? Theme.of(context).primaryColor.withAlpha(150)
-                    : null,
+                color: event.isAttendanceTaken ? Theme.of(context).primaryColor.withAlpha(150) : null,
               ),
         ),
         onTap: () {
@@ -83,11 +85,12 @@ class _EventAttendanceState extends State<EventAttendance> {
 
   Future<List<Event>> get fetchEvents async {
     try {
-      UserRole _userRole = await AppSharedPrefUtil.getUserRole();
+      UserAccess _userRole = CacheData.userAccess;
       if (_userRole != null) {
-        Response res = await _api.fetchEvents(groupName: _userRole.groupName);
-        if (res.statusCode == WSConstant.SUCCESS_CODE) {
-          return EventResponse.fromJson(jsonDecode(res.body)).message;
+        Response res = await _api.fetchEvents(groupName: _userRole.fillAttendanceData.groupName);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.isSuccess) {
+          return Event.fromJsonList(appResponse.data);
         }
         throw 'Failed to load Events';
       }
@@ -101,7 +104,17 @@ class _EventAttendanceState extends State<EventAttendance> {
   @override
   void initState() {
     super.initState();
-    futureEvent = fetchEvents;
+    events = fetchEvents;
+    events.then((eventsList) => () {
+      for(Event event in eventsList) {
+        if(event.isEditable)
+          openEvent.add(event);
+        else if(event.startDateTime.isAfter(CacheData.today))
+          futureEvent.add(event);
+        else
+          historyEvent.add(event);
+      }
+    });
   }
 
   @override
@@ -112,7 +125,7 @@ class _EventAttendanceState extends State<EventAttendance> {
       ),
       body: SafeArea(
         child: FutureBuilder(
-          future: futureEvent,
+          future: events,
           builder: (context, AsyncSnapshot<List<Event>> snapshot) {
             if (snapshot.hasData) {
               return ListView.separated(

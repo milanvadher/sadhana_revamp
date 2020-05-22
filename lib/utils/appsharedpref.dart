@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:intl/intl.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/charts/model/filter_type.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -125,14 +126,14 @@ class AppSharedPrefUtil {
     await saveMhtId(mhtId);
   }
 
-  static Future<void> saveUserRole(UserRole userRole) async {
-    await saveObjectJson(SharedPrefConstant.obj_user_role, userRole.toJson());
+  static Future<void> saveUserAccess(UserAccess userAccess) async {
+    await saveObjectJson(SharedPrefConstant.obj_user_access, userAccess.toJson());
   }
 
-  static Future<UserRole> getUserRole() async {
-    dynamic objectJson = await getObjectJson(SharedPrefConstant.obj_user_role);
+  static Future<UserAccess> getUserAccess() async {
+    dynamic objectJson = await getObjectJson(SharedPrefConstant.obj_user_access);
     if (objectJson != null) {
-      return UserRole.fromJson(objectJson);
+      return UserAccess.fromJson(objectJson);
     } else
       return null;
   }
