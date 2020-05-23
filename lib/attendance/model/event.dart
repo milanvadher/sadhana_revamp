@@ -26,7 +26,8 @@ class Event {
 
   Event();
 
-  DateTime get startDateTime =>  startDate != null ? WSConstant.wsDateFormat.parse(startDate) : null;
+  DateTime get startDateTime =>
+      startDate != null ? WSConstant.wsDateFormat.parse(startDate) : null;
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 
@@ -42,7 +43,15 @@ class Event {
 
   static Event fromJsonFun(Map<String, dynamic> json) => Event.fromJson(json);
   static List<Event> fromJsonList(dynamic json) {
-    return AppUtils.fromJsonList<Event>(json, Event.fromJsonFun);
+    // return AppUtils.fromJsonList<Event>(json, Event.fromJsonFun);
+    List<Event> events = [];
+    if (json is Map && json['data'] != null) {
+      events = new List<Event>();
+      json['data'].forEach((v) {
+        events.add(new Event.fromJson(v));
+      });
+    }
+    return events;
   }
 
   @override
