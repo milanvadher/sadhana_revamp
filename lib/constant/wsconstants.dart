@@ -23,5 +23,7 @@ class WSConstant {
   static final String attendanceType_GD = 'GD';
   static final String attendanceType_Event = 'Event';
 
-  static final String JOB_CHANGE = "Job Change";
+  static final String JOB_CHANGE = "Job";
+
+  static final String REJECTED = "Rejected";
 }

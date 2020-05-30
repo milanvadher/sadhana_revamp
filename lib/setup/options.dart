@@ -2,6 +2,10 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:sadhana/attendance/attendance_summary.dart';
+import 'package:sadhana/attendance/event_attendance.dart';
+import 'package:sadhana/attendance/model/attendance_summary.dart';
+import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/auth/profile/profile_page.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
@@ -117,6 +121,14 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               showRightIcon: true,
             ),
             ActionItem(
+              Icons.calendar_today,
+              Constant.colors[1],
+              'My Attendance',
+              onMyAttendance,
+              'View My Attendance',
+              showRightIcon: true,
+            ),
+            ActionItem(
               Icons.person_outline,
               Constant.colors[0],
               'Change Center',
@@ -181,6 +193,22 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         context,
         MaterialPageRoute(
           builder: (context) => ProfilePage(),
+        ));
+  }
+
+  void onMyAttendance() {
+    UserAccess userAccess = CacheData.userAccess;
+    if(userAccess != null && AppUtils.equalsIgnoreCase(userAccess.myAttendanceType, 'Event')) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EventAttendance(myAttendance: true),
+          ));
+    }
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AttendanceSummaryPage(isMyAttendanceSummary: true),
         ));
   }
 

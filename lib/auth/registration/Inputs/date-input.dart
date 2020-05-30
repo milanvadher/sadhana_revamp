@@ -14,6 +14,8 @@ class DateInput extends StatelessWidget {
       this.viewMode = false,
       this.viewModeTitleWidth,
       this.isFutureAllow = false,
+      this.maxDate,
+      this.minDate,
       this.isRequiredValidation = false})
       : super(key: key);
 
@@ -26,6 +28,8 @@ class DateInput extends StatelessWidget {
   final bool isFutureAllow;
   final double viewModeTitleWidth;
   BuildContext context;
+  final DateTime maxDate;
+  final DateTime minDate;
 
   buildDateInputPicker(BuildContext context) {
     return Row(
@@ -65,8 +69,8 @@ class DateInput extends StatelessWidget {
     final DateTime picked = await showDatePicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1950, 1),
-      lastDate: isFutureAllow ? DateTime(2099, 1): DateTime.now(),
+      firstDate: minDate != null ? minDate : DateTime(1950, 1),
+      lastDate: maxDate != null ? maxDate : isFutureAllow ? DateTime(2099, 1) : DateTime.now(),
     );
     if (picked != null && picked != selectedDate) selectDate(picked);
   }

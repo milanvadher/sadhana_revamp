@@ -3,11 +3,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:sadhana/attendance/attendance_home.dart';
+import 'package:sadhana/attendance/attendance_summary.dart';
+import 'package:sadhana/attendance/attendance_utils.dart';
+import 'package:sadhana/attendance/model/fill_attendance_data.dart';
+import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/widgets/base_state.dart';
+import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 import '../common.dart';
@@ -15,38 +21,106 @@ import 'model/event.dart';
 
 class EventAttendance extends StatefulWidget {
   final bool myAttendance;
-  EventAttendance({this.myAttendance = false});
+  final bool isReadOnly;
+  EventAttendance({this.myAttendance = false, this.isReadOnly = false});
   @override
   _EventAttendanceState createState() => _EventAttendanceState();
 }
 
-class _EventAttendanceState extends State<EventAttendance> {
+class _EventAttendanceState extends BaseState<EventAttendance> {
   ApiService _api = ApiService();
   Future<List<Event>> events;
   List<Event> openEvent = [];
   List<Event> futureEvent = [];
   List<Event> pastEvent = [];
+  FillAttendanceData fillAttendanceData;
+  String myMhtID;
+  @override
+  void initState() {
+    super.initState();
+    if(!widget.myAttendance) {
+      UserAccess _userRole = CacheData.userAccess;
+      fillAttendanceData = _userRole.fillAttendanceData;
+    } else {
+      CacheData.getUserProfile().then((value) => myMhtID = value.mhtId);
+    }
+    events = fetchEvents;
+  }
+
+  Future<List<Event>> get fetchEvents async {
+    try {
+      List<Event> events;
+        Response res;
+        if (widget.myAttendance) {
+          res = await _api.getMBAEvents();
+        } else
+          res = await _api.fetchEvents(groupName: fillAttendanceData.groupName);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.isSuccess) {
+          events = Event.fromJsonList(appResponse.data);
+          if (widget.myAttendance)
+            await addAttendanceIfAbsent(events);
+          else
+            await addSessionIfAbsent(events);
+          return events;
+        } else
+          throw 'Failed to load Events';
+    } catch (e, s) {
+      CommonFunction.displayErrorDialog(context: context, error: e.toString());
+      print(e);
+      print(s);
+      throw 'Error to load Event';
+    }
+  }
+
   void onEventClick(Event event) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => AttendanceHomePage(
-          date: event.startDateTime,
-          eventName: event.eventPk,
-          eventTitle: event.eventName,
-          isEditMode: event.isAttendanceTaken,
-        ),
+    if(!widget.isReadOnly) {
+      if (widget.myAttendance) {
+        onCheck(event);
+      } else {
+        if(!event.isFuture) {
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+            builder: (context) => AttendanceHomePage(date: event.startDateTime, event: event),
+          ))
+              .then((value) {
+            if (value != null) {
+              setState(() {
+                event.isAttendanceTaken = value;
+              });
+            }
+          });
+        }
+      }
+    }
+  }
+
+  List<Widget> _buildAction() {
+    return <Widget>[
+      PopupMenuButton<PopUpMenu>(
+        onSelected: _onPopupSelected,
+        itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
+          const PopupMenuItem<PopUpMenu>(value: PopUpMenu.attendanceSummary, child: Text('Attendance Summary')),
+        ],
       ),
-    );
+    ];
+  }
+
+  void _onPopupSelected(PopUpMenu result) {
+    switch (result) {
+      case PopUpMenu.attendanceSummary:
+        Navigator.pushNamed(context, AttendanceSummaryPage.routeName);
+        break;
+      default:
+    }
   }
 
   Widget createEventTile({
     @required Event event,
   }) {
     return Container(
-      color: event.isAttendanceTaken
-          ? Theme.of(context).brightness == Brightness.dark
-              ? Colors.yellow.shade600
-              : Colors.yellow.shade200
+      color: !widget.myAttendance && event.isAttendanceTaken
+          ? Theme.of(context).brightness == Brightness.dark ? Colors.yellow.shade600 : Colors.yellow.shade200
           : null,
       child: ListTile(
         selected: event.isAttendanceTaken,
@@ -56,58 +130,81 @@ class _EventAttendanceState extends State<EventAttendance> {
               padding: EdgeInsets.only(right: 5),
               child: Text(event.eventName ?? ""),
             ),
-            event.isAttendanceTaken
+            !widget.myAttendance && event.isAttendanceTaken
                 ? CircleAvatar(
                     maxRadius: 8,
                     backgroundColor: Colors.green,
-                    child: Icon(
-                      Icons.done,
-                      color: Colors.white,
-                      size: 12,
-                    ),
+                    child: Icon(Icons.done, color: Colors.white, size: 12),
                   )
                 : Container(),
           ],
         ),
         subtitle: Text(
-          event.startDate.isNotEmpty
-              ? '${event.startDate} to ${event?.endDate}'
-              : '' ?? "",
+          event.startDate.isNotEmpty ? '${event.startDate} to ${event?.endDate}' : '' ?? "",
           style: Theme.of(context).textTheme.caption.copyWith(
-                color: event.isAttendanceTaken
-                    ? Theme.of(context).primaryColor.withAlpha(150)
-                    : null,
+                color: event.isAttendanceTaken ? Theme.of(context).primaryColor.withAlpha(150) : null,
               ),
         ),
         onTap: () {
           onEventClick(event);
         },
-        trailing: event.isAttendanceTaken
-            ? Icon(
-                Icons.edit,
-                color: Theme.of(context).accentColor,
-              )
-            : null,
+        trailing: getTrailing(event, event.isEditable),
       ),
     );
   }
 
-  Future<List<Event>> get fetchEvents async {
-    try {
-      UserAccess _userRole = CacheData.userAccess;
-      if (_userRole != null) {
-        Response res = await _api.fetchEvents(
-          groupName: _userRole.fillAttendanceData.groupName,
-        );
-        if (res.statusCode == WSConstant.SUCCESS_CODE) {
-          return Event.fromJsonList(jsonDecode(res.body)['message']);
-        }
-        throw 'Failed to load Events';
+  Widget getTrailing(Event event, bool isEditable) {
+    if (widget.myAttendance) {
+      return Checkbox(
+        activeColor: Colors.red.shade500,
+        onChanged: isEditable && !widget.isReadOnly ? (val) => onCheck(event) : null,
+        value: event.sessions.first.attendance.first.isPresent,
+      );
+    } else {
+      return event.isAttendanceTaken && isEditable ? Icon(Icons.edit, color: Theme.of(context).accentColor) : null;
+    }
+  }
+
+  void onCheck(Event event) async {
+    if(!widget.isReadOnly) {
+      if (event.isEditable) {
+        startOverlay();
+        await CommonFunction.tryCatchAsync(context, () async {
+          event.sessions.first.attendance.first.isPresent = !event.sessions.first.attendance.first.isPresent;
+          event.sessions.first.attendance.first.mhtId = myMhtID;
+          AppResponse appResponse = AppResponseParser.parseResponse(await _api.submitAttendanceSession(event), context: context);
+          if (appResponse.isSuccess) {
+            CommonFunction.alertDialog(context: context, msg: "Your attendance submitted successfully.");
+            String sessionName = AttendanceUtils.getSessionName(appResponse.data);
+            if (event.sessions.first.name == null) event.sessions.first.name = sessionName;
+          }
+        });
+        stopOverlay();
       }
-      throw 'Insufficient permission';
-    } catch (e) {
-      CommonFunction.displayErrorDialog(context: context);
-      throw 'Error to load Event';
+    }
+  }
+
+
+  Future<void> addSessionIfAbsent(List<Event> events) async {
+    for (Event event in events) {
+      AttendanceUtils.addEmptySessionIfAbsent(event);
+    }
+  }
+
+  Future<void> addAttendanceIfAbsent(List<Event> events) async {
+    for (Event event in events) {
+      AttendanceUtils.addEmptySessionIfAbsent(event);
+      Session session = event.sessions.first;
+      if (session.attendance == null || session.attendance.isEmpty) {
+        Attendance attendance = new Attendance();
+        attendance.isPresent = false;
+        attendance.mhtId = myMhtID;
+        session.attendance = List();
+        session.attendance.add(attendance);
+        event.isAttendanceTaken = false;
+      } else {
+        event.isAttendanceTaken = true;
+      }
     }
   }
 
@@ -116,9 +213,7 @@ class _EventAttendanceState extends State<EventAttendance> {
       margin: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
         ),
         borderRadius: BorderRadius.all(
           Radius.circular(5),
@@ -145,26 +240,29 @@ class _EventAttendanceState extends State<EventAttendance> {
     futureEvent = [];
     pastEvent = [];
     for (Event event in eventList) {
-      if (event.isEditable)
+      if (event.isEditable) {
+        event.setCurrent();
         openEvent.add(event);
-      else if (event.startDateTime.isAfter(CacheData.today))
+      } else if (event.startDateTime.isAfter(CacheData.today)) {
+        event.setFuture();
         futureEvent.add(event);
-      else
+      } else {
+        event.setPast();
         pastEvent.add(event);
+      }
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    events = fetchEvents;
-  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget pageToDisplay() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select Event'),
+        title: widget.myAttendance ? Text('Select Event') : AppTitleWithSubTitle(
+          title: 'Select Event',
+          subTitle: fillAttendanceData.groupTitle,
+        ),
+        actions: widget.myAttendance ? null : _buildAction(),
       ),
       body: SafeArea(
         child: FutureBuilder(

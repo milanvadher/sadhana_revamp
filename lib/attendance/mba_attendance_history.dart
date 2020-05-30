@@ -47,7 +47,7 @@ class _MBAAttendanceHistoryState extends BaseState<MBAAttendanceHistory> {
     try {
       _userAccess = await AppSharedPrefUtil.getUserAccess();
       if (_userAccess != null) {
-        Response res = await _api.getMBAAttendance(widget.mhtID, _userAccess.fillAttendanceData.groupName);
+        Response res = await _api.getMBAAttendance(widget.mhtID, _userAccess.fillAttendanceData);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {

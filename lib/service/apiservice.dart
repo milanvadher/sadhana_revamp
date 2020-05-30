@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/event.dart';
+import 'package:sadhana/attendance/model/fill_attendance_data.dart';
 import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
@@ -105,6 +106,12 @@ class ApiService {
     return res;
   }
 
+  Future<Response> getRegRequest(String mhtId) async {
+    Map<String, dynamic> data = {"mht_id" : mhtId};
+    Response res = await _postApi(url: '/mba.user.check_mba_registration_status', data: data);
+    return res;
+  }
+
   Future<Response> sendRequest(RegistrationRequest registrationRequest) async {
     Map<String, dynamic> data = registrationRequest.toJson();
     Response res =
@@ -115,20 +122,12 @@ class ApiService {
   Future<Response> centerChangeRequest(
       CenterChangeRequest centerChangeRequest) async {
     Map<String, dynamic> data = centerChangeRequest.toJson();
-    String body = json.encode(data);
-    print('Post Url:' + "mba.user.center_change_request" + '\tReq:' + body);
-    //Response res = await _postApi(
-    //    url: '/mba.user.center_change_request', data: data, isResource: true);
-    return Response("", 200);
+    return await _postApi(url: '/mba.user.center_change_request', data: data);
   }
 
   Future<Response> getCenterChangeRequest() async {
     Map<String, dynamic> data = {};
-    String body = json.encode(data);
-    print('Post Url:' + "mba.user.center_change_request" + '\tReq:' + body);
-    //Response res = await _postApi(
-    //    url: '/mba.user.get_center_change_request', data: data, isResource: true);
-    return Response("", 200);
+    return await _postApi(url: '/mba.user.get_center_change_request', data: data);
   }
   Future<Response> changeMobile(
       String mht_id, String oldNo, String newNo) async {
@@ -275,62 +274,48 @@ class ApiService {
     return res;
   }
 
-  Future<Response> getUserAccess() async {
-    Map<String, dynamic> data = {};
-    Response res = await _postApi(url: '/mba.user.get_user_access', data: data);
-    String changedRes = res.body.replaceAll(":{\"f", ":{\"data\":{\"f").replaceAll("}}}", "}}}}");
-    print("changed res:" + changedRes);
-    Response res1 = http.Response(changedRes,200);
-    //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
-    return res1;
+  Map<String, dynamic> addAttendanceCoordinatorData(Map<String, dynamic> data, FillAttendanceData fillAttendanceData) {
+    data['group_name'] = fillAttendanceData.groupName;
+    data['event_name'] = fillAttendanceData.eventName;
+    data['event_type'] = FillAttendanceData.convertEnumToStr(fillAttendanceData.attendanceType);
+    return data;
   }
 
-  Future<Response> getMonthPendingForAttendance(String group, String eventName) async {
-    Map<String, dynamic> data = {'group_name': group, "event_name": eventName};
+  Future<Response> getUserAccess() async {
+    Map<String, dynamic> data = {};
+    return await _postApi(url: '/mba.user.get_user_access', data: data);
+  }
+
+  Future<Response> getMonthPendingForAttendance(FillAttendanceData fillAttendanceData) async {
+    Map<String, dynamic> data = addAttendanceCoordinatorData({}, fillAttendanceData);
     Response res = await _postApi(
         url: '/mba.attendance.get_month_pending_for_attendance', data: data);
     //Response res = http.Response("{\r\n    \"message\": {\r\n        \"data\": {\r\n            \"role\": \"\",\r\n            \"group_name\": \"\"\r\n        }\r\n    }\r\n}", 200);
     return res;
   }
 
-  Future<Response> getSessionDates(String group, String eventName) async {
-    Map<String, dynamic> data = {'group_name': group, "event_name": eventName};
-    Response res =
-        await _postApi(url: '/mba.attendance.get_session_dates', data: data);
-    //Response res = http.Response("{\"message\":{\"data\":[\"2019-07-05\",\"2019-07-04\"]}}", 200);
-    //Response res = http.Response("{\"message\":{\"msg\":\"ProgrammingError(1064, \\\"You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ') ORDER BY `first_name`' at line 1\\\")\"}}", 500);
-    return res;
+  Future<Response> getSessionDates(FillAttendanceData fillAttendanceData) async {
+    Map<String, dynamic> data = addAttendanceCoordinatorData({}, fillAttendanceData);
+    return await _postApi(url: '/mba.attendance.get_session_dates', data: data);
   }
 
   Future<Response> getMBAOfGroup(String date, String group) async {
     Map<String, dynamic> data = {'date': date, 'group_name': group};
-    Response res =
-        await _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
-    //Response res = http.Response(
-    //    "{\"message\":{\"data\":[{\"mht_id\":\"61758\",\"first_name\":\"Kamlesh\",\"last_name\":\"Kanazariya\"},{\"mht_id\":\"111111\",\"first_name\":\"Divyang\",\"last_name\":\"Mistry\"},{\"mht_id\":\"222222\",\"first_name\":\"Milan\",\"last_name\":\"Vadher\"},{\"mht_id\":\"333333\",\"first_name\":\"Gaurav\",\"last_name\":\"Suri\"},{\"mht_id\":\"444444\",\"first_name\":\"Parth\",\"last_name\":\"Gudkha\"},{\"mht_id\":\"555555\",\"first_name\":\"Laxit\",\"last_name\":\"Patel\"},{\"mht_id\":\"666666\",\"first_name\":\"Vijay\",\"last_name\":\"Yadav\"}]}}",
-    //    200);
-    return res;
+    return _postApi(url: '/mba.group_api.get_mba_by_group', data: data);
   }
 
-  Future<Response> getAttendanceSession(String group, String eventName, String eventType, {String sessionName}) async {
-    Map<String, dynamic> data = {'session_name': sessionName, 'group_name': group, 'event_name' : eventName, 'event_type' : eventType};
-
-    Response res =
-    await _postApi(url: '/mba.attendance.get_attendance', data: data);
-    String changedRes = res.body.replaceAll(":{\"ses", ":{\"data\":{\"ses").replaceAll(":{\"nam", ":{\"data\":{\"nam").replaceAll("]}]}}", "]}]}}}");
-    print("changed res:" + changedRes);
-    Response res1 = http.Response(changedRes,200);
-    //Response res = http.Response(
-    //    "{\"message\":{\"data\":{\"date\":\"2019-06-15\",\"group\":\"ahmedabad\",\"dvdtype\":\"parayan\/satsang\",\"dvdno\":123,\"dvdpart\":1,\"remark\":\"target zero session\",\"attendance\":[{\"mht_id\":\"61758\",\"isPresent\":1,\"absentreason\":\"job\"},{\"mht_id\":\"111111\",\"isPresent\":0},{\"mht_id\":\"222222\",\"isPresent\":1},{\"mht_id\":\"333333\",\"isPresent\":0},{\"mht_id\":\"444444\",\"isPresent\":1,\"absentreason\":\"job\"}]}}}",
-    //    200);
-    return res1;
+  Future<Response> getAttendanceSession(FillAttendanceData fillAttendanceData, {String sessionName, String eventName}) async {
+    Map<String, dynamic> data = addAttendanceCoordinatorData({'session_name': sessionName}, fillAttendanceData);
+    if(eventName != null)
+      data['event_name'] = eventName;
+    return await _postApi(url: '/mba.attendance.get_attendance', data: data);
   }
 
-  Future<Response> getSessionAttendance(String sessionName, String group, String eventName, String eventType) async {
-    return getAttendanceSession(group, eventName, eventType, sessionName: sessionName);
+  Future<Response> getSessionAttendance(String sessionName, FillAttendanceData fillAttendanceData) async {
+    return getAttendanceSession(fillAttendanceData, sessionName: sessionName);
   }
-  Future<Response> getEventAttendance(String group, String eventName, String eventType) async {
-    return getAttendanceSession(group, eventName, eventType);
+  Future<Response> getEventAttendance(FillAttendanceData fillAttendanceData, String eventName) async {
+    return getAttendanceSession(fillAttendanceData, eventName: eventName);
   }
 
   Future<Response> submitAttendanceSession(Event event) async {
@@ -340,11 +325,13 @@ class ApiService {
     return res;
   }
 
-  Future<Response> deleteAttendanceSession(
-      DateTime sessionDate, String group) async {
+  Future<Response> deleteAttendanceSession(String sessionName,
+      DateTime sessionDate, FillAttendanceData fillAttendanceData) async {
     Map<String, dynamic> data = {
+      'session_name' : sessionName,
       'session_date': WSConstant.wsDateFormat.format(sessionDate),
-      'group_name': group
+      'group_name': fillAttendanceData.groupName,
+     "event_name": fillAttendanceData.eventName
     };
     Response res =
         await _postApi(url: '/mba.attendance.delete_session', data: data);
@@ -352,8 +339,8 @@ class ApiService {
     return res;
   }
 
-  Future<Response> getMonthlySummary(String month, String group) async {
-    Map<String, dynamic> data = {'month': month, 'group_name': group};
+  Future<Response> getMonthlySummary(String month, FillAttendanceData fillAttendanceData) async {
+    Map<String, dynamic> data = {'month': month, 'group_name': fillAttendanceData.groupName, "event_name": fillAttendanceData.eventName};
     Response res =
         await _postApi(url: '/mba.group_api.get_monthly_summary', data: data);
     /*Response res = http.Response(
@@ -362,8 +349,8 @@ class ApiService {
     return res;
   }
 
-  Future<Response> getAttendanceSummary(String group) async {
-    Map<String, dynamic> data = {'group_name': group};
+  Future<Response> getAttendanceSummary(FillAttendanceData fillAttendanceData) async {
+    Map<String, dynamic> data = addAttendanceCoordinatorData({}, fillAttendanceData);
     Response res = await _postApi(
         url: '/mba.attendance.get_attendance_summary', data: data);
     /*Response res = http.Response(
@@ -372,21 +359,22 @@ class ApiService {
     return res;
   }
 
+  Future<Response> getMyAttendanceSummary() async {
+    Map<String, dynamic> data = {};
+    return await _postApi(url: '/mba.attendance.get_my_attendance_summary', data: data);
+  }
+
   Future<Response> submitMontlyReport(
-      String month, String group, List<AttendanceSummary> summary) async {
-    Map<String, dynamic> data = {
-      'month': month,
-      'group_name': group,
-      'less_attendance_reasons': AttendanceSummary.toJsonList(summary)
-    };
+      String month, List<AttendanceSummary> summary, FillAttendanceData fillAttendanceData) async {
+    Map<String, dynamic> data = addAttendanceCoordinatorData({'month': month, 'less_attendance_reasons': AttendanceSummary.toJsonList(summary)}, fillAttendanceData);
     Response res =
         await _postApi(url: '/mba.group_api.submit_monthly_report', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }
 
-  Future<Response> getMBAAttendance(String mhtId, String group) async {
-    Map<String, dynamic> data = {'mba_mht_id': mhtId, 'group_name': group};
+  Future<Response> getMBAAttendance(String mhtId, FillAttendanceData fillAttendanceData) async {
+    Map<String, dynamic> data = addAttendanceCoordinatorData({'mba_mht_id': mhtId}, fillAttendanceData);
     Response res =
         await _postApi(url: '/mba.attendance.get_mba_attendance', data: data);
     /*Response res = http.Response(
@@ -397,10 +385,12 @@ class ApiService {
 
   Future<Response> fetchEvents({@required String groupName}) async {
     Map<String, dynamic> data = {'group_name': groupName};
-    Response res = await _postApi(url: '/mba.attendance.get_events', data: data);
-    String changedRes = res.body.replaceAll(":[{", ":{\"data\":[{").replaceAll("}]}", "}]}}");
-    print("changed res:" + changedRes);
-    Response res1 = http.Response(changedRes,200);
-    return res1;
+    return await _postApi(url: '/mba.attendance.get_events', data: data);
   }
+
+  Future<Response> getMBAEvents() async {
+    Map<String, dynamic> data = {'event_type': 'Event'};
+    return await _postApi(url: '/mba.attendance.get_mba_event_attendance', data: data);
+  }
+
 }

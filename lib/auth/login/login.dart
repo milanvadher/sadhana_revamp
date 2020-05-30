@@ -12,6 +12,7 @@ import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/logindatastate.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
+import 'package:sadhana/model/registration_request.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -283,16 +284,33 @@ class LoginPageState extends BaseState<LoginPage> {
           return true;
         } else if (appResponse.status == WSConstant.CODE_ENTITY_NOT_FOUND) {
           print('inside data');
+          RegistrationRequest registrationRequest = await getRegistrationRequest(loginState.mhtId);
+          String msg;
+          String doneButtonText;
+          bool allow = true;
+          if(registrationRequest == null) {
+            msg = "Your Mht Id is not registered with us, Pls Check again, "
+                "If it is correct and you are Dada's MBA then Kindly click Register button to enter registration details.";
+            doneButtonText = "Register";
+          } else {
+            if(AppUtils.equalsIgnoreCase(registrationRequest.status,WSConstant.REJECTED)) {
+              msg = "Your registration request is already rejected.";
+              doneButtonText = "OK";
+              allow = false;
+            } else {
+              msg = "You have already raised registration request. Do You want to Updated request?";
+              doneButtonText = "Yes";
+            }
+          }
           CommonFunction.alertDialog(
               context: context,
-              msg:
-                  "Your Mht Id is not registered with us, Pls Check again, "
-                      "If it is correct and you are Dada's MBA then Kindly click Register button to enter registration details.",
+              msg: msg,
               showCancelButton: true,
-              doneButtonText: "Register",
+              doneButtonText: doneButtonText,
               doneButtonFn: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage(mhtId: loginState.mhtId,)));
+                if(allow)
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage(mhtId: loginState.mhtId,request: registrationRequest,)));
               });
         }
       } catch (e, s) {
@@ -305,6 +323,25 @@ class LoginPageState extends BaseState<LoginPage> {
       CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
     return false;
+  }
+
+  Future<RegistrationRequest> getRegistrationRequest(String mhtId) async {
+    RegistrationRequest request;
+    await CommonFunction.tryCatchAsync(context, () async {
+      Response res = await api.getRegRequest(mhtId);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.isSuccess) {
+        setState(() {
+          List<RegistrationRequest> regRequestList = RegistrationRequest.fromJsonList(appResponse.data['profile']);
+          if(regRequestList.isNotEmpty) {
+            setState(() {
+              request = regRequestList.first;
+            });
+          }
+        });
+      }
+    });
+    return request;
   }
 
   Future<bool> _sendOtp(BuildContext context) async {

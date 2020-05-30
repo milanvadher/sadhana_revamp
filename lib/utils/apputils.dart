@@ -40,7 +40,7 @@ class AppUtils {
     return boolValue != null ? (boolValue ? 1 : 0) : defaultValue;
   }
 
-  static String convertDateToDateStr(DateTime input, {String defaultValue = null}) {
+  static String convertDateToDateStr(DateTime input, {String defaultValue}) {
     if (input == null) {
       return defaultValue;
     } else {
@@ -48,7 +48,10 @@ class AppUtils {
     }
   }
   static DateTime convertDateStrToDate(String strDate) {
-    return WSConstant.wsDateFormat.parse(strDate);
+    if(strDate != null && strDate.isNotEmpty)
+      return WSConstant.wsDateFormat.parse(strDate);
+    else
+        return null;
   }
 
   static String getCountTitleForSadhana(String sadhanaName) {

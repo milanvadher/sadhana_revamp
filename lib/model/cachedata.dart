@@ -80,7 +80,7 @@ class CacheData {
     if(userAccess != null && userAccess.fillAttendanceData != null) {
       FillAttendanceData fillAttendanceData = userAccess.fillAttendanceData;
       if(fillAttendanceData.attendanceType == AttendanceType.CENTER) {
-        await loadPendingMonthForAttendance(fillAttendanceData.groupName, fillAttendanceData.eventName, context);
+        await loadPendingMonthForAttendance(fillAttendanceData, context);
       }
     }
   }
@@ -96,8 +96,8 @@ class CacheData {
     }
   }
 
-  static loadPendingMonthForAttendance(String group, String eventName, BuildContext context) async {
-    Response res = await api.getMonthPendingForAttendance(group, eventName);
+  static loadPendingMonthForAttendance(FillAttendanceData fillAttendanceData, BuildContext context) async {
+    Response res = await api.getMonthPendingForAttendance(fillAttendanceData);
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {
       if (!AppUtils.isNullOrEmpty(appResponse.data))

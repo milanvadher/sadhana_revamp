@@ -7,12 +7,22 @@ part 'event.g.dart';
 
 @JsonSerializable()
 class Event {
-  @JsonKey(name: 'event_pk')
-  String eventPk;
   @JsonKey(name: 'event_name')
   String eventName;
   @JsonKey(name: 'name')
   String name;
+
+  @JsonKey(ignore: true)
+  int type = 0;
+  void setPast() => type = -1;
+  void setFuture() => type = 1;
+  void setCurrent() => type = 0;
+  bool get isCurrent => type == 0;
+  bool get isPast => type == -1;
+  bool get isFuture => type == 1;
+
+  //String get name => name1 != null ? name1 : eventPk;
+
   @JsonKey(name: 'start_date')
   String startDate;
   @JsonKey(name: 'end_date')
@@ -23,6 +33,7 @@ class Event {
   bool isAttendanceTaken;
   @JsonKey(name: 'sessions')
   List<Session> sessions;
+
 
   Event();
 
@@ -38,24 +49,23 @@ class Event {
     sessions.add(session);
     this.name = name;
     this.sessions = sessions;
-    this.eventPk = name;
   }
 
   static Event fromJsonFun(Map<String, dynamic> json) => Event.fromJson(json);
   static List<Event> fromJsonList(dynamic json) {
-    // return AppUtils.fromJsonList<Event>(json, Event.fromJsonFun);
-    List<Event> events = [];
+    return AppUtils.fromJsonList<Event>(json, Event.fromJsonFun);
+    /*List<Event> events = [];
     if (json is Map && json['data'] != null) {
       events = new List<Event>();
       json['data'].forEach((v) {
         events.add(new Event.fromJson(v));
       });
     }
-    return events;
+    return events;*/
   }
 
   @override
   String toString() {
-    return 'Event{eventPk: $eventPk, eventName: $eventName, name: $name, startDate: $startDate, endDate: $endDate, isEditable: $isEditable, isAttendanceTaken: $isAttendanceTaken, sessions: $sessions}';
+    return 'Event{eventName: $eventName, name: $name, startDate: $startDate, endDate: $endDate, isEditable: $isEditable, isAttendanceTaken: $isAttendanceTaken, sessions: $sessions}';
   }
 }

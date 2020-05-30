@@ -6,6 +6,7 @@ class Constant {
   static final DateFormat APP_DATE_FORMAT = DateFormat('dd-MMM-yyyy');
   static final DateFormat SYNC_DATE_FORMAT = DateFormat('dd-MM-yy');
   static final String APP_MONTH_FORMAT = 'MMM';
+  static final String APP_MONTH_YEAR_FORMAT = 'MMM yyyy';
   static final String APP_DATE_TIME_FORMAT = "dd-MM-yy hh:mm a";
   static final String APP_DATE_TIME_FILE_FORMAT = "dd-MM-yy hh-mm-a";
   static final String vanchanName = "Vanchan";

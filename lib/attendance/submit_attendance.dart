@@ -60,7 +60,7 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
           strMonth = DateFormat.yMMM().format(widget.month);
         });
 
-        Response res = await _api.getMonthlySummary(wsMonth, _fillAttendanceData.groupName);
+        Response res = await _api.getMonthlySummary(wsMonth, _fillAttendanceData);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           setState(() {
@@ -197,10 +197,10 @@ class _SubmitAttendancePageState extends BaseState<SubmitAttendancePage> {
     try {
       startOverlay();
       List<AttendanceSummary> lessAttendanceReason = summary.where((s) => !AppUtils.isNullOrEmpty(s.lessAttendanceReason)).toList();
-      Response res = await _api.submitMontlyReport(wsMonth, _fillAttendanceData.groupName, lessAttendanceReason);
+      Response res = await _api.submitMontlyReport(wsMonth, lessAttendanceReason, _fillAttendanceData);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        await CacheData.loadPendingMonthForAttendance(_fillAttendanceData.groupName, _fillAttendanceData.eventName, context);
+        await CacheData.loadPendingMonthForAttendance(_fillAttendanceData, context);
         CommonFunction.alertDialog(
             closeable: false,
             context: context,

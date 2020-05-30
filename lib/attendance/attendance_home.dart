@@ -3,6 +3,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:sadhana/attendance/attendance_constant.dart';
 import 'package:sadhana/attendance/attendance_summary.dart';
+import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/model/dvd_info.dart';
 import 'package:sadhana/attendance/model/event.dart';
 import 'package:sadhana/attendance/model/fill_attendance_data.dart';
@@ -28,10 +29,8 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 class AttendanceHomePage extends StatefulWidget {
   static const String routeName = '/attendance_home';
   final DateTime date;
-  final String eventName;
-  final String eventTitle;
-  final bool isEditMode;
-  AttendanceHomePage({this.date, this.eventName, this.eventTitle, this.isEditMode = false});
+  final Event event;
+  AttendanceHomePage({this.date, this.event});
 
   @override
   AttendanceHomePageState createState() => AttendanceHomePageState();
@@ -58,16 +57,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   final GlobalKey<FormState> _attendanceForm = GlobalKey<FormState>();
   bool isReadOnly = false;
   bool isEditMode = false;
-
+  bool isEventAttendance = false;
   String eventName;
   String eventTitle;
   @override
   void initState() {
     super.initState();
     if (widget.date != null) selectedDate = widget.date;
-    if (widget.eventName != null) {
-      eventName = widget.eventName;
-      eventTitle = widget.eventTitle;
+    if (widget.event != null) {
+      isEventAttendance = true;
+      event = widget.event;
+      isReadOnly = !widget.event.isEditable;
     }
     loadData();
   }
@@ -78,8 +78,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       _userAccess = CacheData.userAccess;
       if (_userAccess != null && _userAccess.fillAttendanceData != null) {
         fillAttendanceData = _userAccess.fillAttendanceData;
-        if (fillAttendanceData.isEventType) {
-          eventName = widget.eventName;
+        if (isEventAttendance) {
+          eventName = event.name;
         } else {
           eventName = fillAttendanceData.eventName;
           await loadSessionDates();
@@ -98,9 +98,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   loadEvent(DateTime date) async {
     startOverlay();
     await CommonFunction.tryCatchAsync(context, () async {
-      String strDate = WSConstant.wsDateFormat.format(date);
       if (fillAttendanceData.isEventType) {
-        isEditMode = widget.isEditMode;
+        isEditMode = widget.event.isAttendanceTaken;
       } else {
         if (sessionNameByDate.containsKey(date))
           isEditMode = true;
@@ -110,6 +109,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       if (isEditMode) {
         event = await getEvent();
       } else {
+        String strDate = WSConstant.wsDateFormat.format(date);
         event = await createEvent(eventName, strDate);
       }
       print('event' + event.toString());
@@ -125,11 +125,15 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Future<Event> createEvent(String eventName, String strDate) async {
     Response res = await _api.getMBAOfGroup(strDate, fillAttendanceData.groupName);
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-    if (appResponse.status == WSConstant.SUCCESS_CODE) {
+    if (appResponse.isSuccess) {
       List<Attendance> attendances = Attendance.fromJsonList(appResponse.data);
-      String sessionType = fillAttendanceData.isGDType ? WSConstant.sessionType_GD : WSConstant.sessionType_General;
-      session = Session.fromAttendanceList(fillAttendanceData.groupName, strDate, sessionType, attendances);
-      event = Event.fromSession(eventName, session);
+      if(!isEventAttendance) {
+        String sessionType = fillAttendanceData.isGDType ? WSConstant.sessionType_GD : WSConstant.sessionType_General;
+        session = Session.fromAttendanceList(fillAttendanceData.groupName, strDate, sessionType, attendances);
+        event = Event.fromSession(eventName, session);
+      } else {
+        event.sessions.first.attendance = attendances;
+      }
     }
     return event;
   }
@@ -137,12 +141,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   Future<Event> getEvent() async {
     Response res;
     if (fillAttendanceData.isEventType) {
-      res = await _api.getEventAttendance(
-          fillAttendanceData.groupName, eventName, FillAttendanceData.convertEnumToStr(fillAttendanceData.attendanceType));
+      res = await _api.getEventAttendance(fillAttendanceData, eventName);
     } else {
       String sessionName = sessionNameByDate[selectedDate];
-      res = await _api.getSessionAttendance(
-          sessionName, fillAttendanceData.groupName, eventName, FillAttendanceData.convertEnumToStr(fillAttendanceData.attendanceType));
+      res = await _api.getSessionAttendance(sessionName, fillAttendanceData);
     }
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.isSuccess) {
@@ -152,7 +154,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   loadSessionDates() async {
-    Response res = await _api.getSessionDates(fillAttendanceData.groupName, eventName);
+    Response res = await _api.getSessionDates(fillAttendanceData);
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.isSuccess) {
       List<SessionDate> sessionDates = SessionDate.fromJsonList(appResponse.data);
@@ -179,7 +181,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       appBar: AppBar(
         title: fillAttendanceData.isEventType
             ? AppTitleWithSubTitle(
-                title: eventTitle,
+                title: event.eventName,
                 subTitle: fillAttendanceData.groupTitle,
               )
             : InkWell(
@@ -228,7 +230,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             ),
           ),
         ),
-        actions: _buildAction(),
+        actions: isEventAttendance ? null : _buildAction(),
       ),
       body: SafeArea(
         child: Form(
@@ -273,7 +275,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                     onCheck(attendance);
                   },
           ),
-          !attendance.isPresent && fillAttendanceData.isGDType
+          !attendance.isPresent && (fillAttendanceData.isGDType || fillAttendanceData.isEventType)
               ? Container(
                   padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
                   child: TextInputField(
@@ -337,14 +339,14 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          FloatingActionButton(
+      !fillAttendanceData.isEventType ? FloatingActionButton(
             heroTag: _dvdFormButton,
             onPressed: () => _onDVDClick(),
             backgroundColor: Colors.white,
             child: fillAttendanceData.isCenterType
                 ? Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11))
                 : Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent),
-          ),
+          ) : Container(),
           SizedBox(width: 20),
           !isReadOnly
               ? FloatingActionButton.extended(
@@ -381,15 +383,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void setReadOnlyField() {
-    setState(() {
-      isReadOnly = isSelectedDateReadOnly();
-    });
+    if(!isEventAttendance) {
+      setState(() {
+        isReadOnly = isSelectedDateReadOnly();
+      });
+    }
   }
 
   bool isSelectedDateReadOnly() {
     return CommonFunction.tryCatchSync(context, () {
       if (fillAttendanceData.isGDType) {
-        if (selectedDate.isBefore(CacheData.today.add(Duration(days: -AttendanceConstant.SIMCITY_MAX_ALLOWED))))
+        if (selectedDate.isBefore(CacheData.today.add(Duration(days: -_userAccess.attendanceEditableDays))))
           return true;
         else
           return false;
@@ -450,7 +454,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   void onSubmitAttendanceClick() async {
     startOverlay();
     await CommonFunction.tryCatchAsync(context, () async {
-      await CacheData.loadPendingMonthForAttendance(fillAttendanceData.groupName, fillAttendanceData.eventName, context);
+      await CacheData.loadPendingMonthForAttendance(fillAttendanceData, context);
       if (CacheData.pendingMonth == null) {
         CommonFunction.alertDialog(context: context, msg: "You have already submmited Attendance");
       } else {
@@ -535,7 +539,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   deleteSession() async {
     Navigator.pop(context);
     CommonFunction.tryCatchAsync(context, () async {
-      Response res = await _api.deleteAttendanceSession(session.dateTime, fillAttendanceData.groupName);
+      Response res = await _api.deleteAttendanceSession(session.name, session.dateTime, fillAttendanceData);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse.isSuccess) {
         setState(() {
@@ -548,12 +552,16 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             msg: "Attendance deleted successfully.",
             doneButtonFn: () {
               Navigator.pop(context);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AttendanceHomePage(date: selectedDate),
-                ),
-              );
+              if(isEventAttendance) {
+                Navigator.pop(context, false);
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AttendanceHomePage(date: selectedDate),
+                  ),
+                );
+              }
             });
       }
     });
@@ -583,7 +591,11 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             if(!fillAttendanceData.isEventType) {
               setState(() {
                 _sessionDates.add(session.dateTime);
-                sessionNameByDate.putIfAbsent(session.dateTime, () => getSessionName(appResponse.data));
+                String sessionName = AttendanceUtils.getSessionName(appResponse.data);
+                if(sessionName != null) {
+                  sessionNameByDate.putIfAbsent(session.dateTime, () => sessionName);
+                  session.name = sessionName;
+                }
               });
             }
             setState(() {
@@ -596,6 +608,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 msg: "Attendance submitted successfully.",
                 doneButtonFn: () {
                   Navigator.pop(context);
+                  if(isEventAttendance)
+                    Navigator.pop(context, true);
                   //Navigator.pop(context);
                 });
           }
@@ -604,11 +618,6 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     });
     stopOverlay();
   }
-
-  String getSessionName(dynamic data) {
-    return (data as List)?.first;
-  }
-
   void goToAttendanceSubmitPage() {
     if (CacheData.pendingMonth != null) {
       Navigator.push(

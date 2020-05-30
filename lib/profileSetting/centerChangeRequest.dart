@@ -11,9 +11,11 @@ import 'package:sadhana/auth/registration/Inputs/text-input.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/center_change_request.dart';
 import 'package:sadhana/model/jobinfo.dart';
 import 'package:sadhana/model/mba_center.dart';
+import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/registration_request.dart';
 import 'package:sadhana/profileSetting/job_info_widget.dart';
 import 'package:sadhana/service/apiservice.dart';
@@ -24,56 +26,56 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:intl/intl.dart';
 
 class CenterChangeRequestPage extends StatefulWidget {
-  String mhtId;
-
-  CenterChangeRequestPage({this.mhtId});
+  CenterChangeRequestPage();
 
   @override
   State<StatefulWidget> createState() => new CenterChangeRequestPageState();
 }
 
 class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
-
-
   final _formIndiaKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   ApiService _api = new ApiService();
   var dateFormatter = new DateFormat(WSConstant.DATE_FORMAT);
   CenterChangeRequest request = CenterChangeRequest();
   List<MBACenter> centerList;
-  bool showJobInfo = true;
+  bool showJobInfo = false;
   @override
   void initState() {
     super.initState();
-    if (!AppUtils.isNullOrEmpty(widget.mhtId)) {
-      request.mhtId = widget.mhtId;
-      request.startDate = DateTime.now();
-      request.setJobInfo(JobInfo());
-    }
-    loadData();
+    loadCenterList();
+    loadCenterChangeRequest();
   }
 
-  loadData() async {
+  loadCenterList() async {
     startLoading();
-    Response res = await _api.getCenterList();
-    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-    if (appResponse.status == WSConstant.SUCCESS_CODE) {
-      setState(() {
-        centerList = MBACenter.fromJsonList(appResponse.data);
-      });
-    }
+    await CommonFunction.tryCatchAsync(context, () async {
+      Profile profile = await CacheData.getUserProfile();
+      request.mhtId = profile.mhtId;
+      request.startDate = DateTime.now();
+      Response res = await _api.getCenterList();
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.isSuccess) {
+        setState(() {
+          centerList = MBACenter.fromJsonList(appResponse.data);
+        });
+      }
+    });
     stopLoading();
   }
 
   loadCenterChangeRequest() async {
     startLoading();
-    Response res = await _api.getCenterChangeRequest();
-    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-    if (appResponse.status == WSConstant.SUCCESS_CODE) {
-      setState(() {
-        request = CenterChangeRequest.fromJson(appResponse.data);
-      });
-    }
+    await CommonFunction.tryCatchAsync(context, () async {
+      Response res = await _api.getCenterChangeRequest();
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.isSuccess && appResponse.data != null) {
+        setState(() {
+          request = CenterChangeRequest.fromJson(appResponse.data);
+          checkJobReason();
+        });
+      }
+    });
     stopLoading();
   }
 
@@ -81,7 +83,6 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
   Widget pageToDisplay() {
     return new Scaffold(
       appBar: AppBar(title: Text('Center Change Request')),
-      backgroundColor: Colors.white,
       body: new Form(
         key: _formIndiaKey,
         autovalidate: _autoValidate,
@@ -118,32 +119,32 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
           isRequiredValidation: true,
           isFutureAllow: true,
           selectedDate: request.startDate,
+          minDate: CacheData.today.add(Duration(days: -30)),
+          maxDate: CacheData.today.add(Duration(days: 30)),
           selectDate: (DateTime date) {
             setState(() {
               request.startDate = date;
             });
           },
         ),
-        DropDownInput(
+        DropDownInput.fromMap(
           labelText: "Reason",
-          items: ['Job Change', 'Other'],
+          valuesByLabel: {'Job/Seva Change': 'Job', 'Other': 'Other'},
           onChange: (value) {
             setState(() {
               if (value != null) request.reason = value;
-              if(AppUtils.equalsIgnoreCase(request.reason, "Job Change")) {
-
-              } else {
-
-              }
+              checkJobReason();
             });
           },
           valueText: request.reason,
           isRequiredValidation: true,
         ),
+        showJobInfo ? JobInfoWidget(jobInfo: request.jobInfo, displayStartDate: false) : Container(),
         TextInputField(
           isRequiredValidation: true,
-          labelText: "Reason",
-          onSaved: (val) => request.reason = val,
+          labelText: "Reason Description",
+          onSaved: (val) => request.description = val,
+          valueText: request.description,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -167,29 +168,38 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
             )
           ],
         ),
-        showJobInfo ? JobInfoWidget(jobInfo: request.getJobInfo()) : Container(),
       ],
     );
+  }
+
+  void checkJobReason() {
+    if (AppUtils.equalsIgnoreCase(request.reason, "Job")) {
+      setState(() {
+        showJobInfo = true;
+      });
+    }
   }
 
   void _submitRequest() async {
     if (_formIndiaKey.currentState.validate()) {
       _formIndiaKey.currentState.save();
       startOverlay();
-      request.status = "New";
-      Response res = await _api.centerChangeRequest(request);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        CommonFunction.alertDialog(
-            context: context,
-            msg: "We will get back to you soon after reviewing your request or You can also contact " + Constant.MBA_MAILID,
-            type: "success",
-            doneButtonText: "OK",
-            doneButtonFn: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            });
-      }
+      await CommonFunction.tryCatchAsync(context, () async {
+        request.status = "New";
+        Response res = await _api.centerChangeRequest(request);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.isSuccess) {
+          CommonFunction.alertDialog(
+              context: context,
+              msg: "We will get back to you soon after reviewing your request or You can also contact " + Constant.MBA_MAILID,
+              type: "success",
+              doneButtonText: "OK",
+              doneButtonFn: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
+        }
+      });
       stopOverlay();
     }
   }

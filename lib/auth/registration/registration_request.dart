@@ -21,8 +21,8 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 
 class RegistrationRequestPage extends StatefulWidget {
   String mhtId;
-
-  RegistrationRequestPage({this.mhtId});
+  RegistrationRequest request;
+  RegistrationRequestPage({this.mhtId, this.request});
 
   @override
   State<StatefulWidget> createState() => new RegistrationRequestPageState();
@@ -36,12 +36,18 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   List<MBACenter> centerList;
   bool _dadasMba;
   File iCardPhoto;
-
+  bool isEditMode = false;
   @override
   void initState() {
     super.initState();
     if (!AppUtils.isNullOrEmpty(widget.mhtId)) {
-      request.mhtId = widget.mhtId;
+      if(widget.request != null) {
+        request = widget.request;
+        isEditMode = true;
+      }
+      else
+        request.mhtId = widget.mhtId;
+
     }
     loadData();
   }
@@ -50,7 +56,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
     startLoading();
     Response res = await _api.getCenterList();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-    if (appResponse.status == WSConstant.SUCCESS_CODE) {
+    if (appResponse.isSuccess) {
       setState(() {
         centerList = MBACenter.fromJsonList(appResponse.data);
       });
@@ -70,7 +76,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
         child: SafeArea(
           child: new ListView(
             padding: EdgeInsets.only(left: 20, top: 20, bottom: 10, right: 20),
-            children: <Widget>[
+            children: isEditMode ? <Widget>[ buildRequestPage()] : <Widget>[
               //_titleAndLogo(),
               _areyouMBA(),
               _dadasMba == null ? Container() : _dadasMba ? buildRequestPage() : buildNonMBA(),
@@ -151,23 +157,23 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   Widget buildRequestPage() {
     return Column(
       children: <Widget>[
-        NumberInput(
+        TextInputField(
           isRequiredValidation: true,
           labelText: "MHT ID",
           enabled: false,
-          valueText: request.mhtId,
-          onSaved: (val) => request.mhtId = val?.toInt().toString(),
-          digitOnly: true,
+          valueText: request.mhtId
         ),
         TextInputField(
           isRequiredValidation: true,
           labelText: "First Name",
           onSaved: (val) => request.firstName = val,
+          valueText: request.firstName,
         ),
         TextInputField(
           isRequiredValidation: true,
           labelText: "Last Name",
           onSaved: (val) => request.lastName = val,
+          valueText: request.lastName,
         ),
         TextInputField(
           labelText: 'Mobile',
@@ -182,6 +188,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           textInputType: TextInputType.emailAddress,
           validation: (value) => CommonFunction.emailValidation(value),
           onSaved: (val) => request.emailId = val,
+          valueText: request.emailId,
         ),
         DropDownInput.fromMap(
           labelText: "Center",
@@ -208,7 +215,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
           children: <Widget>[
             new Container(
               child: new RaisedButton(
-                child: Text('Request', style: TextStyle(color: Colors.white)),
+                child: Text(isEditMode ? 'Update': 'Request', style: TextStyle(color: Colors.white)),
                 elevation: 4.0,
                 onPressed: _submitRequest,
               ),

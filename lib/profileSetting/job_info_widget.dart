@@ -21,10 +21,12 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 class JobInfoWidget extends StatefulWidget {
   final JobInfo jobInfo;
   final bool viewMode;
+  final bool displayStartDate;
   const JobInfoWidget({
     Key key,
     @required this.jobInfo,
     this.viewMode = false,
+    this.displayStartDate = true
   }) : super(key: key);
 
   @override
@@ -64,7 +66,7 @@ class _JobInfoWidgetState extends State<JobInfoWidget> {
             });
           },
         ),
-        DateInput(
+        widget.displayStartDate ? DateInput(
           labelText: 'Job/Business Start Date',
           viewMode: viewMode,
           selectedDate: _register.jobStartDate,
@@ -73,7 +75,7 @@ class _JobInfoWidgetState extends State<JobInfoWidget> {
               _register.jobStartDate = date;
             });
           },
-        ),
+        ) : Container(),
         TextInputField(
           labelText: 'Work City',
           viewMode: viewMode,

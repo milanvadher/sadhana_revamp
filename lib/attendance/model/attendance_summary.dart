@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/utils/apputils.dart';
+import 'package:intl/intl.dart';
 part 'attendance_summary.g.dart';
 
 @JsonSerializable()
@@ -20,7 +22,7 @@ class AttendanceSummary {
   DateTime get dateTime =>  date != null ? WSConstant.wsDateFormat.parse(date) : null;
 
   @JsonKey(ignore: true)
-  String get name => '$firstName $lastName';
+  String get name => date != null ? new DateFormat(Constant.APP_MONTH_YEAR_FORMAT).format(dateTime) : '$firstName $lastName';
 
   @JsonKey(name: 'total_session_for_mht')
   int totalAttendanceDates;

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:sadhana/model/center_change_request.dart';
 import 'package:sadhana/utils/apputils.dart';
 part 'jobinfo.g.dart';
 
@@ -15,4 +16,17 @@ class JobInfo {
   String workCity;
   factory JobInfo.fromJson(Map<String, dynamic> json) => _$JobInfoFromJson(json);
   Map<String, dynamic> toJson() => _$JobInfoToJson(this);
+
+
+  JobInfo.fromCenterChangeRequest(CenterChangeRequest centerChangeRequest) {
+    this.occupation = centerChangeRequest.occupation;
+    this.companyName = centerChangeRequest.companyName;
+    this.workCity = centerChangeRequest.workCity;
+  }
+
+  void toCenterChangeRequest(CenterChangeRequest centerChangeRequest) {
+    centerChangeRequest.occupation = this.occupation;
+    centerChangeRequest.companyName = this.companyName;
+    centerChangeRequest.workCity = this.workCity;
+  }
 }

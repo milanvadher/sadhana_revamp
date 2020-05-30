@@ -4,6 +4,7 @@ import 'package:sadhana/attendance/mba_attendance_history.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/fill_attendance_data.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -14,6 +15,8 @@ import 'package:sadhana/wsmodel/appresponse.dart';
 
 class AttendanceSummaryPage extends StatefulWidget {
   static const String routeName = '/attendance_summary';
+  bool isMyAttendanceSummary;
+  AttendanceSummaryPage({this.isMyAttendanceSummary = false});
 
   @override
   _AttendanceSummaryPageState createState() => _AttendanceSummaryPageState();
@@ -52,32 +55,49 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   void loadData() async {
-    startLoading();
+    await CommonFunction.tryCatchAsync(context, () async {
+      startLoading();
+      if (widget.isMyAttendanceSummary)
+        await loadMyAttendanceSummary();
+      else
+        await loadCoordinatorAttendanceSummary();
+      stopLoading();
+    });
+  }
+
+  loadMyAttendanceSummary() async {
+    Response res = await _api.getMyAttendanceSummary();
+    AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+    if (appResponse.isSuccess) {
+      allSummary = AttendanceSummary.fromJsonList(appResponse.data);
+      if (allSummary == null) allSummary = [];
+      filteredSummary = allSummary;
+      setTitle();
+      print(filteredSummary);
+    }
+  }
+
+  loadCoordinatorAttendanceSummary() async {
     _userAccess = await AppSharedPrefUtil.getUserAccess();
     if (_userAccess != null && _userAccess.fillAttendanceData != null) {
       _fillAttendanceData = _userAccess.fillAttendanceData;
-      Response res = await _api.getAttendanceSummary(_fillAttendanceData.groupName);
-      AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
-        allSummary =
-            AttendanceSummary.fromJsonList(appResponse.data['details']);
+      Response res = await _api.getAttendanceSummary(_fillAttendanceData);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.isSuccess) {
+        allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
         if (allSummary == null) allSummary = [];
         filteredSummary = allSummary;
         setTitle();
         print(filteredSummary);
       }
     }
-    stopLoading();
   }
 
   void _filteredSummary() async {
     if (_searchText.isNotEmpty) {
       setState(() {
-        filteredSummary = filteredSummary
-            .where((summary) =>
-                summary.name.toLowerCase().contains(_searchText.toLowerCase()))
-            .toList(growable: true);
+        filteredSummary =
+            filteredSummary.where((summary) => summary.name.toLowerCase().contains(_searchText.toLowerCase())).toList(growable: true);
       });
     }
   }
@@ -109,10 +129,12 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   setTitle() {
-    _appBarTitle = AppTitleWithSubTitle(
-      title: 'Attendance Summary',
-      subTitle: _fillAttendanceData.groupTitle,
-    );
+    _appBarTitle = widget.isMyAttendanceSummary
+        ? Text('My Attenndance')
+        : AppTitleWithSubTitle(
+            title: 'Attendance Summary',
+            subTitle: _fillAttendanceData.groupTitle,
+          );
   }
 
   @override
@@ -123,12 +145,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
       appBar: AppBar(
         centerTitle: true,
         title: _appBarTitle,
-        actions: <Widget>[
-          IconButton(
-            icon: _searchIcon,
-            onPressed: _onSearchPressed,
-          ),
-        ],
+        actions: !widget.isMyAttendanceSummary ? <Widget>[IconButton(icon: _searchIcon, onPressed: _onSearchPressed)] : null,
       ),
       body: SafeArea(
         child: _buildNewListView(),
@@ -154,9 +171,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
       margin: EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black,
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
         ),
         borderRadius: BorderRadius.all(
           Radius.circular(5),
@@ -183,7 +198,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
+                data.totalAttendanceDates == 0 ? '0 %' : '${((data.presentDates / data.totalAttendanceDates) * 100).toInt().toString()} %',
                 style: TextStyle(color: Colors.white),
               ),
               Text(
@@ -198,14 +213,16 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   }
 
   onListTileClick(AttendanceSummary summary) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MBAAttendanceHistory(
-          mhtID: summary.mhtId,
-          name: summary.name,
+    if(!widget.isMyAttendanceSummary) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MBAAttendanceHistory(
+            mhtID: summary.mhtId,
+            name: summary.name,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }
