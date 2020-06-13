@@ -32,6 +32,7 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   final _formIndiaKey = GlobalKey<FormState>();
   bool _autoValidate = false;
   ApiService _api = new ApiService();
+  RegistrationRequest old = RegistrationRequest();
   RegistrationRequest request = RegistrationRequest();
   List<MBACenter> centerList;
   bool _dadasMba;
@@ -47,8 +48,8 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
       }
       else
         request.mhtId = widget.mhtId;
-
     }
+    old = RegistrationRequest.fromObj(request);
     loadData();
   }
 
@@ -248,27 +249,36 @@ class RegistrationRequestPageState extends BaseState<RegistrationRequestPage> {
   void _submitRequest() async {
     if (_formIndiaKey.currentState.validate()) {
       _formIndiaKey.currentState.save();
-      startOverlay();
-      if (Platform.isAndroid)
-        request.requestSource = 'Android';
-      else
-        request.requestSource = 'iOS';
-      /*print('File size ${await iCardPhoto.length()/1024} ');
-      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);*/
-      Response res = await _api.sendRequest(request);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+      if(request == old) {
         CommonFunction.alertDialog(
             context: context,
-            msg: "We will get back to you soon after reviewing your request or You can also contact " + Constant.MBA_MAILID,
-            type: "success",
+            msg: "Please update registration request details to apply changes.",
+            type: "info",
             doneButtonText: "OK",
-            doneButtonFn: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            });
+        );
+      } else {
+        startOverlay();
+        if (Platform.isAndroid)
+          request.requestSource = 'Android';
+        else
+          request.requestSource = 'iOS';
+        /*print('File size ${await iCardPhoto.length()/1024} ');
+      request.iCardPhoto = CommonFunction.getBase64String(iCardPhoto);*/
+        Response res = await _api.sendRequest(request);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        if (appResponse.status == WSConstant.SUCCESS_CODE) {
+          CommonFunction.alertDialog(
+              context: context,
+              msg: "We will get back to you soon after reviewing your request or You can also contact " + Constant.MBA_MAILID,
+              type: "success",
+              doneButtonText: "OK",
+              doneButtonFn: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              });
+        }
+        stopOverlay();
       }
-      stopOverlay();
     }
   }
 }

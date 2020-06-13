@@ -25,8 +25,14 @@ class Event {
 
   @JsonKey(name: 'start_date')
   String startDate;
+
+  DateTime get startDateTime =>  startDate != null ? WSConstant.wsDateFormat.parse(startDate) : null;
+
   @JsonKey(name: 'end_date')
   String endDate;
+
+  DateTime get endDateTime =>  endDate != null ? WSConstant.wsDateFormat.parse(endDate) : null;
+
   @JsonKey(name: 'is_editable')
   bool isEditable;
   @JsonKey(name: 'is_attendance_taken')
@@ -36,9 +42,6 @@ class Event {
 
 
   Event();
-
-  DateTime get startDateTime =>
-      startDate != null ? WSConstant.wsDateFormat.parse(startDate) : null;
 
   factory Event.fromJson(Map<String, dynamic> json) => _$EventFromJson(json);
 

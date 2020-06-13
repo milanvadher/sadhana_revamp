@@ -17,7 +17,7 @@ class AppResponseParser {
   static AppResponse parseResponse(Response res, {@required BuildContext context, bool showDialog = true}) {
     ApiService _api = new ApiService();
     ServerResponse serverResponse;
-    if (res.statusCode == 226) {
+    if (res.statusCode == 226 || res.statusCode == 403) {
       logout(context);
     } else {
       if (res.statusCode == 500 || res.statusCode == 502)

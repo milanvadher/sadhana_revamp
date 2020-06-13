@@ -15,7 +15,7 @@ class UserAccess {
   bool fillEventAttendance;
   @JsonKey(name: 'fill_attendance_data')
   FillAttendanceData fillAttendanceData;
-  @JsonKey(name: 'attendance_editable_days')
+  @JsonKey(name: 'attendance_editable_days', defaultValue: 60)
   int attendanceEditableDays = 60;
   @JsonKey(name: 'mba_event_type')
   String myAttendanceType;

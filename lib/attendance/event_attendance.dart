@@ -12,6 +12,7 @@ import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
@@ -21,8 +22,8 @@ import 'model/event.dart';
 
 class EventAttendance extends StatefulWidget {
   final bool myAttendance;
-  final bool isReadOnly;
-  EventAttendance({this.myAttendance = false, this.isReadOnly = false});
+  final bool isMyAttendanceSummary;
+  EventAttendance({this.myAttendance = false, this.isMyAttendanceSummary = false});
   @override
   _EventAttendanceState createState() => _EventAttendanceState();
 }
@@ -35,6 +36,7 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
   List<Event> pastEvent = [];
   FillAttendanceData fillAttendanceData;
   String myMhtID;
+  bool isReadOnly = false;
   @override
   void initState() {
     super.initState();
@@ -43,6 +45,8 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
       fillAttendanceData = _userRole.fillAttendanceData;
     } else {
       CacheData.getUserProfile().then((value) => myMhtID = value.mhtId);
+      if(widget.isMyAttendanceSummary)
+        this.isReadOnly = true;
     }
     events = fetchEvents;
   }
@@ -52,7 +56,10 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
       List<Event> events;
         Response res;
         if (widget.myAttendance) {
-          res = await _api.getMBAEvents();
+          if(widget.isMyAttendanceSummary)
+            res = await _api.getMyAttendanceSummary();
+          else
+            res = await _api.getMBAEvents();
         } else
           res = await _api.fetchEvents(groupName: fillAttendanceData.groupName);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -74,7 +81,7 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
   }
 
   void onEventClick(Event event) {
-    if(!widget.isReadOnly) {
+    if(!isReadOnly) {
       if (widget.myAttendance) {
         onCheck(event);
       } else {
@@ -140,10 +147,8 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
           ],
         ),
         subtitle: Text(
-          event.startDate.isNotEmpty ? '${event.startDate} to ${event?.endDate}' : '' ?? "",
-          style: Theme.of(context).textTheme.caption.copyWith(
-                color: event.isAttendanceTaken ? Theme.of(context).primaryColor.withAlpha(150) : null,
-              ),
+          event.startDate.isNotEmpty ? '${AppUtils.getAppDisplayDate(event.startDateTime)} to ${AppUtils.getAppDisplayDate(event.endDateTime)}' : '' ?? "",
+          style: Theme.of(context).textTheme.caption.copyWith(color: null, fontWeight: event.isAttendanceTaken ? FontWeight.bold : FontWeight.normal),
         ),
         onTap: () {
           onEventClick(event);
@@ -157,7 +162,7 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
     if (widget.myAttendance) {
       return Checkbox(
         activeColor: Colors.red.shade500,
-        onChanged: isEditable && !widget.isReadOnly ? (val) => onCheck(event) : null,
+        onChanged: isEditable && !isReadOnly ? (val) => onCheck(event) : null,
         value: event.sessions.first.attendance.first.isPresent,
       );
     } else {
@@ -166,7 +171,7 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
   }
 
   void onCheck(Event event) async {
-    if(!widget.isReadOnly) {
+    if(!isReadOnly) {
       if (event.isEditable) {
         startOverlay();
         await CommonFunction.tryCatchAsync(context, () async {

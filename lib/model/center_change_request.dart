@@ -18,8 +18,8 @@ class CenterChangeRequest {
   String centerName;
   @JsonKey(name: 'start_date', fromJson: AppUtils.convertDateStrToDate, toJson: AppUtils.convertDateToDateStr)
   DateTime startDate;
-  @JsonKey(name: 'reason')
-  String reason;
+  @JsonKey(name: 'reason', defaultValue: 'Other')
+  String reason = 'Other';
   @JsonKey(name: 'status')
   String status;
   @JsonKey(name: 'reason_description')

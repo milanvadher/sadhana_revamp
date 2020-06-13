@@ -36,4 +36,28 @@ class RegistrationRequest {
     return AppUtils.fromJsonList<RegistrationRequest>(json, RegistrationRequest.fromJsonFun);
   }
 
+  static RegistrationRequest fromObj(RegistrationRequest dailyInfo) => RegistrationRequest.fromJson(dailyInfo.toJson());
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is RegistrationRequest &&
+              runtimeType == other.runtimeType &&
+              mobile == other.mobile &&
+              center == other.center &&
+              emailId == other.emailId &&
+              firstName == other.firstName &&
+              lastName == other.lastName;
+
+  @override
+  int get hashCode =>
+      mobile.hashCode ^
+      center.hashCode ^
+      emailId.hashCode ^
+      firstName.hashCode ^
+      lastName.hashCode;
+
+
+
+
 }

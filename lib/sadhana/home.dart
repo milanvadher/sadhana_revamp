@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:open_file/open_file.dart';
+import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/event_attendance.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
@@ -546,7 +547,7 @@ class HomePageState extends BaseState<HomePage> {
                           value: 'attendance',
                         )
                       : null,
-                  fillEventAttendance ? PopupMenuItem(
+                  fillEventAttendance && !AttendanceUtils.isOtherGroupMBA(userAccess) ? PopupMenuItem(
                     child: ListTile(
                       trailing: Icon(
                         Icons.event_available,

@@ -6,9 +6,11 @@ import 'package:sadhana/attendance/model/fill_attendance_data.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
+import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/widgets/title_with_subtitle.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
@@ -33,6 +35,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
   int month = new DateTime.now().month;
   UserAccess _userAccess;
   FillAttendanceData _fillAttendanceData;
+  DateTime summaryFrom;
   @override
   void initState() {
     super.initState();
@@ -69,8 +72,9 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
     Response res = await _api.getMyAttendanceSummary();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.isSuccess) {
-      allSummary = AttendanceSummary.fromJsonList(appResponse.data);
+      allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
       if (allSummary == null) allSummary = [];
+      summaryFrom = getSummaryFrom(appResponse);
       filteredSummary = allSummary;
       setTitle();
       print(filteredSummary);
@@ -83,14 +87,22 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
       _fillAttendanceData = _userAccess.fillAttendanceData;
       Response res = await _api.getAttendanceSummary(_fillAttendanceData);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.isSuccess) {
+      if (appResponse.isSuccess && appResponse.data != null) {
         allSummary = AttendanceSummary.fromJsonList(appResponse.data['details']);
         if (allSummary == null) allSummary = [];
+        summaryFrom = getSummaryFrom(appResponse);
         filteredSummary = allSummary;
         setTitle();
         print(filteredSummary);
       }
     }
+  }
+
+  DateTime getSummaryFrom(AppResponse appResponse) {
+    if(appResponse.data is Map)
+      return AppUtils.convertDateStrToDate(appResponse.data['saffrony_start_date']);
+    else
+      return null;
   }
 
   void _filteredSummary() async {
@@ -130,7 +142,7 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
 
   setTitle() {
     _appBarTitle = widget.isMyAttendanceSummary
-        ? Text('My Attenndance')
+        ? Text('My Attendance')
         : AppTitleWithSubTitle(
             title: 'Attendance Summary',
             subTitle: _fillAttendanceData.groupTitle,
@@ -148,21 +160,58 @@ class _AttendanceSummaryPageState extends BaseState<AttendanceSummaryPage> {
         actions: !widget.isMyAttendanceSummary ? <Widget>[IconButton(icon: _searchIcon, onPressed: _onSearchPressed)] : null,
       ),
       body: SafeArea(
-        child: _buildNewListView(),
+        child: (filteredSummary != null && filteredSummary.isNotEmpty) ? _buildNewListView() : _buildNoSummary(),
       ),
     );
   }
 
+  _buildNoSummary() {
+    return Center(child: Text('No attendance record found.'));
+  }
+
+  Widget buildNote() {
+    return summaryFrom != null ? Padding(
+      padding: EdgeInsets.only(top: 10, bottom: 5),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+              color: theme == Brightness.dark ? Colors.white : Colors.black),
+          children: <TextSpan>[
+            TextSpan(
+                text: 'Note: ',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            TextSpan(text: 'Summary from '),
+            TextSpan(
+                text: '${AppUtils.getAppDisplayDate(summaryFrom)}',
+                style: TextStyle(fontWeight: FontWeight.bold),)
+          ],
+        ),
+      ),
+    ) : Container();
+  }
+
   _buildNewListView() {
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(vertical: 12),
-      separatorBuilder: (context, index) {
-        return Divider();
-      },
-      itemCount: filteredSummary.length,
-      itemBuilder: (BuildContext context, int index) {
-        return _buildUserTile(filteredSummary[index]);
-      },
+    return Column(
+      children: <Widget>[
+        buildNote(),
+        Expanded(
+          child: Container(
+            child:
+                ListView.separated(
+
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  separatorBuilder: (context, index) {
+                    return Divider();
+                  },
+                  itemCount: filteredSummary.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return _buildUserTile(filteredSummary[index]);
+                  },
+                ),
+
+          ),
+        ),
+      ],
     );
   }
 

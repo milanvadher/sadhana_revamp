@@ -54,6 +54,14 @@ class AppUtils {
         return null;
   }
 
+  static String getAppDisplayDate(DateTime input, {String defaultValue}) {
+    if (input == null) {
+      return defaultValue;
+    } else {
+      return Constant.APP_DATE_FORMAT.format(input);
+    }
+  }
+
   static String getCountTitleForSadhana(String sadhanaName) {
     if (AppUtils.equalsIgnoreCase(sadhanaName, Constant.SEVANAME))
       return 'Hours';

@@ -177,6 +177,11 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
       setState(() {
         showJobInfo = true;
       });
+    } else {
+      setState(() {
+        showJobInfo = false;
+        request.jobInfo = JobInfo();
+      });
     }
   }
 

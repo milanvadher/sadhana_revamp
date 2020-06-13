@@ -40,8 +40,8 @@ class StartWidget extends StatelessWidget {
           child: TextFormField(
             initialValue: loginState.mhtId,
             validator: CommonValidation.mhtIdValidation,
-            keyboardType: TextInputType.number,
-            inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+            //keyboardType: TextInputType.number,
+            //inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
               icon: Icon(Icons.email),
               border: OutlineInputBorder(),

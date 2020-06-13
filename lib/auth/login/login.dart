@@ -265,11 +265,11 @@ class LoginPageState extends BaseState<LoginPage> {
     if (await AppUtils.isInternetConnected()) {
       startOverlay();
       try {
-        try {
-          loginState.mhtId = int.parse(loginState.mhtId).toString();
+        /*try {
+          loginState.intMhtId = int.parse(loginState.intMhtId).toString();
         } catch (e,s) {
           print(e); print(s);
-        }
+        }*/
         Response res = await api.getUserProfile(loginState.mhtId);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
         print(appResponse.status);
@@ -298,7 +298,7 @@ class LoginPageState extends BaseState<LoginPage> {
               doneButtonText = "OK";
               allow = false;
             } else {
-              msg = "You have already raised registration request. Do You want to Updated request?";
+              msg = "You have already raised registration request. Do You want to update request?";
               doneButtonText = "Yes";
             }
           }
@@ -329,8 +329,8 @@ class LoginPageState extends BaseState<LoginPage> {
     RegistrationRequest request;
     await CommonFunction.tryCatchAsync(context, () async {
       Response res = await api.getRegRequest(mhtId);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
-      if (appResponse.isSuccess) {
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
+      if (appResponse.isSuccess && appResponse.data != null) {
         setState(() {
           List<RegistrationRequest> regRequestList = RegistrationRequest.fromJsonList(appResponse.data['profile']);
           if(regRequestList.isNotEmpty) {

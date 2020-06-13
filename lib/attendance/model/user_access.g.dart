@@ -17,7 +17,7 @@ UserAccess _$UserAccessFromJson(Map<String, dynamic> json) {
         ? null
         : FillAttendanceData.fromJson(
             json['fill_attendance_data'] as Map<String, dynamic>)
-    ..attendanceEditableDays = json['attendance_editable_days'] as int
+    ..attendanceEditableDays = json['attendance_editable_days'] as int ?? 60
     ..myAttendanceType = json['mba_event_type'] as String;
 }
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:sadhana/attendance/attendance_summary.dart';
+import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/event_attendance.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
@@ -133,7 +134,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               Constant.colors[0],
               'Change Center',
               onChangeCenter,
-              'Change you center',
+              'Change your center',
               showRightIcon: true,
             ),
             _Heading('Settings'),
@@ -198,18 +199,20 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
 
   void onMyAttendance() {
     UserAccess userAccess = CacheData.userAccess;
-    if(userAccess != null && AppUtils.equalsIgnoreCase(userAccess.myAttendanceType, 'Event')) {
+    if(AttendanceUtils.isOtherGroupMBA(userAccess)) {
       Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventAttendance(myAttendance: true),
+            builder: (context) => EventAttendance(myAttendance: true, isMyAttendanceSummary: true,),
+          ));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AttendanceSummaryPage(isMyAttendanceSummary: true),
           ));
     }
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AttendanceSummaryPage(isMyAttendanceSummary: true),
-        ));
+
   }
 
   void onChangeCenter() {
