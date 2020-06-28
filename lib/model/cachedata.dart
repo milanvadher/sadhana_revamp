@@ -76,7 +76,7 @@ class CacheData {
   static UserAccess userAccess;
 
   static loadAttendanceData(BuildContext context) async {
-    await loadUserAccess(context);
+    await loadUserAccessFromServer(context);
     if(userAccess != null && userAccess.fillAttendanceData != null) {
       FillAttendanceData fillAttendanceData = userAccess.fillAttendanceData;
       if(fillAttendanceData.attendanceType == AttendanceType.CENTER) {
@@ -85,7 +85,20 @@ class CacheData {
     }
   }
 
-  static loadUserAccess(BuildContext context) async {
+  static Future<UserAccess> getUsageAccess(BuildContext context) async {
+    if(userAccess == null)
+      await loadUserAccessFromSharedPref();
+    return userAccess;
+  }
+
+  static Future<UserAccess> loadUserAccessFromSharedPref() async {
+    userAccess = await AppSharedPrefUtil.getUserAccess();
+    if (userAccess != null)
+      CacheData.userAccess = userAccess;
+    return userAccess;
+  }
+
+  static loadUserAccessFromServer(BuildContext context) async {
     Response res = await api.getUserAccess();
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.status == WSConstant.SUCCESS_CODE) {

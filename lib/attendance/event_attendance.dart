@@ -64,7 +64,10 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
           res = await _api.fetchEvents(groupName: fillAttendanceData.groupName);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.isSuccess) {
-          events = Event.fromJsonList(appResponse.data);
+          if(widget.myAttendance)
+            events = Event.fromJsonList(appResponse.data['details']);
+          else
+            events = Event.fromJsonList(appResponse.data);
           if (widget.myAttendance)
             await addAttendanceIfAbsent(events);
           else

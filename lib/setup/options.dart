@@ -80,18 +80,11 @@ class AppOptionsPage extends StatefulWidget {
 
 class _AppOptionsPageState extends BaseState<AppOptionsPage> {
   bool isAllowSyncFromServer = true;
+  bool isShowMyAttendance = false;
   @override
   void initState() {
     super.initState();
-    AppSettingUtil.getServerAppSetting().then((appSetting) async {
-      if (appSetting != null) {
-        if (await AppSharedPrefUtil.isUserRegistered()) {
-          setState(() {
-            isAllowSyncFromServer = appSetting.allowSyncFromServer;
-          });
-        }
-      }
-    });
+    loadData();
   }
 
   loadData() async {
@@ -100,6 +93,12 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
       if (await AppSharedPrefUtil.isUserRegistered()) {
         isAllowSyncFromServer = appSetting.allowSyncFromServer;
       }
+    }
+    UserAccess userAccess = await CacheData.getUsageAccess(context);
+    if(userAccess != null) {
+      setState(() {
+        isShowMyAttendance = userAccess.showMyAttendance;
+      });
     }
   }
 
@@ -121,14 +120,14 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
               'View/Edit your profile',
               showRightIcon: true,
             ),
-            ActionItem(
+            isShowMyAttendance ? ActionItem(
               Icons.calendar_today,
               Constant.colors[1],
               'My Attendance',
               onMyAttendance,
               'View My Attendance',
               showRightIcon: true,
-            ),
+            ) : Container(),
             ActionItem(
               Icons.person_outline,
               Constant.colors[0],
@@ -148,7 +147,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
                     : Container(),
                 ActionItem(Icons.file_download, Constant.colors[4], 'Backup Data', _onBackup, 'Backup your data'),
                 ActionItem(Icons.file_upload, Constant.colors[5], 'Import Data', _onImport,
-                    'Import Data your data which hass been taken backup. Select .db file.'),
+                    'Import your data which has been taken backup. Select .db file.'),
               ],
             ),
           ]..addAll(<Widget>[
@@ -197,22 +196,25 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
         ));
   }
 
-  void onMyAttendance() {
-    UserAccess userAccess = CacheData.userAccess;
-    if(AttendanceUtils.isOtherGroupMBA(userAccess)) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EventAttendance(myAttendance: true, isMyAttendanceSummary: true,),
-          ));
+  void onMyAttendance() async {
+    if(await AppUtils.isInternetConnected()) {
+      UserAccess userAccess = CacheData.userAccess;
+      if(AttendanceUtils.isOtherGroupMBA(userAccess)) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EventAttendance(myAttendance: true, isMyAttendanceSummary: true,),
+            ));
+      } else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AttendanceSummaryPage(isMyAttendanceSummary: true),
+            ));
+      }
     } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AttendanceSummaryPage(isMyAttendanceSummary: true),
-          ));
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
-
   }
 
   void onChangeCenter() {

@@ -57,9 +57,7 @@ class CenterChangeRequest {
   }
 
   Map<String, dynamic> toJson() {
-    if (AppUtils.equalsIgnoreCase(reason, WSConstant.JOB_CHANGE)) {
-      jobInfo.toCenterChangeRequest(this);
-    }
+    jobInfo.toCenterChangeRequest(this);
     return _$CenterChangeRequestToJson(this);
   }
 }

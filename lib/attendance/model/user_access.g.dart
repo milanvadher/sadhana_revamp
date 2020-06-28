@@ -18,7 +18,7 @@ UserAccess _$UserAccessFromJson(Map<String, dynamic> json) {
         : FillAttendanceData.fromJson(
             json['fill_attendance_data'] as Map<String, dynamic>)
     ..attendanceEditableDays = json['attendance_editable_days'] as int ?? 60
-    ..myAttendanceType = json['mba_event_type'] as String;
+    ..myAttendanceType = json['my_event_type'] as String;
 }
 
 Map<String, dynamic> _$UserAccessToJson(UserAccess instance) =>
@@ -30,5 +30,5 @@ Map<String, dynamic> _$UserAccessToJson(UserAccess instance) =>
           AppUtils.convertBoolToInt(instance.fillEventAttendance),
       'fill_attendance_data': instance.fillAttendanceData?.toJson(),
       'attendance_editable_days': instance.attendanceEditableDays,
-      'mba_event_type': instance.myAttendanceType,
+      'my_event_type': instance.myAttendanceType,
     };

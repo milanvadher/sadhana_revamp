@@ -115,7 +115,7 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadUserAccessFromSharedPref() async {
-    userAccess = await AppSharedPrefUtil.getUserAccess();
+    userAccess = await CacheData.getUsageAccess(context);
     if (userAccess != null) {
       setState(() {
         if(userAccess.fillEventAttendance)
@@ -130,7 +130,7 @@ class HomePageState extends BaseState<HomePage> {
 
   loadUserAccessFromServer() async {
     if (await AppUtils.isInternetConnected()) {
-      await CacheData.loadUserAccess(context);
+      await CacheData.loadUserAccessFromServer(context);
     }
   }
 

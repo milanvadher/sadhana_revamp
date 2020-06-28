@@ -398,23 +398,45 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         else
           return false;
       } else {
-        if (selectedDate.month == CacheData.today.month) {
+        if (isEqualMonth(selectedDate, CacheData.today)) {
           if (isCurrentMonthAttendanceSubmitted())
             return true;
           else
             return false;
         }
-        if (CacheData.pendingMonth != null && selectedDate.month >= CacheData.pendingMonth.month)
+        if (CacheData.pendingMonth != null && isGreaterOrEqualMonth(selectedDate, CacheData.pendingMonth))
           return false;
         else {
           if (CacheData.pendingMonth == null) {
             DateTime lastSubmittedMonth = getLastSubmittedMonth();
-            if (lastSubmittedMonth == null || selectedDate.month > lastSubmittedMonth.month) return false;
+            if (lastSubmittedMonth == null || isGreaterMonth(selectedDate, lastSubmittedMonth)) return false;
           }
         }
         return true;
       }
     });
+  }
+
+  bool isGreaterMonth(DateTime month1, DateTime month2) {
+    if(month1.year == month2.year)
+      return month1.month > month2.month;
+    else if(month1.year > month2.year)
+      return true;
+    else
+      return false;
+  }
+
+  bool isGreaterOrEqualMonth(DateTime month1, DateTime month2) {
+    if(month1.year == month2.year)
+      return month1.month >= month2.month;
+    else if(month1.year > month2.year)
+      return true;
+    else
+      return false;
+  }
+
+  bool isEqualMonth(DateTime month1, DateTime month2) {
+    return (month1.year == month2.year && month1.month >= month2.month);
   }
 
   DateTime getLastSubmittedMonth() {
@@ -431,7 +453,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   bool isContainCurrentMonthDates() {
     for (DateTime sessionDate in _sessionDates) {
-      if (sessionDate.month == CacheData.today.month) return true;
+      if (isEqualMonth(sessionDate,CacheData.today)) return true;
     }
     return false;
   }
@@ -568,7 +590,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
-    if (CacheData.isAttendanceSubmissionPending() && CacheData.pendingMonth.month != selectedDate.month) {
+    if (CacheData.isAttendanceSubmissionPending() && !isEqualMonth(CacheData.pendingMonth, selectedDate)) {
       String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
       CommonFunction.alertDialog(
           context: context,

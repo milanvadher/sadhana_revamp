@@ -16,9 +16,10 @@ class AppLocalNotification {
     priority: Priority.High,
     playSound: true,
     color: Colors.redAccent,
-    largeIcon: "ic_notification_large_icon",
-    largeIconBitmapSource: BitmapSource.Drawable,
-    style: AndroidNotificationStyle.BigText,
+    largeIcon: DrawableResourceAndroidBitmap('ic_notification_large_icon'),
+    //largeIconBitmapSource: BitmapSource.Drawable,
+    //style: AndroidNotificationStyle.BigText,
+      //styleInformation:
     //ongoing: true,  // Sticky Notification
   );
   
@@ -55,9 +56,9 @@ class AppLocalNotification {
         priority: Priority.High,
         playSound: true,
         color: Colors.redAccent,
-        largeIcon: "ic_notification_large_icon",
-        largeIconBitmapSource: BitmapSource.Drawable,
-        style: AndroidNotificationStyle.BigText,
+        largeIcon: DrawableResourceAndroidBitmap('ic_notification_large_icon'),
+        //largeIconBitmapSource: BitmapSource.Drawable,
+        //style: AndroidNotificationStyle.BigText,
         //ongoing: true,  // Sticky Notification
       );
       var iOSPlatformChannelSpecifics = IOSNotificationDetails();
