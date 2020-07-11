@@ -388,7 +388,7 @@ class ApiService {
     return await _postApi(url: '/mba.attendance.get_events', data: data);
   }
 
-  Future<Response> getMBAEvents() async {
+  Future<Response> getMBAEventsAttendance() async {
     Map<String, dynamic> data = {'event_type': 'Event'};
     return await _postApi(url: '/mba.attendance.get_mba_event_attendance', data: data);
   }

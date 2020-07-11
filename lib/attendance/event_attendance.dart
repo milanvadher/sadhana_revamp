@@ -56,16 +56,20 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
       List<Event> events;
         Response res;
         if (widget.myAttendance) {
-          if(widget.isMyAttendanceSummary)
+          if(widget.isMyAttendanceSummary) // Other-1 MBA Event History
             res = await _api.getMyAttendanceSummary();
-          else
-            res = await _api.getMBAEvents();
-        } else
+          else //MBA Event
+            res = await _api.getMBAEventsAttendance();
+        } else //Co-ordinator Other-1 Event
           res = await _api.fetchEvents(groupName: fillAttendanceData.groupName);
         AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
         if (appResponse.isSuccess) {
-          if(widget.myAttendance)
-            events = Event.fromJsonList(appResponse.data['details']);
+          if(widget.myAttendance) {
+            if(widget.isMyAttendanceSummary)
+              events = Event.fromJsonList(appResponse.data['details']);
+            else
+              events = Event.fromJsonList(appResponse.data);
+          }
           else
             events = Event.fromJsonList(appResponse.data);
           if (widget.myAttendance)
