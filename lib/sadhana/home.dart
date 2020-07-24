@@ -419,9 +419,9 @@ class HomePageState extends BaseState<HomePage> {
       DateTime date = today.subtract(new Duration(days: index));
       return today.subtract(new Duration(days: index));
     });
-    if (androidVersion != null && androidVersion < 23) {
+    /*if (androidVersion != null && androidVersion == 23) {
       addMissing(dates);
-    }
+    }*/
     return dates;
   }
 
