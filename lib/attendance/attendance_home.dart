@@ -127,7 +127,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
     if (appResponse.isSuccess) {
       List<Attendance> attendances = Attendance.fromJsonList(appResponse.data);
-      if(!isEventAttendance) {
+      if (!isEventAttendance) {
         String sessionType = fillAttendanceData.isGDType ? WSConstant.sessionType_GD : WSConstant.sessionType_General;
         session = Session.fromAttendanceList(fillAttendanceData.groupName, strDate, sessionType, attendances);
         event = Event.fromSession(eventName, session);
@@ -235,7 +235,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       body: SafeArea(
         child: Form(
           key: _attendanceForm,
-          child: session != null ? _buildNewListView() : Container(),
+          child: session != null ? _buildListView() : Container(),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -296,22 +296,23 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     );
   }
 
-  Widget _buildNewListView() {
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(vertical: 12),
-      itemCount: session.attendance.length,
-      itemBuilder: (context, index) {
-        if (session.attendance.length - 1 == index) {
-          return Container(
-            margin: EdgeInsets.only(bottom: 80),
-            child: userTile(attendance: session.attendance[index]),
-          );
-        }
-        return userTile(attendance: session.attendance[index]);
-      },
-      separatorBuilder: (context, index) {
-        return Divider();
-      },
+  Widget _buildListView() {
+    List<Widget> cartList = session.attendance.map((attendance) {
+      return Column(
+        children: <Widget>[userTile(attendance: attendance), Divider()],
+      );
+    }).toList();
+    cartList.add(Column(children: <Widget>[SizedBox(height: 80)]));
+    return Container(
+      padding: EdgeInsets.only(top: 10),
+      child: ListView(
+        padding: EdgeInsets.symmetric(vertical: 12),
+        children: [
+          Container(
+            child: Column(children: cartList),
+          )
+        ],
+      ),
     );
   }
 
@@ -339,14 +340,16 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-      !fillAttendanceData.isEventType ? FloatingActionButton(
-            heroTag: _dvdFormButton,
-            onPressed: () => _onDVDClick(),
-            backgroundColor: Colors.white,
-            child: fillAttendanceData.isCenterType
-                ? Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11))
-                : Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent),
-          ) : Container(),
+          !fillAttendanceData.isEventType
+              ? FloatingActionButton(
+                  heroTag: _dvdFormButton,
+                  onPressed: () => _onDVDClick(),
+                  backgroundColor: Colors.white,
+                  child: fillAttendanceData.isCenterType
+                      ? Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11))
+                      : Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent),
+                )
+              : Container(),
           SizedBox(width: 20),
           !isReadOnly
               ? FloatingActionButton.extended(
@@ -383,7 +386,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void setReadOnlyField() {
-    if(!isEventAttendance) {
+    if (!isEventAttendance) {
       setState(() {
         isReadOnly = isSelectedDateReadOnly();
       });
@@ -418,18 +421,18 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   bool isGreaterMonth(DateTime month1, DateTime month2) {
-    if(month1.year == month2.year)
+    if (month1.year == month2.year)
       return month1.month > month2.month;
-    else if(month1.year > month2.year)
+    else if (month1.year > month2.year)
       return true;
     else
       return false;
   }
 
   bool isGreaterOrEqualMonth(DateTime month1, DateTime month2) {
-    if(month1.year == month2.year)
+    if (month1.year == month2.year)
       return month1.month >= month2.month;
-    else if(month1.year > month2.year)
+    else if (month1.year > month2.year)
       return true;
     else
       return false;
@@ -453,7 +456,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   bool isContainCurrentMonthDates() {
     for (DateTime sessionDate in _sessionDates) {
-      if (isEqualMonth(sessionDate,CacheData.today)) return true;
+      if (isEqualMonth(sessionDate, CacheData.today)) return true;
     }
     return false;
   }
@@ -574,7 +577,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             msg: "Attendance deleted successfully.",
             doneButtonFn: () {
               Navigator.pop(context);
-              if(isEventAttendance) {
+              if (isEventAttendance) {
                 Navigator.pop(context, false);
               } else {
                 Navigator.pushReplacement(
@@ -610,11 +613,11 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           Response res = await _api.submitAttendanceSession(event);
           AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
           if (appResponse.isSuccess) {
-            if(!fillAttendanceData.isEventType) {
+            if (!fillAttendanceData.isEventType) {
               setState(() {
                 _sessionDates.add(session.dateTime);
                 String sessionName = AttendanceUtils.getSessionName(appResponse.data);
-                if(sessionName != null) {
+                if (sessionName != null) {
                   sessionNameByDate.putIfAbsent(session.dateTime, () => sessionName);
                   session.name = sessionName;
                 }
@@ -630,8 +633,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 msg: "Attendance submitted successfully.",
                 doneButtonFn: () {
                   Navigator.pop(context);
-                  if(isEventAttendance)
-                    Navigator.pop(context, true);
+                  if (isEventAttendance) Navigator.pop(context, true);
                   //Navigator.pop(context);
                 });
           }
@@ -640,6 +642,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     });
     stopOverlay();
   }
+
   void goToAttendanceSubmitPage() {
     if (CacheData.pendingMonth != null) {
       Navigator.push(

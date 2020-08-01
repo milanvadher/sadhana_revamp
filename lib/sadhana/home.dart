@@ -551,6 +551,7 @@ class HomePageState extends BaseState<HomePage> {
                     child: ListTile(
                       trailing: Icon(
                         Icons.event_available,
+                        color: Colors.blueGrey,
                       ),
                       title: Text('Event Attendance'),
                     ),

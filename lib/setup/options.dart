@@ -5,14 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:sadhana/attendance/attendance_summary.dart';
 import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/event_attendance.dart';
-import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/auth/profile/profile_page.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
-import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
@@ -26,7 +24,6 @@ import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 import 'package:sadhana/widgets/action_item.dart';
 import 'package:sadhana/widgets/base_state.dart';
-import 'package:sadhana/widgets/boolean_item.dart';
 import 'package:sadhana/widgets/them_item.dart';
 import 'package:sadhana/wsmodel/ws_app_setting.dart';
 
@@ -131,9 +128,9 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
             ActionItem(
               Icons.person_outline,
               Constant.colors[0],
-              'Change Center',
+              'Center Change Request',
               onChangeCenter,
-              'Change your center',
+              'Raise your center change request',
               showRightIcon: true,
             ),
             _Heading('Settings'),
@@ -217,12 +214,16 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
     }
   }
 
-  void onChangeCenter() {
-    Navigator.push(
-        context,
+  void onChangeCenter() async {
+    if(await AppUtils.isInternetConnected()) {
+      Navigator.push(context,
         MaterialPageRoute(
           builder: (context) => CenterChangeRequestPage(),
         ));
+    } else {
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
+    }
+
   }
 
   void askForSyncActivity() {
@@ -289,7 +290,7 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
           await importFile(_path);
           CommonFunction.alertDialog(
               context: context,
-              msg: "File Imported Successfully",
+              msg: "File Imported Successfully, Reopen App to show changes.",
               doneButtonFn: () {
                 Navigator.pop(context);
                 Navigator.pop(context);

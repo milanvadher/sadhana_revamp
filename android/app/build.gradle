@@ -21,19 +21,19 @@ if (flutterRoot == null) {
 
 //def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 //if (flutterVersionCode == null) {
-def flutterVersionCode = '2019'
+def flutterVersionCode = '2020'
 //}
 
 //def flutterVersionName = localProperties.getProperty('flutter.versionName')
 //if (flutterVersionName == null) {
-def flutterVersionName = '1.1.6'
+def flutterVersionName = '1.1.7'
 //}
 
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     lintOptions {
         disable 'InvalidPackage'

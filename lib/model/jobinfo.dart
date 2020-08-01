@@ -6,8 +6,8 @@ part 'jobinfo.g.dart';
 @JsonSerializable()
 class JobInfo {
   JobInfo();
-  @JsonKey(name: 'occupation')
-  String occupation;
+  @JsonKey(name: 'occupation', defaultValue: 'Job')
+  String occupation = 'Job';
   @JsonKey(name: 'job_start_date' , fromJson: AppUtils.convertDateStrToDate, toJson: AppUtils.convertDateToDateStr)
   DateTime jobStartDate;
   @JsonKey(name: 'company_name')
