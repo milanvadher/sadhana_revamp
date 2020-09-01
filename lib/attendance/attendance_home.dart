@@ -340,16 +340,14 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          !fillAttendanceData.isEventType
-              ? FloatingActionButton(
+          FloatingActionButton(
                   heroTag: _dvdFormButton,
                   onPressed: () => _onDVDClick(),
                   backgroundColor: Colors.white,
                   child: fillAttendanceData.isCenterType
                       ? Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11))
                       : Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent),
-                )
-              : Container(),
+                ),
           SizedBox(width: 20),
           !isReadOnly
               ? FloatingActionButton.extended(

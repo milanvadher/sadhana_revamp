@@ -11,7 +11,7 @@ class Constant {
   static final String APP_DATE_TIME_FILE_FORMAT = "dd-MM-yy hh-mm-a";
   static final String vanchanName = "Vanchan";
   static final String SEVANAME = "Seva";
-  static final int REMARK_MANDATORY_VALUE = 4;
+  static final int REMARK_MANDATORY_VALUE = 1;
   static final String MBA_MAILID = "mbaapps1958@gmail.com";
 
   static final String BASE_PLAYSTORE_URL = "https://play.google.com/store/apps/details?id=";
