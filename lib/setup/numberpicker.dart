@@ -508,7 +508,7 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
                     onPressed: () {
                       if(widget.isForSevaSadhana) {
                         if(selectedIntValue >= Constant.REMARK_MANDATORY_VALUE && (remarkCtrl.text == null || remarkCtrl.text.trim().isEmpty)) {
-                          CommonFunction.alertDialog(context: context, msg: "Remark is manadatory.", type: 'error');
+                          CommonFunction.alertDialog(context: context, msg: "Remark is mandatory.", type: 'error');
                           return;
                         }
                       }
