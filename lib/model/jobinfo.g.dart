@@ -8,7 +8,7 @@ part of 'jobinfo.dart';
 
 JobInfo _$JobInfoFromJson(Map<String, dynamic> json) {
   return JobInfo()
-    ..occupation = json['occupation'] as String
+    ..occupation = json['occupation'] as String ?? 'Job'
     ..jobStartDate =
         AppUtils.convertDateStrToDate(json['job_start_date'] as String)
     ..companyName = json['company_name'] as String

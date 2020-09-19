@@ -8,7 +8,6 @@ import 'package:meta/meta.dart';
 import 'package:sadhana/attendance/model/attendance_summary.dart';
 import 'package:sadhana/attendance/model/event.dart';
 import 'package:sadhana/attendance/model/fill_attendance_data.dart';
-import 'package:sadhana/attendance/model/session.dart';
 import 'package:sadhana/constant/sharedpref_constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/center_change_request.dart';

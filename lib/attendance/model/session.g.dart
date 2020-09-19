@@ -11,7 +11,7 @@ Session _$SessionFromJson(Map<String, dynamic> json) {
     ..name = json['name'] as String
     ..date = json['session_date'] as String
     ..group = json['group_name'] as String
-    ..dvdType = json['dvdtype'] as String
+    ..dvdType = json['dvd_type'] as String
     ..dvdNo = json['dvd_no'] as int
     ..dvdPart = json['dvd_part'] as int
     ..remark = json['remark'] as String
@@ -28,7 +28,7 @@ Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'name': instance.name,
       'session_date': instance.date,
       'group_name': instance.group,
-      'dvdtype': instance.dvdType,
+      'dvd_type': instance.dvdType,
       'dvd_no': instance.dvdNo,
       'dvd_part': instance.dvdPart,
       'remark': instance.remark,

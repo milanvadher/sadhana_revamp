@@ -25,6 +25,9 @@ import 'package:sadhana/widgets/base_state.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 import 'package:intl/intl.dart';
 
+import '../model/register.dart';
+import '../utils/appsharedpref.dart';
+
 class CenterChangeRequestPage extends StatefulWidget {
   CenterChangeRequestPage();
 
@@ -40,15 +43,36 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
   CenterChangeRequest request = CenterChangeRequest();
   List<MBACenter> centerList;
   bool showJobInfo = false;
+  Register mbaProfile;
   @override
   void initState() {
     super.initState();
-    loadCenterList();
-    loadCenterChangeRequest();
+    loadData();
+  }
+
+  loadData() async {
+    startLoading();
+    await loadMBAProfile();
+    await loadCenterList();
+    await loadCenterChangeRequest();
+    stopLoading();
+  }
+
+  loadMBAProfile() async {
+    await CommonFunction.tryCatchAsync(context, () async {
+      Response res = await _api.getMBAProfile();
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      if (appResponse.status == WSConstant.SUCCESS_CODE) {
+        OtpData otpData = OtpData.fromJson(appResponse.data);
+        if (otpData != null && otpData.profile != null && otpData.profile.firstName != null) {
+          this.mbaProfile = otpData.profile;
+          await AppSharedPrefUtil.saveMBAProfile(mbaProfile);
+        }
+      }
+    });
   }
 
   loadCenterList() async {
-    startLoading();
     await CommonFunction.tryCatchAsync(context, () async {
       Profile profile = await CacheData.getUserProfile();
       request.mhtId = profile.mhtId;
@@ -58,14 +82,14 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
       if (appResponse.isSuccess) {
         setState(() {
           centerList = MBACenter.fromJsonList(appResponse.data);
+          if(mbaProfile != null)
+             centerList.removeWhere((center) => center.title == mbaProfile.center);
         });
       }
     });
-    stopLoading();
   }
 
   loadCenterChangeRequest() async {
-    startLoading();
     await CommonFunction.tryCatchAsync(context, () async {
       Response res = await _api.getCenterChangeRequest();
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -76,7 +100,6 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
         });
       }
     });
-    stopLoading();
   }
 
   @override
@@ -101,6 +124,13 @@ class CenterChangeRequestPageState extends BaseState<CenterChangeRequestPage> {
   Widget buildRequestPage() {
     return Column(
       children: <Widget>[
+        TextInputField(
+          enabled: false,
+          labelText: 'Current Center',
+          valueText: mbaProfile.center ?? '',
+          viewMode: true,
+          viewModeTitleWidth: 120,
+        ),
         DropDownInput.fromMap(
           labelText: "Center",
           valuesByLabel: centerList != null
