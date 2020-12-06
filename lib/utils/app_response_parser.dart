@@ -94,7 +94,7 @@ class AppResponseParser {
       print('Error while exporting backup:');
       print(error);
       print(s);
-      CommonFunction.displayErrorDialog(context: context);
+      CommonFunction.displayErrorDialog(context: context, error: error.toString());
     }
   }
 }
