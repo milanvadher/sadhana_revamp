@@ -12,7 +12,7 @@ class Session {
   String date;
   @JsonKey(name: 'group_name')
   String group;
-  @JsonKey(name: 'dvdtype')
+  @JsonKey(name: 'dvd_type')
   String dvdType;
   @JsonKey(name: 'dvd_no')
   int dvdNo;

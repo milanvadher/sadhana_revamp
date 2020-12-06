@@ -12,7 +12,7 @@ CenterChangeRequest _$CenterChangeRequestFromJson(Map<String, dynamic> json) {
     ..mhtId = json['mht_id'] as String
     ..centerName = json['center_name'] as String
     ..startDate = AppUtils.convertDateStrToDate(json['start_date'] as String)
-    ..reason = json['reason'] as String
+    ..reason = json['reason'] as String ?? 'Other'
     ..status = json['status'] as String
     ..description = json['reason_description'] as String
     ..occupation = json['occupation'] as String
