@@ -392,4 +392,9 @@ class ApiService {
     return await _postApi(url: '/mba.attendance.get_mba_event_attendance', data: data);
   }
 
+  Future<Response> getDvdList(date, groupName) async {
+    Map<String, dynamic> data = {"date": date, "group_name": groupName};
+    return await _postApi(url: '/mba.group_api.get_dvd_detail', data: data);
+  }
+
 }
