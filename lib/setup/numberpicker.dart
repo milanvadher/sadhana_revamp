@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 
 /// Created by Marcin Szałek
@@ -486,10 +486,12 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
             Padding(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: TextField(
+                textCapitalization: TextCapitalization.sentences,
                 controller: remarkCtrl,
                 onChanged: (value) {
                   setState(() {});
                 },
+                maxLength: 300,
                 decoration: InputDecoration(
                   labelText: 'Remark',
                   border: OutlineInputBorder(),
@@ -506,7 +508,7 @@ class _NumberPickerDialogControllerState extends State<NumberPickerDialog> {
                     onPressed: () {
                       if(widget.isForSevaSadhana) {
                         if(selectedIntValue >= Constant.REMARK_MANDATORY_VALUE && (remarkCtrl.text == null || remarkCtrl.text.trim().isEmpty)) {
-                          CommonFunction.alertDialog(context: context, msg: "Remark is manadatory for seva hour more than 3", type: 'error');
+                          CommonFunction.alertDialog(context: context, msg: "Remark is mandatory.", type: 'error');
                           return;
                         }
                       }

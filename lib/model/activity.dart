@@ -87,4 +87,11 @@ class Activity extends Entity {
   getTableName() {
     return tableActivity;
   }
+
+  @override
+  String toString() {
+    return 'Activity{sadhanaId: $sadhanaId, sadhanaDate: $sadhanaDate, sadhanaActivityDate: $sadhanaActivityDate, sadhanaValue: $sadhanaValue, isSynced: $isSynced, remarks: $remarks}';
+  }
+
+
 }

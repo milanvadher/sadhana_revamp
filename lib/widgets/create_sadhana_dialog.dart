@@ -6,14 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/auth/registration/Inputs/time-input.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
-import 'package:sadhana/sadhana/time-table.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/widgets/color_picker_dialog.dart';
 
@@ -43,15 +41,16 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
   Sadhana sadhana;
   bool isPreloaded = false;
   Color color;
-  final formats = {
+  /*final formats = {
     //InputType.both: DateFormat("EEEE, MMMM d, yyyy 'at' h:mma"),
     //InputType.date: DateFormat('yyyy-MM-dd'),
     InputType.time: DateFormat(Constant.APP_TIME_FORMAT),
   };
-  final InputType inputType = InputType.time;
+  final InputType inputType = InputType.time;*/
   DateTime reminderTime;
   AppLocalNotification appLocalNotification = new AppLocalNotification();
   String operation;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -82,15 +81,37 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             color: theme == Brightness.light ? Colors.white : Colors.black),
         backgroundColor: color,
         // centerTitle: true,
-        title: Text('$operation Sadhana',
-            style: TextStyle(
-                color:
-                    theme == Brightness.light ? Colors.white : Colors.black)),
+        title: Text('$operation Sadhana'),
       ),
       body: SafeArea(
         child: ListView(
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-          children: <Widget>[sadhanaCreateEditForm()],
+          children: <Widget>[
+            sadhana == null || !sadhana.isPreloaded
+                ? buildBottomBar()
+                : Container(),
+            sadhanaCreateEditForm(),
+          ],
+        ),
+      ),
+      //bottomNavigationBar: sadhana == null || !sadhana.isPreloaded ? buildBottomBar() : null,
+    );
+  }
+
+  Widget buildBottomBar() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+              color: theme == Brightness.dark ? Colors.white : Colors.black),
+          children: <TextSpan>[
+            TextSpan(
+                text: 'Note: ',
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            TextSpan(text: 'This sadhana will not be synced to server.'),
+          ],
         ),
       ),
     );
@@ -125,11 +146,11 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
                 ? Container()
                 : RadioInput(
                     handleRadioValueChange: _onChangeType,
-                    lableText: 'Type',
+                    labelText: 'Type',
                     radioValue: radioValue,
                     radioData: [
-                      {'lable': 'Yes / No', 'value': 0},
-                      {'lable': 'Number', 'value': 1},
+                      {'label': 'Yes / No', 'value': 0},
+                      {'label': 'Number', 'value': 1},
                     ],
                   ),
             radioValue == 1
@@ -161,30 +182,57 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             ),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 5),
-              child: DateTimePickerFormField(
-                inputType: inputType,
-                format: formats[inputType],
-                editable: false,
-                initialTime: reminderTime != null
+              child: _DateTimePicker(
+                labelText: 'Reminder',
+                selectedTime: reminderTime != null
                     ? TimeOfDay(
-                        hour: reminderTime.hour,
-                        minute: reminderTime.minute,
-                      )
-                    : TimeOfDay(hour: 7, minute: 0),
-                decoration: InputDecoration(
-                  labelText: _getReminderText(),
-                  hasFloatingPlaceholder: false,
-                  hintText: "Reminder",
-                ),
-                onChanged: (dt) => setState(
-                      () {
-                        if (dt != null) {
-                          reminderTime = dt;
-                        }
-                      },
-                    ),
+                        hour: reminderTime.hour, minute: reminderTime.minute)
+                    : null,
+                onReset: () {
+                  setState(() {
+                    reminderTime = null;
+                  });
+                },
+                selectTime: (TimeOfDay time) {
+                  print(time.format(context));
+                  setState(() {
+                    reminderTime = DateTime(2019, 1, 1, time.hour, time.minute);
+                  });
+                  print('Selected date ==> $reminderTime');
+                },
               ),
             ),
+            // Padding(
+            //   padding: EdgeInsets.symmetric(vertical: 5),
+            //   child: DateTimeField(
+            //     format: Constant.APP_TIME_FORMAT,
+            //     onShowPicker: (context, currentValue) async {
+            //       final time = await showTimePicker(
+            //         context: context,
+            //         initialTime:
+            //             TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+            //       );
+            //       if (time != null)
+            //         return DateTimeField.convert(time);
+            //       else
+            //         return null;
+            //     },
+            //     initialValue: reminderTime,
+            //     readOnly: true,
+            //     resetIcon: Icon(Icons.delete),
+            //     decoration: InputDecoration(
+            //       labelText: _getReminderText(),
+            //       hasFloatingPlaceholder: false,
+            //       hintText: "Reminder",
+            //     ),
+            //     onSaved: (dt) {
+            //       print('old selected ==> $dt');
+            //       setState(() {
+            //         reminderTime = dt;
+            //       });
+            //     },
+            //   ),
+            // ),
             // TimeInput(
             //   enable: true,
             //   labelText: 'Reminder',
@@ -250,13 +298,9 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 RaisedButton(
-                  onPressed: onOKClick,
+                  onPressed: onSaveClick,
                   color: color,
-                  child: Text('Save',
-                      style: TextStyle(
-                          color: theme == Brightness.light
-                              ? Colors.white
-                              : Colors.black)),
+                  child: Text('Save'),
                 ),
                 OutlineButton(
                   highlightedBorderColor: color,
@@ -289,12 +333,12 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     if (value < 1) {
       return 'Invalid Target value.';
     }
+    if (value > 100) return 'Max 100 value is allowed.';
   }
 
   String _getReminderText() {
-    return reminderTime != null
-        ? new DateFormat(Constant.APP_TIME_FORMAT).format(reminderTime)
-        : "Reminder";
+    //return reminderTime != null ? Constant.APP_TIME_FORMAT.format(reminderTime) : "Reminder";
+    return "Reminder";
   }
 
   void _onChangeType(dynamic value) {
@@ -331,7 +375,7 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
     });
   }
 
-  onOKClick() async {
+  onSaveClick() async {
     _formKey.currentState.save();
     if (_formKey.currentState.validate()) {
       //_formKey.currentState.save();
@@ -356,12 +400,12 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
             radioValue == 0 ? SadhanaType.BOOLEAN : SadhanaType.NUMBER;
       }
       sadhana.reminderTime = reminderTime;
-      if (sadhana.type == SadhanaType.NUMBER)
+      if (sadhana.isNumeric)
         sadhana.targetValue = target;
       else
         sadhana.targetValue = 1;
       await sadhanaDAO.insertOrUpdate(sadhana);
-      scheduleLocalNotification();
+      appLocalNotification.scheduleSadhanaDailyAtTime(sadhana);
       widget.onDone(sadhana);
       Navigator.pop(context);
     } else {
@@ -370,12 +414,99 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       });
     }
   }
+}
 
-  void scheduleLocalNotification() {
-    if (sadhana.reminderTime != null) {
-      Time time =
-          Time(sadhana.reminderTime.hour, sadhana.reminderTime.minute, 0);
-      appLocalNotification.scheduleSadhanaDailyAtTime(sadhana, time);
-    }
+// Time Picker
+class _DateTimePicker extends StatelessWidget {
+  final Function onReset;
+
+  const _DateTimePicker({
+    Key key,
+    this.labelText,
+    this.selectedTime,
+    this.selectTime,
+    this.onReset,
+  }) : super(key: key);
+
+  final String labelText;
+  final TimeOfDay selectedTime;
+  final ValueChanged<TimeOfDay> selectTime;
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime ?? TimeOfDay.now(),
+    );
+    if (picked != null && picked != selectedTime) selectTime(picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        Expanded(
+          child: _InputDropdown(
+            labelText: labelText,
+            valueText:
+                selectedTime != null ? selectedTime.format(context) : null,
+            onPressed: () {
+              _selectTime(context);
+            },
+            onReset: () {
+              onReset();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InputDropdown extends StatelessWidget {
+  const _InputDropdown({
+    Key key,
+    this.child,
+    this.labelText,
+    this.valueText,
+    this.onPressed,
+    this.onReset,
+  }) : super(key: key);
+
+  final String labelText;
+  final String valueText;
+  final VoidCallback onPressed;
+  final VoidCallback onReset;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: labelText,
+          suffixIcon: valueText != null
+              ? IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    print('Delete');
+                    onReset();
+                  },
+                )
+              : Icon(Icons.timer),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              valueText ?? 'Select time',
+              style: Theme.of(context).textTheme.subhead,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

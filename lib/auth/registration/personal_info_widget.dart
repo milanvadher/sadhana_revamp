@@ -6,7 +6,7 @@ import 'package:sadhana/auth/registration/Inputs/date-input.dart';
 import 'package:sadhana/auth/registration/Inputs/dropdown-input.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/country.dart';
 import 'package:sadhana/model/register.dart';
@@ -19,11 +19,15 @@ class PersonalInfoWidget extends StatefulWidget {
   final Register register;
   final Function startLoading;
   final Function stopLoading;
+  final bool viewMode;
+  final bool profileEdit;
   const PersonalInfoWidget({
     Key key,
     @required this.register,
     @required this.startLoading,
     @required this.stopLoading,
+    this.viewMode = false,
+    this.profileEdit = false,
   }) : super(key: key);
 
   @override
@@ -36,17 +40,20 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   var dateFormatter = new DateFormat(WSConstant.DATE_FORMAT);
   List<String> countryList = [];
   ApiService api = new ApiService();
+  bool viewMode;
   @override
   void initState() {
     super.initState();
-    loadCountries();
+    if(!widget.viewMode) {
+      loadCountries();
+    }
   }
 
   loadCountries() async {
     try {
       Response res = await api.getAllCountries();
       AppResponse appResponse =
-          AppResponseParser.parseResponse(res, context: context);
+      AppResponseParser.parseResponse(res, context: context);
       if (appResponse.status == WSConstant.SUCCESS_CODE) {
         countryList = [];
         if (mounted) {
@@ -67,6 +74,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
   @override
   Widget build(BuildContext context) {
     _register = widget.register;
+    viewMode = widget.viewMode;
     isExpandedAddress[1] = !_register.sameAsPermanentAddress;
     return Column(
       children: <Widget>[
@@ -75,13 +83,15 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           enabled: false,
           labelText: 'Mht Id',
           valueText: _register.mhtId,
+          viewMode: viewMode,
         ),
         // FullName
         TextInputField(
           enabled: false,
           labelText: 'Full Name',
           valueText:
-              '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName?? ""}',
+          '${_register.firstName} ${_register.middleName ?? ""} ${_register.lastName?? ""}',
+          viewMode: viewMode,
         ),
         // Mobile
         TextInputField(
@@ -91,6 +101,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           textInputType: TextInputType.phone,
           onSaved: (value) => _register.mobileNo1 = value,
           validation: (value) => CommonFunction.mobileValidation(value),
+          viewMode: viewMode,
         ),
         TextInputField(
           enabled: true,
@@ -99,6 +110,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           textInputType: TextInputType.phone,
           onSaved: (value) => _register.mobileNo2 = value,
           validation: (value) => CommonFunction.mobileRegexValidator(value, isRequired: false),
+          viewMode: viewMode,
         ),
         // Email
         TextInputField(
@@ -108,19 +120,34 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           onSaved: (value) => _register.email = value,
           isRequiredValidation: true,
           validation: CommonFunction.emailValidation,
+          viewMode: viewMode,
         ),
         // Center
         TextInputField(
           enabled: false,
           labelText: 'Center',
           valueText: _register.center,
+          viewMode: viewMode,
+        ),
+        !AppUtils.equalsIgnoreCase(_register.center, _register.group) ? TextInputField(
+          enabled: false,
+          labelText: 'Group',
+          valueText: _register.group,
+          viewMode: viewMode,
+        ) : Container(),
+        TextInputField(
+          enabled: false,
+          labelText: 'Aptputra',
+          valueText: _register.aptName,
+          viewMode: viewMode,
         ),
         // B_date
-        DateInput(
+        widget.profileEdit ? Container() : DateInput(
           labelText: 'Birth Date',
+          viewMode: viewMode,
           isRequiredValidation: true,
           selectedDate:
-              _register.bDate == null ? null : DateTime.parse(_register.bDate),
+          _register.bDate == null ? null : DateTime.parse(_register.bDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.bDate = dateFormatter.format(date);
@@ -128,11 +155,12 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           },
         ),
         // G_date
-        DateInput(
+        widget.profileEdit ? Container() : DateInput(
           labelText: 'Gnan Date',
+          viewMode: viewMode,
           isRequiredValidation: true,
           selectedDate:
-              _register.gDate == null ? null : DateTime.parse(_register.gDate),
+          _register.gDate == null ? null : DateTime.parse(_register.gDate),
           selectDate: (DateTime date) {
             setState(() {
               _register.gDate = dateFormatter.format(date);
@@ -145,6 +173,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           labelText: 'Blood Group',
           isRequiredValidation: true,
           valueText: _register.bloodGroup,
+          viewMode: viewMode,
           onChange: (value) {
             setState(() {
               _register.bloodGroup = value;
@@ -157,6 +186,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           labelText: 'T-shirt Size',
           isRequiredValidation: true,
           valueText: _register.tshirtSize,
+          viewMode: viewMode,
           onChange: (value) {
             setState(() {
               _register.tshirtSize = value;
@@ -164,6 +194,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           },
         ),
         // Permanent Address
+        viewMode ? addressForView("Permanent Address", _register.permanentAddress) :
         new ExpansionPanelList(
           expansionCallback: (int index, bool isExpanded) {
             setState(() {
@@ -187,18 +218,22 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           ],
         ),
         // Copy checkbox
-        Container(
+        viewMode ? Container() : Container(
           padding: EdgeInsets.symmetric(vertical: 10),
           child: Row(
             children: <Widget>[
-              Text('Same as Permenent Address'),
+              Text('Same as Permanent Address'),
               Checkbox(
                 value: _register.sameAsPermanentAddress,
                 onChanged: (value) {
                   setState(() {
                     _register.sameAsPermanentAddress = value;
-                    if(_register.sameAsPermanentAddress)
+                    if(_register.sameAsPermanentAddress) {
+                      _register.currentAddress = _register.permanentAddress;
                       isExpandedAddress[1] = false;
+                    } else {
+                      _register.currentAddress = Address();
+                    }
                   });
                 },
               ),
@@ -206,7 +241,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
           ),
         ),
         // Current Address
-        new ExpansionPanelList(
+        viewMode ? addressForView("Current Address", _register.currentAddress) : new ExpansionPanelList(
           expansionCallback: (int index, bool isExpanded) {
             if (!_register.sameAsPermanentAddress) {
               setState(() {
@@ -232,16 +267,27 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget> {
               isExpanded: isExpandedAddress[1],
               body: isExpandedAddress[1]
                   ? AddressInput(
-                      address: _register.currentAddress,
-                      countryList: countryList,
-                      startLoading: widget.startLoading,
-                      stopLoading: widget.stopLoading,
-                    )
+                address: _register.currentAddress,
+                countryList: countryList,
+                startLoading: widget.startLoading,
+                stopLoading: widget.stopLoading,
+              )
                   : Container(),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget addressForView(String title, Address address) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    String city = address.city?.replaceAll("-", ", ");
+    String valueText = '${address.addressLine1} ${address.addressLine2} $city ${address.pincode}';
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5),
+      alignment: Alignment.bottomLeft,
+      child: CommonFunction.getTitleAndNameForProfilePage(screenWidth: screenWidth, title: title, value: valueText),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:onesignal/onesignal.dart';
-import 'package:sadhana/comman.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/model/register.dart';
 
 class OneSignalNotification {
@@ -20,7 +20,7 @@ class OneSignalNotification {
       OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
       var settings = {
-        OSiOSSettings.autoPrompt: false,
+        OSiOSSettings.autoPrompt: true,
         OSiOSSettings.promptBeforeOpeningPushUrl: true
       };
 

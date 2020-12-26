@@ -5,8 +5,8 @@ import 'package:sadhana/dao/basedao.dart';
 import 'package:sadhana/main.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
-import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/utils/apputils.dart';
 
 class SadhanaDAO extends BaseDAO<Sadhana> {
@@ -22,37 +22,56 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
         dColor: Constant.colors[0][1]);
   }
 
+  SadhanaDAO();
+  @override
+  SadhanaDAO.withDBProvider(DBProvider idbProvider) : super.withDBProvider(idbProvider){
+    _activityDAO = ActivityDAO.withDBProvider(idbProvider);
+  }
+
   @override
   getTableName() {
     return Sadhana.tableSadhana;
   }
 
   Future<Sadhana> insertOrUpdate(Sadhana entity) async {
-    if(AppUtils.isNullOrEmpty(entity.description))
-      entity.description = 'Have you done ${entity.sadhanaName} today?';
+    if (AppUtils.isNullOrEmpty(entity.description)) entity.description = 'Have you done ${entity.sadhanaName} today?';
     Sadhana sadhana = await super.insertOrUpdate(entity);
     CacheData.addSadhanas([sadhana]);
     return sadhana;
   }
 
   @override
-  Future<List<Sadhana>> getAll() async {
+  Future<List<Sadhana>> getAll({bool withAllActivity = false}) async {
     List<Sadhana> sadhanas = await super.getAll();
     for (Sadhana sadhana in sadhanas) {
-      List<Activity> activities = await _activityDAO.getActivityBySadhanaId(sadhana.id);
-      if (activities != null && activities.isNotEmpty) {
-        sadhana.activitiesByDate = new Map.fromIterable(
-          activities,
-          key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch,
-          value: (v) => v,
-        );
-      } else {
-        sadhana.activitiesByDate = new Map();
-      }
+      List<Activity> activities = await _activityDAO.getHomeVisibleActivityBySadhanaId(sadhana.id);
+      loadActivityToSadhana(sadhana, activities);
+      if(withAllActivity)
+        await loadAllActivity(sadhana);
+      else
+        loadAllActivity(sadhana);
     }
     sadhanas.sort((a, b) => a.index.compareTo(b.index));
     CacheData.addSadhanas(sadhanas);
     return sadhanas;
+  }
+
+  loadAllActivity(Sadhana sadhana) async {
+    List<Activity> activities = await _activityDAO.getAllActivityBySadhanaId(sadhana.id);
+    loadActivityToSadhana(sadhana, activities);
+    sadhana.isLoadedAllActivity = true;
+  }
+
+  loadActivityToSadhana(Sadhana sadhana, List<Activity> activities) {
+    if (activities != null && activities.isNotEmpty) {
+      sadhana.activitiesByDate = new Map.fromIterable(
+        activities,
+        key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch,
+        value: (v) => v,
+      );
+    } else {
+      sadhana.activitiesByDate = new Map();
+    }
   }
 
   Future<int> delete(int id) async {

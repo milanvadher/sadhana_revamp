@@ -10,8 +10,8 @@ class NotificationSetup {
     try {
       //String fbToken = await FirebaseNotification.setupFBNotification(context: context);
       String fbToken = null;
-      String oneSiganlPlayerId = await OneSignalNotification.setupOneSignalNotification(context: context, userInfo: userInfo);
-      await _apiService.updateNotificationToken(mhtId: userInfo.mhtId, fbToken: fbToken, oneSignalToken: oneSiganlPlayerId);
+      String oneSignalPlayerId = await OneSignalNotification.setupOneSignalNotification(context: context, userInfo: userInfo);
+      await _apiService.updateNotificationToken(mhtId: userInfo.mhtId, fbToken: fbToken, oneSignalToken: oneSignalPlayerId);
     } catch(e,s) {
       print(e);print(s);
       print("Error while Notification Setup:");

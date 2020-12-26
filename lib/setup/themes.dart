@@ -17,7 +17,7 @@ final AppTheme kLightAppTheme = AppTheme._('Light', _buildLightTheme());
 TextTheme _buildTextTheme(TextTheme base) {
   return base
       .copyWith(
-        title: base.title.copyWith(
+        headline6: base.headline6.copyWith(
           fontFamily: 'GoogleSans',
         ),
       )
@@ -45,11 +45,14 @@ ThemeData _buildDarkTheme() {
     errorColor: const Color(0xFFB00020),
     cardColor: const Color(0xFF1A1E1E),
     inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(),
+      border: OutlineInputBorder(),
     ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: primaryColor
+    buttonTheme: ButtonThemeData(
+      colorScheme: colorScheme,
+      textTheme: ButtonTextTheme.primary,
     ),
+    floatingActionButtonTheme:
+        FloatingActionButtonThemeData(backgroundColor: primaryColor),
     textTheme: _buildTextTheme(base.textTheme),
     primaryTextTheme: _buildTextTheme(base.primaryTextTheme),
     accentTextTheme: _buildTextTheme(base.accentTextTheme),

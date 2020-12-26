@@ -7,12 +7,14 @@ class RemarkPickerDialog extends StatefulWidget {
   final Widget confirmWidget;
   final Widget cancelWidget;
   final String remark;
+  final bool isEnabled;
   RemarkPickerDialog({
     this.title,
     this.titlePadding,
     Widget confirmWidget,
     Widget cancelWidget,
     this.remark = "",
+    this.isEnabled = true,
   })  : confirmWidget = confirmWidget ?? new Text("OK"),
         cancelWidget = cancelWidget ?? new Text("CANCEL");
 
@@ -44,10 +46,13 @@ class _RemarkPickerDialogControllerState extends State<RemarkPickerDialog> {
             Padding(
               padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
               child: TextField(
+                enabled : widget.isEnabled,
+                maxLength: 300,
                 controller: remarkCtrl,
                 onChanged: (value) {
                   setState(() {});
                 },
+                textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                   labelText: 'Remark',
                   border: OutlineInputBorder(),

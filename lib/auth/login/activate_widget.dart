@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/commonvalidation.dart';
 import 'package:sadhana/model/logindatastate.dart';
 import 'package:sadhana/model/profile.dart';
@@ -239,8 +239,11 @@ class _ActivateWidgetState extends State<ActivateWidget> {
       if (!AppUtils.isNullOrEmpty(profileData.firstName)) {
         fullName = '${profileData.firstName.substring(0, 2)}******';
       }
-      if (!AppUtils.isNullOrEmpty(profileData.lastName)) {
-        fullName = fullName + '${profileData.lastName.substring(0, 2)}******';
+      if (!AppUtils.isNullOrEmpty(profileData.lastName) && profileData.lastName.length > 2) {
+        if(profileData.lastName.length > 2)
+          fullName = fullName + '${profileData.lastName.substring(0, 2)}******';
+        else
+          fullName = fullName + ' ${profileData.lastName}';
       }
     }
     return fullName;

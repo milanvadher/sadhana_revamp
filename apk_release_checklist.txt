@@ -1,0 +1,12 @@
+
+Verify Below Details
+
+1. Verify :  ***** API URL  ******
+2. applicationId  => sadhanatest
+3. SadhanaQA Title (home.dart)
+4. App Name(android:label) => Sadhana Testing
+5. Change Version name & code
+5. Remove dummy notification
+6. main dart
+
+

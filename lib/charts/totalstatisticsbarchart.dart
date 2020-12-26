@@ -1,128 +1,258 @@
 //import 'dart:math';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:flutter/material.dart';
-import 'package:sadhana/charts/custom_bar_label_decorator.dart';
-import 'package:sadhana/constant/constant.dart';
-import 'package:sadhana/model/activity.dart';
 import 'package:charts_flutter/flutter.dart';
-import 'package:charts_flutter/src/text_element.dart';
-import 'package:charts_flutter/src/text_style.dart' as style;
+import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart' as FlutterColor;
+import 'package:intl/intl.dart';
+import 'package:sadhana/charts/custom_bar_label_decorator.dart';
+import 'package:sadhana/common.dart';
+import 'package:sadhana/constant/constant.dart';
+import 'package:sadhana/model/sadhana_statistics.dart';
+import 'package:sadhana/utils/appsharedpref.dart';
+import 'package:sadhana/utils/apputils.dart';
+import 'package:sadhana/utils/chart_utils.dart';
 
-class TotalStatisticsBarChart extends StatelessWidget {
-  final List<Series> seriesList;
-  final bool animate;
+import 'model/filter_type.dart';
+
+class TotalStatisticsBarChart extends StatefulWidget {
   final Color color;
-  final OrdinalViewport viewport;
+  final bool isNumeric;
+  final String sadhanaName;
+  final SadhanaStatistics statistics;
+  final bool forHistory;
 
-  TotalStatisticsBarChart(this.seriesList, this.color, {this.animate, this.viewport});
+  TotalStatisticsBarChart(this.statistics, this.color, {this.forHistory = false, this.isNumeric = false, this.sadhanaName});
 
-  factory TotalStatisticsBarChart.withActivity(Color color, List<Activity> activities) {
-    Map<DateTime, int> countByMonth = new Map();
-    activities.forEach((activity) {
-      if (activity.sadhanaValue > 0) {
-        DateTime activityMonth = DateTime(activity.sadhanaDate.year, activity.sadhanaDate.month);
-        if (countByMonth[activityMonth] == null) {
-          countByMonth[activityMonth] = 1;
-        } else {
-          countByMonth[activityMonth] = countByMonth[activityMonth] + 1;
+  @override
+  _TotalStatisticsBarChartState createState() => _TotalStatisticsBarChartState();
+}
+
+class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
+  List<Series<dynamic, String>> seriesList;
+  OrdinalViewport viewport;
+  FilterType filterType = FilterType.Month;
+  int maxValue = 0;
+  Brightness theme;
+  Color outSideLabelColor;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  loadData() async {
+    //if(!widget.forHistory) {
+    filterType = await AppSharedPrefUtil.getChartFilter();
+    /*} else
+      filterType = FilterType.Month;*/
+    setState(() {
+      generateSeriesList();
+    });
+  }
+
+  generateSeriesList() {
+    maxValue = 0;
+    List<TimeSeries> listOfTimeSeries = List();
+    Map<DateTime, int> counts;
+    if (widget.forHistory)
+      counts = widget.statistics.getTotalValues(filterType);
+    else
+      counts = widget.statistics.getCounts(filterType);
+
+    counts.forEach((month, value) {
+      listOfTimeSeries.add(TimeSeries(month, value));
+    });
+    listOfTimeSeries.sort((a, b) => b.time.compareTo(a.time));
+    List<String> listOfXaxis = [];
+    List<BarData> barChartData = [];
+    for (int i = 0; i < listOfTimeSeries.length; i++) {
+      TimeSeries timeSeries = listOfTimeSeries[i];
+      DateTime date = timeSeries.time;
+      String xaxis = getXAxis(date);
+      if (i != 0) {
+        xaxis = getAppendedXAxis(xaxis, date, listOfTimeSeries[i - 1].time);
+        while (listOfXaxis.contains(xaxis)) {
+          xaxis = "$xaxis ";
         }
       }
-    });
-    List<TimeSeries> timeSeries = List();
-    countByMonth.forEach((month, value) {
-      timeSeries.add(TimeSeries(month, value));
-    });
-    timeSeries.sort((a, b) => a.time.compareTo(b.time));
-    List<OrdinalSales> barChartData = timeSeries.map((timeSeries) {
-      String xaxis = Constant.monthName[timeSeries.time.month - 1];
-      if (xaxis == 'Dec') {
-        xaxis = 'Dec ${timeSeries.time.year}';
-      }
-      return OrdinalSales(xaxis, timeSeries.values);
-    }).toList();
-    OrdinalViewport viewport = OrdinalViewport(barChartData.last.year, barChartData.last.sales);
-    List<Series<dynamic, String>> chart_series = [
-      new Series<OrdinalSales, String>(
+      listOfXaxis.add(xaxis);
+      if (maxValue < timeSeries.value) maxValue = timeSeries.value;
+      barChartData.add(BarData(xaxis, timeSeries.value, timeSeries.time));
+    }
+    List<BarData> finalBarChartData = barChartData.reversed.toList();
+    if (finalBarChartData.isNotEmpty) viewport = OrdinalViewport(finalBarChartData.last.xAxis, 8);
+    seriesList = [
+      new Series<BarData, String>(
         id: 'Sadhana',
-        colorFn: (_, __) => Color.fromHex(code: color.hexString),
-        domainFn: (OrdinalSales sales, _) => sales.year,
-        measureFn: (OrdinalSales sales, _) => sales.sales,
-        labelAccessorFn: (OrdinalSales sales, _) => sales.sales.toString(),
-        data: barChartData,
+        keyFn: (value, _) => value.time.toString(),
+        colorFn: (_, __) => Color.fromHex(code: widget.color.hexString),
+        domainFn: (BarData sales, _) => sales.xAxis,
+        measureFn: (BarData sales, _) => sales.yAxis,
+        labelAccessorFn: (BarData sales, _) => sales.yAxis == 0 ? '' : sales.yAxis.toString(),
+        data: finalBarChartData,
       )
     ];
-    return new TotalStatisticsBarChart(
-      chart_series,
-      color,
-      animate: false,
-      viewport: viewport,
-    );
+  }
+
+  getXAxis(DateTime date) {
+    switch (filterType) {
+      case FilterType.Month:
+        return Constant.monthName[date.month - 1];
+      case FilterType.Year:
+        return DateFormat.y().format(date);
+      case FilterType.Week:
+        return DateFormat.d().format(date);
+      case FilterType.Quarter:
+        return Constant.monthName[date.month - 1];
+      case FilterType.Day:
+        return DateFormat.d().format(date);
+      /*default:
+        return Constant.monthName[date.month - 1];*/
+    }
+  }
+
+  String getAppendedXAxis(String xaxis, DateTime date, DateTime previousDate) {
+    if (filterType != FilterType.Year) {
+      if (previousDate.year != date.year) {
+        int year = int.parse(DateFormat("yy").format(date));
+        xaxis = '$xaxis $year';
+      }
+    }
+    if (filterType == FilterType.Week || filterType == FilterType.Day) {
+      if (previousDate.month != date.month) {
+        String month = Constant.monthName[date.month - 1];
+        xaxis = '$xaxis $month';
+      }
+    }
+    return xaxis;
   }
 
   @override
   Widget build(BuildContext context) {
-    return new BarChart(
-      seriesList,
-      animate: animate,
-      domainAxis: new OrdinalAxisSpec(
-        renderSpec: new SmallTickRendererSpec(
+    theme = Theme.of(context).brightness;
+    outSideLabelColor = theme == Brightness.light ? Color.black : Color.white;
+    return Column(
+      children: <Widget>[
+        buildTitle(),
+        SizedBox(
+          height: 240,
+          child: seriesList != null ? buildBarChart() : Container(),
+        )
+      ],
+    );
+  }
+
+  buildTitle() {
+    return ListTile(
+      dense: true,
+      title: Text(widget.forHistory ? 'No of ${AppUtils.getCountTitleForSadhana(widget.sadhanaName)}' : 'No of Days',
+          style: TextStyle(color: getFlutterColor(widget.color), fontSize: ChartUtils.chartTitleSize)),
+      trailing: SizedBox(
+        width: 80,
+        child: buildTotalTypeDropDown(),
+      ),
+    );
+  }
+
+  FlutterColor.Color getFlutterColor(Color color) {
+    return FlutterColor.Color.fromARGB(color.a, color.r, color.g, color.b);
+  }
+
+  buildTotalTypeDropDown() {
+    Map<String, dynamic> valuesByLabel = new Map.fromIterable(FilterType.values, key: (v) => FilterTypeLabel[v], value: (v) => v);
+    if (!widget.forHistory) valuesByLabel.remove("Day");
+    return DropdownButton<dynamic>(
+      isExpanded: true,
+      isDense: true,
+      hint: Text('Select Type'),
+      items: getDropDownMenuItem(valuesByLabel),
+      onChanged: (value) {
+        setState(() {
+          filterType = value;
+          generateSeriesList();
+          if (!(filterType == FilterType.Day || filterType == FilterType.Quarter))
+            AppSharedPrefUtil.saveChartFilter(filterType.toString());
+        });
+      },
+      value: filterType,
+    );
+  }
+
+  List<DropdownMenuItem> getDropDownMenuItem(Map<String, dynamic> valuesByLabel) {
+    List<DropdownMenuItem> items = [];
+    if (valuesByLabel != null) {
+      valuesByLabel.forEach((label, value) {
+        items.add(DropdownMenuItem<dynamic>(value: value, child: new Text(label)));
+      });
+    }
+    return items;
+  }
+
+  buildBarChart() {
+    return CommonFunction.tryCatchSync(context, () {
+      return BarChart(
+        seriesList,
+        animate: false,
+        domainAxis: new OrdinalAxisSpec(
+          tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
+          renderSpec: new SmallTickRendererSpec(
             labelStyle: new TextStyleSpec(
-              fontSize: 12, // size in Pts.
-              color: color,
+              fontSize: 12,
+              color: widget.color,
             ),
             lineStyle: new LineStyleSpec(
               color: MaterialPalette.gray.shade500,
-            )),
-        viewport: viewport,
-      ),
-      primaryMeasureAxis: new NumericAxisSpec(
+            ),
+          ),
+          viewport: viewport,
+        ),
+        primaryMeasureAxis: new NumericAxisSpec(
           renderSpec: new GridlineRendererSpec(
               labelStyle: new TextStyleSpec(
-                fontSize: 12, // size in Pts.
-                color: color,
+                fontSize: 12,
+                color: widget.color,
               ),
               lineStyle: new LineStyleSpec(
                 color: MaterialPalette.gray.shade500,
               )),
-          tickProviderSpec: new StaticNumericTickProviderSpec(
-            <TickSpec<num>>[
-              TickSpec<num>(0),
-              TickSpec<num>(7),
-              TickSpec<num>(13),
-              TickSpec<num>(19),
-              TickSpec<num>(25),
-              TickSpec<num>(31),
-            ],
-          )),
-      behaviors: [
-        SlidingViewport(),
-        new ChartTitle(
+          tickProviderSpec: widget.forHistory ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
+        ),
+        behaviors: [
+          SlidingViewport(),
+          /*new ChartTitle(
           'Total',
           behaviorPosition: BehaviorPosition.top,
           titleOutsideJustification: OutsideJustification.start,
           innerPadding: 18,
-          titleStyleSpec: TextStyleSpec(color: color),
+          titleStyleSpec: TextStyleSpec(color: widget.color),
+        ),*/
+          new PanAndZoomBehavior(),
+        ],
+        //defaultRenderer: LineRendererConfig(includePoints: true),
+        //defaultRenderer: BarLaneRendererConfig(),
+        defaultRenderer: new BarRendererConfig<String>(
+          strokeWidthPx: 0.3,
+          barRendererDecorator: CustomBarLabelDecorator<String>(
+              labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
         ),
-        new PanAndZoomBehavior(),
-      ],
-      //defaultRenderer: LineRendererConfig(includePoints: true),
-      defaultRenderer: new charts.BarRendererConfig(strokeWidthPx: 0.8,),
-      //barRendererDecorator: CustomBarLabelDecorator<String>(labelPadding: 5),
-    );
+      );
+    });
   }
 }
 
 /// Sample time series data type.
 class TimeSeries {
   final DateTime time;
-  final int values;
+  final int value;
 
-  TimeSeries(this.time, this.values);
+  TimeSeries(this.time, this.value);
 }
 
-class OrdinalSales {
-  final String year;
-  final int sales;
+class BarData {
+  final DateTime time;
+  final String xAxis;
+  final int yAxis;
 
-  OrdinalSales(this.year, this.sales);
+  BarData(this.xAxis, this.yAxis, this.time);
 }

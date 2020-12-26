@@ -6,11 +6,13 @@ import 'package:sadhana/auth/login/mobile_request_success.dart';
 import 'package:sadhana/auth/login/start.dart';
 import 'package:sadhana/auth/login/verify.dart';
 import 'package:sadhana/auth/registration/registration.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/auth/registration/registration_request.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/model/logindatastate.dart';
 import 'package:sadhana/model/profile.dart';
 import 'package:sadhana/model/register.dart';
+import 'package:sadhana/model/registration_request.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
@@ -44,6 +46,7 @@ class LoginPageState extends BaseState<LoginPage> {
   ScrollController _scrollController = new ScrollController();
   LoginState loginState;
   List<GlobalKey<FormState>> formKeys = List.generate(4, (index) => GlobalKey());
+
   @override
   initState() {
     super.initState();
@@ -141,8 +144,8 @@ class LoginPageState extends BaseState<LoginPage> {
         children: <Widget>[
           RaisedButton(
             onPressed: onStepContinue,
-            child: Text(
-                currentStep != loginSteps.length - 1 ? 'CONTINUE' : loginState.mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
+            child:
+                Text(currentStep != loginSteps.length - 1 ? 'CONTINUE' : loginState.mobileChangeRequestStart ? 'RESTART' : 'CONTINUE'),
           ),
           SizedBox(
             width: 10,
@@ -198,7 +201,7 @@ class LoginPageState extends BaseState<LoginPage> {
         break;
       case 2: //Verify
         if (loginState.mobileChangeRequestStart)
-          return await sumbitMobileChangeReq();
+          return await submitMobileChangeReq();
         else
           return _verify(context);
         break;
@@ -238,6 +241,8 @@ class LoginPageState extends BaseState<LoginPage> {
           },
           doneButtonFn: goToHomePage,
         );
+      } else {
+        goToHomePage();
       }
     }
   }
@@ -258,10 +263,16 @@ class LoginPageState extends BaseState<LoginPage> {
   Future<bool> _loadUserProfile(BuildContext context) async {
     print('Login');
     if (await AppUtils.isInternetConnected()) {
-      startLoading();
+      startOverlay();
       try {
+        /*try {
+          loginState.intMhtId = int.parse(loginState.intMhtId).toString();
+        } catch (e,s) {
+          print(e); print(s);
+        }*/
         Response res = await api.getUserProfile(loginState.mhtId);
-        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+        AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
+        print(appResponse.status);
         if (appResponse.status == WSConstant.SUCCESS_CODE) {
           print('***** Login Data ::: ');
           print(appResponse.data);
@@ -269,19 +280,68 @@ class LoginPageState extends BaseState<LoginPage> {
             loginState.profileData = Profile.fromJson(appResponse.data);
             loginState = loginState;
           });
-          stopLoading();
+          stopOverlay();
           return true;
+        } else if (appResponse.status == WSConstant.CODE_ENTITY_NOT_FOUND) {
+          print('inside data');
+          RegistrationRequest registrationRequest = await getRegistrationRequest(loginState.mhtId);
+          String msg;
+          String doneButtonText;
+          bool allow = true;
+          if(registrationRequest == null) {
+            msg = "Your Mht Id is not registered with us, Pls Check again, "
+                "If it is correct and you are Dada's MBA then Kindly click Register button to enter registration details.";
+            doneButtonText = "Register";
+          } else {
+            if(AppUtils.equalsIgnoreCase(registrationRequest.status,WSConstant.REJECTED)) {
+              msg = "Your registration request is already rejected.";
+              doneButtonText = "OK";
+              allow = false;
+            } else {
+              msg = "You have already raised registration request. Do You want to update request?";
+              doneButtonText = "Yes";
+            }
+          }
+          CommonFunction.alertDialog(
+              context: context,
+              msg: msg,
+              showCancelButton: true,
+              doneButtonText: doneButtonText,
+              doneButtonFn: () {
+                Navigator.pop(context);
+                if(allow)
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationRequestPage(mhtId: loginState.mhtId,request: registrationRequest,)));
+              });
         }
       } catch (e, s) {
         print(e);
         print(s);
         CommonFunction.displayErrorDialog(context: context);
       }
-      stopLoading();
+      stopOverlay();
     } else {
-      CommonFunction.displayInernetNotAvailableDialog(context: context);
+      CommonFunction.displayInternetNotAvailableDialog(context: context);
     }
     return false;
+  }
+
+  Future<RegistrationRequest> getRegistrationRequest(String mhtId) async {
+    RegistrationRequest request;
+    await CommonFunction.tryCatchAsync(context, () async {
+      Response res = await api.getRegRequest(mhtId);
+      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context, showDialog: false);
+      if (appResponse.isSuccess && appResponse.data != null) {
+        setState(() {
+          List<RegistrationRequest> regRequestList = RegistrationRequest.fromJsonList(appResponse.data['profile']);
+          if(regRequestList.isNotEmpty) {
+            setState(() {
+              request = regRequestList.first;
+            });
+          }
+        });
+      }
+    });
+    return request;
   }
 
   Future<bool> _sendOtp(BuildContext context) async {
@@ -319,7 +379,7 @@ class LoginPageState extends BaseState<LoginPage> {
 
   Future<bool> _sendOTPAPICall() async {
     print('Send OTP');
-    startLoading();
+    startOverlay();
     try {
       Response res = await api.sendOTP(loginState.mhtId, loginState.email, loginState.mobileNo);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
@@ -327,7 +387,7 @@ class LoginPageState extends BaseState<LoginPage> {
         print('***** OTP Data ::: ');
         print(appResponse.data);
         otpData = OtpData.fromJson(appResponse.data);
-        stopLoading();
+        stopOverlay();
         return true;
       }
     } catch (e, s) {
@@ -335,7 +395,7 @@ class LoginPageState extends BaseState<LoginPage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
     return false;
   }
 
@@ -365,13 +425,17 @@ class LoginPageState extends BaseState<LoginPage> {
     return false;
   }
 
-  Future<bool> sumbitMobileChangeReq() async {
+  Future<bool> submitMobileChangeReq() async {
     try {
-      startLoading();
+      if(loginState.profileData.mobileNo1 == loginState.newMobile) {
+        CommonFunction.alertDialog(context: context, type: 'error', msg: "Your old mobile number and new mobile are same.");
+        return false;
+      }
+      startOverlay();
       Response res = await api.changeMobile(loginState.mhtId, loginState.profileData.mobileNo1, loginState.newMobile);
       AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
       if (appResponse != null && appResponse.status == WSConstant.SUCCESS_CODE) {
-        stopLoading();
+        stopOverlay();
         return true;
       }
     } catch (e, s) {
@@ -379,7 +443,7 @@ class LoginPageState extends BaseState<LoginPage> {
       print(s);
       CommonFunction.displayErrorDialog(context: context);
     }
-    stopLoading();
+    stopOverlay();
     return false;
   }
 
@@ -388,7 +452,7 @@ class LoginPageState extends BaseState<LoginPage> {
     if (await CommonFunction.registerUser(register: otpData.profile, context: context)) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => HomePage(optionsPage: CommonFunction.appOptionsPage,),
         ),
       );
     }

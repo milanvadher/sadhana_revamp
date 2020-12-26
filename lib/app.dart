@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:sadhana/auth/login/login.dart';
-import 'package:sadhana/comman.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/setup/options.dart';
@@ -26,18 +26,19 @@ class _SadhanaAppState extends State<SadhanaApp> {
   initState() {
     super.initState();
     _options = AppOptions(
-      theme: kDarkAppTheme,
+      theme: kLightAppTheme,
       platform: defaultTargetPlatform,
     );
     new Future.delayed(Duration.zero, () {
       AppLocalNotification.initAppLocalNotification(context);
     });
     _getUserSelectedTheme();
-    //checkForUserLoggedIn();
+    checkForUserLoggedIn();
   }
 
   void checkForUserLoggedIn() {
     getAppOptionPage();
+    //pageToDisplay = ReorderableListDemo();
     AppSharedPrefUtil.isUserLoggedIn().then((isLoggedIn) {
       if(isLoggedIn) {
         setState(() {
@@ -72,7 +73,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
 
   @override
   Widget build(BuildContext context) {
-    checkForUserLoggedIn();
+    //checkForUserLoggedIn();
     return MaterialApp(
       theme: _options.theme.data.copyWith(platform: _options.platform),
       title: 'Sadhana',

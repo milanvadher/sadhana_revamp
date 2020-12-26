@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:sadhana/auth/login/validate_widget.dart';
 import 'package:sadhana/auth/registration/Inputs/appautocomplete_textfield.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/utils/apputils.dart';
 
 class ComboboxInput extends StatelessWidget {
@@ -12,6 +13,8 @@ class ComboboxInput extends StatelessWidget {
     this.selectedData,
     this.onDelete,
     this.isRequiredValidation,
+    this.viewMode = false,
+    this.viewModeTitleWidth,
   });
 
   // final String text;
@@ -21,8 +24,28 @@ class ComboboxInput extends StatelessWidget {
   final List<String> listData;
   final List<dynamic> selectedData;
   final bool isRequiredValidation;
+  final bool viewMode;
+  final double viewModeTitleWidth;
+  BuildContext context;
   @override
   Widget build(BuildContext context) {
+    this.context = context;
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: !viewMode ? 10.0 : 5),
+      alignment: Alignment.bottomLeft,
+      child: viewMode ? viewModeWidget() : editModeWidget(),
+    );
+  }
+
+  Widget viewModeWidget() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    String values = '';
+    if(selectedData != null)
+      selectedData.forEach((s) => values = '$values ${s.toString()}');
+    return CommonFunction.getTitleAndNameForProfilePage(screenWidth: screenWidth, title: labelText, value: values, titleWidth: viewModeTitleWidth);
+  }
+
+  Widget editModeWidget() {
     return ValidateInput(
       labelText: labelText,
       isRequiredValidation: isRequiredValidation,
@@ -34,12 +57,10 @@ class ComboboxInput extends StatelessWidget {
     );
   }
   TextEditingController textController = TextEditingController();
+
   Widget buildCombobox() {
     AppSimpleAutoCompleteTextField autoCompleteTextField;
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      alignment: Alignment.bottomLeft,
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
         child: Column(
           children: <Widget>[
             autoCompleteTextField = AppSimpleAutoCompleteTextField(
@@ -84,7 +105,6 @@ class ComboboxInput extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 }

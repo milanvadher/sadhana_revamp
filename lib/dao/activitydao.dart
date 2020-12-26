@@ -1,12 +1,17 @@
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/dao/basedao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/entity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/service/apiservice.dart';
+import 'package:sadhana/service/dbprovider.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
 
 class ActivityDAO extends BaseDAO<Activity> {
+  ActivityDAO();
+  @override
+  ActivityDAO.withDBProvider(DBProvider idbProvider) : super.withDBProvider(idbProvider);
   @override
   getDefaultInstance() {
     return Activity();
@@ -37,6 +42,16 @@ class ActivityDAO extends BaseDAO<Activity> {
     return getEntityBySearchKey(Activity.columnSadhanaId, sadhanaId);
   }
 
+  Future<List<Activity>> getHomeVisibleActivityBySadhanaId(int sadhanaId) {
+    int lastTwoMonth = DateTime.now().add(Duration(days: -Constant.displayDays)).millisecondsSinceEpoch;
+    return query(where: '${Activity.columnSadhanaId} = $sadhanaId and ${Activity.columnSadhanaDate} >= $lastTwoMonth');
+  }
+
+  Future<List<Activity>> getAllActivityBySadhanaId(int sadhanaId) {
+    return getEntityBySearchKey(Activity.columnSadhanaId, sadhanaId);
+  }
+
+  
   Future<int> deleteBySadhanaId(int sadhanaId) async {
     return await super.deleteByColumn(Activity.columnSadhanaId, sadhanaId);
   }

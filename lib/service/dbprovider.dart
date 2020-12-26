@@ -4,12 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sadhana/constant/constant.dart';
-import 'package:sadhana/dao/activitydao.dart';
-import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_file_util.dart';
-import 'package:sadhana/utils/appcsvutils.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -18,11 +15,14 @@ class DBProvider {
 
   static final DBProvider db = DBProvider._();
 
+  DBProvider(Database database) {
+    _database = database;
+  }
   Database _database;
 
   Future<Database> get database async {
     if (_database != null) return _database;
-    _database = await initDB();
+    _database = await getDB(await _getDBPath());
     return _database;
   }
 
@@ -31,8 +31,7 @@ class DBProvider {
     return join(documentsDirectory.path, "Sadhana.db");
   }
 
-  initDB() async {
-    String path = await _getDBPath();
+  static getDB(String path) async {
     return await openDatabase(path, version: 1, onOpen: (db) {}, onCreate: (Database db, int version) async {
       await db.execute(Sadhana.createSadhanaTable);
       await db.execute(Activity.createActivityTable);
@@ -40,7 +39,7 @@ class DBProvider {
   }
 
   Future<File> exportDB() async {
-    if(await AppUtils.checkPermission()) {
+    if(Platform.isIOS || await AppUtils.askForPermission()) {
       Directory documentsDirectory = await getApplicationDocumentsDirectory();
       String path = join(documentsDirectory.path, "Sadhana.db");
       File dbFile = new File(path);

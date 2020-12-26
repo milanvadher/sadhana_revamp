@@ -6,7 +6,6 @@ import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/cachedata.dart';
 import 'package:sadhana/model/profile.dart';
-import 'package:sadhana/model/register.dart';
 import 'package:sadhana/model/sadhana.dart';
 import 'package:sadhana/utils/app_file_util.dart';
 import 'package:sadhana/utils/apputils.dart';
