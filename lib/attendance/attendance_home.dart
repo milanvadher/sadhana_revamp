@@ -132,8 +132,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     AppResponse appResponse =
         AppResponseParser.parseResponse(res, context: context);
     if (appResponse.isSuccess) {
-      print(appResponse.data);
       dvds = DVDInfo.fromJsonList(appResponse.data);
+      print("==================DVDS==================");
       print(dvds);
     }
     stopOverlay();

@@ -26,12 +26,15 @@ class DVDForm extends StatefulWidget {
 class _DVDFormState extends State<DVDForm> {
   DVDInfo dvdInfo;
   final GlobalKey<FormState> _dvdForm = GlobalKey<FormState>();
+   TextEditingController remarkController;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     dvdInfo = DVDInfo.fromSession(widget.session);
-    if (dvdInfo.dvdPart == null) {dvdInfo = null;}
+    if (dvdInfo == null) {dvdInfo = DVDInfo();}
+    remarkController = TextEditingController(text: dvdInfo.remark ?? "");
+
   }
 
   final double paddingBtwInput = 15;
@@ -78,8 +81,9 @@ class _DVDFormState extends State<DVDForm> {
                   hintText: 'Enter a Remarks',
                   contentPadding: contentPaddingForTextInput,
                 ),
-                initialValue: dvdInfo == null ? "" : dvdInfo.remark,
-                onSaved: (value) => dvdInfo.remark = value, 
+                // initialValue: dvdInfo == null ? "" : dvdInfo.remark ?? "",
+                controller: remarkController,
+                // onSaved: (value) => remark = value, 
               ),
               SizedBox(height: 20),
               Row(
@@ -112,12 +116,21 @@ class _DVDFormState extends State<DVDForm> {
   }
 
   buildDropdownList(){
-    return widget.dvds.map((dvd) {
-      return DropdownMenuItem<DVDInfo>(
+    print(widget.dvds);
+    List<DropdownMenuItem<DVDInfo>> dropdownList = [];
+    List<String> seenDvd = [];
+    for (DVDInfo dvd in widget.dvds) {
+      print(dvd.dvdType + " " + dvd.dvdNo.toString());
+      print(dvd);
+      if(seenDvd.contains(dvd.dvdPart)){ continue; }
+      else{ seenDvd.add(dvd.dvdPart);} // Filter out duplicate dvds
+       dropdownList.add( DropdownMenuItem<DVDInfo>(
         child: Text(dvd.dvdType + " " + dvd.dvdNo.toString()),
         value: dvd,
-      );
-    }).toList();
+      ));
+    }
+    dropdownList.insert(0, DropdownMenuItem<DVDInfo>(child: Text('-'), value: DVDInfo(),)); // Add default dvd
+    return dropdownList;
   }
 
   buildNumberInputField({String label, int initialValue, Function onSaved}) {
@@ -137,7 +150,9 @@ class _DVDFormState extends State<DVDForm> {
   }
 
   submitForm() {
+    dvdInfo.remark = remarkController.value.text;
     _dvdForm.currentState.save();
+    print(dvdInfo);
     if (AppUtils.isNullOrEmpty(dvdInfo.remark) && 
         dvdInfo.dvdPart == null) {
       CommonFunction.alertDialog(
