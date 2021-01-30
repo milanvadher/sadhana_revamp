@@ -557,6 +557,7 @@ class HomePageState extends BaseState<HomePage> {
                     ),
                     value: 'event_attendance',
                   ): null,
+                  
                 ];
               },
             )
@@ -569,7 +570,17 @@ class HomePageState extends BaseState<HomePage> {
                 );
               },
               tooltip: 'Options',
-            )
+            ),
+            PopupMenuItem(
+              child: ListTile(
+                trailing: Icon(
+                  Icons.app_registration,
+                  color: Colors.blueGrey,
+                ),
+                title: Text('Registration'),
+              ),
+              value: 'registration',
+            ),
     ];
   }
 
