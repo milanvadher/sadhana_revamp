@@ -122,11 +122,14 @@ Future<DateTime> showDatePickerWithEvents(BuildContext context, DateTime selecte
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(children: <Widget>[
-          Builder(
-            builder: (BuildContext context) => AppCalendarCarousel(
-                  selectedDate: selectedDate,
-                  events: events,
-                ),
+          Container(
+            width: 100,
+            child: Builder(
+              builder: (BuildContext context) => AppCalendarCarousel(
+                    selectedDate: selectedDate,
+                    events: events,
+                  ),
+            ),
           )
         ]);
       });

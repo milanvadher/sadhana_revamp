@@ -62,6 +62,7 @@ dependencies:
   flutter_image_compress: ^0.6.3
   ntp: ^1.0.4
   file_picker: ^1.4.3+1
+  flutter_inappwebview: ^4.0.0+4
   #share:
   #  git:
   #    url: https://github.com/d-silveira/flutter-share.git
