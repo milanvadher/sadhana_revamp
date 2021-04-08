@@ -415,14 +415,33 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   getDaysToDisplay() {
+    if(DateTime.now().timeZoneName == "IST") {
+      return getDaysToDisplayIST();
+    } else
+      return getDaysToDisplayOutSideIndia();
+  }
+
+  getDaysToDisplayIST() {
     List<DateTime> dates = List.generate(durationInDays, (int index) {
-      DateTime date = today.subtract(new Duration(days: index));
-      return today.subtract(new Duration(days: index));
+       return today.subtract(new Duration(days: index));
     });
-    /*if (androidVersion != null && androidVersion == 23) {
-      addMissing(dates);
-    }*/
     return dates;
+  }
+
+  getDaysToDisplayOutSideIndia() {
+    DateTime tmpToday = new DateTime.utc(now.year, now.month, now.day);
+    List<DateTime> dates = List.generate(durationInDays, (int index) {
+      return tmpToday.subtract(new Duration(days: index)).toLocal();
+    });
+    return getLocalDates(dates);
+  }
+
+  List<DateTime> getLocalDates(List<DateTime> dates) {
+    List<DateTime> localDates = List();
+    dates.forEach((dateTime) {
+      localDates.add(Constant.APP_DATE_FORMAT.parse(Constant.APP_DATE_FORMAT.format(dateTime)));
+    });
+    return localDates;
   }
 
   void addMissing(List<DateTime> dates) {
