@@ -47,6 +47,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   ApiService _api = ApiService();
   Event event;
   Session session;
+  List<DVDInfo> dvds;
   Hero _dvdFormButton;
   Hero _saveButton;
   UserAccess _userAccess;
@@ -60,6 +61,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   bool isEventAttendance = false;
   String eventName;
   String eventTitle;
+
   @override
   void initState() {
     super.initState();
@@ -85,6 +87,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           await loadSessionDates();
         }
         await loadEvent(selectedDate);
+        await loadDvdData(selectedDate);
         setState(() {
           setReadOnlyField();
         });
@@ -119,6 +122,20 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         });
       }
     });
+    stopOverlay();
+  }
+
+  loadDvdData(DateTime date) async {
+    startOverlay();
+    String strDate = WSConstant.wsDateFormat.format(date);
+    Response res = await _api.getDvdList(strDate, fillAttendanceData.groupName);
+    AppResponse appResponse =
+        AppResponseParser.parseResponse(res, context: context);
+    if (appResponse.isSuccess) {
+      dvds = DVDInfo.fromJsonList(appResponse.data);
+      print("==================DVDS==================");
+      print(dvds);
+    }
     stopOverlay();
   }
 
@@ -341,13 +358,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           FloatingActionButton(
-                  heroTag: _dvdFormButton,
-                  onPressed: () => _onDVDClick(),
-                  backgroundColor: Colors.white,
-                  child: fillAttendanceData.isCenterType
-                      ? Image.asset('assets/icon/iconfinder_BT_dvd_905549.png', color: Color(0xFFce0e11))
-                      : Icon(Icons.chat, color: AppUtils.isNullOrEmpty(session.remark) ? Colors.red : Colors.blueAccent),
-                ),
+            heroTag: _dvdFormButton,
+            onPressed: () => _onDVDClick(),
+            backgroundColor: Colors.white,
+            child: fillAttendanceData.isCenterType
+                ? Image.asset('assets/icon/iconfinder_BT_dvd_905549.png',
+                    color: Color(0xFFce0e11))
+                : Icon(Icons.chat,
+                    color: AppUtils.isNullOrEmpty(session.remark)
+                        ? Colors.red
+                        : Colors.blueAccent),
+          ),
           SizedBox(width: 20),
           !isReadOnly
               ? FloatingActionButton.extended(
@@ -355,7 +376,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                   onPressed: _onSubmit,
                   //backgroundColor: Colors.white,
                   icon: Icon(Icons.check, color: Colors.white),
-                  label: Text(isEditMode ? 'Update' : 'Save', style: TextStyle(color: Colors.white)),
+                  label: Text(isEditMode ? 'Update' : 'Save',
+                      style: TextStyle(color: Colors.white)),
                 )
               : Container(),
         ],
@@ -364,7 +386,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   Future<void> _onSelectDate() async {
-    final DateTime picked = await showDatePickerWithEvents(context, selectedDate, _sessionDates);
+    final DateTime picked =
+        await showDatePickerWithEvents(context, selectedDate, _sessionDates);
     if (picked != null) {
       setState(() {
         selectedDate = picked;
@@ -379,6 +402,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       } else {
         setReadOnlyField();
         loadEvent(selectedDate);
+        loadDvdData(selectedDate);
       }
     }
   }
@@ -394,7 +418,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   bool isSelectedDateReadOnly() {
     return CommonFunction.tryCatchSync(context, () {
       if (fillAttendanceData.isGDType) {
-        if (selectedDate.isBefore(CacheData.today.add(Duration(days: -_userAccess.attendanceEditableDays))))
+        if (selectedDate.isBefore(CacheData.today
+            .add(Duration(days: -_userAccess.attendanceEditableDays))))
           return true;
         else
           return false;
@@ -405,12 +430,14 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
           else
             return false;
         }
-        if (CacheData.pendingMonth != null && isGreaterOrEqualMonth(selectedDate, CacheData.pendingMonth))
+        if (CacheData.pendingMonth != null &&
+            isGreaterOrEqualMonth(selectedDate, CacheData.pendingMonth))
           return false;
         else {
           if (CacheData.pendingMonth == null) {
             DateTime lastSubmittedMonth = getLastSubmittedMonth();
-            if (lastSubmittedMonth == null || isGreaterMonth(selectedDate, lastSubmittedMonth)) return false;
+            if (lastSubmittedMonth == null ||
+                isGreaterMonth(selectedDate, lastSubmittedMonth)) return false;
           }
         }
         return true;
@@ -477,9 +504,11 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   void onSubmitAttendanceClick() async {
     startOverlay();
     await CommonFunction.tryCatchAsync(context, () async {
-      await CacheData.loadPendingMonthForAttendance(fillAttendanceData, context);
+      await CacheData.loadPendingMonthForAttendance(
+          fillAttendanceData, context);
       if (CacheData.pendingMonth == null) {
-        CommonFunction.alertDialog(context: context, msg: "You have already submmited Attendance");
+        CommonFunction.alertDialog(
+            context: context, msg: "You have already submmited Attendance");
       } else {
         goToAttendanceSubmitPage();
       }
@@ -518,6 +547,7 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 Builder(
                   builder: (BuildContext context) => DVDForm(
                     session: session,
+                    dvds: dvds,
                     onDVDSubmit: _onDVDEntered,
                     isReadOnly: isReadOnly,
                   ),
@@ -554,7 +584,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
     CommonFunction.alertDialog(
         context: context,
         title: 'Are you sure ?',
-        msg: "Do you want to delete ${Constant.APP_DATE_FORMAT.format(selectedDate)} Session?",
+        msg:
+            "Do you want to delete ${Constant.APP_DATE_FORMAT.format(selectedDate)} Session?",
         showCancelButton: true,
         doneButtonFn: deleteSession);
   }
@@ -562,8 +593,10 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   deleteSession() async {
     Navigator.pop(context);
     CommonFunction.tryCatchAsync(context, () async {
-      Response res = await _api.deleteAttendanceSession(session.name, session.dateTime, fillAttendanceData);
-      AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+      Response res = await _api.deleteAttendanceSession(
+          session.name, session.dateTime, fillAttendanceData);
+      AppResponse appResponse =
+          AppResponseParser.parseResponse(res, context: context);
       if (appResponse.isSuccess) {
         setState(() {
           _sessionDates.remove(session.dateTime);
@@ -581,7 +614,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AttendanceHomePage(date: selectedDate),
+                    builder: (context) =>
+                        AttendanceHomePage(date: selectedDate),
                   ),
                 );
               }
@@ -591,11 +625,16 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
   }
 
   void _onSubmit() async {
-    if (CacheData.isAttendanceSubmissionPending() && !isEqualMonth(CacheData.pendingMonth, selectedDate)) {
+    print(
+        "9999999999999999999999999999999999999SESSIOn DATE =======================================================");
+    print(session.date);
+    if (CacheData.isAttendanceSubmissionPending() &&
+        !isEqualMonth(CacheData.pendingMonth, selectedDate)) {
       String strMonth = DateFormat.yMMM().format(CacheData.pendingMonth);
       CommonFunction.alertDialog(
           context: context,
-          msg: "$strMonth month's attendance submission is pending, Please submit Attendance to continue.",
+          msg:
+              "$strMonth month's attendance submission is pending, Please submit Attendance to continue.",
           doneButtonFn: () {
             Navigator.pop(context);
             goToAttendanceSubmitPage();
@@ -609,14 +648,17 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
         if (_validateDVD() && _validateAttendance()) {
           print(event);
           Response res = await _api.submitAttendanceSession(event);
-          AppResponse appResponse = AppResponseParser.parseResponse(res, context: context);
+          AppResponse appResponse =
+              AppResponseParser.parseResponse(res, context: context);
           if (appResponse.isSuccess) {
             if (!fillAttendanceData.isEventType) {
               setState(() {
                 _sessionDates.add(session.dateTime);
-                String sessionName = AttendanceUtils.getSessionName(appResponse.data);
+                String sessionName =
+                    AttendanceUtils.getSessionName(appResponse.data);
                 if (sessionName != null) {
-                  sessionNameByDate.putIfAbsent(session.dateTime, () => sessionName);
+                  sessionNameByDate.putIfAbsent(
+                      session.dateTime, () => sessionName);
                   session.name = sessionName;
                 }
               });
@@ -624,7 +666,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
             setState(() {
               isEditMode = true;
             });
-            if (CacheData.pendingMonth == null) CacheData.pendingMonth = session.dateTime;
+            if (CacheData.pendingMonth == null)
+              CacheData.pendingMonth = session.dateTime;
             CommonFunction.alertDialog(
                 closeable: false,
                 context: context,
@@ -657,8 +700,9 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
 
   bool _validateDVD() {
     if (fillAttendanceData.isCenterType) {
-      if (session.dvdNo == null && session.dvdPart == null && session.remark == null) {
-        CommonFunction.alertDialog(context: context, msg: "Please fill DVD Details", type: 'error');
+      if (session.dvdNo == null && session.remark == null) {
+        CommonFunction.alertDialog(
+            context: context, msg: "Please fill DVD Details", type: 'error');
         return false;
       }
     }
@@ -674,7 +718,8 @@ class AttendanceHomePageState extends BaseState<AttendanceHomePage> {
       }
     }
     if (!isAnyPresent) {
-      CommonFunction.alertDialog(context: context, msg: "One Person should be present", type: 'error');
+      CommonFunction.alertDialog(
+          context: context, msg: "One Person should be present", type: 'error');
       return false;
     }
     return true;
