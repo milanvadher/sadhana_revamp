@@ -41,7 +41,7 @@ class AppCSVUtils {
       sadhanasName.asMap().forEach((index, sadhanaName) {
         Sadhana sadhana = sadhanaByName[sadhanaName];
         if (sadhana != null) {
-          Activity activity = sadhana.activitiesByDate[date.millisecondsSinceEpoch];
+          Activity activity = sadhana.activitiesByDate[Constant.APP_DATE_FORMAT.format(date)];
           String value = '';
           if (sadhana.type == SadhanaType.BOOLEAN)
             value = 'N';

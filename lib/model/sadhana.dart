@@ -48,7 +48,7 @@ class Sadhana extends Entity {
   List<Color> _colors;
   DateTime reminderTime;
   String reminderDays;
-  Map<int, Activity> activitiesByDate = new Map();
+  Map<String, Activity> activitiesByDate = new Map();
   bool isLoadedAllActivity = false;
   bool get isNumeric => type == SadhanaType.NUMBER;
 

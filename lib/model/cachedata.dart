@@ -3,6 +3,7 @@ import 'package:http/http.dart';
 import 'package:sadhana/attendance/model/fill_attendance_data.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
 import 'package:sadhana/attendance/model/user_role.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/wsconstants.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
 import 'package:sadhana/model/activity.dart';
@@ -62,7 +63,7 @@ class CacheData {
   static addActivity(Activity activity) {
     Sadhana sadhana = _sadhanasById[activity.sadhanaId];
     if (sadhana != null) {
-      sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
+      sadhana.activitiesByDate[Constant.APP_DATE_FORMAT.format(activity.sadhanaDate)] = activity;
     }
   }
 

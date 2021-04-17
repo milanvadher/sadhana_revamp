@@ -191,12 +191,12 @@ class SyncActivityUtils {
     });
   }
 
-  static bool isEntryExist(Map<int, Activity> activitiesByDate, int days) {
+  static bool isEntryExist(Map<String, Activity> activitiesByDate, int days) {
     DateTime day = CacheData.today;
     //print('$MODULE all activity $activitiesByDate');
     for (int i = 0; i < days; i++) {
       //print('$MODULE ${day.millisecondsSinceEpoch} checking date ${activitiesByDate[day.millisecondsSinceEpoch]}');
-      Activity activity = activitiesByDate[day.millisecondsSinceEpoch];
+      Activity activity = activitiesByDate[Constant.APP_DATE_FORMAT.format(day)];
       if (activity != null && activity.sadhanaValue > 0) return true;
       day = day.add(Duration(days: -1));
     }

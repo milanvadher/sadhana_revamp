@@ -66,7 +66,7 @@ class SadhanaDAO extends BaseDAO<Sadhana> {
     if (activities != null && activities.isNotEmpty) {
       sadhana.activitiesByDate = new Map.fromIterable(
         activities,
-        key: (v) => (v as Activity).sadhanaDate.millisecondsSinceEpoch,
+        key: (v) => Constant.APP_DATE_FORMAT.format((v as Activity).sadhanaDate),
         value: (v) => v,
       );
     } else {

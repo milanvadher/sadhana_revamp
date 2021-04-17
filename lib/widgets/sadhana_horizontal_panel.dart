@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
@@ -53,7 +54,7 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
             children: List.generate(
               daysToDisplay.length,
               (int index) {
-                Activity activity = sadhana.activitiesByDate[widget.daysToDisplay[index].millisecondsSinceEpoch];
+                Activity activity = sadhana.activitiesByDate[Constant.APP_DATE_FORMAT.format(widget.daysToDisplay[index])];
                 if (activity == null)
                   activity = Activity(sadhanaId: sadhana.id, sadhanaDate: daysToDisplay[index], sadhanaValue: 0, remarks: "");
                 bool isDisabled = false;
@@ -91,11 +92,11 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
     /*if(activity.sadhanaValue <= 0)
       activity.remarks = '';*/
     setState(() {
-      sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = activity;
+      sadhana.activitiesByDate[Constant.APP_DATE_FORMAT.format(activity.sadhanaDate)] = activity;
     });
     activityDAO.insertOrUpdate(activity).then((dbActivity) {
       setState(() {
-        sadhana.activitiesByDate[activity.sadhanaDate.millisecondsSinceEpoch] = dbActivity;
+        sadhana.activitiesByDate[Constant.APP_DATE_FORMAT.format(activity.sadhanaDate)] = dbActivity;
       });
     });
     var namingState = listOfNamingState[sadhana.sadhanaName];
