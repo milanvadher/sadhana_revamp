@@ -18,8 +18,8 @@ import 'package:sadhana/wsmodel/ws_sadhana_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static final _baseServerUrl = 'https://sadhanaapi-dev.dbf.ooo'; //Test
-  // static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
+  // static final _baseServerUrl = 'https://sadhanaapi-dev.dbf.ooo'; //Test
+  static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
   static final _apiUrl = '$_baseServerUrl/api/method';
   static final _resourceApiUrl = '$_baseServerUrl/api/resource';
 

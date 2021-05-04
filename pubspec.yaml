@@ -49,7 +49,7 @@ dependencies:
   connectivity: ^0.4.5+6
   package_info: ^0.4.0+11
   #onesignal: ^1.1.0My
-  onesignal_flutter: ^2.2.0
+  onesignal_flutter: 2.6.3
   flutter_launcher_icons: ^0.7.4
   device_info: ^0.4.1+2
   flutter_cache_manager: ^1.1.3
