@@ -21,7 +21,7 @@ if (flutterRoot == null) {
 
 //def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 //if (flutterVersionCode == null) {
-def flutterVersionCode = '2022'
+def flutterVersionCode = '2024'
 //}
 
 //def flutterVersionName = localProperties.getProperty('flutter.versionName')
@@ -41,7 +41,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "org.sheelsadhak.sadhana"
+        applicationId "org.sheelsadhak.sadhanaprod"
         minSdkVersion 16
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
