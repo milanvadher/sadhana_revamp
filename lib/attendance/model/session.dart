@@ -17,7 +17,7 @@ class Session {
   @JsonKey(name: 'number')
   int dvdNo;
   @JsonKey(name: 'satsang_part') // This is primary key in frappe docs
-  String dvdPart;
+  String satsangPart;
   @JsonKey(name: 'remark')
   String remark;
   @JsonKey(name: 'session_type')

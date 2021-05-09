@@ -13,7 +13,7 @@ Session _$SessionFromJson(Map<String, dynamic> json) {
     ..group = json['group_name'] as String
     ..dvdType = json['type'] as String
     ..dvdNo = json['number'] as int
-    ..dvdPart = json['satsang_part'] as String
+    ..satsangPart = json['satsang_part'] as String
     ..remark = json['remark'] as String
     ..sessionType = json['session_type'] as String
     ..attendance = (json['attendance'] as List)
@@ -30,7 +30,7 @@ Map<String, dynamic> _$SessionToJson(Session instance) => <String, dynamic>{
       'group_name': instance.group,
       'type': instance.dvdType,
       'number': instance.dvdNo,
-      'satsang_part': instance.dvdPart,
+      'satsang_part': instance.satsangPart,
       'remark': instance.remark,
       'session_type': instance.sessionType,
       'attendance': instance.attendance?.map((e) => e?.toJson())?.toList(),

@@ -319,7 +319,7 @@ class ApiService {
 
   Future<Response> submitAttendanceSession(Event event) async {
     Map<String, dynamic> data = event.toJson();
-    Response res = await _postApi(url: '/mba.attendance.save_attendance', data: data);
+    Response res = await _postApi(url: '/mba.attendance.save_attendance_v1', data: data);
     //Response res = http.Response("{\"message\":{\"data\":{}}}", 200);
     return res;
   }

@@ -122,8 +122,8 @@ class _DVDFormState extends State<DVDForm> {
     for (DVDInfo dvd in widget.dvds) {
       print(dvd.dvdType + " " + dvd.dvdNo.toString());
       print(dvd);
-      if(seenDvd.contains(dvd.dvdPart)){ continue; }
-      else{ seenDvd.add(dvd.dvdPart);} // Filter out duplicate dvds
+      if(seenDvd.contains(dvd.name)){ continue; }
+      else{ seenDvd.add(dvd.name);} // Filter out duplicate dvds
        dropdownList.add( DropdownMenuItem<DVDInfo>(
         child: Text(dvd.dvdType + " " + dvd.dvdNo.toString()),
         value: dvd,
@@ -154,7 +154,7 @@ class _DVDFormState extends State<DVDForm> {
     _dvdForm.currentState.save();
     print(dvdInfo);
     if (AppUtils.isNullOrEmpty(dvdInfo.remark) && 
-        dvdInfo.dvdPart == null) {
+        dvdInfo.name == null) {
       CommonFunction.alertDialog(
           context: context, msg: "Please fill any one Detail", type: 'error');
     } else {

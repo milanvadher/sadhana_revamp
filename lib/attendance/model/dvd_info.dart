@@ -13,7 +13,7 @@ class DVDInfo {
   @JsonKey(name: 'number')
   int dvdNo;
   @JsonKey(name: 'name') // Primary Key of frappe doc
-  String dvdPart;
+  String name;
   String remark;
 
   DVDInfo();
@@ -22,14 +22,14 @@ class DVDInfo {
     date = session.date;
     dvdType = session.dvdType;
     dvdNo = session.dvdNo;
-    dvdPart = session.dvdPart;
+    name = session.satsangPart;
     remark = session.remark;
   }
 
   static setSession(Session session, DVDInfo dvdInfo) {
     session.dvdType = dvdInfo.dvdType;
     session.dvdNo = dvdInfo.dvdNo;
-    session.dvdPart = dvdInfo.dvdPart;
+    session.satsangPart = dvdInfo.name;
     session.remark = dvdInfo.remark;
   }
 
@@ -49,7 +49,7 @@ class DVDInfo {
   }
 
   bool operator ==(dynamic other) =>
-      other != null && other is DVDInfo && this.dvdPart == other.dvdPart;
+      other != null && other is DVDInfo && this.name == other.name;
 
   @override
   int get hashCode => super.hashCode;
