@@ -7,7 +7,7 @@ import 'package:sadhana/utils/apputils.dart';
 part "mba_attendance.g.dart";
 
 @JsonSerializable()
-class MBAAttendance extends EventInterface{
+class MBAAttendance extends EventInterface {
   
   @JsonKey(name: 'session_date')
   String sessionDate;
@@ -56,4 +56,10 @@ class MBAAttendance extends EventInterface{
   String getTitle() {
     return "Attendance";
   }
+
+  @override
+  int getId() {
+    return WSConstant.wsDateFormat.parse(sessionDate).millisecondsSinceEpoch;
+  }
+
 }

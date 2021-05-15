@@ -12,8 +12,8 @@ class AppLocalNotification {
     "General",
     "General",
     "This channel is Notifcation",
-    importance: Importance.Max,
-    priority: Priority.High,
+    importance: Importance.high,
+    priority: Priority.high,
     playSound: true,
     color: Colors.redAccent,
     largeIcon: DrawableResourceAndroidBitmap('ic_notification_large_icon'),
@@ -35,13 +35,13 @@ class AppLocalNotification {
   AppLocalNotification._internal() {
     var initializationSettingsAndroid = AndroidInitializationSettings('ic_notification');
     var initializationSettingsIOS = IOSInitializationSettings(onDidReceiveLocalNotification: onDidRecieveLocalNotification);
-    var initializationSettings = InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings = InitializationSettings(android:initializationSettingsAndroid, iOS:initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: onSelectNotification);
   }
   
   Future<void> showNotification(String title, String msg, {int id = 1456}) async {
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(androidGeneralChannel, iOSPlatformChannelSpecifics);
+    var platformChannelSpecifics = NotificationDetails(android:androidGeneralChannel, iOS:iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(id, title, msg, platformChannelSpecifics);
   }
 
@@ -52,8 +52,8 @@ class AppLocalNotification {
         sadhana.sadhanaName,
         sadhana.sadhanaName,
         sadhana.description,
-        importance: Importance.Max,
-        priority: Priority.High,
+        importance: Importance.high,
+        priority: Priority.high,
         playSound: true,
         color: Colors.redAccent,
         largeIcon: DrawableResourceAndroidBitmap('ic_notification_large_icon'),
@@ -62,7 +62,7 @@ class AppLocalNotification {
         //ongoing: true,  // Sticky Notification
       );
       var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-      var platformChannelSpecifics = NotificationDetails(androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+      var platformChannelSpecifics = NotificationDetails(android:androidPlatformChannelSpecifics, iOS:iOSPlatformChannelSpecifics);
       await flutterLocalNotificationsPlugin.showDailyAtTime(
         sadhana.id,
         sadhana.sadhanaName,

@@ -1,8 +1,7 @@
-//import 'package:firebase_messaging/firebase_messaging.dart';
-//import 'package:flutter/material.dart';
-//import 'package:GnanG/common.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:flutter/material.dart';
 //
-//class FirebaseNotification {
+// class FirebaseNotification {
 //  static FirebaseMessaging firebaseMessaging = new FirebaseMessaging();
 //
 //  static Future<String> setupFBNotification({BuildContext context}) async {
@@ -38,9 +37,9 @@
 //      if (context != null) {
 //        print('CATCH :: ');
 //        print(err);
-//        CommonFunction.displayErrorDialog(context: context, msg: err.toString());
+//        // CommonFunction.displayErrorDialog(context: context, msg: err.toString());
 //      }
 //    }
 //    return null;
 //  }
-//}
+// }

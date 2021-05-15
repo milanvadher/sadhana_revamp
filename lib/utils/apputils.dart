@@ -166,7 +166,11 @@ class AppUtils {
 
   static Future<bool> askForPermission() async {
     if (Platform.isAndroid) {
-      PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+      if (await Permission.storage.request().isGranted) {
+        // Either the permission was already granted before or the user just granted it.
+        return true;
+      }
+      /*PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
       if (permission != PermissionStatus.granted) {
         Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
         if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
@@ -174,7 +178,7 @@ class AppUtils {
         }
       } else {
         return true;
-      }
+      }*/
     } else {
       return true;
     }

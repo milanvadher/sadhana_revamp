@@ -84,7 +84,8 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
     final Widget picker = Flexible(
       child: buildCalendar(),
     );
-    final Widget actions = ButtonTheme.bar(
+    final Widget actions = ButtonBarTheme(
+      data: ButtonBarThemeData(alignment: MainAxisAlignment.center),
       child: ButtonBar(
         children: <Widget>[
           FlatButton(

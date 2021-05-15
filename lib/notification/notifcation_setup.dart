@@ -17,4 +17,14 @@ class NotificationSetup {
       print("Error while Notification Setup:");
     }
   }
+
+  /*static Future<void> setupNotification({BuildContext context, Register userInfo}) async {
+    try {
+      String fbToken = await FirebaseNotification.setupFBNotification(context: context);
+      await _apiService.updateNotificationToken(mhtId: userInfo.mhtId, fbToken: fbToken, oneSignalToken: oneSignalPlayerId);
+    } catch(e,s) {
+      print(e);print(s);
+      print("Error while Notification Setup:");
+    }
+  }*/
 }
