@@ -9,6 +9,7 @@ class NotificationSetup {
   static ApiService _apiService = ApiService();
   static Future<void> setupNotification({BuildContext context, Register userInfo}) async {
     try {
+      await FireBaseNotificationSetup.initFirebaseOnAppLaunch();
       await FireBaseNotificationSetup.updateFCMToken(mhtId : userInfo.mhtId);
       /*String oneSignalPlayerId = await OneSignalNotification.setupOneSignalNotification(context: context, userInfo: userInfo);
       await _apiService.updateNotificationToken(mhtId: userInfo.mhtId, oneSignalToken: oneSignalPlayerId);*/

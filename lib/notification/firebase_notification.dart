@@ -47,6 +47,9 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 
 class FireBaseNotificationSetup {
   static Future<void> initFirebaseOnAppLaunch() async {
+    if(!await AppSharedPrefUtil.isUserRegistered()) {
+      return;
+    }
     await Firebase.initializeApp();
     // Set the background messaging handler early on, as a named top-level function
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
