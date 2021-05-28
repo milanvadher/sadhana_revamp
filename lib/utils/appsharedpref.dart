@@ -121,6 +121,14 @@ class AppSharedPrefUtil {
     return await getString('token');
   }
 
+  static Future<void> saveFCMToken(String fcmToken) async {
+    await saveString('fcm_token', fcmToken);
+  }
+
+  static Future<String> getFCMToken() async {
+    return await getString('fcm_token');
+  }
+
   static Future<void> saveUserData(String token, String mhtId) async {
     await saveToken(token);
     await saveMhtId(mhtId);

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sadhana/auth/login/login.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/notification/app_local_notification.dart';
+import 'package:sadhana/notification/firebase_notification.dart';
 import 'package:sadhana/sadhana/home.dart';
 import 'package:sadhana/setup/options.dart';
 import 'package:sadhana/setup/routes.dart';
@@ -34,6 +35,7 @@ class _SadhanaAppState extends State<SadhanaApp> {
     });
     _getUserSelectedTheme();
     checkForUserLoggedIn();
+    FireBaseNotificationSetup.initToHandleForegroundNotification(context);
   }
 
   void checkForUserLoggedIn() {

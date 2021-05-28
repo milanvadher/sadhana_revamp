@@ -1,3 +1,4 @@
+/*
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -204,3 +205,4 @@ class OneSignalNotification {
     print("Sent notification with response: $response");
   }
 }
+*/

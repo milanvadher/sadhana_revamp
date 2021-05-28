@@ -140,9 +140,11 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
         selected: event.isAttendanceTaken,
         title: Row(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 5),
-              child: Text(event.eventName ?? ""),
+            Flexible(
+              child: Text(
+                event.eventName ?? "",
+                overflow: TextOverflow.fade,
+              ),
             ),
             !widget.myAttendance && event.isAttendanceTaken
                 ? CircleAvatar(

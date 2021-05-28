@@ -18,10 +18,10 @@ import 'package:sadhana/wsmodel/ws_sadhana_activity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static final _baseServerUrl = 'https://sadhanaapi-dev.dbf.ooo'; //Test
+  static final _baseServerUrl = 'sadhanaapi-dev.dbf.ooo'; //Test
   // static final _baseServerUrl = 'https://sadhanaapi.dbf.ooo';  //Live
-  static final _apiUrl = '$_baseServerUrl/api/method';
-  static final _resourceApiUrl = '$_baseServerUrl/api/resource';
+  static final _apiUrl = '/api/method';
+  static final _resourceApiUrl = '/api/resource';
 
   Map<String, String> headers = {'content-type': 'application/json'};
   bool enableMock = false;
@@ -36,8 +36,9 @@ class ApiService {
   Future<Response> getApi({@required String url}) async {
     await checkLogin();
     String getUrl = _apiUrl + url;
-    print('Get Url:' + getUrl);
-    Response res = await http.get(getUrl, headers: headers);
+    print('Get Url:https://' +  _baseServerUrl + getUrl);
+    var uri = Uri.https(_baseServerUrl, getUrl, {'q': '{http}'});
+    Response res = await http.get(uri, headers: headers);
     print('Response:' + res.body);
     return res;
   }
@@ -50,8 +51,9 @@ class ApiService {
     String postUrl = isResource ? _resourceApiUrl + url : _apiUrl + url;
     await appendCommonDataToBody(data);
     String body = json.encode(data);
-    print('Post Url:' + postUrl + '\tReq:' + body);
-    Response res = await http.post(_apiUrl + url, body: body, headers: headers);
+    print('Post Url:https://' + _baseServerUrl + postUrl + '\tReq:' + body);
+    var uri = Uri.https(_baseServerUrl, postUrl, {'q': '{http}'});
+    Response res = await http.post(uri, body: body, headers: headers);
     print(
         'Response: ${res.body} status code: ${res.statusCode} msg: ${res.reasonPhrase}');
     return res;
@@ -162,7 +164,6 @@ class ApiService {
 
   Future<Response> updateNotificationToken(
       {@required String mhtId,
-      @required String fbToken,
       @required String oneSignalToken}) async {
     Map<String, dynamic> data = {
       'mht_id': mhtId,
@@ -170,6 +171,18 @@ class ApiService {
     };
     Response res =
         await _postApi(url: '/mba.user.save_one_signal_token', data: data);
+    return res;
+  }
+
+  Future<Response> updateFCMNotificationToken(
+      {@required String mhtId,
+        @required String fcmToken}) async {
+    Map<String, dynamic> data = {
+      'mht_id': mhtId,
+      'firebase_token': fcmToken
+    };
+    Response res =
+    await _postApi(url: '/mba.user.save_firebase_token', data: data);
     return res;
   }
 

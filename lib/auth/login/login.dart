@@ -316,7 +316,7 @@ class LoginPageState extends BaseState<LoginPage> {
       } catch (e, s) {
         print(e);
         print(s);
-        CommonFunction.displayErrorDialog(context: context);
+        CommonFunction.displayErrorDialog(context: context, error: e.toString());
       }
       stopOverlay();
     } else {
