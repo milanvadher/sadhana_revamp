@@ -64,7 +64,8 @@ dependencies:
 #  image_cropper: ^1.4.0
   flutter_image_compress: ^1.0.0
   ntp: ^2.0.0
-  file_picker: ^3.0.2+2
+  file_picker: ^1.4.3+1
+#  file_picker: ^3.0.2+2
   #share:
   #  git:
   #    url: https://github.com/d-silveira/flutter-share.git

@@ -284,10 +284,11 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
 
   void _openFileExplorer() async {
     await CommonFunction.tryCatchAsync(context, () async {
-      FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.any);
+      /*FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.any);
       if(result != null && result.paths.isNotEmpty) {
-        String _path = result.paths.first;
-        if(_path != null) {
+        String _path = result.paths.first;*/
+      String _path = await FilePicker.getFilePath(type: FileType.any);
+      if(_path != null) {
           if (_path.endsWith(".db")) {
             await importFile(_path);
             CommonFunction.alertDialog(
@@ -301,9 +302,9 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
             CommonFunction.alertDialog(context: context, msg: "Select Valid File which have extension .db");
           }
         }
-      } else {
+      /*} else {
         // User canceled the picker
-      }
+      }*/
 
     });
   }
