@@ -33,6 +33,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
+  print('data ' + message.data.toString());
+  print('notification ' + message.notification.toString());
 }
 
 /// Create a [AndroidNotificationChannel] for heads up notifications
@@ -55,6 +57,7 @@ class FireBaseNotificationSetup {
     // Set the background messaging handler early on, as a named top-level function
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     subScribeTopic('allUser');
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!subscribed to allUser topic");
     /// Create an Android Notification Channel.
     ///
     /// We use this channel in the `AndroidManifest.xml` file to override the
@@ -71,16 +74,11 @@ class FireBaseNotificationSetup {
       sound: true,
     );
 
-    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage message) {
-      print("@@@@@@@@@@@@@@@@@@@@ inside getInitialMessage $message");
-      if (message != null) {
-        // Navigator.pushNamed(context, '/message', arguments: MessageArguments(message, true));
-      }
-    });
     updateFCMToken();
   }
 
   static void initToHandleForegroundNotification(BuildContext context) {
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
@@ -94,20 +92,33 @@ class FireBaseNotificationSetup {
                 channel.id,
                 channel.name,
                 channel.description,
-                color: Colors.red
+                color: Colors.red,
                 // icon: 'launch_background',
               ),
-            ));
+            ),
+          payload: jsonEncode(message.data),
+        );
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('A new onMessageOpenedApp event was published!');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => EventAttendance(myAttendance: true)),
-      );
+      print('A new onMessageOpenedApp event was published! ' + message.toString());
+      handleOnNotificationClick(message, context);
     });
+
+    FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage message) {
+      print("inside getInitialMessage $message");
+      handleOnNotificationClick(message, context);
+    });
+  }
+
+  static handleOnNotificationClick(RemoteMessage message, BuildContext context) {
+    if(message != null) {
+      if(message.data != null && !AppUtils.isNullOrEmpty(message.data['screen'])) {
+        print('Opening page by notification click ' + message.data['screen']);
+        Navigator.pushNamed(context, message.data['screen']);
+      }
+    }
   }
 
   requestPermission() async {

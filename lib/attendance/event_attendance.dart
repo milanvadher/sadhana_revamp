@@ -23,6 +23,7 @@ import 'model/event.dart';
 class EventAttendance extends StatefulWidget {
   final bool myAttendance;
   final bool isMyAttendanceSummary;
+  static const String routeName = '/event_attendance';
   EventAttendance({this.myAttendance = false, this.isMyAttendanceSummary = false});
   @override
   _EventAttendanceState createState() => _EventAttendanceState();

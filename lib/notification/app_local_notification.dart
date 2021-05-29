@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/utils/apputils.dart';
 
 class AppLocalNotification {
   static final AppLocalNotification _singleton = new AppLocalNotification._internal();
@@ -80,14 +83,26 @@ class AppLocalNotification {
   }
 
   Future<void> onSelectNotification(String payload) async {
-    if (payload != null) {
-      debugPrint('notification payload: ' + payload);
+    debugPrint('notification1 payload: ' + payload);
+    if (!AppUtils.isNullOrEmpty(payload)) {
+      try {
+        dynamic map = jsonDecode(payload);
+        print('map:' + map.toString());
+        if(!AppUtils.isNullOrEmpty(map['screen'])) {
+          print('Opening page by notification click ' + map['screen']);
+          Navigator.pushNamed(_context, map['screen']);
+        }
+      } catch(e) {
+        print(e);
+      }
+
     }
-    CommonFunction.alertDialog(context: _context, msg: "This is test message");
+
+    /*CommonFunction.alertDialog(context: _context, msg: "This is test message");
     await Navigator.push(
       _context,
       MaterialPageRoute(builder: (context) => SecondScreen(payload)),
-    );
+    );*/
   }
 
   Future<void> onDidRecieveLocalNotification(int id, String title, String body, String payload) async {

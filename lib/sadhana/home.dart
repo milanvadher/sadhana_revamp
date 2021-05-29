@@ -11,7 +11,6 @@ import 'package:open_file/open_file.dart';
 import 'package:sadhana/attendance/attendance_utils.dart';
 import 'package:sadhana/attendance/event_attendance.dart';
 import 'package:sadhana/attendance/model/user_access.dart';
-import 'package:sadhana/attendance/model/user_role.dart';
 import 'package:sadhana/background/mbaschedule_check.dart';
 import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';

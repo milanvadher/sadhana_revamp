@@ -30,12 +30,8 @@ class _SadhanaAppState extends State<SadhanaApp> {
       theme: kLightAppTheme,
       platform: defaultTargetPlatform,
     );
-    new Future.delayed(Duration.zero, () {
-      AppLocalNotification.initAppLocalNotification(context);
-    });
     _getUserSelectedTheme();
     checkForUserLoggedIn();
-    FireBaseNotificationSetup.initToHandleForegroundNotification(context);
   }
 
   void checkForUserLoggedIn() {
