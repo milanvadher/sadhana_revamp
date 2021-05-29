@@ -21,6 +21,7 @@ import 'package:sadhana/service/apiservice.dart';
 import 'package:sadhana/utils/app_response_parser.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
+import 'package:sadhana/utils/device_info_utils.dart';
 import 'package:sadhana/wsmodel/appresponse.dart';
 
 /// Define a top-level named handler which background/terminated messages will
@@ -141,10 +142,11 @@ class FireBaseNotificationSetup {
     String token = await FirebaseMessaging.instance.getToken();
     print(' FCM Token $token');
     if(AppUtils.isNullOrEmpty(await AppSharedPrefUtil.getFCMToken()) && !AppUtils.isNullOrEmpty(mhtId)) {
-      Response res = await ApiService().updateFCMNotificationToken(mhtId:mhtId, fcmToken:token);
+      Map<String,dynamic> deviceInfo = await DeviceInfoUtils.getDeviceInfo();
+      Response res = await ApiService().updateFCMNotificationToken(mhtId:mhtId, fcmToken:token, deviceInfo: deviceInfo);
       AppResponse appRes = AppResponseParser.parseResponse(res, context: null);
       if(appRes.isSuccess) {
-        AppSharedPrefUtil.saveFCMToken(token);
+        AppSharedPrefUtil.saveFCMToken(token, deviceInfo);
       }
     }
   }

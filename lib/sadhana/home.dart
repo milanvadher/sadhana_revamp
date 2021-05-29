@@ -75,7 +75,7 @@ class HomePageState extends BaseState<HomePage> {
   bool fillAttendance = false;
   bool fillEventAttendance = false;
   UserAccess userAccess;
-  int androidVersion;
+  // int androidVersion;
   @override
   void initState() {
     super.initState();
@@ -83,9 +83,9 @@ class HomePageState extends BaseState<HomePage> {
   }
 
   loadData() async {
-    if (Platform.isAndroid) {
+    /*if (Platform.isAndroid) {
       androidVersion = await AppUtils.getAndroidOSVersion();
-    }
+    }*/
     new Future.delayed(Duration.zero, () {
       validateMobileDate();
     });
@@ -276,7 +276,7 @@ class HomePageState extends BaseState<HomePage> {
           padding: EdgeInsets.all(10),
           child: Image.asset('images/logo_dada.png'),
         ),
-        title: Text('Sadhana'),
+        title: Text('SadhanaQA'),
         actions: _buildActions(),
       ),
       body: SafeArea(

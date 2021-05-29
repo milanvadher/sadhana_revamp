@@ -176,10 +176,13 @@ class ApiService {
 
   Future<Response> updateFCMNotificationToken(
       {@required String mhtId,
-        @required String fcmToken}) async {
+        @required String fcmToken,
+        Map<String,dynamic> deviceInfo,
+      }) async {
     Map<String, dynamic> data = {
       'mht_id': mhtId,
-      'firebase_token': fcmToken
+      'firebase_token': fcmToken,
+      'device_info': deviceInfo.toString()
     };
     Response res =
     await _postApi(url: '/mba.user.save_firebase_token', data: data);

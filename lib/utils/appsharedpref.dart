@@ -121,8 +121,9 @@ class AppSharedPrefUtil {
     return await getString('token');
   }
 
-  static Future<void> saveFCMToken(String fcmToken) async {
+  static Future<void> saveFCMToken(String fcmToken, Map<String,dynamic> deviceInfo) async {
     await saveString('fcm_token', fcmToken);
+    await saveString('device_info', deviceInfo.toString());
   }
 
   static Future<String> getFCMToken() async {
