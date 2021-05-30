@@ -64,7 +64,7 @@ class _DVDFormState extends State<DVDForm> {
                         child: DropdownButton(
                         isExpanded: true,
                         items: buildDropdownList(),
-                        onChanged: (newVal) => setState(() => dvdInfo = newVal),
+                        onChanged: widget.isReadOnly ? null : (newVal) => setState(() => dvdInfo = newVal),
                         value: dvdInfo,
                   ),
                       ),

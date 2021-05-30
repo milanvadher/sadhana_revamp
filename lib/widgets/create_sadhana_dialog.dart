@@ -408,14 +408,8 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       await sadhanaDAO.insertOrUpdate(sadhana);
       appLocalNotification.scheduleSadhanaDailyAtTime(sadhana);
       widget.onDone(sadhana);
-      CommonFunction.alertDialog(
-          context: context,
-          msg: "Sadhana created successfully, Reopen App to show changes.",
-          doneButtonFn: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          });
-     } else {
+      Navigator.pop(context);
+    } else {
       setState(() {
         _autoValidate = true;
       });
