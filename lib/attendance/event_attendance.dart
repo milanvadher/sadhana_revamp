@@ -23,6 +23,7 @@ import 'model/event.dart';
 class EventAttendance extends StatefulWidget {
   final bool myAttendance;
   final bool isMyAttendanceSummary;
+  static const String routeName = '/event_attendance';
   EventAttendance({this.myAttendance = false, this.isMyAttendanceSummary = false});
   @override
   _EventAttendanceState createState() => _EventAttendanceState();
@@ -140,9 +141,11 @@ class _EventAttendanceState extends BaseState<EventAttendance> {
         selected: event.isAttendanceTaken,
         title: Row(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 5),
-              child: Text(event.eventName ?? ""),
+            Flexible(
+              child: Text(
+                event.eventName ?? "",
+                overflow: TextOverflow.fade,
+              ),
             ),
             !widget.myAttendance && event.isAttendanceTaken
                 ? CircleAvatar(

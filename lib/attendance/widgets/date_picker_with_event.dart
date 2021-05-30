@@ -84,7 +84,8 @@ class _AppCalendarCarouselState extends State<AppCalendarCarousel> {
     final Widget picker = Flexible(
       child: buildCalendar(),
     );
-    final Widget actions = ButtonTheme.bar(
+    final Widget actions = ButtonBarTheme(
+      data: ButtonBarThemeData(alignment: MainAxisAlignment.center),
       child: ButtonBar(
         children: <Widget>[
           FlatButton(
@@ -122,11 +123,14 @@ Future<DateTime> showDatePickerWithEvents(BuildContext context, DateTime selecte
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(children: <Widget>[
-          Builder(
-            builder: (BuildContext context) => AppCalendarCarousel(
-                  selectedDate: selectedDate,
-                  events: events,
-                ),
+          Container(
+            width: 100, // Wasn't working on @rajpar29's device without this
+            child: Builder(
+              builder: (BuildContext context) => AppCalendarCarousel(
+                selectedDate: selectedDate,
+                events: events,
+              ),
+            ),
           )
         ]);
       });

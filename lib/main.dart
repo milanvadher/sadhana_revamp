@@ -1,8 +1,10 @@
 import 'dart:io' show Platform;
 import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sadhana/notification/firebase_notification.dart';
 import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:sadhana/utils/apputils.dart';
 import 'package:sadhana/utils/sync_activity_utlils.dart';
@@ -13,6 +15,7 @@ import 'constant/constant.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FireBaseNotificationSetup.initFirebaseOnAppLaunch();
   if (!Platform.isIOS) {
     await schedulePeriodicSync();
   }

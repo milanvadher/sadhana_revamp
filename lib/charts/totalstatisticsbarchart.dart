@@ -1,6 +1,5 @@
 //import 'dart:math';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:charts_flutter/flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart' as FlutterColor;
 import 'package:intl/intl.dart';
@@ -15,7 +14,7 @@ import 'package:sadhana/utils/chart_utils.dart';
 import 'model/filter_type.dart';
 
 class TotalStatisticsBarChart extends StatefulWidget {
-  final Color color;
+  final charts.Color color;
   final bool isNumeric;
   final String sadhanaName;
   final SadhanaStatistics statistics;
@@ -28,12 +27,12 @@ class TotalStatisticsBarChart extends StatefulWidget {
 }
 
 class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
-  List<Series<dynamic, String>> seriesList;
-  OrdinalViewport viewport;
+  List<charts.Series<dynamic, String>> seriesList;
+  charts.OrdinalViewport viewport;
   FilterType filterType = FilterType.Month;
   int maxValue = 0;
   Brightness theme;
-  Color outSideLabelColor;
+  charts.Color outSideLabelColor;
 
   @override
   void initState() {
@@ -81,12 +80,12 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
       barChartData.add(BarData(xaxis, timeSeries.value, timeSeries.time));
     }
     List<BarData> finalBarChartData = barChartData.reversed.toList();
-    if (finalBarChartData.isNotEmpty) viewport = OrdinalViewport(finalBarChartData.last.xAxis, 8);
+    if (finalBarChartData.isNotEmpty) viewport = charts.OrdinalViewport(finalBarChartData.last.xAxis, 8);
     seriesList = [
-      new Series<BarData, String>(
+      new charts.Series<BarData, String>(
         id: 'Sadhana',
         keyFn: (value, _) => value.time.toString(),
-        colorFn: (_, __) => Color.fromHex(code: widget.color.hexString),
+        colorFn: (_, __) => charts.Color.fromHex(code: widget.color.hexString),
         domainFn: (BarData sales, _) => sales.xAxis,
         measureFn: (BarData sales, _) => sales.yAxis,
         labelAccessorFn: (BarData sales, _) => sales.yAxis == 0 ? '' : sales.yAxis.toString(),
@@ -131,7 +130,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
   @override
   Widget build(BuildContext context) {
     theme = Theme.of(context).brightness;
-    outSideLabelColor = theme == Brightness.light ? Color.black : Color.white;
+    outSideLabelColor = theme == Brightness.light ? charts.Color.black : charts.Color.white;
     return Column(
       children: <Widget>[
         buildTitle(),
@@ -155,7 +154,7 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
     );
   }
 
-  FlutterColor.Color getFlutterColor(Color color) {
+  FlutterColor.Color getFlutterColor(charts.Color color) {
     return FlutterColor.Color.fromARGB(color.a, color.r, color.g, color.b);
   }
 
@@ -191,35 +190,35 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
 
   buildBarChart() {
     return CommonFunction.tryCatchSync(context, () {
-      return BarChart(
+      return charts.BarChart(
         seriesList,
         animate: false,
-        domainAxis: new OrdinalAxisSpec(
+        domainAxis: new charts.OrdinalAxisSpec(
           tickProviderSpec: charts.BasicOrdinalTickProviderSpec(),
-          renderSpec: new SmallTickRendererSpec(
-            labelStyle: new TextStyleSpec(
+          renderSpec: new charts.SmallTickRendererSpec(
+            labelStyle: new charts.TextStyleSpec(
               fontSize: 12,
               color: widget.color,
             ),
-            lineStyle: new LineStyleSpec(
-              color: MaterialPalette.gray.shade500,
+            lineStyle: new charts.LineStyleSpec(
+              color: charts.MaterialPalette.gray.shade500,
             ),
           ),
           viewport: viewport,
         ),
-        primaryMeasureAxis: new NumericAxisSpec(
-          renderSpec: new GridlineRendererSpec(
-              labelStyle: new TextStyleSpec(
+        primaryMeasureAxis: new charts.NumericAxisSpec(
+          renderSpec: new charts.GridlineRendererSpec(
+              labelStyle: new charts.TextStyleSpec(
                 fontSize: 12,
                 color: widget.color,
               ),
-              lineStyle: new LineStyleSpec(
-                color: MaterialPalette.gray.shade500,
+              lineStyle: new charts.LineStyleSpec(
+                color: charts.MaterialPalette.gray.shade500,
               )),
           tickProviderSpec: widget.forHistory ? getDayTickProviderSpec(maxValue) : FilterTypeTickProviderSpec[filterType],
         ),
         behaviors: [
-          SlidingViewport(),
+          charts.SlidingViewport(),
           /*new ChartTitle(
           'Total',
           behaviorPosition: BehaviorPosition.top,
@@ -227,14 +226,14 @@ class _TotalStatisticsBarChartState extends State<TotalStatisticsBarChart> {
           innerPadding: 18,
           titleStyleSpec: TextStyleSpec(color: widget.color),
         ),*/
-          new PanAndZoomBehavior(),
+          new charts.PanAndZoomBehavior(),
         ],
         //defaultRenderer: LineRendererConfig(includePoints: true),
         //defaultRenderer: BarLaneRendererConfig(),
-        defaultRenderer: new BarRendererConfig<String>(
+        defaultRenderer: new charts.BarRendererConfig<String>(
           strokeWidthPx: 0.3,
           barRendererDecorator: CustomBarLabelDecorator<String>(
-              labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
+              labelAnchor: CustomBarLabelAnchor.end, outsideLabelStyleSpec: new charts.TextStyleSpec(fontSize: 12, color: outSideLabelColor)),
         ),
       );
     });

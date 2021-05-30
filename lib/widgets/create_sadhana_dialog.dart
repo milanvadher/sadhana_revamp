@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:sadhana/auth/registration/Inputs/number-input.dart';
 import 'package:sadhana/auth/registration/Inputs/radio-input.dart';
 import 'package:sadhana/auth/registration/Inputs/text-input.dart';
+import 'package:sadhana/common.dart';
 import 'package:sadhana/constant/constant.dart';
 import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/sadhanadao.dart';
@@ -407,7 +408,16 @@ class _CreateSadhanaDialogState extends State<CreateSadhanaDialog> {
       await sadhanaDAO.insertOrUpdate(sadhana);
       appLocalNotification.scheduleSadhanaDailyAtTime(sadhana);
       widget.onDone(sadhana);
-      Navigator.pop(context);
+      if (widget.isEditMode)
+        Navigator.pop(context);
+      else
+        CommonFunction.alertDialog(
+            context: context,
+            msg: "Sadhana created successfully, Reopen App to show changes.",
+            doneButtonFn: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
     } else {
       setState(() {
         _autoValidate = true;

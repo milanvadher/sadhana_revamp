@@ -34,6 +34,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:423174894:android:738119d5861b574bfb49ff",
+        "android_client_info": {
+          "package_name": "org.sheelsadhak.sadhanaqa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "423174894-b3lqpcj55qnoq38ibuhu16ssn6cr7842.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzI7dfnlJZc6lIM0mRhSwJaUaK0nO-Dy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "423174894-b3lqpcj55qnoq38ibuhu16ssn6cr7842.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"

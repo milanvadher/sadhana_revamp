@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:csv/csv.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,11 +24,11 @@ class AppFileUtil {
   }
 
   static Future<String> getBackupDir() async {
-    String dir = null;
+    String dir;
     if (Platform.isIOS) {
       dir = (await getApplicationDocumentsDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
     } else {
-      dir = (await getExternalStorageDirectory()).absolute.path + "/$sadhanaDirPath/$backupDirName";
+      dir = (await ExtStorage.getExternalStorageDirectory()) + "/$sadhanaDirPath/$backupDirName";
     }
     new Directory('$dir').createSync(recursive: true);
     return dir;

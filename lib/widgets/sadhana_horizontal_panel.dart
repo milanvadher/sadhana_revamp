@@ -4,6 +4,8 @@ import 'package:sadhana/constant/sadhanatype.dart';
 import 'package:sadhana/dao/activitydao.dart';
 import 'package:sadhana/model/activity.dart';
 import 'package:sadhana/model/sadhana.dart';
+import 'package:sadhana/notification/app_local_notification.dart';
+import 'package:sadhana/notification/firebase_notification.dart';
 import 'package:sadhana/utils/app_setting_util.dart';
 import 'package:sadhana/widgets/checkmarkbutton.dart';
 import 'package:sadhana/widgets/nameheading.dart';
@@ -33,6 +35,11 @@ class _SadhanaHorizontalPanelState extends State<SadhanaHorizontalPanel> {
       setState(() {
         editableDays = appSetting.editableDays;
       });
+    });
+    //Needs at here as facing navigator issue while click on notifications
+    FireBaseNotificationSetup.initToHandleForegroundNotification(context);
+    new Future.delayed(Duration.zero, () {
+      AppLocalNotification.initAppLocalNotification(context);
     });
   }
 

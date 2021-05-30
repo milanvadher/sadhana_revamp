@@ -356,10 +356,16 @@ class SadhanaEditPageState extends State<SadhanaEditPage> with TickerProviderSta
   Future<void> deleteSadhana() async {
     await sadhanaDAO.delete(sadhana.id);
     AppLocalNotification().cancelNotification(sadhana.id);
-    Navigator.pop(context);
-    Navigator.pop(context);
-    if (widget.onDelete != null) widget.onDelete(sadhana.id);
-    main();
+    CommonFunction.alertDialog(
+        context: context,
+        msg: "Sadhana deleted successfully, Reopen App to show changes.",
+        doneButtonFn: () {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Navigator.pop(context);
+          if (widget.onDelete != null) widget.onDelete(sadhana.id);
+          main();
+        });
   }
 
   charts.Color getChartColor(Color color) {

@@ -12,12 +12,12 @@ class Session {
   String date;
   @JsonKey(name: 'group_name')
   String group;
-  @JsonKey(name: 'dvd_type')
+  @JsonKey(name: 'type')
   String dvdType;
-  @JsonKey(name: 'dvd_no')
+  @JsonKey(name: 'number')
   int dvdNo;
-  @JsonKey(name: 'dvd_part')
-  int dvdPart;
+  @JsonKey(name: 'satsang_part') // This is primary key in frappe docs
+  String satsangPart;
   @JsonKey(name: 'remark')
   String remark;
   @JsonKey(name: 'session_type')
@@ -40,10 +40,8 @@ class Session {
 
   @override
   String toString() {
-    return 'Session{name: $name, date: $date, group: $group, dvdType: $dvdType, dvdNo: $dvdNo, dvdPart: $dvdPart, remark: $remark, sessionType: $sessionType, attendance: $attendance}';
+    return 'Session{name: $name, date: $date, group: $group, dvdType: $dvdType, dvdNo: $dvdNo,  remark: $remark, sessionType: $sessionType, attendance: $attendance}';
   }
-
-
 }
 
 @JsonSerializable()
@@ -83,5 +81,4 @@ class Attendance {
   String toString() {
     return 'Attendance{mhtId: $mhtId, name: $name, isPresent: $isPresent, absentReason: $reason}';
   }
-
 }

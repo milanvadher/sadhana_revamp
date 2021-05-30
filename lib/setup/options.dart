@@ -284,25 +284,32 @@ class _AppOptionsPageState extends BaseState<AppOptionsPage> {
 
   void _openFileExplorer() async {
     await CommonFunction.tryCatchAsync(context, () async {
+      /*FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.any);
+      if(result != null && result.paths.isNotEmpty) {
+        String _path = result.paths.first;*/
       String _path = await FilePicker.getFilePath(type: FileType.any);
       if(_path != null) {
-        if (_path.endsWith(".db")) {
-          await importFile(_path);
-          CommonFunction.alertDialog(
-              context: context,
-              msg: "File Imported Successfully, Reopen App to show changes.",
-              doneButtonFn: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              });
-        } else {
-          CommonFunction.alertDialog(context: context, msg: "Select Valid File which have extension .db");
+          if (_path.endsWith(".db")) {
+            await importFile(_path);
+            CommonFunction.alertDialog(
+                context: context,
+                msg: "File Imported Successfully, Reopen App to show changes.",
+                doneButtonFn: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                });
+          } else {
+            CommonFunction.alertDialog(context: context, msg: "Select Valid File which have extension .db");
+          }
         }
-      }
+      /*} else {
+        // User canceled the picker
+      }*/
+
     });
   }
 
-  void importFile(String _path) async {
+  importFile(String _path) async {
     SadhanaDAO sFileDAO = SadhanaDAO.withDBProvider(DBProvider(await DBProvider.getDB(_path)));
     List<Sadhana> sadhanas = await sFileDAO.getAll(withAllActivity: true);
     SadhanaDAO sadhanaDBDAO = SadhanaDAO();

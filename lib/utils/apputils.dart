@@ -15,7 +15,7 @@ import 'package:sadhana/utils/appsharedpref.dart';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:vibration/vibration.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
+// import 'package:device_info/device_info.dart';
 
 class AppUtils {
   static bool equalsIgnoreCase(String string1, String string2) {
@@ -128,11 +128,11 @@ class AppUtils {
     }
   }
 
-  static Future<int> getAndroidOSVersion() async {
+  /*static Future<int> getAndroidOSVersion() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     return androidInfo.version.sdkInt;
-  }
+  }*/
 
   /*static askForPermission() async {
     List<PermissionName> permissions = [PermissionName.Storage];
@@ -166,7 +166,11 @@ class AppUtils {
 
   static Future<bool> askForPermission() async {
     if (Platform.isAndroid) {
-      PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+      if (await Permission.storage.request().isGranted) {
+        // Either the permission was already granted before or the user just granted it.
+        return true;
+      }
+      /*PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
       if (permission != PermissionStatus.granted) {
         Map<PermissionGroup, PermissionStatus> permissions = await PermissionHandler().requestPermissions([PermissionGroup.storage]);
         if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
@@ -174,7 +178,7 @@ class AppUtils {
         }
       } else {
         return true;
-      }
+      }*/
     } else {
       return true;
     }

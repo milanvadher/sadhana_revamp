@@ -66,6 +66,9 @@ class AppResponseParser {
         });
   }
 
+  static reLogin() {
+
+  }
   static _exportDB(BuildContext context) async {
     try {
       void logout2() async {
