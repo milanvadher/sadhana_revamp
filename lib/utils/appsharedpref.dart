@@ -185,6 +185,14 @@ class AppSharedPrefUtil {
   }
 
   static Future<void> saveMBAProfile(Register registerProfile) async {
+    Profile userProfile = await getUserProfile();
+    userProfile.center = registerProfile.center;
+    userProfile.email = registerProfile.email;
+    userProfile.mhtId = registerProfile.mhtId;
+    userProfile.firstName = registerProfile.firstName;
+    userProfile.lastName = registerProfile.lastName;
+    userProfile.mobileNo1 = registerProfile.mobileNo1;
+    await saveUserProfile(userProfile);
     await saveString(SharedPrefConstant.s_register_profile, json.encode(registerProfile.toJson()));
   }
 
